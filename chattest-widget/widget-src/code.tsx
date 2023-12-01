@@ -21,8 +21,6 @@ function ChatWidget() {
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
-
-
     
     const updateUserName = () => {
         if (figma.currentUser && figma.currentUser.name) {
