@@ -95,7 +95,7 @@ function ChatWidget() {
         >
             <AutoLayout 
                 direction="horizontal" 
-                spacing={4} 
+                spacing={100}
                 padding={8} 
                 stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
                 strokeWidth={1} 
@@ -117,7 +117,7 @@ function ChatWidget() {
             </AutoLayout>
             <AutoLayout
                 direction="vertical"
-                spacing={2}
+                spacing={-100} //changed from 1
                 padding={4}
             >
                 {renderMessages()}
@@ -129,18 +129,10 @@ function ChatWidget() {
 function MessageBubble({ message, onReply, onDelete, replyChain }: MessageBubbleProps) {
     const isReply = message.parentId !== null; // Check if the message is a reply
   
-    const bubbleStyles = {
-      marginLeft: isReply ? '16px' : '0', // Indent replies
-    };
-  
-    const spacingStyle = {
-      marginBottom: isReply ? '1px' : '0px', // Adjust spacing for replies and top-level messages
-    };
-  
     return (
       <AutoLayout
         direction="vertical"
-        padding={{ top: 4, bottom: 4, left: isReply ? 32 : 8, right: 8 }} // Increased left padding for replies
+        padding={{ top: 1, bottom: 1, left: isReply ? 32 : 8, right: 8 }} // Increased left padding for replies
       >
         <AutoLayout
           direction="horizontal"
@@ -175,7 +167,7 @@ function MessageBubble({ message, onReply, onDelete, replyChain }: MessageBubble
         {replyChain && (
           <AutoLayout
             direction="vertical"
-            spacing={-100} // Reduced space between reply chains
+            spacing={-100} // Reduced space between reply chains was 100
           >
             {replyChain}
           </AutoLayout>
