@@ -12,9 +12,12 @@ type MessageBubbleProps = {
     onReply: () => void;
     onDelete: () => void;
     replyChain: any; // Or whatever type is appropriate for your replyChain
+    replyToId: number | null; // Add this line
+
   };
 
 function ChatWidget() {
+  console.log("ChatWidget rendered");
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<number | null>('replyToId', null);
     const [messages, setMessages] = useSyncedState<Message[]>('messages', []);
@@ -29,15 +32,16 @@ function ChatWidget() {
       };
     
       const handleAddMessage = () => {
-        console.log('handleAddMessage called');
+        console.log('handleAddMessage called1');
         if (newMessage.trim() !== '') {
             const newId = Date.now();
             const timestampDate = new Date(newId);
             const hours = timestampDate.getHours();
-            const minutes = timestampDate.getMinutes().toString().padStart(2, '0');
+            const minutes = timestampDate.getMinutes();
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
             const ampm = hours >= 12 ? 'PM' : 'AM';
             const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-            const timestampString = `${formattedHours}:${minutes} ${ampm}`;
+            const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
             const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
             const newMessageObject = {
                 id: newId,
@@ -69,15 +73,18 @@ function ChatWidget() {
       };
 
       const renderMessages = (parentId: number | null = null) => {
+        console.log("render")
         return messages
           .filter(message => message.parentId === parentId)
           .map((message) => (
             <MessageBubble
+              
               key={message.id}
               message={message}
               onReply={() => handleReplyToMessage(message.id)}
               onDelete={() => setMessages(messages.filter(m => m.id !== message.id))}
               replyChain={renderMessages(message.id)}
+              replyToId={replyToId} // Pass replyToId as a prop
             />
           ));
       };
@@ -124,55 +131,70 @@ function ChatWidget() {
     );
 }
 
-function MessageBubble({ message, onReply, onDelete, replyChain }: MessageBubbleProps) {
-    const isReply = message.parentId !== null; // Check if the message is a reply
-  
-    return (
+function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: MessageBubbleProps) {
+  console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
+
+  const isReply = message.parentId !== null;
+  const isBeingRepliedTo = replyToId === message.id;
+
+  console.log(`Message ID: ${message.id}, ReplyTo ID: ${replyToId}, Is Being Replied To: ${isBeingRepliedTo}`);
+
+  // Define the style for the message bubble
+  const messageStyle = {
+    fill: isBeingRepliedTo ? "#007AFF" : "#FFFFFF", // Blue if being replied to, otherwise white
+    color: isBeingRepliedTo ? "#FFFFFF" : "#000000", // Text color white if being replied to, otherwise black
+  };
+
+  // Log the message style for debugging
+  console.log(messageStyle);
+
+  return (
+    <AutoLayout
+      direction="vertical"
+      padding={{ top: 1, bottom: 1, left: isReply ? 32 : 8, right: 8 }}
+    >
       <AutoLayout
-        direction="vertical"
-        padding={{ top: 1, bottom: 1, left: isReply ? 32 : 8, right: 8 }} // Increased left padding for replies
+        direction="horizontal"
+        horizontalAlignItems="start"
+        verticalAlignItems="center"
+        spacing={4}
+        padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
+        stroke="#DADCE0"
+        strokeWidth={1}
+        cornerRadius={4}
+        fill={messageStyle.fill} // Apply dynamic background color
       >
-        <AutoLayout
-          direction="horizontal"
-          horizontalAlignItems="start"
-          verticalAlignItems="center"
-          spacing={4}
-          padding={{ top: 4, bottom: 4, left: 4, right: 4 }} // Consistent padding inside the message bubble
-          stroke="#DADCE0"
-          strokeWidth={1}
+        <Text fontSize={14} width="fill-parent" fill={messageStyle.color}>{message.sender}: {message.text}</Text>
+        <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
+        <AutoLayout // Reply button with additional padding
+          fill="#007AFF"
           cornerRadius={4}
-          fill="#FFFFFF"
+          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+          onClick={onReply}
         >
-          <Text fontSize={14} width="fill-parent">{message.sender}: {message.text}</Text>
-          <Text fontSize={12} fill="#777777">{message.timestamp}</Text>
-          <AutoLayout // Reply button with additional padding
-            fill="#007AFF"
-            cornerRadius={4}
-            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-            onClick={onReply}
-          >
-            <Text fontSize={14} fill="#FFFFFF">Reply</Text>
-          </AutoLayout>
-          <AutoLayout // Delete button with additional padding
-            fill="#FF3B30"
-            cornerRadius={4}
-            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-            onClick={onDelete}
-          >
-            <Text fontSize={14} fill="#FFFFFF">Delete</Text>
-          </AutoLayout>
+          <Text fontSize={14} fill="#FFFFFF">Reply</Text>
         </AutoLayout>
-        {replyChain && (
-          <AutoLayout
-            direction="vertical"
-            spacing={-100} // Reduced space between reply chains was 100
-          >
-            {replyChain}
-          </AutoLayout>
-        )}
+        <AutoLayout // Delete button with additional padding
+          fill="#FF3B30"
+          cornerRadius={4}
+          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+          onClick={onDelete}
+        >
+          <Text fontSize={14} fill="#FFFFFF">Delete</Text>
+        </AutoLayout>
       </AutoLayout>
-    );
-  }
+      {replyChain && (
+        <AutoLayout
+          direction="vertical"
+          spacing={-100} // Reduced space between reply chains was 100
+        >
+          {replyChain}
+        </AutoLayout>
+      )}
+    </AutoLayout>
+  );
+}
+
   
   
 
