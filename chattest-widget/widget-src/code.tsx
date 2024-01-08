@@ -15,6 +15,7 @@ type MessageBubbleProps = {
     replyToId: number | null; // Add this line
 
   };
+  
 
 function ChatWidget() {
   console.log("ChatWidget rendered");
@@ -24,6 +25,23 @@ function ChatWidget() {
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
+    const renderMessagesWithScroll = () => {
+    return (
+      <Frame // Use Frame to create a container
+        width="fill-parent" // Ensure the Frame takes the full width of the parent
+        height={500} // Set a fixed height to simulate a 'maxHeight'
+        overflow="scroll" // Allow scrolling for overflow content
+      >
+        <AutoLayout
+          direction="vertical"
+          spacing={-100} // Adjust as needed
+          padding={4}
+        >
+          {renderMessages()}
+        </AutoLayout>
+      </Frame>
+    );
+  };
     
     const updateUserName = () => {
         if (figma.currentUser && figma.currentUser.name) {
@@ -91,21 +109,21 @@ function ChatWidget() {
 
       return (
         <AutoLayout
-            direction="vertical"
-            spacing={8}
-            padding={8}
-            stroke="#DADCE0" // Outline color for the send area
-            strokeWidth={1} // Outline width for the send area
-            cornerRadius={4} // Rounded corners for the send area
-        >
-            <AutoLayout 
-                direction="horizontal" 
-                spacing={100}
-                padding={8} 
-                stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
-                strokeWidth={1} 
-                cornerRadius={4} 
-            >
+      direction="vertical"
+      spacing={8}
+      padding={8}
+      stroke="#DADCE0" // Outline color for the send area
+      strokeWidth={1} // Outline width for the send area
+      cornerRadius={4} // Rounded corners for the send area
+    >
+      <AutoLayout 
+          direction="horizontal" 
+          spacing={100}
+          padding={8} 
+          stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
+          strokeWidth={1} 
+          cornerRadius={4} 
+      >
                 <Input
                     placeholder={inputPlaceholder}
                     value={newMessage}
@@ -126,8 +144,8 @@ function ChatWidget() {
                 padding={4}
             >
                 {renderMessages()}
-            </AutoLayout>
-        </AutoLayout>
+                </AutoLayout>
+    </AutoLayout>
     );
 }
 
@@ -151,21 +169,35 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
   return (
     <AutoLayout
       direction="vertical"
-      padding={{ top: 1, bottom: 1, left: isReply ? 32 : 8, right: 8 }}
+      padding={{ top: 1, bottom: 10, left: isReply ? 32 : 8, right: 8 }}
+      stroke="#D3D3D3" // Light grey outline
+      strokeWidth={1} // Width of the outline
+      cornerRadius={4} // You can adjust the corner radius to suit your design preferences
+      fill={messageStyle.fill}
     >
-      <AutoLayout
+      <AutoLayout // Container for sender and timestamp
         direction="horizontal"
         horizontalAlignItems="start"
         verticalAlignItems="center"
-        spacing={4}
-        padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
-        stroke="#DADCE0"
-        strokeWidth={1}
-        cornerRadius={4}
+        spacing={150}
+        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
+         // Apply dynamic background color
+      >
+        <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
+        <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
+      </AutoLayout>
+      <AutoLayout // Container for the message text
+        direction="horizontal"
+        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
         fill={messageStyle.fill} // Apply dynamic background color
       >
-        <Text fontSize={14} width="fill-parent" fill={messageStyle.color}>{message.sender}: {message.text}</Text>
-        <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
+        <Text> {message.text}</Text>
+      </AutoLayout>
+      <AutoLayout // Container for Reply and Delete buttons
+        direction="horizontal"
+        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
+        spacing={8} // Space between buttons
+      >
         <AutoLayout // Reply button with additional padding
           fill="#007AFF"
           cornerRadius={4}
@@ -182,11 +214,11 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
         >
           <Text fontSize={14} fill="#FFFFFF">Delete</Text>
         </AutoLayout>
-      </AutoLayout>
+        </AutoLayout>
       {replyChain && (
         <AutoLayout
           direction="vertical"
-          spacing={-100} // Reduced space between reply chains was 100
+          spacing={30} // Adjusted space between reply chains
         >
           {replyChain}
         </AutoLayout>
