@@ -15,16 +15,18 @@ type MessageBubbleProps = {
     replyToId: number | null; // Add this line
 
   };
-  
+ 
 
 function ChatWidget() {
-  console.log("ChatWidget rendered");
+    console.log("ChatWidget rendered2");
+   
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<number | null>('replyToId', null);
     const [messages, setMessages] = useSyncedState<Message[]>('messages', []);
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
+    console.log("Current messages:", messages);
     const renderMessagesWithScroll = () => {
     return (
       <Frame // Use Frame to create a container
@@ -42,15 +44,30 @@ function ChatWidget() {
       </Frame>
     );
   };
+  const updateUserName = () => {
+    if (figma.currentUser && figma.currentUser.name) {
+      setUserName(figma.currentUser.name);
+    }
+  };
+  function deleteMessage(messageId: number) {
+    const toDelete = messages.find(m => m.id === messageId)
+    if (toDelete){
+      const currUser = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+      const oldUser = toDelete.sender
+      if (toDelete.sender == currUser){
+        setMessages(messages.filter(m => m.id !== messageId))
+        console.log("deleted", messageId, figma.currentUser,oldUser );
+      }
+      else{
+        console.log("not deleted - wrong user" , messageId,figma.currentUser,oldUser)
+      }
+      
+    }
+   }
     
-    const updateUserName = () => {
-        if (figma.currentUser && figma.currentUser.name) {
-          setUserName(figma.currentUser.name);
-        }
-      };
     
       const handleAddMessage = () => {
-        console.log('handleAddMessage called1');
+        console.log('handleAddMessage called');
         if (newMessage.trim() !== '') {
             const newId = Date.now();
             const timestampDate = new Date(newId);
@@ -100,7 +117,7 @@ function ChatWidget() {
               key={message.id}
               message={message}
               onReply={() => handleReplyToMessage(message.id)}
-              onDelete={() => setMessages(messages.filter(m => m.id !== message.id))}
+              onDelete={() => deleteMessage(message.id)}
               replyChain={renderMessages(message.id)}
               replyToId={replyToId} // Pass replyToId as a prop
             />
@@ -151,6 +168,7 @@ function ChatWidget() {
 
 function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: MessageBubbleProps) {
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
+  
 
   const isReply = message.parentId !== null;
   const isBeingRepliedTo = replyToId === message.id;
