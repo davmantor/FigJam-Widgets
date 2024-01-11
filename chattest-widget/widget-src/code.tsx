@@ -1,11 +1,12 @@
 const { widget } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame } = widget;
 type Message = {
-    id: number;
-    parentId: number | null;
-    text: string;
-    sender: string;
-    timestamp: string;
+  id: number;
+  parentId: number | null;
+  text: string;
+  sender?: string;
+  timestamp?: string;
+  isDeleted?: boolean;
   };
 type MessageBubbleProps = {
     message: Message;
@@ -50,20 +51,21 @@ function ChatWidget() {
     }
   };
   function deleteMessage(messageId: number) {
-    const toDelete = messages.find(m => m.id === messageId)
-    if (toDelete){
-      const currUser = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
-      const oldUser = toDelete.sender
-      if (toDelete.sender == currUser){
-        setMessages(messages.filter(m => m.id !== messageId))
-        console.log("deleted", messageId, figma.currentUser,oldUser );
+    setMessages(messages.map(m => {
+      if (m.id === messageId) {
+        return {
+          id: m.id,
+          parentId: m.parentId,
+          text: "*This message was deleted*",
+          sender: undefined,
+          timestamp: undefined,
+          isDeleted: true
+        };
       }
-      else{
-        console.log("not deleted - wrong user" , messageId,figma.currentUser,oldUser)
-      }
-      
-    }
-   }
+      return m;
+    }));
+   
+  }
     
     
       const handleAddMessage = () => {
@@ -108,21 +110,21 @@ function ChatWidget() {
       };
 
       const renderMessages = (parentId: number | null = null) => {
-        console.log("render")
         return messages
           .filter(message => message.parentId === parentId)
           .map((message) => (
             <MessageBubble
-              
               key={message.id}
               message={message}
               onReply={() => handleReplyToMessage(message.id)}
               onDelete={() => deleteMessage(message.id)}
               replyChain={renderMessages(message.id)}
-              replyToId={replyToId} // Pass replyToId as a prop
+              replyToId={replyToId}
             />
           ));
       };
+      
+      
 
       return (
         <AutoLayout
@@ -193,6 +195,7 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
       cornerRadius={4} // You can adjust the corner radius to suit your design preferences
       fill={messageStyle.fill}
     >
+    {!message.isDeleted && (
       <AutoLayout // Container for sender and timestamp
         direction="horizontal"
         horizontalAlignItems="start"
@@ -201,16 +204,18 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
         padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
          // Apply dynamic background color
       >
-        <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
-        <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
-      </AutoLayout>
+          {message.sender && <Text fontSize={14}>{message.sender}:</Text>}
+          {message.timestamp && <Text fontSize={12}>{message.timestamp}</Text>}
+        </AutoLayout>
+      )}
       <AutoLayout // Container for the message text
         direction="horizontal"
         padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
         fill={messageStyle.fill} // Apply dynamic background color
       >
-        <Text> {message.text}</Text>
+        <Text>{message.isDeleted ? message.text = "*This message was deleted*" : message.text}</Text>
       </AutoLayout>
+      {!message.isDeleted && (
       <AutoLayout // Container for Reply and Delete buttons
         direction="horizontal"
         padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
@@ -233,6 +238,7 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
           <Text fontSize={14} fill="#FFFFFF">Delete</Text>
         </AutoLayout>
         </AutoLayout>
+        )}
       {replyChain && (
         <AutoLayout
           direction="vertical"
