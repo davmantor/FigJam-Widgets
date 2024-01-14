@@ -1,20 +1,26 @@
 const { widget } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame } = widget;
+
 type Message = {
     id: number;
     parentId: number | null;
     text: string;
     sender: string;
     timestamp: string;
-  };
+    edited: boolean;//used to keep tracak of edited status of message
+    deleteConfirm: boolean;
+};
+
 type MessageBubbleProps = {
     message: Message;
     onReply: () => void;
     onDelete: () => void;
+    onEdit: () => void;
+    onDeleteConfirm: () => void;
     replyChain: any; // Or whatever type is appropriate for your replyChain
     replyToId: number | null; // Add this line
-
-  };
+    user: any;//
+};
   
 
 function ChatWidget() {
@@ -25,97 +31,213 @@ function ChatWidget() {
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
+
+    const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
+
+
     const renderMessagesWithScroll = () => {
-    return (
-      <Frame // Use Frame to create a container
-        width="fill-parent" // Ensure the Frame takes the full width of the parent
-        height={500} // Set a fixed height to simulate a 'maxHeight'
-        overflow="scroll" // Allow scrolling for overflow content
-      >
-        <AutoLayout
-          direction="vertical"
-          spacing={-100} // Adjust as needed
-          padding={4}
+      return (
+        <Frame // Use Frame to create a container
+          width="fill-parent" // Ensure the Frame takes the full width of the parent
+          height={500} // Set a fixed height to simulate a 'maxHeight'
+          overflow="scroll" // Allow scrolling for overflow content
         >
-          {renderMessages()}
-        </AutoLayout>
-      </Frame>
-    );
-  };
+          <AutoLayout
+            direction="vertical"
+            spacing={-100} // Adjust as needed
+            padding={4}
+          >
+            {renderMessages()}
+          </AutoLayout>
+        </Frame>
+      );
+    };
     
     const updateUserName = () => {
-        if (figma.currentUser && figma.currentUser.name) {
-          setUserName(figma.currentUser.name);
-        }
-      };
+      if (figma.currentUser && figma.currentUser.name) {
+        setUserName(figma.currentUser.name);
+      }
+    };
     
-      const handleAddMessage = () => {
-        console.log('handleAddMessage called1');
-        if (newMessage.trim() !== '') {
-            const newId = Date.now();
-            const timestampDate = new Date(newId);
-            const hours = timestampDate.getHours();
-            const minutes = timestampDate.getMinutes();
-            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-            const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
-            const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
-            const newMessageObject = {
-                id: newId,
-                parentId: replyToId,
+
+    const handleAddMessage = () => {
+      console.log('handleAddMessage called1');
+      updateUserName();
+      if (newMessage.trim() !== '') {
+        const newId = Date.now();
+        const timestampDate = new Date(newId);
+        const hours = timestampDate.getHours();
+        const minutes = timestampDate.getMinutes();
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+        const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+        const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+              
+        //if we are editing the message go into the if statement, else - reply or add new message
+        if (isEditing) {
+          // Editing an existing message
+          const editedMessages = messages.map(message => {
+            if (message.id === replyToId) {
+              return {
+                ...message,
                 text: newMessage.trim(),
-                sender: currentUserName,
-                timestamp: timestampString,
-            
-            };
-            setMessages([...messages, newMessageObject]); // Add the new message to the messages state
-            setNewMessage(''); // Reset the new message input field
-            setReplyToId(null); // Reset replyToId after message is sent
-            setInputPlaceholder('Type a message...');
-            setInputActive(true); // Simulate active input when a message is added
-            setTimeout(() => setInputActive(false), 2000);
+                edited: true
+              };
+            }
+            return message;
+          });
+          setMessages(editedMessages);
+          setReplyToId(null);//resets reply id
+          setIsEditing(false);//resets editing to false
+        } else {
+          // Sending a new message or replying
+          const newMessageObject = {
+            id: newId,
+            parentId: replyToId,
+            text: newMessage.trim(),
+            sender: currentUserName,
+            timestamp: timestampString,
+            edited: false,
+            deleteConfirm: false
+          };
+          setMessages([...messages, newMessageObject]);
+          setReplyToId(null);
+          setIsEditing(false);//resets editing to false
         }
+              
+        setNewMessage(''); // Reset the new message input field
+        setInputPlaceholder('Type a message...');
+        setInputActive(true); // Simulate active input when a message is added
+        setTimeout(() => setInputActive(false), 2000);
+      }
+
     };
     
 
     const handleReplyToMessage = (id: number) => {
-        setReplyToId(id); // Set the ID of the message being replied to
-        const messageToReply = messages.find(message => message.id === id);
-        if (messageToReply) {
-          setNewMessage(""); // Prepare the reply text
-          setInputPlaceholder(`Reply to "${messageToReply.text}":`); // Update placeholder to indicate replying
-        }
-        setInputActive(true); // Simulate active input when reply is initiated
+      setReplyToId(id); // Set the ID of the message being replied to
+      const messageToReply = messages.find(message => message.id === id);
+      if (messageToReply) {
+        setNewMessage(""); // Prepare the reply text
+        setInputPlaceholder(`Reply to "${messageToReply.text}":`); // Update placeholder to indicate replying
+      }
+      setInputActive(true); // Simulate active input when reply is initiated
+      setTimeout(() => setInputActive(false), 2000);
+      setIsEditing(false); // Set editing mode to false
+    };
+      
+
+
+    const handleDeleteMessage = (id: number) => {
+      // Find the message to delete
+      const messageToDelete = messages.find(message => message.id === id);
+
+      // Check if the message exists
+      if (messageToDelete) {
+        // Update the message with text and sender
+        const updatedMessages = messages.map(message => {
+            if (message.id === id) {
+                return {
+                    ...message,
+                    text: "this message has been deleted",
+                    sender: "Anonymous", 
+                    edited: false,
+                };
+            }
+            return message;
+        });
+
+        // Set the updated messages in the state
+        setMessages(updatedMessages);
+
+        // Clear the replyToId, newMessage, and set input placeholder
+        setReplyToId(null);
+        setNewMessage('');
+        setInputPlaceholder('Type a message...');
+
+        // Simulate active input when reply is initiated
+        setInputActive(true);
         setTimeout(() => setInputActive(false), 2000);
-      };
+      }
 
-      const renderMessages = (parentId: number | null = null) => {
-        console.log("render")
-        return messages
-          .filter(message => message.parentId === parentId)
-          .map((message) => (
-            <MessageBubble
-              
-              key={message.id}
-              message={message}
-              onReply={() => handleReplyToMessage(message.id)}
-              onDelete={() => setMessages(messages.filter(m => m.id !== message.id))}
-              replyChain={renderMessages(message.id)}
-              replyToId={replyToId} // Pass replyToId as a prop
-            />
-          ));
-      };
+    };
 
-      return (
-        <AutoLayout
+    const handleDeleteConfirm = (id: number) => {
+      const messageToDelete = messages.find(message => message.id === id);
+
+      // Check if the message exists
+      if (messageToDelete && messageToDelete.deleteConfirm === false) {
+        setMessages(prevMessages => {
+          return prevMessages.map(message => {
+            if (message.id === id) {
+              return {
+                ...message,
+                deleteConfirm: true,
+              };
+            }
+            return message;
+          });
+        });
+
+      }else{
+        setMessages(prevMessages => {
+          return prevMessages.map(message => {
+            if (message.id === id) {
+              return {
+                ...message,
+                deleteConfirm: false,
+              };
+            }
+            return message;
+          });
+        });
+      }
+
+    };
+
+    const handleEditToMessage = (id: number) => {
+      const messageToEdit = messages.find(message => message.id === id);
+      if (messageToEdit) {
+        setReplyToId(id);
+        setNewMessage(messageToEdit.text);
+        setInputPlaceholder(`Edit message: "${messageToEdit.text}"`);
+        setInputActive(true);
+        setIsEditing(true); // Set editing mode
+        setTimeout(() => setInputActive(false), 2000);
+      }
+    };
+
+    const renderMessages = (parentId: number | null = null) => {
+      console.log("render")
+
+      return messages
+        .filter(message => message.parentId === parentId)
+        .map((message) => (
+          <MessageBubble
+            
+            key={message.id}
+            message={message}
+            onReply={() => handleReplyToMessage(message.id)}
+            onEdit={() => handleEditToMessage(message.id)}
+            onDelete={() => handleDeleteMessage(message.id)}
+            onDeleteConfirm={() => handleDeleteConfirm(message.id)}
+            replyChain={renderMessages(message.id)}
+            replyToId={replyToId} // Pass replyToId as a prop
+            user={userName}// Pass in the current user
+          />
+        ));
+    };
+    //creates the send/typing box and the overall widget
+    return (
+      <AutoLayout
       direction="vertical"
       spacing={8}
       padding={8}
       stroke="#DADCE0" // Outline color for the send area
       strokeWidth={1} // Outline width for the send area
       cornerRadius={4} // Rounded corners for the send area
-    >
+      >
       <AutoLayout 
           direction="horizontal" 
           spacing={100}
@@ -124,32 +246,32 @@ function ChatWidget() {
           strokeWidth={1} 
           cornerRadius={4} 
       >
-                <Input
-                    placeholder={inputPlaceholder}
-                    value={newMessage}
-                    onTextEditEnd={(e) => setNewMessage(e.characters)}
-                />
-                <AutoLayout // Send button with additional styling
-                    fill="#007AFF"
-                    padding={8}
-                    cornerRadius={4}
-                    onClick={handleAddMessage}
-                >
-                    <Text fontSize={14} fill="#FFFFFF">Send</Text>
-                </AutoLayout>
-            </AutoLayout>
-            <AutoLayout
-                direction="vertical"
-                spacing={-100} //changed from 1
-                padding={4}
-            >
-                {renderMessages()}
-                </AutoLayout>
-    </AutoLayout>
+        <Input
+            placeholder={inputPlaceholder}
+            value={newMessage}
+            onTextEditEnd={(e) => setNewMessage(e.characters)}
+        />
+        <AutoLayout // Send button with additional styling
+            fill="#007AFF"
+            padding={8}
+            cornerRadius={4}
+            onClick={handleAddMessage}
+        >
+            <Text fontSize={14} fill="#FFFFFF">Send</Text>
+        </AutoLayout>
+      </AutoLayout>
+        <AutoLayout
+            direction="vertical"
+            spacing={1} //changed from 10
+            padding={4}
+        >
+            {renderMessages()}
+        </AutoLayout>
+      </AutoLayout>
     );
 }
 
-function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: MessageBubbleProps) {
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm}: MessageBubbleProps) {
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
 
   const isReply = message.parentId !== null;
@@ -166,37 +288,57 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
   // Log the message style for debugging
   console.log(messageStyle);
 
+  //variable to hide the delete and edit buttons
+  const isCurrentUserMessage = message.sender === user;
+  //variable to see whether the message has been edited
+  const isEdited = message.edited;
+
+
+  //debugging
+  console.log("edited", isEdited);
+  console.log("user", user);
+  console.log("sender", message.sender);
+  console.log(isCurrentUserMessage);
+
   return (
+
     <AutoLayout
       direction="vertical"
-      padding={{ top: 1, bottom: 10, left: isReply ? 32 : 8, right: 8 }}
+      padding={{ top: 10, bottom: 10, left: isReply ? 32 : 8, right: 8 }}
       stroke="#D3D3D3" // Light grey outline
       strokeWidth={1} // Width of the outline
       cornerRadius={4} // You can adjust the corner radius to suit your design preferences
       fill={messageStyle.fill}
     >
+
       <AutoLayout // Container for sender and timestamp
         direction="horizontal"
         horizontalAlignItems="start"
         verticalAlignItems="center"
         spacing={150}
-        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
+        padding={{ top: 4, bottom: 1, left: 4, right: 4 }}
          // Apply dynamic background color
       >
         <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
         <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
       </AutoLayout>
+
+
       <AutoLayout // Container for the message text
         direction="horizontal"
-        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
+        padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
         fill={messageStyle.fill} // Apply dynamic background color
       >
-        <Text> {message.text}</Text>
+        <Text > {message.text}</Text>
+        {isEdited && <Text fontSize={12} fill="#808080"> (edited)</Text>}
       </AutoLayout>
-      <AutoLayout // Container for Reply and Delete buttons
+
+
+      <AutoLayout // Container for Reply and Delete and Edit buttons
         direction="horizontal"
         padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
         spacing={8} // Space between buttons
+        //maxHeight={60}
       >
         <AutoLayout // Reply button with additional padding
           fill="#007AFF"
@@ -206,24 +348,65 @@ function MessageBubble({ message, onReply, onDelete, replyChain, replyToId }: Me
         >
           <Text fontSize={14} fill="#FFFFFF">Reply</Text>
         </AutoLayout>
+
+        {isCurrentUserMessage && !message.deleteConfirm && (
         <AutoLayout // Delete button with additional padding
           fill="#FF3B30"
           cornerRadius={4}
           padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-          onClick={onDelete}
+          onClick={onDeleteConfirm}
         >
           <Text fontSize={14} fill="#FFFFFF">Delete</Text>
         </AutoLayout>
+        )}
+
+        {isCurrentUserMessage && message.deleteConfirm && (
+          <AutoLayout // Confirm button with additional padding
+            fill="#FFFFFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            onClick={onDelete}
+          >
+            <Text fontSize={14} fill="#FF3B30">Confirm Deletion</Text>
+          </AutoLayout>
+        )}
+
+        {isCurrentUserMessage && message.deleteConfirm && (
+          <AutoLayout // Cancel button with additional padding
+            fill="#FFFFFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            onClick={onDeleteConfirm}
+          >
+            <Text fontSize={14} fill="FF3B30">Cancel</Text>
+          </AutoLayout>
+        )}
+        
+
+        {isCurrentUserMessage && (
+        <AutoLayout // Edit button with additional padding
+          fill="#808080"
+          cornerRadius={4}
+          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+          onClick={onEdit}
+        >
+          <Text fontSize={14} fill="#FFFFFF">Edit</Text>
         </AutoLayout>
+        )}
+      
+      </AutoLayout>
+      
       {replyChain && (
         <AutoLayout
           direction="vertical"
-          spacing={30} // Adjusted space between reply chains
+          spacing={10} // Adjusted space between reply chains
         >
           {replyChain}
         </AutoLayout>
       )}
+
     </AutoLayout>
+
   );
 }
 
