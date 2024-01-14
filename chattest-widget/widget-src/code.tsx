@@ -24,7 +24,8 @@ type MessageBubbleProps = {
   
 
 function ChatWidget() {
-  console.log("ChatWidget rendered");
+    console.log("ChatWidget rendered2");
+   
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<number | null>('replyToId', null);
     const [messages, setMessages] = useSyncedState<Message[]>('messages', []);
@@ -273,6 +274,7 @@ function ChatWidget() {
 
 function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm}: MessageBubbleProps) {
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
+  
 
   const isReply = message.parentId !== null;
   const isBeingRepliedTo = replyToId === message.id;
@@ -310,7 +312,6 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
       cornerRadius={4} // You can adjust the corner radius to suit your design preferences
       fill={messageStyle.fill}
     >
-
       <AutoLayout // Container for sender and timestamp
         direction="horizontal"
         horizontalAlignItems="start"
