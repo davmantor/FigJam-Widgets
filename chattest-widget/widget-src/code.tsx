@@ -325,7 +325,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   const messageDepth = getMessageDepth(message.id);
 
   // Adjust the right padding based on the message depth
-  //const adjustedRightPadding = 150 + (5 * messageDepth);;
+  const adjustedRightPadding = 150 + (3 * messageDepth);;
 
   //debugging
   console.log("edited", isEdited);
@@ -357,8 +357,8 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         direction="horizontal"
         horizontalAlignItems="start"
         verticalAlignItems="center"
-        spacing={155}
-        padding={{ top: 4, bottom: 1, left: 4, right: 4 }}
+        spacing={adjustedRightPadding}
+        padding={{ top: 4, bottom: 1, left: 4}}
          // Apply dynamic background color
       >
         <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
