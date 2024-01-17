@@ -20,6 +20,7 @@ type MessageBubbleProps = {
     replyChain: any; // Or whatever type is appropriate for your replyChain
     replyToId: number | null; // Add this line
     user: any;//
+    getMessageDepth: (messageId: number) => number;
 };
   
 
@@ -208,6 +209,29 @@ function ChatWidget() {
         setTimeout(() => setInputActive(false), 2000);
       }
     };
+    
+    const getMessageDepth = (messageId: number) => {
+      let currentMessage = messages.find(message => message.id === messageId);
+
+        if (!currentMessage) {
+            return 0; // Return 0 if the message is not found
+        }
+
+        let maxDepth = 0;
+        const getDepth = (parentId: number, currentDepth: number) => {
+            messages.forEach(message => {
+                if (message.parentId === parentId) {
+                    getDepth(message.id, currentDepth + 1);
+                }
+            });
+            if (currentDepth > maxDepth) {
+                maxDepth = currentDepth;
+            }
+        };
+
+        getDepth(messageId, 0); // Start recursion with the initial message
+        return maxDepth;
+    };
 
     const renderMessages = (parentId: number | null = null) => {
       console.log("render")
@@ -226,6 +250,7 @@ function ChatWidget() {
             replyChain={renderMessages(message.id)}
             replyToId={replyToId} // Pass replyToId as a prop
             user={userName}// Pass in the current user
+            getMessageDepth={getMessageDepth}
           />
         ));
     };
@@ -237,11 +262,11 @@ function ChatWidget() {
       padding={8}
       stroke="#DADCE0" // Outline color for the send area
       strokeWidth={1} // Outline width for the send area
-      cornerRadius={4} // Rounded corners for the send area
+      cornerRadius={10} // Rounded corners for the send area
       >
       <AutoLayout 
           direction="horizontal" 
-          spacing={100}
+          spacing={100}//changed from 100
           padding={8} 
           stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
           strokeWidth={1} 
@@ -272,7 +297,8 @@ function ChatWidget() {
     );
 }
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm}: MessageBubbleProps) {
+
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth}: MessageBubbleProps) {
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
 
@@ -294,7 +320,12 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   const isCurrentUserMessage = message.sender === user;
   //variable to see whether the message has been edited
   const isEdited = message.edited;
+  
+  // Calculate the depth of the current message
+  const messageDepth = getMessageDepth(message.id);
 
+  // Adjust the right padding based on the message depth
+  const adjustedRightPadding = 150 + (20 * messageDepth);;
 
   //debugging
   console.log("edited", isEdited);
@@ -303,35 +334,47 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   console.log(isCurrentUserMessage);
 
   return (
+    <AutoLayout
+    direction="vertical"
+    >
+      
 
     <AutoLayout
       direction="vertical"
-      padding={{ top: 10, bottom: 10, left: isReply ? 32 : 8, right: 8 }}
+      padding={{ top: 10, bottom: 10, left: 8, right: 8 }}//left: isReply ? 32 :8
       stroke="#D3D3D3" // Light grey outline
       strokeWidth={1} // Width of the outline
       cornerRadius={4} // You can adjust the corner radius to suit your design preferences
       fill={messageStyle.fill}
+      width={"fill-parent"}
+      maxWidth={350}
+      maxHeight={100}
+      
+      
     >
+      
       <AutoLayout // Container for sender and timestamp
         direction="horizontal"
         horizontalAlignItems="start"
         verticalAlignItems="center"
-        spacing={150}
+        spacing={adjustedRightPadding}
         padding={{ top: 4, bottom: 1, left: 4, right: 4 }}
          // Apply dynamic background color
       >
         <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
         <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
       </AutoLayout>
-
+      
 
       <AutoLayout // Container for the message text
         direction="horizontal"
         padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
         fill={messageStyle.fill} // Apply dynamic background color
+
       >
         <Text > {message.text}</Text>
         {isEdited && <Text fontSize={12} fill="#808080"> (edited)</Text>}
+
       </AutoLayout>
 
 
@@ -339,7 +382,6 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         direction="horizontal"
         padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
         spacing={8} // Space between buttons
-        //maxHeight={60}
       >
         <AutoLayout // Reply button with additional padding
           fill="#007AFF"
@@ -362,24 +404,26 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         )}
 
         {isCurrentUserMessage && message.deleteConfirm && (
-          <AutoLayout // Confirm button with additional padding
-            fill="#FFFFFF"
-            cornerRadius={4}
-            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-            onClick={onDelete}
-          >
-            <Text fontSize={14} fill="#FF3B30">Confirm Deletion</Text>
-          </AutoLayout>
-        )}
-
-        {isCurrentUserMessage && message.deleteConfirm && (
           <AutoLayout // Cancel button with additional padding
             fill="#FFFFFF"
             cornerRadius={4}
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onDeleteConfirm}
+            stroke="#808080"
           >
-            <Text fontSize={14} fill="FF3B30">Cancel</Text>
+            <Text fontSize={14} fill="#808080">Cancel</Text>
+          </AutoLayout>
+        )}
+
+        {isCurrentUserMessage && message.deleteConfirm && (
+          <AutoLayout // Confirm button with additional padding
+            fill="#FFFFFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            onClick={onDelete}
+            stroke="#FF3B30"
+          >
+            <Text fontSize={14} fill="#FF3B30">Confirm Deletion</Text>
           </AutoLayout>
         )}
         
@@ -397,10 +441,20 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
       
       </AutoLayout>
       
+      
+
+    </AutoLayout>
+
+    <AutoLayout
+    direction="vertical"
+    padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
+    >
+    
       {replyChain && (
         <AutoLayout
           direction="vertical"
           spacing={10} // Adjusted space between reply chains
+          width={"fill-parent"}
         >
           {replyChain}
         </AutoLayout>
@@ -408,6 +462,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
 
     </AutoLayout>
 
+    </AutoLayout>
   );
 }
 
