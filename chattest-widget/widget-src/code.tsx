@@ -325,7 +325,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   const messageDepth = getMessageDepth(message.id);
 
   // Adjust the right padding based on the message depth
-  const adjustedRightPadding = 150 + (3 * messageDepth);;
+  const adjustedRightPadding = 150 + (4 * messageDepth);;
 
   //debugging
   console.log("edited", isEdited);
@@ -447,7 +447,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
 
     <AutoLayout
     direction="vertical"
-    padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
+    padding={{ top: 10, bottom: 10, left: 8, right: 8 }}
     >
     
       {replyChain && (
