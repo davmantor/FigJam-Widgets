@@ -339,133 +339,144 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   return (
     <AutoLayout
     direction="vertical"
-    >
-      
+    >    
 
-    <AutoLayout
-      direction="vertical"
-      padding={{ top: 10, bottom: 10, left: 8, right: 8 }}//left: isReply ? 32 :8
-      stroke="#D3D3D3" // Light grey outline
-      strokeWidth={1} // Width of the outline
-      cornerRadius={4} // You can adjust the corner radius to suit your design preferences
-      fill={messageStyle.fill}
-      width={"fill-parent"}
-      maxWidth={350}
-      maxHeight={100}
-      
-      
-    >
-      
-      <AutoLayout // Container for sender and timestamp
-        direction="horizontal"
-        horizontalAlignItems="start"
-        verticalAlignItems="center"
-        spacing={adjustedRightPadding}
-        padding={{ top: 4, bottom: 1, left: 4, right: 8}}
-         // Apply dynamic background color
+      <AutoLayout
+        direction="vertical"
+        padding={{ top: 10, bottom: 10, left: 8, right: 8 }}//left: isReply ? 32 :8
+        stroke="#D3D3D3" // Light grey outline
+        strokeWidth={1} // Width of the outline
+        cornerRadius={4} // You can adjust the corner radius to suit your design preferences
+        fill={messageStyle.fill}
+        //width={"fill-parent"}
+        maxWidth={350}
+        //maxHeight={100}
+        
+        
       >
-        <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
-        <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
-      </AutoLayout>
-      
-
-      <AutoLayout // Container for the message text
-        direction="horizontal"
-        padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
-        fill={messageStyle.fill} // Apply dynamic background color
-
-      >
-        <Text > {message.text}</Text>
-        {isEdited && <Text fontSize={12} fill="#808080"> (edited)</Text>}
-
-      </AutoLayout>
-
-
-      <AutoLayout // Container for Reply and Delete and Edit buttons
-        direction="horizontal"
-        padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
-        spacing={8} // Space between buttons
-      >
-        <AutoLayout // Reply button with additional padding
-          fill="#007AFF"
-          cornerRadius={4}
-          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-          onClick={onReply}
+        
+        <AutoLayout // Container for sender and timestamp
+          direction="horizontal"
+          horizontalAlignItems="start"
+          verticalAlignItems="center"
+          spacing={adjustedRightPadding}
+          padding={{ top: 4, bottom: 1, left: 4, right: 8}}
+          // Apply dynamic background color
         >
-          <Text fontSize={14} fill="#FFFFFF">Reply</Text>
+          <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
+          <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
+        </AutoLayout>
+        
+
+        <AutoLayout // Container for the message text
+          direction="horizontal"
+          padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
+          fill={messageStyle.fill} // Apply dynamic background color
+          
+        >
+          <AutoLayout 
+            direction="vertical"
+          >
+            <Text width={280}>
+              {message.text}
+            </Text>
+            
+            {isEdited && (
+              <Text width={60} fontSize={12} fill="#808080">
+                (edited)
+              </Text>
+            )}
+          </AutoLayout>
+            
         </AutoLayout>
 
-        {isCurrentUserMessage && !message.deleteConfirm && (
-        <AutoLayout // Delete button with additional padding
-          fill="#FF3B30"
-          cornerRadius={4}
-          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-          onClick={onDeleteConfirm}
-        >
-          <Text fontSize={14} fill="#FFFFFF">Delete</Text>
-        </AutoLayout>
-        )}
 
-        {isCurrentUserMessage && message.deleteConfirm && (
-          <AutoLayout // Cancel button with additional padding
-            fill="#FFFFFF"
+        <AutoLayout // Container for Reply and Delete and Edit buttons
+          direction="horizontal"
+          padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
+          spacing={8} // Space between buttons
+        >
+          <AutoLayout // Reply button with additional padding
+            fill="#007AFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            onClick={onReply}
+          >
+            <Text fontSize={14} fill="#FFFFFF">Reply</Text>
+          </AutoLayout>
+
+          {isCurrentUserMessage && !message.deleteConfirm && (
+          <AutoLayout // Delete button with additional padding
+            fill="#FF3B30"
             cornerRadius={4}
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onDeleteConfirm}
-            stroke="#808080"
           >
-            <Text fontSize={14} fill="#808080">Cancel</Text>
+            <Text fontSize={14} fill="#FFFFFF">Delete</Text>
           </AutoLayout>
-        )}
+          )}
 
-        {isCurrentUserMessage && message.deleteConfirm && (
-          <AutoLayout // Confirm button with additional padding
-            fill="#FFFFFF"
+          {isCurrentUserMessage && message.deleteConfirm && (
+            <AutoLayout // Cancel button with additional padding
+              fill="#FFFFFF"
+              cornerRadius={4}
+              padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+              onClick={onDeleteConfirm}
+              stroke="#808080"
+            >
+              <Text fontSize={14} fill="#808080">Cancel</Text>
+            </AutoLayout>
+          )}
+
+          {isCurrentUserMessage && message.deleteConfirm && (
+            <AutoLayout // Confirm button with additional padding
+              fill="#FFFFFF"
+              cornerRadius={4}
+              padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+              onClick={onDelete}
+              stroke="#FF3B30"
+            >
+              <Text fontSize={14} fill="#FF3B30">Confirm Deletion</Text>
+            </AutoLayout>
+          )}
+          
+
+          {isCurrentUserMessage && (
+          <AutoLayout // Edit button with additional padding
+            fill="#808080"
             cornerRadius={4}
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-            onClick={onDelete}
-            stroke="#FF3B30"
+            onClick={onEdit}
           >
-            <Text fontSize={14} fill="#FF3B30">Confirm Deletion</Text>
+            <Text fontSize={14} fill="#FFFFFF">Edit</Text>
           </AutoLayout>
-        )}
+          )}
+        
+        </AutoLayout>
         
 
-        {isCurrentUserMessage && (
-        <AutoLayout // Edit button with additional padding
-          fill="#808080"
-          cornerRadius={4}
-          padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
-          onClick={onEdit}
-        >
-          <Text fontSize={14} fill="#FFFFFF">Edit</Text>
-        </AutoLayout>
-        )}
-      
       </AutoLayout>
+
+
+      <AutoLayout
+      direction="vertical"
+      padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
+      >
       
-      
+        {replyChain && (
+          <AutoLayout
+            direction="vertical"
+            spacing={10} // Adjusted space between reply chains
+            width={"fill-parent"}
+          >
+            {replyChain}
+          </AutoLayout>
+        )}
+
+      </AutoLayout>
 
     </AutoLayout>
 
-    <AutoLayout
-    direction="vertical"
-    padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
-    >
-    
-      {replyChain && (
-        <AutoLayout
-          direction="vertical"
-          spacing={10} // Adjusted space between reply chains
-          width={"fill-parent"}
-        >
-          {replyChain}
-        </AutoLayout>
-      )}
-
-    </AutoLayout>
-
-    </AutoLayout>
   );
 }
 
