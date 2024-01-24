@@ -9,7 +9,10 @@ type Message = {
     timestamp: string;
     edited: boolean;//used to keep tracak of edited status of message
     deleteConfirm: boolean;
+    showReplies: boolean;
+    pinned: boolean;
 };
+
 
 type MessageBubbleProps = {
     message: Message;
@@ -17,10 +20,12 @@ type MessageBubbleProps = {
     onDelete: () => void;
     onEdit: () => void;
     onDeleteConfirm: () => void;
+    onShowReplies: () => void;
     replyChain: any; // Or whatever type is appropriate for your replyChain
     replyToId: number | null; // Add this line
     user: any;//
     getMessageDepth: (messageId: number) => number;
+    onPin: (id: number) => void;
 };
   
 
@@ -33,7 +38,6 @@ function ChatWidget() {
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
-
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
 
 
@@ -101,8 +105,11 @@ function ChatWidget() {
             sender: currentUserName,
             timestamp: timestampString,
             edited: false,
-            deleteConfirm: false
+            deleteConfirm: false,
+            showReplies: false,
+            pinned: false,
           };
+
           setMessages([...messages, newMessageObject]);
           setReplyToId(null);
           setIsEditing(false);//resets editing to false
@@ -117,17 +124,31 @@ function ChatWidget() {
     };
     
 
+
     const handleReplyToMessage = (id: number) => {
-      setReplyToId(id); // Set the ID of the message being replied to
-      const messageToReply = messages.find(message => message.id === id);
-      if (messageToReply) {
-        setNewMessage(""); // Prepare the reply text
-        setInputPlaceholder(`Reply to "${messageToReply.text}":`); // Update placeholder to indicate replying
+      // If the clicked message is already the one being replied to, deactivate reply
+      if (replyToId === id) {
+        setReplyToId(null);
+        setNewMessage('');
+        setInputPlaceholder('Type a message...');
+        setInputActive(true); // Simulate active input when reply is initiated
+        setTimeout(() => setInputActive(false), 2000);
+        setIsEditing(false); // Set editing mode to false
+      } else {
+        // Set the ID of the message being replied to
+        setReplyToId(id);
+        const messageToReply = messages.find(message => message.id === id);
+        if (messageToReply) {
+          setNewMessage(""); // Prepare the reply text
+          setInputPlaceholder(`Reply to "${messageToReply.text}":`); // Update placeholder to indicate replying
+        }
+    
+        setInputActive(true); // Simulate active input when reply is initiated
+        setTimeout(() => setInputActive(false), 2000);
+        setIsEditing(false); // Set editing mode to false
       }
-      setInputActive(true); // Simulate active input when reply is initiated
-      setTimeout(() => setInputActive(false), 2000);
-      setIsEditing(false); // Set editing mode to false
     };
+    
       
 
 
@@ -145,6 +166,7 @@ function ChatWidget() {
                     text: "this message has been deleted",
                     sender: "Anonymous", 
                     edited: false,
+                    showReplies: false,
                 };
             }
             return message;
@@ -197,18 +219,64 @@ function ChatWidget() {
       }
 
     };
+    
+
+    const handleShowReplies = (id: number) => {
+      const messageToDelete = messages.find(message => message.id === id);
+
+      // Check if the message exists
+      if (messageToDelete && messageToDelete.showReplies === false) {
+        setMessages(prevMessages => {
+          return prevMessages.map(message => {
+            if (message.id === id) {
+              return {
+                ...message,
+                showReplies: true,
+              };
+            }
+            return message;
+          });
+        });
+
+      }else{
+        setMessages(prevMessages => {
+          return prevMessages.map(message => {
+            if (message.id === id) {
+              return {
+                ...message,
+                showReplies: false,
+              };
+            }
+            return message;
+          });
+        });
+      }
+
+    };
 
     const handleEditToMessage = (id: number) => {
-      const messageToEdit = messages.find(message => message.id === id);
-      if (messageToEdit) {
-        setReplyToId(id);
-        setNewMessage(messageToEdit.text);
-        setInputPlaceholder(`Edit message: "${messageToEdit.text}"`);
-        setInputActive(true);
-        setIsEditing(true); // Set editing mode
+      // If the clicked message is already the one being edited, deactivate edit
+      if (replyToId === id) {
+        setReplyToId(null);
+        setNewMessage('');
+        setInputPlaceholder('Type a message...');
+        setInputActive(true); // Simulate active input when edit is initiated
         setTimeout(() => setInputActive(false), 2000);
+        setIsEditing(false); // Set editing mode to false
+      } else {
+        // Set the ID of the message being edited
+        setReplyToId(id);
+        const messageToEdit = messages.find(message => message.id === id);
+        if (messageToEdit) {
+          setNewMessage(messageToEdit.text);
+          setInputPlaceholder(`Edit message: "${messageToEdit.text}"`);
+          setInputActive(true); // Simulate active input when edit is initiated
+          setTimeout(() => setInputActive(false), 2000);
+          setIsEditing(true); // Set editing mode
+        }
       }
     };
+    
     
     const getMessageDepth = (messageId: number) => {
       let currentMessage = messages.find(message => message.id === messageId);
@@ -233,6 +301,22 @@ function ChatWidget() {
         return maxDepth;
     };
 
+    const handlePinMessage = (id: number) => {
+      if (userName === 'Neel Walse') {
+        setMessages(prevMessages => prevMessages.map(message => {
+            if (message.id === id) {
+                const isPinned = message.pinned !== undefined ? message.pinned : false;
+                return { ...message, pinned: !isPinned }; // Toggle the pinned state
+            }
+            return message;
+        }));
+      } else {
+          // Optionally, handle the case where the user is not 'Ashwin Chembu'
+          console.log("Only Ashwin Chembu can pin messages.");
+    }
+    };
+
+  /*
     const renderMessages = (parentId: number | null = null) => {
       console.log("render")
 
@@ -240,13 +324,13 @@ function ChatWidget() {
         .filter(message => message.parentId === parentId)
         .map((message) => (
           <MessageBubble
-            
             key={message.id}
             message={message}
             onReply={() => handleReplyToMessage(message.id)}
             onEdit={() => handleEditToMessage(message.id)}
             onDelete={() => handleDeleteMessage(message.id)}
             onDeleteConfirm={() => handleDeleteConfirm(message.id)}
+            onShowReplies={() => handleShowReplies(message.id)}
             replyChain={renderMessages(message.id)}
             replyToId={replyToId} // Pass replyToId as a prop
             user={userName}// Pass in the current user
@@ -254,6 +338,39 @@ function ChatWidget() {
           />
         ));
     };
+*/
+
+    const renderMessages = (parentId: number | null = null) => {
+      console.log('render')
+      const sortedMessages = [...messages].sort((a, b) => {
+        if (a.pinned && !b.pinned) {
+            return -1; // a comes before b
+        }
+        if (!a.pinned && b.pinned) {
+            return 1; // a comes after b
+        }
+        return 0; // no change in order
+    });
+      return sortedMessages
+      .filter(message => message.parentId === parentId)
+      .map((message) => (
+          <MessageBubble
+              key={message.id}
+              message={message}
+              onReply={() => handleReplyToMessage(message.id)}
+              onEdit={() => handleEditToMessage(message.id)}
+              onDelete={() => handleDeleteMessage(message.id)}
+              onDeleteConfirm={() => handleDeleteConfirm(message.id)}
+              onShowReplies={() => handleShowReplies(message.id)}
+              replyChain={renderMessages(message.id)}
+              replyToId={replyToId}
+              user={userName}
+              getMessageDepth={getMessageDepth}
+              onPin={handlePinMessage}
+          />
+      ));
+    };
+
     //creates the send/typing box and the overall widget
     return (
       <AutoLayout
@@ -298,7 +415,7 @@ function ChatWidget() {
 }
 
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth}: MessageBubbleProps) {
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin}: MessageBubbleProps) {
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
 
@@ -324,6 +441,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   // Calculate the depth of the current message
   const messageDepth = getMessageDepth(message.id);
 
+
   // Adjust the right padding based on the message depth
   var adjustedRightPadding = 160;
   if (messageDepth == 0){
@@ -336,9 +454,21 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   console.log("sender", message.sender);
   console.log(isCurrentUserMessage);
 
+  //show the sow replies button or not
+  var repliesAvaliable = false;
+  if(messageDepth >= 1){
+    repliesAvaliable = true;
+  }
+
+  var showNoRepliesDeleted = true;
+  if(message.text == "this message has been deleted"){
+    showNoRepliesDeleted = false;
+  }
+
   return (
     <AutoLayout
     direction="vertical"
+
     >    
 
       <AutoLayout
@@ -348,10 +478,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         strokeWidth={1} // Width of the outline
         cornerRadius={4} // You can adjust the corner radius to suit your design preferences
         fill={messageStyle.fill}
-        //width={"fill-parent"}
-        maxWidth={350}
-        //maxHeight={100}
-        
+        width={350}
         
       >
         
@@ -391,19 +518,22 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         </AutoLayout>
 
 
-        <AutoLayout // Container for Reply and Delete and Edit buttons
+        <AutoLayout // Container for Reply and Delete and Edit and Show Replies buttons
           direction="horizontal"
           padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
           spacing={8} // Space between buttons
         >
+          { message.text != "this message has been deleted" && (
           <AutoLayout // Reply button with additional padding
             fill="#007AFF"
             cornerRadius={4}
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onReply}
+
           >
             <Text fontSize={14} fill="#FFFFFF">Reply</Text>
           </AutoLayout>
+          )}
 
           {isCurrentUserMessage && !message.deleteConfirm && (
           <AutoLayout // Delete button with additional padding
@@ -451,29 +581,51 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             <Text fontSize={14} fill="#FFFFFF">Edit</Text>
           </AutoLayout>
           )}
+
+          {isCurrentUserMessage && (
+            <AutoLayout // Pin button
+              fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
+              cornerRadius={4}
+              padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
+              onClick={() => onPin(message.id)}
+            >
+              <Text fontSize={14} fill='#FFFFFF'>{message.pinned ? ' Unpin' : ' Pin'} </Text>
+            </AutoLayout>
+          )}
+
+          {repliesAvaliable && (
+          <AutoLayout // show replies button with additional padding
+            fill={message.showReplies ? '#FFFFFF' : '#000033'}
+            stroke={message.showReplies ? '#000033' : ''}
+            cornerRadius={4}
+            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            onClick={onShowReplies}
+          >
+            <Text fontSize={14} fill={message.showReplies ? '#000033' : '#FFFFFF'}> 
+              {message.showReplies ? `▲ ${messageDepth} Replies` : `▽ ${messageDepth} Replies`} 
+            </Text>
+            
+          </AutoLayout>
+          )}
         
         </AutoLayout>
+
+        
         
 
       </AutoLayout>
 
-
-      <AutoLayout
-      direction="vertical"
-      padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
-      >
       
-        {replyChain && (
-          <AutoLayout
-            direction="vertical"
-            spacing={10} // Adjusted space between reply chains
-            width={"fill-parent"}
-          >
-            {replyChain}
-          </AutoLayout>
-        )}
-
-      </AutoLayout>
+      {message.showReplies && replyChain && (
+        <AutoLayout
+          direction="vertical"
+          //spacing={-100} // Adjusted space between reply chains
+          width={"fill-parent"}
+          padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
+        >
+          {replyChain}
+        </AutoLayout>
+      )}
 
     </AutoLayout>
 
