@@ -48,7 +48,7 @@ function ChatWidget() {
     const renderMessagesWithScroll = () => {
       return (
         <Frame // Use Frame to create a container
-          width="fill-parent" // Ensure the Frame takes the full width of the parent
+          width={400} // Ensure the Frame takes the full width of the parent
           height={500} // Set a fixed height to simulate a 'maxHeight'
           overflow="scroll" // Allow scrolling for overflow content
         >
@@ -61,6 +61,7 @@ function ChatWidget() {
           </AutoLayout>
         </Frame>
       );
+      
     };
     
     const updateUserName = () => {
@@ -562,7 +563,11 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           </AutoLayout>
           )}
 
-          {(isCurrentUserMessage || admin) && !message.deleteConfirm && (
+          {(
+            isCurrentUserMessage || admin) && 
+            message.text != "this message has been deleted" &&
+            !message.deleteConfirm && 
+          (
           <AutoLayout // Delete button with additional padding
             fill="#FF3B30"
             cornerRadius={4}
@@ -573,7 +578,11 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           </AutoLayout>
           )}
 
-          {(isCurrentUserMessage || admin) && message.deleteConfirm && (
+          {(
+            isCurrentUserMessage || admin) && 
+            message.text != "this message has been deleted" && 
+            message.deleteConfirm && 
+          (
             <AutoLayout // Cancel button with additional padding
               fill="#FFFFFF"
               cornerRadius={4}
@@ -585,7 +594,11 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             </AutoLayout>
           )}
 
-          {(isCurrentUserMessage || admin) && message.deleteConfirm && (
+          {(
+            isCurrentUserMessage || admin) && 
+            message.text != "this message has been deleted" && 
+            message.deleteConfirm && 
+          (
             <AutoLayout // Confirm button with additional padding
               fill="#FFFFFF"
               cornerRadius={4}
@@ -609,7 +622,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           </AutoLayout>
           )}
 
-          {admin && (
+          {admin && message.text != "this message has been deleted" && (
             <AutoLayout // Pin button
               fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
               cornerRadius={4}
