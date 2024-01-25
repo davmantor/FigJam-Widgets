@@ -11,6 +11,7 @@ type Message = {
     deleteConfirm: boolean;
     showReplies: boolean;
     pinned: boolean;
+    deleted: boolean;
 };
 
 
@@ -26,6 +27,8 @@ type MessageBubbleProps = {
     user: any;//
     getMessageDepth: (messageId: number) => number;
     onPin: (id: number) => void;
+    totalReplies: number
+    allowedUsersToPin: Set<string>;
 };
   
 
@@ -39,6 +42,7 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
+    const allowedUsersToPin = new Set(['Neel Walse', 'John Doe', 'Alice']);
 
 
     const renderMessagesWithScroll = () => {
@@ -108,6 +112,7 @@ function ChatWidget() {
             deleteConfirm: false,
             showReplies: false,
             pinned: false,
+            deleted: false,
           };
 
           setMessages([...messages, newMessageObject]);
@@ -302,7 +307,7 @@ function ChatWidget() {
     };
 
     const handlePinMessage = (id: number) => {
-      if (userName === 'Neel Walse') {
+      if (allowedUsersToPin.has(userName)) {
         setMessages(prevMessages => prevMessages.map(message => {
             if (message.id === id) {
                 const isPinned = message.pinned !== undefined ? message.pinned : false;
@@ -316,41 +321,37 @@ function ChatWidget() {
     }
     };
 
-  /*
     const renderMessages = (parentId: number | null = null) => {
-      console.log("render")
 
-      return messages
-        .filter(message => message.parentId === parentId)
-        .map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            onReply={() => handleReplyToMessage(message.id)}
-            onEdit={() => handleEditToMessage(message.id)}
-            onDelete={() => handleDeleteMessage(message.id)}
-            onDeleteConfirm={() => handleDeleteConfirm(message.id)}
-            onShowReplies={() => handleShowReplies(message.id)}
-            replyChain={renderMessages(message.id)}
-            replyToId={replyToId} // Pass replyToId as a prop
-            user={userName}// Pass in the current user
-            getMessageDepth={getMessageDepth}
-          />
-        ));
-    };
-*/
-
-    const renderMessages = (parentId: number | null = null) => {
       console.log('render')
+      // Function to calculate the total number of replies for a message
+      const getTotalReplies = (messageId: number): number => {
+        let totalReplies = 0;
+
+        // Recursive function to traverse the message tree
+        const countReplies = (parentId: number | null) => {
+          const replies = messages.filter((message) => message.parentId === parentId);
+          totalReplies += replies.length;
+
+          replies.forEach((reply) => {
+            countReplies(reply.id);
+          });
+        };
+
+        countReplies(messageId);
+
+        return totalReplies;
+      };
+
       const sortedMessages = [...messages].sort((a, b) => {
-        if (a.pinned && !b.pinned) {
-            return -1; // a comes before b
-        }
-        if (!a.pinned && b.pinned) {
-            return 1; // a comes after b
-        }
-        return 0; // no change in order
-    });
+          if (a.pinned && !b.pinned) {
+              return -1; // a comes before b
+          }
+          if (!a.pinned && b.pinned) {
+              return 1; // a comes after b
+          }
+          return 0; // no change in order
+      });
       return sortedMessages
       .filter(message => message.parentId === parentId)
       .map((message) => (
@@ -367,6 +368,8 @@ function ChatWidget() {
               user={userName}
               getMessageDepth={getMessageDepth}
               onPin={handlePinMessage}
+              totalReplies={getTotalReplies(message.id)}
+              allowedUsersToPin={allowedUsersToPin}
           />
       ));
     };
@@ -383,7 +386,7 @@ function ChatWidget() {
       >
       <AutoLayout 
           direction="horizontal" 
-          spacing={100}//changed from 100
+          spacing={120}//changed from 100
           padding={8} 
           stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
           strokeWidth={1} 
@@ -415,8 +418,10 @@ function ChatWidget() {
 }
 
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin}: MessageBubbleProps) {
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin}: MessageBubbleProps) {
+  
   console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
+  
   
 
   const isReply = message.parentId !== null;
@@ -437,9 +442,16 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
   const isCurrentUserMessage = message.sender === user;
   //variable to see whether the message has been edited
   const isEdited = message.edited;
+
+  const isDeleted = message.deleted;
   
   // Calculate the depth of the current message
   const messageDepth = getMessageDepth(message.id);
+
+  var admin = false;
+  if (allowedUsersToPin.has(user)){
+    admin = true;
+  }
 
 
   // Adjust the right padding based on the message depth
@@ -460,74 +472,89 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
     repliesAvaliable = true;
   }
 
+  
   var showNoRepliesDeleted = true;
   if(message.text == "this message has been deleted"){
     showNoRepliesDeleted = false;
   }
 
   return (
+    
     <AutoLayout
     direction="vertical"
 
     >    
-
+    {!isDeleted && (
       <AutoLayout
         direction="vertical"
-        padding={{ top: 10, bottom: 10, left: 8, right: 8 }}//left: isReply ? 32 :8
-        stroke="#D3D3D3" // Light grey outline
-        strokeWidth={1} // Width of the outline
-        cornerRadius={4} // You can adjust the corner radius to suit your design preferences
+        padding={{ top: 10, bottom: isDeleted ? 0 : 10, left: 8, right: 8 }}
+        stroke="#D3D3D3"
+        strokeWidth={1}
+        cornerRadius={4}
         fill={messageStyle.fill}
-        width={350}
-        
+        width={370}
       >
-        
-        <AutoLayout // Container for sender and timestamp
+        <AutoLayout
           direction="horizontal"
-          horizontalAlignItems="start"
-          verticalAlignItems="center"
-          spacing={adjustedRightPadding}
+          width={370}
           padding={{ top: 4, bottom: 1, left: 4, right: 8}}
-          // Apply dynamic background color
         >
-          <Text fontSize={14} fill={messageStyle.color}>{message.sender}:</Text>
-          <Text fontSize={12} fill={messageStyle.color}>{message.timestamp}</Text>
-        </AutoLayout>
-        
+          <AutoLayout
+            direction="horizontal"
+            horizontalAlignItems="start"
+            width={170}
+          >
+            <Text fontSize={14} fill={messageStyle.color} horizontalAlignText={"left"}>
+              {isDeleted ? 'Anonymous' : message.sender}:
+            </Text>
+          </AutoLayout>
+          
+          <AutoLayout
+            direction="horizontal"
+            horizontalAlignItems="end"
+            width={170}
+          >
+            <Text fontSize={12} fill={messageStyle.color} horizontalAlignText={"right"}>
+              {message.timestamp}
+            </Text>
+          </AutoLayout>
 
-        <AutoLayout // Container for the message text
+        </AutoLayout>
+
+       
+        <AutoLayout
           direction="horizontal"
           padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
-          fill={messageStyle.fill} // Apply dynamic background color
-          
+          fill={messageStyle.fill}
         >
           <AutoLayout 
             direction="vertical"
           >
             <Text width={280}>
-              {message.text}
+              {isDeleted ? 'this message has been deleted' : message.text}
             </Text>
             
-            {isEdited && (
+            {isEdited && !isDeleted && (
               <Text width={60} fontSize={12} fill="#808080">
                 (edited)
               </Text>
             )}
           </AutoLayout>
-            
         </AutoLayout>
 
-
+        
         <AutoLayout // Container for Reply and Delete and Edit and Show Replies buttons
           direction="horizontal"
           padding={{ top: 4, bottom: 0, left: 4, right: 4 }}
           spacing={8} // Space between buttons
         >
+
+
           { message.text != "this message has been deleted" && (
           <AutoLayout // Reply button with additional padding
             fill="#007AFF"
             cornerRadius={4}
-            padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
+            padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onReply}
 
           >
@@ -535,7 +562,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           </AutoLayout>
           )}
 
-          {isCurrentUserMessage && !message.deleteConfirm && (
+          {(isCurrentUserMessage || admin) && !message.deleteConfirm && (
           <AutoLayout // Delete button with additional padding
             fill="#FF3B30"
             cornerRadius={4}
@@ -546,7 +573,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           </AutoLayout>
           )}
 
-          {isCurrentUserMessage && message.deleteConfirm && (
+          {(isCurrentUserMessage || admin) && message.deleteConfirm && (
             <AutoLayout // Cancel button with additional padding
               fill="#FFFFFF"
               cornerRadius={4}
@@ -558,7 +585,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             </AutoLayout>
           )}
 
-          {isCurrentUserMessage && message.deleteConfirm && (
+          {(isCurrentUserMessage || admin) && message.deleteConfirm && (
             <AutoLayout // Confirm button with additional padding
               fill="#FFFFFF"
               cornerRadius={4}
@@ -578,11 +605,11 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onEdit}
           >
-            <Text fontSize={14} fill="#FFFFFF">Edit</Text>
+            <Text fontSize={14} fill="#FFFFFF"> Edit </Text>
           </AutoLayout>
           )}
 
-          {isCurrentUserMessage && (
+          {admin && (
             <AutoLayout // Pin button
               fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
               cornerRadius={4}
@@ -602,31 +629,42 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             onClick={onShowReplies}
           >
             <Text fontSize={14} fill={message.showReplies ? '#000033' : '#FFFFFF'}> 
-              {message.showReplies ? `▲ ${messageDepth} Replies` : `▽ ${messageDepth} Replies`} 
+              {message.showReplies ? `▲ ${totalReplies} Replies` : `▽ ${totalReplies} Replies`} 
             </Text>
             
           </AutoLayout>
           )}
-        
-        </AutoLayout>
 
+          { message.text == "this message has been deleted" && (
+          <AutoLayout // fake button with additional padding
+            fill="#FFFFFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
+
+          >
+            <Text fontSize={14} fill="#FFFFFF">FAKE</Text>
+          </AutoLayout>
+          )}
+
+        </AutoLayout>
+        
         
         
 
       </AutoLayout>
-
+)}
       
       {message.showReplies && replyChain && (
         <AutoLayout
           direction="vertical"
           //spacing={-100} // Adjusted space between reply chains
           width={"fill-parent"}
-          padding={{ top: 10, bottom: 10, left: 32, right: 8 }}
+          padding={{ top: isDeleted ? 0 : 10, bottom: isDeleted ? 0 : 10, left: 32, right: 8 }}
         >
           {replyChain}
         </AutoLayout>
       )}
-
+    
     </AutoLayout>
 
   );
