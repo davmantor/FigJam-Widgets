@@ -59,7 +59,7 @@ type MessageBubbleProps = {
   
 
 function ChatWidget() {
-    console.log("ChatWidget rendered2");
+    //console.log("ChatWidget rendered2");
    
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<number | null>('replyToId', null);
@@ -100,7 +100,7 @@ function ChatWidget() {
     
 
     const handleAddMessage = () => {
-      console.log('handleAddMessage called1');
+      //console.log('handleAddMessage called1');
       updateUserName();
 
       if (newMessage.trim() !== '') {
@@ -115,8 +115,9 @@ function ChatWidget() {
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
               
         //if we are editing the message go into the if statement, else - reply or add new message
-        console.log("userName", currentUserName);
-        console.log("userName", currentUserName);
+        console.log("userName", userName);
+        console.log("currentUserName", currentUserName);
+        console.log("----------");
 
         if (isEditing && userName === currentUserName) {
           // Editing an existing message
@@ -410,7 +411,7 @@ function ChatWidget() {
         }));
       } else {
           // Optionally, handle the case where the user is not 'Ashwin Chembu'
-          console.log("Only Ashwin Chembu can pin messages.");
+          //console.log("Only Ashwin Chembu can pin messages.");
     }
     };
 
@@ -580,7 +581,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
     repliesAvaliable = true;
   }
 
-  console.log("users upvoted", message.upvotedUsers);
+  //console.log("users upvoted", message.upvotedUsers);
 
 
   
