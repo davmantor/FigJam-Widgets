@@ -102,6 +102,7 @@ function ChatWidget() {
     const handleAddMessage = () => {
       console.log('handleAddMessage called1');
       updateUserName();
+
       if (newMessage.trim() !== '') {
         const newId = Date.now();
         const timestampDate = new Date(newId);
@@ -134,6 +135,7 @@ function ChatWidget() {
           setReplyToId(null);//resets reply id
           setIsEditing(false);//resets editing to false
         } else if(userName === currentUserName) {
+          updateUserName();
           // Sending a new message or replying
           const newMessageObject = {
             id: newId,
