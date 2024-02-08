@@ -115,11 +115,11 @@ function ChatWidget() {
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
               
         //if we are editing the message go into the if statement, else - reply or add new message
-        console.log("userName", userName);
-        console.log("currentUserName", currentUserName);
-        console.log("----------");
+        //console.log("userName", userName);
+        //console.log("currentUserName", currentUserName);
+        //console.log("----------");
 
-        if (isEditing && userName === currentUserName) {
+        if (isEditing) {
           // Editing an existing message
           const editedMessages = messages.map(message => {
             if (message.id === replyToId) {
@@ -134,7 +134,7 @@ function ChatWidget() {
           setMessages(editedMessages);
           setReplyToId(null);//resets reply id
           setIsEditing(false);//resets editing to false
-        } else if(userName === currentUserName) {
+        } else {
           // Sending a new message or replying
           const newMessageObject = {
             id: newId,
@@ -819,7 +819,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             message.deleteConfirm && 
           (
             <AutoLayout // Confirm button with additional padding
-              fill="#FFFFFF"
+              fill={messageStyle.fill}
               cornerRadius={4}
               padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
               onClick={onDelete}
@@ -862,6 +862,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           (
           <AutoLayout // Delete button with additional padding
             //fill="#FF3B30"
+            fill={messageStyle.fill}
             cornerRadius={4}
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onDeleteConfirm}
@@ -883,7 +884,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             message.deleteConfirm && 
           (
             <AutoLayout // Cancel button with additional padding
-              fill="#FFFFFF"
+              fill={messageStyle.fill}
               cornerRadius={4}
               padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
               onClick={onDeleteConfirm}
