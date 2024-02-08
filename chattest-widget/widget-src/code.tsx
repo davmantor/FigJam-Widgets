@@ -1,6 +1,8 @@
 const { widget } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG} = widget;
 //import '@fontawesome/free-solid-svg-icons';
+
+
 const replyIconSrc = '<svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 17V15.8C20 14.1198 20 13.2798 19.673 12.638C19.3854 12.0735 18.9265 11.6146 18.362 11.327C17.7202 11 16.8802 11 15.2 11H4M4 11L8 7M4 11L8 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
 
 const delete1 = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
@@ -112,7 +114,11 @@ function ChatWidget() {
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
               
         //if we are editing the message go into the if statement, else - reply or add new message
-        if (isEditing) {
+        console.log("userName", currentUserName);
+        console.log("userName", currentUserName);
+
+        if (isEditing && userName === currentUserName) {
+          updateUserName();
           // Editing an existing message
           const editedMessages = messages.map(message => {
             if (message.id === replyToId) {
@@ -127,7 +133,7 @@ function ChatWidget() {
           setMessages(editedMessages);
           setReplyToId(null);//resets reply id
           setIsEditing(false);//resets editing to false
-        } else {
+        } else if(userName === currentUserName) {
           // Sending a new message or replying
           const newMessageObject = {
             id: newId,
@@ -182,33 +188,33 @@ function ChatWidget() {
           }
           return message;
       }));
-  };
+    };
   
-  const onDownvote = (id: number) => {
-      setMessages(prevMessages => prevMessages.map(message => {
-          if (message.id === id) {
-              let newUpvotedUsers = [...message.upvotedUsers];
-              let newDownvotedUsers = [...message.downvotedUsers];
-  
-              const upvoteIndex = newUpvotedUsers.indexOf(userName);
-              const downvoteIndex = newDownvotedUsers.indexOf(userName);
-  
-              if (downvoteIndex > -1) {
-                  // User already downvoted, so remove their downvote
-                  newDownvotedUsers.splice(downvoteIndex, 1);
-              } else {
-                  // User hasn't downvoted, so add their downvote
-                  newDownvotedUsers.push(userName);
-                  if (upvoteIndex > -1) {
-                      // Also remove upvote if it exists
-                      newUpvotedUsers.splice(upvoteIndex, 1);
-                  }
-              }
-              return { ...message, upvotedUsers: newUpvotedUsers, downvotedUsers: newDownvotedUsers };
-          }
-          return message;
-      }));
-  };
+    const onDownvote = (id: number) => {
+        setMessages(prevMessages => prevMessages.map(message => {
+            if (message.id === id) {
+                let newUpvotedUsers = [...message.upvotedUsers];
+                let newDownvotedUsers = [...message.downvotedUsers];
+    
+                const upvoteIndex = newUpvotedUsers.indexOf(userName);
+                const downvoteIndex = newDownvotedUsers.indexOf(userName);
+    
+                if (downvoteIndex > -1) {
+                    // User already downvoted, so remove their downvote
+                    newDownvotedUsers.splice(downvoteIndex, 1);
+                } else {
+                    // User hasn't downvoted, so add their downvote
+                    newDownvotedUsers.push(userName);
+                    if (upvoteIndex > -1) {
+                        // Also remove upvote if it exists
+                        newUpvotedUsers.splice(upvoteIndex, 1);
+                    }
+                }
+                return { ...message, upvotedUsers: newUpvotedUsers, downvotedUsers: newDownvotedUsers };
+            }
+            return message;
+        }));
+    };
   
   
   
@@ -463,7 +469,8 @@ function ChatWidget() {
       ));
     };
 
-    //creates the send/typing box and the overall widget
+    
+
     return (
       <AutoLayout
       direction="vertical"
@@ -494,6 +501,7 @@ function ChatWidget() {
         >
             <Text fontSize={14} fill="#FFFFFF">Send</Text>
         </AutoLayout>
+
       </AutoLayout>
         <AutoLayout
             direction="vertical"
