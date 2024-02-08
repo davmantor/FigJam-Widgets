@@ -119,7 +119,6 @@ function ChatWidget() {
         console.log("userName", currentUserName);
 
         if (isEditing && userName === currentUserName) {
-          updateUserName();
           // Editing an existing message
           const editedMessages = messages.map(message => {
             if (message.id === replyToId) {
@@ -135,7 +134,6 @@ function ChatWidget() {
           setReplyToId(null);//resets reply id
           setIsEditing(false);//resets editing to false
         } else if(userName === currentUserName) {
-          updateUserName();
           // Sending a new message or replying
           const newMessageObject = {
             id: newId,
