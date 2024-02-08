@@ -795,6 +795,18 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             </AutoLayout>
           )}
 
+          {!admin && message.text != "this message has been deleted" && (
+            <AutoLayout // Pin button
+              //fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
+              fill={messageStyle.fill}
+              cornerRadius={4}
+              padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
+              //onClick={() => onPin(message.id)}
+            >
+                  <Text fontSize={14} fill={message.showReplies ? '#007AFF' : '#007AFF'}>     </Text>
+            </AutoLayout>
+          )}
+
           {!repliesAvaliable && (
           <AutoLayout // show replies button with additional padding
             //fill={message.showReplies ? '#FFFFFF' : '#FFFFFF'}
