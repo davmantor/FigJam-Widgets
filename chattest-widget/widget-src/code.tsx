@@ -1,6 +1,7 @@
-const { widget } = figma;
+const { widget, showUI, ui } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG} = widget;
 //import '@fontawesome/free-solid-svg-icons';
+
 
 
 const replyIconSrc = '<svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 17V15.8C20 14.1198 20 13.2798 19.673 12.638C19.3854 12.0735 18.9265 11.6146 18.362 11.327C17.7202 11 16.8802 11 15.2 11H4M4 11L8 7M4 11L8 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
@@ -70,6 +71,25 @@ function ChatWidget() {
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
 
+    function openMessageInputModal(): Promise<void> { // Specify the function returns a Promise<void>
+      // Return a new promise
+      return new Promise<void>((resolve, reject) => { // Explicitly declare Promise<void>
+        // Define the size and HTML content for the modal
+        figma.showUI(__html__, { width: 400, height: 300 });
+    
+        // Listen for messages from the modal
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'new-message') {
+            const messageText = msg.payload;
+            handleAddMessage(messageText);
+            resolve();
+          } else if (msg.type === 'close-plugin') {
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          }
+        };
+      });
+    }
 
     /*
     const renderMessagesWithScroll = () => {
@@ -91,6 +111,40 @@ function ChatWidget() {
       
     };
     */
+   
+    const handleEditToMessage = (id: number): Promise<void> => {
+      return new Promise<void>((resolve, reject) => {
+        const messageToEdit = messages.find(message => message.id === id);
+        if (messageToEdit) {
+          // Open the UI modal with the message content
+          figma.showUI(__html__, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
+    
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              // Process the updated message text
+              const updatedText = msg.payload;
+              const updatedMessages = messages.map(message => {
+                if (message.id === id) {
+                  return { ...message, text: updatedText, edited: true };
+                }
+                return message;
+              });
+              setMessages(updatedMessages);
+              figma.closePlugin();
+              resolve(); // Resolve the promise when the message is updated, no value needed
+            } else if (msg.type === 'cancel-edit') {
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+          resolve(); // Optionally resolve the promise here, since the action is completed
+        }
+          };
+        } else {
+          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+        }
+      });
+    };
     
     const updateUserName = () => {
       if (figma.currentUser && figma.currentUser.name) {
@@ -99,11 +153,12 @@ function ChatWidget() {
     };
     
 
-    const handleAddMessage = () => {
-      //console.log('handleAddMessage called1');
-      updateUserName();
+    
 
-      if (newMessage.trim() !== '') {
+    const handleAddMessage = (messageText: string) => {
+      updateUserName(); // Assumes you have a function to set/update the userName
+    
+      if (messageText.trim() !== '') {
         const newId = Date.now();
         const timestampDate = new Date(newId);
         const hours = timestampDate.getHours();
@@ -113,56 +168,26 @@ function ChatWidget() {
         const formattedHours = hours % 12 || 12; // Convert to 12-hour format
         const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
-              
-        //if we are editing the message go into the if statement, else - reply or add new message
-        //console.log("userName", userName);
-        //console.log("currentUserName", currentUserName);
-        //console.log("----------");
-
-        if (isEditing) {
-          // Editing an existing message
-          const editedMessages = messages.map(message => {
-            if (message.id === replyToId) {
-              return {
-                ...message,
-                text: newMessage.trim(),
-                edited: true
-              };
-            }
-            return message;
-          });
-          setMessages(editedMessages);
-          setReplyToId(null);//resets reply id
-          setIsEditing(false);//resets editing to false
-        } else {
-          // Sending a new message or replying
-          const newMessageObject = {
-            id: newId,
-            parentId: replyToId,
-            text: newMessage.trim(),
-            sender: currentUserName,
-            timestamp: timestampString,
-            edited: false,
-            deleteConfirm: false,
-            showReplies: false,
-            pinned: false,
-            deleted: false,
-            upvotedUsers: [],
-            downvotedUsers: [],
-          };
-
-          setMessages([...messages, newMessageObject]);
-          setReplyToId(null);
-          setIsEditing(false);//resets editing to false
-        }
-              
-        setNewMessage(''); // Reset the new message input field
-        setInputPlaceholder('Type a message...');
-        setInputActive(true); // Simulate active input when a message is added
-        setTimeout(() => setInputActive(false), 2000);
+        
+        const newMessageObject = {
+          id: newId,
+          parentId: null, // Assuming direct messages have no parent; adjust if implementing replies
+          text: messageText.trim(),
+          sender: currentUserName,
+          timestamp: timestampString,
+          edited: false, // New messages are not edited at creation
+          deleteConfirm: false, // Initial state for deletion confirmation
+          showReplies: false, // Initial state for showing replies
+          pinned: false, // Initial pinned state
+          deleted: false, // Initial deletion state
+          upvotedUsers: [], // Initial upvote state
+          downvotedUsers: [], // Initial downvote state
+        };
+    
+        setMessages([...messages, newMessageObject]); // Append the new message to the current messages state
       }
-
     };
+    
     
    
     const onUpvote = (id: number) => {
@@ -221,29 +246,63 @@ function ChatWidget() {
   
   
 
-    const handleReplyToMessage = (id: number) => {
-      // If the clicked message is already the one being replied to, deactivate reply
-      if (replyToId === id) {
-        setReplyToId(null);
-        setNewMessage('');
-        setInputPlaceholder('Type a message...');
-        setInputActive(true); // Simulate active input when reply is initiated
-        setTimeout(() => setInputActive(false), 2000);
-        setIsEditing(false); // Set editing mode to false
-      } else {
-        // Set the ID of the message being replied to
-        setReplyToId(id);
-        const messageToReply = messages.find(message => message.id === id);
-        if (messageToReply) {
-          setNewMessage(""); // Prepare the reply text
-          setInputPlaceholder(`Reply to "${messageToReply.text}":`); // Update placeholder to indicate replying
+    // This function is triggered when a user clicks to reply to a message.
+const handleReplyToMessage = async (id: number) => {
+        const newId = Date.now();
+        const timestampDate = new Date(newId);
+        const hours = timestampDate.getHours();
+        const minutes = timestampDate.getMinutes();
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+        const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+        const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+  // Find the message being replied to
+  const messageToReply = messages.find(message => message.id === id);
+  
+  if (messageToReply) {
+    // Open the UI for entering a reply message
+    figma.showUI(__html__, { width: 400, height: 300 });
+    // Send the original message text to the UI, indicating a reply action
+    figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
+
+    return new Promise<void>((resolve, reject) => {
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'send-reply') {
+          // Extract the reply message text from the UI response
+          const replyText = msg.payload;
+          // Create a new message object for the reply
+          const newMessage: Message = {
+            id: Date.now(), // Generate a unique ID for the new message
+            parentId: id, // Set the parent ID to link the reply to the original message
+            text: replyText,
+            sender: userName, // Assuming you have a variable for the current user's name
+            timestamp: timestampString, // Format the timestamp as needed
+            edited: false, // New messages are not edited
+            deleteConfirm: false, // Initial state for delete confirmation
+            showReplies: false, // Initial state for showing replies
+            pinned: false, // Initial pinned state
+            deleted: false, // Initial deletion state
+            upvotedUsers: [], // Initial upvote state
+            downvotedUsers: [], // Initial downvote state
+          };
+
+          // Update the messages state to include the new reply
+          setMessages(prevMessages => [...prevMessages, newMessage]);
+          resolve();
+        } else if (msg.type === 'close-plugin') {
+          // Handle the case where the plugin UI is closed without sending a reply
+          reject('Reply action was cancelled.');
         }
-    
-        setInputActive(true); // Simulate active input when reply is initiated
-        setTimeout(() => setInputActive(false), 2000);
-        setIsEditing(false); // Set editing mode to false
-      }
-    };
+      };
+    });
+  } else {
+    // Handle the case where the message to reply to wasn't found
+    console.error('Message to reply to was not found.');
+    return Promise.reject('Message to reply to was not found.');
+  }
+};
+
     
   
 
@@ -350,30 +409,7 @@ function ChatWidget() {
 
     };
 
-    const handleEditToMessage = (id: number) => {
-      // If the clicked message is already the one being edited, deactivate edit
-      updateUserName();
-
-      if (replyToId === id) {
-        setReplyToId(null);
-        setNewMessage('');
-        setInputPlaceholder('Type a message...');
-        setInputActive(true); // Simulate active input when edit is initiated
-        setTimeout(() => setInputActive(false), 2000);
-        setIsEditing(false); // Set editing mode to false
-      } else {
-        // Set the ID of the message being edited
-        setReplyToId(id);
-        const messageToEdit = messages.find(message => message.id === id);
-        if (messageToEdit) {
-          setNewMessage(messageToEdit.text);
-          setInputPlaceholder(`Edit message: "${messageToEdit.text}"`);
-          setInputActive(true); // Simulate active input when edit is initiated
-          setTimeout(() => setInputActive(false), 2000);
-          setIsEditing(true); // Set editing mode
-        }
-      }
-    };
+    
     
     
     
@@ -473,14 +509,7 @@ function ChatWidget() {
     
 
     return (
-      <AutoLayout
-      direction="vertical"
-      spacing={8}
-      padding={8}
-      stroke="#DADCE0" // Outline color for the send area
-      strokeWidth={1} // Outline width for the send area
-      cornerRadius={10} // Rounded corners for the send area
-      >
+      /*
       <AutoLayout 
           direction="horizontal" 
           spacing={210}//changed from 100
@@ -502,8 +531,33 @@ function ChatWidget() {
         >
             <Text fontSize={14} fill="#FFFFFF">Send</Text>
         </AutoLayout>
+      
+       
 
+      </AutoLayout>*/
+      <AutoLayout
+      direction="vertical"
+      spacing={8}
+      padding={8}
+      stroke="#DADCE0" // Outline color for the send area
+      strokeWidth={1} // Outline width for the send area
+      cornerRadius={10} // Rounded corners for the send area
+      >
+      
+    
+      
+      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <AutoLayout
+        direction="horizontal"
+        onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
+        fill="#007AFF" // Example button styling
+        padding={8}
+        cornerRadius={4}
+      >
+        <Text fill="#FFFFFF">Add Message</Text>
       </AutoLayout>
+      {/* Remaining UI elements, like the message display area */}
+    </AutoLayout>
         <AutoLayout
             direction="vertical"
             spacing={1} //changed from 10

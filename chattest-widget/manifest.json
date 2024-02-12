@@ -1,10 +1,12 @@
 {
   "name": "chattest",
-  "id": "1337503751079598964",
+  "id": "1338970910141331132",
   "api": "1.0.0",
   "editorType": ["figjam"],
-  "permissions": ["currentuser"],
+  "permissions": ["currentuser"], 
   "containsWidget": true,
   "main": "dist/code.js",
-  "widgetApi": "1.0.0"
+  "ui": "dist/ui.html", 
+  "widgetApi": "1.0.0",
+  "networkAccess": { "allowedDomains": ["none"] }
 }

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Input</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    textarea {
+      width: calc(100% - 20px); /* Adjust width to account for padding */
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      resize: none; /* Prevents resizing */
+      height: 150px; /* Increased height for better message visibility */
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007AFF; /* A nice blue */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+  </style>
+</head>
+<body>
+  <textarea id="messageInput" placeholder="Type your message here..."></textarea>
+  <button id="sendMessage">Send</button>
+  <button id="cancelButton">Cancel</button>
+
+  <script>
+    // Handle incoming messages for editing or replying
+    window.onmessage = event => {
+      const { type, payload } = event.data.pluginMessage;
+      if (type === 'edit-message') {
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update'; // Change button text to indicate update action
+      } else if (type === 'reply-message') {
+        document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
+        document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...;` // Show reply-to message snippet
+        document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
+      }
+    };
+
+    // Send button click handler
+    document.getElementById('sendMessage').onclick = () => {
+      const message = document.getElementById('messageInput').value.trim();
+      const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
+      parent.postMessage({ pluginMessage: { type: actionType, payload: message } }, '*');
+    };
+    
+    // Cancel button click handler
+    document.getElementById('cancelButton').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'close-plugin' } }, '*');
+    };
+  </script>
+</body>
+</html>
