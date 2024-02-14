@@ -208,7 +208,8 @@ function ChatWidget() {
         messageQueue.push(newMessageObject);
 
         // Call the function to process the queue
-        processMessageQueue();      }
+        processMessageQueue();      
+      }
     };
     
     
@@ -282,50 +283,55 @@ const handleReplyToMessage = async (id: string) => {
         const formattedHours = hours % 12 || 12; // Convert to 12-hour format
         const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
-  // Find the message being replied to
-  const messageToReply = messages.find(message => message.id === id);
-  
-  if (messageToReply) {
-    // Open the UI for entering a reply message
-    figma.showUI(__html__, { width: 400, height: 300 });
-    // Send the original message text to the UI, indicating a reply action
-    figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
+        // Find the message being replied to
+        const messageToReply = messages.find(message => message.id === id);
+        
+        if (messageToReply) {
+          // Open the UI for entering a reply message
+          figma.showUI(__html__, { width: 400, height: 300 });
+          // Send the original message text to the UI, indicating a reply action
+          figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
 
-    return new Promise<void>((resolve, reject) => {
-      figma.ui.onmessage = msg => {
-        if (msg.type === 'send-reply') {
-          // Extract the reply message text from the UI response
-          const replyText = msg.payload;
-          // Create a new message object for the reply
-          const newMessage: Message = {
-            id: newId, // Generate a unique ID for the new message
-            parentId: id, // Set the parent ID to link the reply to the original message
-            text: replyText,
-            sender: userName, // Assuming you have a variable for the current user's name
-            timestamp: timestampString, // Format the timestamp as needed
-            edited: false, // New messages are not edited
-            deleteConfirm: false, // Initial state for delete confirmation
-            showReplies: false, // Initial state for showing replies
-            pinned: false, // Initial pinned state
-            deleted: false, // Initial deletion state
-            upvotedUsers: [], // Initial upvote state
-            downvotedUsers: [], // Initial downvote state
-          };
+          return new Promise<void>((resolve, reject) => {
+            figma.ui.onmessage = msg => {
+              if (msg.type === 'send-reply') {
+                // Extract the reply message text from the UI response
+                const replyText = msg.payload;
+                // Create a new message object for the reply
+                const newMessage: Message = {
+                  id: newId, // Generate a unique ID for the new message
+                  parentId: id, // Set the parent ID to link the reply to the original message
+                  text: replyText,
+                  sender: userName, // Assuming you have a variable for the current user's name
+                  timestamp: timestampString, // Format the timestamp as needed
+                  edited: false, // New messages are not edited
+                  deleteConfirm: false, // Initial state for delete confirmation
+                  showReplies: false, // Initial state for showing replies
+                  pinned: false, // Initial pinned state
+                  deleted: false, // Initial deletion state
+                  upvotedUsers: [], // Initial upvote state
+                  downvotedUsers: [], // Initial downvote state
+                };
 
-          // Update the messages state to include the new reply
-          setMessages(prevMessages => [...prevMessages, newMessage]);
-          resolve();
-        } else if (msg.type === 'close-plugin') {
-          // Handle the case where the plugin UI is closed without sending a reply
-          reject('Reply action was cancelled.');
+                // Update the messages state to include the new reply
+                messageQueue.push(newMessage);
+                // Call the function to process the queue
+                processMessageQueue(); 
+
+                // setMessages(prevMessages => [...prevMessages, newMessage]);
+                     
+                resolve();
+              } else if (msg.type === 'close-plugin') {
+                // Handle the case where the plugin UI is closed without sending a reply
+                reject('Reply action was cancelled.');
+              }
+            };
+          });
+        } else {
+          // Handle the case where the message to reply to wasn't found
+          console.error('Message to reply to was not found.');
+          return Promise.reject('Message to reply to was not found.');
         }
-      };
-    });
-  } else {
-    // Handle the case where the message to reply to wasn't found
-    console.error('Message to reply to was not found.');
-    return Promise.reject('Message to reply to was not found.');
-  }
 };
 
     
@@ -567,6 +573,7 @@ const handleReplyToMessage = async (id: string) => {
       stroke="#DADCE0" // Outline color for the send area
       strokeWidth={1} // Outline width for the send area
       cornerRadius={10} // Rounded corners for the send area
+      onClick={updateUserName}
       >
       
     
