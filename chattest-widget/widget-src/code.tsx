@@ -72,6 +72,7 @@ function ChatWidget() {
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
 
     function openMessageInputModal(): Promise<void> { // Specify the function returns a Promise<void>
+      updateUserName();
       // Return a new promise
       return new Promise<void>((resolve, reject) => { // Explicitly declare Promise<void>
         // Define the size and HTML content for the modal
