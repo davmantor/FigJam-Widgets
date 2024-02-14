@@ -25,8 +25,8 @@ const repliesdown = '<svg fill="#007AFF" height="10px" width="10px" version="1.1
 
 
 type Message = {
-    id: number;
-    parentId: number | null;
+    id: string;
+    parentId: string | null;
     text: string;
     sender: string;
     timestamp: string;
@@ -48,10 +48,10 @@ type MessageBubbleProps = {
     onDeleteConfirm: () => void;
     onShowReplies: () => void;
     replyChain: any; // Or whatever type is appropriate for your replyChain
-    replyToId: number | null; // Add this line
+    replyToId: string | null; // Add this line
     user: any;//
-    getMessageDepth: (messageId: number) => number;
-    onPin: (id: number) => void;
+    getMessageDepth: (messageId: string) => number;
+    onPin: (id: string) => void;
     totalReplies: number
     allowedUsersToPin: Set<string>;
     onUpvote: () => void;
@@ -63,7 +63,7 @@ function ChatWidget() {
     //console.log("ChatWidget rendered2");
    
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
-    const [replyToId, setReplyToId] = useSyncedState<number | null>('replyToId', null);
+    const [replyToId, setReplyToId] = useSyncedState<string | null>('replyToId', null);
     const [messages, setMessages] = useSyncedState<Message[]>('messages', []);
     const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
@@ -112,7 +112,7 @@ function ChatWidget() {
     };
     */
    
-    const handleEditToMessage = (id: number): Promise<void> => {
+    const handleEditToMessage = (id: string): Promise<void> => {
       return new Promise<void>((resolve, reject) => {
         const messageToEdit = messages.find(message => message.id === id);
         if (messageToEdit) {
@@ -151,6 +151,14 @@ function ChatWidget() {
         setUserName(figma.currentUser.name);
       }
     };
+    const generateRandomString = (length = 6) => {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    };
     
 
     
@@ -159,8 +167,11 @@ function ChatWidget() {
       updateUserName(); // Assumes you have a function to set/update the userName
     
       if (messageText.trim() !== '') {
-        const newId = Date.now();
-        const timestampDate = new Date(newId);
+        const timestamp = Date.now(); // Current time in milliseconds
+        const randomString = generateRandomString(); // Generate a random string
+        const newId = `${timestamp}${randomString}${userName}`;
+        console.log(newId);
+        const timestampDate = new Date(timestamp);
         const hours = timestampDate.getHours();
         const minutes = timestampDate.getMinutes();
         const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
@@ -190,7 +201,7 @@ function ChatWidget() {
     
     
    
-    const onUpvote = (id: number) => {
+    const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
               let newUpvotedUsers = [...message.upvotedUsers];
@@ -216,7 +227,7 @@ function ChatWidget() {
       }));
     };
   
-    const onDownvote = (id: number) => {
+    const onDownvote = (id: string) => {
         setMessages(prevMessages => prevMessages.map(message => {
             if (message.id === id) {
                 let newUpvotedUsers = [...message.upvotedUsers];
@@ -247,9 +258,11 @@ function ChatWidget() {
   
 
     // This function is triggered when a user clicks to reply to a message.
-const handleReplyToMessage = async (id: number) => {
-        const newId = Date.now();
-        const timestampDate = new Date(newId);
+const handleReplyToMessage = async (id: string) => {
+        const timestamp = Date.now(); // Current time in milliseconds
+        const randomString = generateRandomString(); // Generate a random string
+        const newId = `${timestamp}${randomString}${userName}`;
+        const timestampDate = new Date(timestamp);
         const hours = timestampDate.getHours();
         const minutes = timestampDate.getMinutes();
         const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
@@ -273,7 +286,7 @@ const handleReplyToMessage = async (id: number) => {
           const replyText = msg.payload;
           // Create a new message object for the reply
           const newMessage: Message = {
-            id: Date.now(), // Generate a unique ID for the new message
+            id: newId, // Generate a unique ID for the new message
             parentId: id, // Set the parent ID to link the reply to the original message
             text: replyText,
             sender: userName, // Assuming you have a variable for the current user's name
@@ -307,7 +320,7 @@ const handleReplyToMessage = async (id: number) => {
   
 
 
-    const handleDeleteMessage = (id: number) => {
+    const handleDeleteMessage = (id: string) => {
       // Find the message to delete
       const messageToDelete = messages.find(message => message.id === id);
 
@@ -342,7 +355,7 @@ const handleReplyToMessage = async (id: number) => {
 
     };
 
-    const handleDeleteConfirm = (id: number) => {
+    const handleDeleteConfirm = (id: string) => {
       const messageToDelete = messages.find(message => message.id === id);
 
       // Check if the message exists
@@ -376,7 +389,7 @@ const handleReplyToMessage = async (id: number) => {
     };
     
 
-    const handleShowReplies = (id: number) => {
+    const handleShowReplies = (id: string) => {
       const messageToDelete = messages.find(message => message.id === id);
 
       // Check if the message exists
@@ -413,7 +426,7 @@ const handleReplyToMessage = async (id: number) => {
     
     
     
-    const getMessageDepth = (messageId: number) => {
+    const getMessageDepth = (messageId: string) => {
       let currentMessage = messages.find(message => message.id === messageId);
 
         if (!currentMessage) {
@@ -421,7 +434,7 @@ const handleReplyToMessage = async (id: number) => {
         }
 
         let maxDepth = 0;
-        const getDepth = (parentId: number, currentDepth: number) => {
+        const getDepth = (parentId: string, currentDepth: number) => {
             messages.forEach(message => {
                 if (message.parentId === parentId) {
                     getDepth(message.id, currentDepth + 1);
@@ -436,7 +449,7 @@ const handleReplyToMessage = async (id: number) => {
         return maxDepth;
     };
 
-    const handlePinMessage = (id: number) => {
+    const handlePinMessage = (id: string) => {
       if (allowedUsersToPin.has(userName)) {
         setMessages(prevMessages => prevMessages.map(message => {
             if (message.id === id) {
@@ -451,15 +464,15 @@ const handleReplyToMessage = async (id: number) => {
     }
     };
 
-    const renderMessages = (parentId: number | null = null) => {
+    const renderMessages = (parentId: string | null = null) => {
 
       //console.log('render')
       // Function to calculate the total number of replies for a message
-      const getTotalReplies = (messageId: number): number => {
+      const getTotalReplies = (messageId: string): number => {
         let totalReplies = 0;
 
         // Recursive function to traverse the message tree
-        const countReplies = (parentId: number | null) => {
+        const countReplies = (parentId: string | null) => {
           const replies = messages.filter((message) => message.parentId === parentId);
           totalReplies += replies.length;
 
