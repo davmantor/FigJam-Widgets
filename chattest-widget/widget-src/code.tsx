@@ -70,9 +70,10 @@ function ChatWidget() {
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
+    let messageQueue: Message[] = [];
+
 
     function openMessageInputModal(): Promise<void> { // Specify the function returns a Promise<void>
-      updateUserName();
       // Return a new promise
       return new Promise<void>((resolve, reject) => { // Explicitly declare Promise<void>
         // Define the size and HTML content for the modal
@@ -160,6 +161,14 @@ function ChatWidget() {
       }
       return result;
     };
+    const processMessageQueue = () => {
+      if (messageQueue.length > 0) {
+        const messageToAdd = messageQueue.shift(); // Get the first message from the queue
+        if (messageToAdd) {
+          setMessages((prevMessages) => [...prevMessages, messageToAdd]); // Add the message to the state
+        }
+      }
+    };
     
 
     
@@ -196,8 +205,10 @@ function ChatWidget() {
           downvotedUsers: [], // Initial downvote state
         };
     
-        setMessages([...messages, newMessageObject]); // Append the new message to the current messages state
-      }
+        messageQueue.push(newMessageObject);
+
+        // Call the function to process the queue
+        processMessageQueue();      }
     };
     
     
