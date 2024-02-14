@@ -47,11 +47,14 @@
   <script>
     // Handle incoming messages for editing or replying
     window.onmessage = event => {
+      console.log("INSIDE MODAL MAIN")
       const { type, payload } = event.data.pluginMessage;
       if (type === 'edit-message') {
+        console.log("MODAL UPDATE");
         document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
         document.getElementById('sendMessage').innerText = 'Update'; // Change button text to indicate update action
       } else if (type === 'reply-message') {
+        console.log("MODAL REPLY");
         document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
         document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...;` // Show reply-to message snippet
         document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
@@ -60,6 +63,7 @@
 
     // Send button click handler
     document.getElementById('sendMessage').onclick = () => {
+      console.log("MODAL SEND");
       const message = document.getElementById('messageInput').value.trim();
       const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
       parent.postMessage({ pluginMessage: { type: actionType, payload: message } }, '*');
@@ -67,6 +71,7 @@
     
     // Cancel button click handler
     document.getElementById('cancelButton').onclick = () => {
+      console.log("MODAL CANCEL");
       parent.postMessage({ pluginMessage: { type: 'close-plugin' } }, '*');
     };
   </script>

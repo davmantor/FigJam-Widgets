@@ -56,6 +56,8 @@ type MessageBubbleProps = {
     allowedUsersToPin: Set<string>;
     onUpvote: () => void;
     onDownvote: () => void; // Add this line
+    onOptionsClick: () => void;
+
 };
   
 
@@ -71,13 +73,19 @@ function ChatWidget() {
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
     let messageQueue: Message[] = [];
+    function isUserAuthorized(userName: string): boolean {
+      // Example implementation: Check if the user is in the list of authorized users
+      const authorizedUsers = allowedUsersToPin;
+      return authorizedUsers.has(userName);
+  }
+    
 
 
     function openMessageInputModal(): Promise<void> { // Specify the function returns a Promise<void>
       // Return a new promise
       return new Promise<void>((resolve, reject) => { // Explicitly declare Promise<void>
         // Define the size and HTML content for the modal
-        figma.showUI(__html__, { width: 400, height: 300 });
+        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
     
         // Listen for messages from the modal
         figma.ui.onmessage = msg => {
@@ -113,17 +121,23 @@ function ChatWidget() {
       
     };
     */
-   
+    function delay(ms: number) {
+      return new Promise( resolve => setTimeout(resolve, ms) );
+  }
     const handleEditToMessage = (id: string): Promise<void> => {
+      console.log("editing");
+      delay(100000);
       return new Promise<void>((resolve, reject) => {
         const messageToEdit = messages.find(message => message.id === id);
         if (messageToEdit) {
           // Open the UI modal with the message content
-          figma.showUI(__html__, { width: 400, height: 300 });
+          console.log("opening modal");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
-    
+          console.log("opened");
           figma.ui.onmessage = msg => {
             if (msg.type === 'update-message') {
+              console.log("updated");
               // Process the updated message text
               const updatedText = msg.payload;
               const updatedMessages = messages.map(message => {
@@ -136,13 +150,16 @@ function ChatWidget() {
               figma.closePlugin();
               resolve(); // Resolve the promise when the message is updated, no value needed
             } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
               reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
             } else if (msg.type === 'close-plugin') {
+              console.log("closed");
           figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
           resolve(); // Optionally resolve the promise here, since the action is completed
         }
           };
         } else {
+          console.log('Message not found.');
           reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
         }
       });
@@ -288,7 +305,7 @@ const handleReplyToMessage = async (id: string) => {
         
         if (messageToReply) {
           // Open the UI for entering a reply message
-          figma.showUI(__html__, { width: 400, height: 300 });
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
           // Send the original message text to the UI, indicating a reply action
           figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
 
@@ -503,7 +520,70 @@ const handleReplyToMessage = async (id: string) => {
 
         return totalReplies;
       };
-
+      const handleOptionsClick = (id: string) => {
+        // Here you can add logic to check if the user is authorized
+        // For example, let's assume you have a function `isUserAuthorized` that checks this
+        if (isUserAuthorized(userName)) {
+            return new Promise<void>((resolve, reject) => {
+                figma.showUI(__uiFiles__.options, { width: 300, height: 200 });
+    
+                // Listen for messages from the options.html iframe
+                figma.ui.onmessage = msg => {
+                    if (msg.type === 'edit-message') {
+                      console.log("calling edit from options");
+                        // Handle edit message action
+                        const messageToEdit = messages.find(message => message.id === id);
+                        if (messageToEdit) {
+                          // Open the UI modal with the message content
+                          console.log("opening modal");
+                          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
+                          console.log("opened");
+                          figma.ui.onmessage = msg => {
+                            if (msg.type === 'update-message') {
+                              console.log("updated");
+                              // Process the updated message text
+                              const updatedText = msg.payload;
+                              const updatedMessages = messages.map(message => {
+                                if (message.id === id) {
+                                  return { ...message, text: updatedText, edited: true };
+                                }
+                                return message;
+                              });
+                              setMessages(updatedMessages);
+                              figma.closePlugin();
+                              resolve(); // Resolve the promise when the message is updated, no value needed
+                            } else if (msg.type === 'cancel-edit') {
+                              console.log("canceled");
+                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                            } else if (msg.type === 'close-plugin') {
+                              console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                        }
+                          };
+                        } else {
+                          console.log('Message not found.');
+                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                        }
+                        
+                    } else if (msg.type === 'delete-message') {
+                        // Handle delete message action
+                        handleDeleteMessage(id);
+                        resolve();
+                    } else if (msg.type === 'pin-message') {
+                        // Handle pin message action
+                        handlePinMessage(id);
+                        resolve();
+                    } else if (msg.type === 'close-options') {
+                        // Handle closing the options iframe
+                        resolve();
+                    }
+                };
+            });
+        }
+    };
+    
       const sortedMessages = [...messages].sort((a, b) => {
           if (a.pinned && !b.pinned) {
               return -1; // a comes before b
@@ -533,6 +613,7 @@ const handleReplyToMessage = async (id: string) => {
               allowedUsersToPin={allowedUsersToPin}
               onUpvote={() => onUpvote(message.id)}
               onDownvote={()=> onDownvote(message.id)}
+              onOptionsClick={() => handleOptionsClick(message.id)}
           />
       ));
     };
@@ -602,7 +683,7 @@ const handleReplyToMessage = async (id: string) => {
 }
 
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote}: MessageBubbleProps) {
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -706,6 +787,11 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             <Text fontSize={14} fill={messageStyle.color} horizontalAlignText={"left"}>
               {isDeleted ? 'Anonymous' : message.sender}:
             </Text>
+            {message.pinned && (
+        <Text fontSize={14} fill="#808080" horizontalAlignText={"left"}>
+            {" - pinned"}
+        </Text>
+    )}
           </AutoLayout>
           
           <AutoLayout
@@ -858,40 +944,18 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             
           </AutoLayout>
           )}
+          
 
-          {admin && message.text != "this message has been deleted" && (
-            <AutoLayout // Pin button
-              //fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
-              cornerRadius={4}
-              padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
-              //onClick={() => onPin(message.id)}
-            >
-              { !message.pinned && (
-              <SVG
-                src={pin}
-                onClick={() => onPin(message.id)}
-              />
-              )}
-              { message.pinned && (
-              <SVG
-                src={pinYES}
-                onClick={() => onPin(message.id)}
-              />
-              )}
-            </AutoLayout>
-          )}
-
-          {!admin && message.text != "this message has been deleted" && (
-            <AutoLayout // Pin button
-              //fill={message.pinned ? '#FFD700' : '#067323'} // Gold for pinned, grey otherwise
-              fill={messageStyle.fill}
-              cornerRadius={4}
-              padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
-              //onClick={() => onPin(message.id)}
-            >
-                  <Text fontSize={14} fill={message.showReplies ? '#007AFF' : '#007AFF'}>     </Text>
-            </AutoLayout>
-          )}
+{admin && (
+                    <AutoLayout
+                        fill="#007AFF"
+                        cornerRadius={4}
+                        padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
+                        onClick={onOptionsClick}
+                    >
+                        <Text fontSize={14} fill="#FFFFFF">O</Text>
+                    </AutoLayout>
+                )}
 
           {!repliesAvaliable && (
           <AutoLayout // show replies button with additional padding

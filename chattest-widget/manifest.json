@@ -6,7 +6,9 @@
   "permissions": ["currentuser"], 
   "containsWidget": true,
   "main": "dist/code.js",
-  "ui": "dist/ui.html", 
+  "ui": {
+    "main": "dist/ui.html", 
+    "options": "dist/options.html"},
   "widgetApi": "1.0.0",
   "networkAccess": { "allowedDomains": ["none"] }
 }
