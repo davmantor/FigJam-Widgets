@@ -57,6 +57,7 @@ type MessageBubbleProps = {
     onUpvote: () => void;
     onDownvote: () => void; // Add this line
     onOptionsClick: () => void;
+    updateUserName: () => void;
 
 };
   
@@ -67,16 +68,18 @@ function ChatWidget() {
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<string | null>('replyToId', null);
     const [messages, setMessages] = useSyncedState<Message[]>('messages', []);
-    const [userName, setUserName] = useSyncedState('userName', 'Anonymous');
+    const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
     let messageQueue: Message[] = [];
+
     function isUserAuthorized(userName: string): boolean {
       // Example implementation: Check if the user is in the list of authorized users
-      const authorizedUsers = allowedUsersToPin;
-      return authorizedUsers.has(userName);
+      updateUserName();
+      console.log(allowedUsersToPin.has(userName));
+      return allowedUsersToPin.has(userName);
   }
     
 
@@ -126,7 +129,7 @@ function ChatWidget() {
   }
     const handleEditToMessage = (id: string): Promise<void> => {
       console.log("editing");
-      delay(100000);
+      delay(10000);
       return new Promise<void>((resolve, reject) => {
         const messageToEdit = messages.find(message => message.id === id);
         if (messageToEdit) {
@@ -140,13 +143,12 @@ function ChatWidget() {
               console.log("updated");
               // Process the updated message text
               const updatedText = msg.payload;
-              const updatedMessages = messages.map(message => {
-                if (message.id === id) {
-                  return { ...message, text: updatedText, edited: true };
-                }
-                return message;
-              });
-              setMessages(updatedMessages);
+              const updatedMessage = { ...messageToEdit, text: updatedText, edited: true };
+                    messageQueue.push(updatedMessage); // Add the updated message to the queue
+                    delay(10000);
+
+                    processMessageQueue(); // Process the message queue
+                    
               figma.closePlugin();
               resolve(); // Resolve the promise when the message is updated, no value needed
             } else if (msg.type === 'cancel-edit') {
@@ -166,9 +168,9 @@ function ChatWidget() {
     };
     
     const updateUserName = () => {
-      if (figma.currentUser && figma.currentUser.name) {
-        setUserName(figma.currentUser.name);
-      }
+      const currentUserName = figma.currentUser ? figma.currentUser.name : 'Unknown User';
+      setUserName(currentUserName);
+      console.log(userName);
     };
     const generateRandomString = (length = 6) => {
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -180,6 +182,7 @@ function ChatWidget() {
     };
     const processMessageQueue = () => {
       if (messageQueue.length > 0) {
+        delay(10000);
         const messageToAdd = messageQueue.shift(); // Get the first message from the queue
         if (messageToAdd) {
           setMessages((prevMessages) => [...prevMessages, messageToAdd]); // Add the message to the state
@@ -223,6 +226,7 @@ function ChatWidget() {
         };
     
         messageQueue.push(newMessageObject);
+        delay(10000);
 
         // Call the function to process the queue
         processMessageQueue();      
@@ -332,6 +336,8 @@ const handleReplyToMessage = async (id: string) => {
 
                 // Update the messages state to include the new reply
                 messageQueue.push(newMessage);
+                delay(10000);
+
                 // Call the function to process the queue
                 processMessageQueue(); 
 
@@ -361,6 +367,7 @@ const handleReplyToMessage = async (id: string) => {
 
       // Check if the message exists
       if (messageToDelete) {
+        messageToDelete.deleted = true;
         // Update the message with text and sender
         const updatedMessages = messages.map(message => {
             if (message.id === id) {
@@ -523,6 +530,8 @@ const handleReplyToMessage = async (id: string) => {
       const handleOptionsClick = (id: string) => {
         // Here you can add logic to check if the user is authorized
         // For example, let's assume you have a function `isUserAuthorized` that checks this
+        updateUserName();
+        console.log("in options:" , userName);
         if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
                 figma.showUI(__uiFiles__.options, { width: 300, height: 200 });
@@ -533,8 +542,9 @@ const handleReplyToMessage = async (id: string) => {
                       console.log("calling edit from options");
                         // Handle edit message action
                         const messageToEdit = messages.find(message => message.id === id);
-                        if (messageToEdit) {
+                        if (messageToEdit && !messageToEdit.deleted) {
                           // Open the UI modal with the message content
+                          console.log(messageToEdit.deleted)
                           console.log("opening modal");
                           figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
                           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
@@ -614,6 +624,7 @@ const handleReplyToMessage = async (id: string) => {
               onUpvote={() => onUpvote(message.id)}
               onDownvote={()=> onDownvote(message.id)}
               onOptionsClick={() => handleOptionsClick(message.id)}
+              updateUserName={() => updateUserName()}
           />
       ));
     };
@@ -683,7 +694,7 @@ const handleReplyToMessage = async (id: string) => {
 }
 
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick}: MessageBubbleProps) {
+function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick, updateUserName}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -722,9 +733,10 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
 
 
   //const isUpvoted = message.upvotedUsers.has(user);
-  
   var admin = false;
+  console.log("USER:" , user);
   if (allowedUsersToPin.has(user)){
+    console.log("inside", admin);
     admin = true;
   }
 
@@ -764,7 +776,6 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
     
 
     >    
-    {!isDeleted && (
       <AutoLayout
         direction="vertical"
         padding={{ top: 10, bottom: isDeleted ? 0 : 10, left: 8, right: 8 }}
@@ -776,28 +787,29 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
       >
         <AutoLayout
           direction="horizontal"
-          width={470}
+          width={430}
           padding={{ top: 4, bottom: 1, left: 4, right: 8}}
         >
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="start"
-            width={160}
+            width={200}
           >
             <Text fontSize={14} fill={messageStyle.color} horizontalAlignText={"left"}>
               {isDeleted ? 'Anonymous' : message.sender}:
             </Text>
             {message.pinned && (
-        <Text fontSize={14} fill="#808080" horizontalAlignText={"left"}>
-            {" - pinned"}
-        </Text>
+        <SVG
+        src={pinYES}
+        onClick={onReply}
+      />
     )}
           </AutoLayout>
           
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="end"
-            width={270}
+            width={220}
           >
             <Text fontSize={12} fill={messageStyle.color} horizontalAlignText={"right"}>
               {message.timestamp}
@@ -976,7 +988,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           
 
           {(
-            isCurrentUserMessage || admin) && 
+            isCurrentUserMessage ) && 
             message.text != "this message has been deleted" && 
             message.deleteConfirm && 
           (
@@ -999,7 +1011,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
 
 
           {(
-            isCurrentUserMessage || admin) && 
+            isCurrentUserMessage) && 
             message.text != "this message has been deleted" && 
             !message.deleteConfirm && 
           (
@@ -1018,7 +1030,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
 
 
           {(
-            isCurrentUserMessage || admin) && 
+            isCurrentUserMessage) && 
             message.text != "this message has been deleted" &&
             !message.deleteConfirm && 
           (
@@ -1041,7 +1053,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
           
 
           {(
-            isCurrentUserMessage || admin) && 
+            isCurrentUserMessage) && 
             message.text != "this message has been deleted" && 
             message.deleteConfirm && 
           (
@@ -1105,7 +1117,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
         
 
       </AutoLayout>
-)}
+
       
       {message.showReplies && replyChain && (
         <AutoLayout

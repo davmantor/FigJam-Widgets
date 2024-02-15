@@ -30,13 +30,35 @@
     </style>
 </head>
 <body>
+    
+
     <div class="container">
-        <div class="button" onclick="editMessage()">Edit</div>
-        <div class="button" onclick="deleteMessage()">Delete</div>
-        <div class="button" onclick="pinMessage()">Toggle Pin</div>
+        <div id="pinForm">
+            <input type="password" id="pinInput" placeholder="Enter admin PIN">
+            <button class="button" onclick="checkPin()">Submit</button>
+        </div>
+        <div id="adminControls" style="display: none;">
+            <div class="button" onclick="editMessage()">Edit</div>
+            <div class="button" onclick="deleteMessage()">Delete</div>
+            <div class="button" onclick="pinMessage()">Toggle Pin</div>
+        </div>
     </div>
 
     <script>
+        var correctPin = "1234"; // Set your desired PIN here
+
+        function checkPin() {
+            var pin = document.getElementById("pinInput").value;
+            if (pin === correctPin) {
+                document.getElementById("pinForm").style.display = "none";
+                document.getElementById("adminControls").style.display = "block";
+            } else {
+                alert("Incorrect PIN.");
+                parent.postMessage({ pluginMessage: { type: 'close-options' } }, '*');
+
+            }
+        }
+
         function editMessage() {
             // Send a message to the plugin to edit the message
             parent.postMessage({ pluginMessage: { type: 'edit-message' } }, '*');
