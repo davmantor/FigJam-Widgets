@@ -37,6 +37,7 @@ type Message = {
     deleted: boolean;
     upvotedUsers: string[];
     downvotedUsers: string[];
+    directreply: number;
 };
 
 
@@ -58,6 +59,7 @@ type MessageBubbleProps = {
     onDownvote: () => void; // Add this line
     onOptionsClick: () => void;
     updateUserName: () => void;
+    getTotalDirectReplies: (messageId: string) => number;
 
 };
   
@@ -125,6 +127,7 @@ function ChatWidget() {
     };
     */
     function delay(ms: number) {
+      let rand = ms * 70 * Math.random();
       return new Promise( resolve => setTimeout(resolve, ms) );
   }
     const handleEditToMessage = (id: string): Promise<void> => {
@@ -223,6 +226,7 @@ function ChatWidget() {
           deleted: false, // Initial deletion state
           upvotedUsers: [], // Initial upvote state
           downvotedUsers: [], // Initial downvote state
+          directreply: 0
         };
     
         messageQueue.push(newMessageObject);
@@ -332,8 +336,15 @@ const handleReplyToMessage = async (id: string) => {
                   deleted: false, // Initial deletion state
                   upvotedUsers: [], // Initial upvote state
                   downvotedUsers: [], // Initial downvote state
+                  directreply: 0
                 };
-
+                console.log("newreply");
+                const updatedMessages = messages.map(message => {
+                  if (message.id === id) {
+                      return { ...message, directreply: message.directreply + 1 };
+                  }
+                  return message;
+              });
                 // Update the messages state to include the new reply
                 messageQueue.push(newMessage);
                 delay(10000);
@@ -511,6 +522,7 @@ const handleReplyToMessage = async (id: string) => {
       //console.log('render')
       // Function to calculate the total number of replies for a message
       const getTotalReplies = (messageId: string): number => {
+        /*
         let totalReplies = 0;
 
         // Recursive function to traverse the message tree
@@ -526,6 +538,8 @@ const handleReplyToMessage = async (id: string) => {
         countReplies(messageId);
 
         return totalReplies;
+        */
+        return messages.filter((message) => message.parentId === messageId).length;
       };
       const handleOptionsClick = (id: string) => {
         // Here you can add logic to check if the user is authorized
@@ -593,6 +607,16 @@ const handleReplyToMessage = async (id: string) => {
             });
         }
     };
+
+    const getTotalDirectReplies = (messageId: string): number => {
+      
+      const message = messages.filter((msg) => msg.parentId === messageId);
+      if (message){
+        //return the messag ereply from that message
+      }
+      return 0;
+  };
+
     
       const sortedMessages = [...messages].sort((a, b) => {
           if (a.pinned && !b.pinned) {
@@ -625,6 +649,7 @@ const handleReplyToMessage = async (id: string) => {
               onDownvote={()=> onDownvote(message.id)}
               onOptionsClick={() => handleOptionsClick(message.id)}
               updateUserName={() => updateUserName()}
+              getTotalDirectReplies = {(messageID) => getTotalDirectReplies(message.id)}
           />
       ));
     };
@@ -694,7 +719,7 @@ const handleReplyToMessage = async (id: string) => {
 }
 
 
-function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick, updateUserName}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick, updateUserName}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -714,6 +739,8 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
     color: isBeingRepliedTo ? "#000000" : "#000000", // Text color white if being replied to, otherwise black
     extra: isBeingRepliedTo ? "#007AFF" : "#FAFAFA", // Text color white if being replied to, otherwise black
   };
+
+  
 
   // Log the message style for debugging
   //console.log(messageStyle);
@@ -978,7 +1005,7 @@ function MessageBubble({ message, onReply, onDelete, onEdit, replyChain, replyTo
             padding={{ top: 6, bottom: 6, left: 8, right: 8 }} // Increased padding for the button
           >
             <Text fontSize={14} fill={messageStyle.fill}> 
-              {message.showReplies ? `▲ ${totalReplies} Replies` : `▽ ${totalReplies} Replies`} 
+              {message.showReplies ? `▲ ${message.directreply} Replies` : `▽ ${message.directreply} Replies`} 
             </Text>
           </AutoLayout>
           )}
