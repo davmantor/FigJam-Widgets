@@ -690,12 +690,12 @@ const handleReplyToMessage = async (id: string) => {
       stroke="#DADCE0" // Outline color for the send area
       strokeWidth={1} // Outline width for the send area
       cornerRadius={10} // Rounded corners for the send area
-      onClick={updateUserName}
+      //onClick={updateUserName}
       >
       
     
       
-      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName}>
       <AutoLayout
         direction="horizontal"
         onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
@@ -800,6 +800,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
     
     <AutoLayout
     direction="vertical"
+    onClick={updateUserName}
     
 
     >    
@@ -886,12 +887,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                     //fill="#FFFFFF"
                     cornerRadius={4}
                     padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
-                    //onClick={() => onUpvote()}
+                    onClick={() => onUpvote()}
                     //stroke={"007AFF"}
                 >
                   <SVG
                     src={upvotearrow}
-                    onClick={() => onUpvote()}
+                    //onClick={() => onUpvote()}
                   />
                     <Text fontSize={14} fill="#FFFFFF"></Text>
                 </AutoLayout>
@@ -910,11 +911,11 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                     //fill="#FFFFFF"
                     cornerRadius={4}
                     padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
-                    //onClick={() => onDownvote()}
+                    onClick={() => onDownvote()}
                 >
                   <SVG
                     src={downvotearrow}
-                    onClick={() => onDownvote()}
+                    //onClick={() => onDownvote()}
                   />
                     <Text fontSize={14} fill="#FFFFFF"></Text>
                 </AutoLayout>
@@ -1152,6 +1153,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           //spacing={-100} // Adjusted space between reply chains
           width={"fill-parent"}
           padding={{ top: isDeleted ? 0 : 10, bottom: isDeleted ? 0 : 10, left: 32, right: 8 }}
+          onClick={updateUserName}
         >
           {replyChain}
         </AutoLayout>
