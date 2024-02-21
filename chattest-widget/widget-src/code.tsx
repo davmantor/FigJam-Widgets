@@ -829,7 +829,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             {message.pinned && (
         <SVG
         src={pinYES}
-        onClick={onReply}
+        //onClick={onReply}
       />
     )}
           </AutoLayout>
