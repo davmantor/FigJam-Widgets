@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script>
+    let eventSource;
+
+    // Listen for messages from the widget
+    window.onmessage = (event) => {
+      if (event.data.pluginMessage.type === 'set-log-id') {
+        const logId = event.data.pluginMessage.logId;
+
+        // Set up an EventSource to listen for messages from the server
+        eventSource = new EventSource(`http://localhost:4000/logs/${logId}/updates`);
+        eventSource.onerror = (errorEvent) => {
+          console.error('EventSource error:', errorEvent);
+          // Additional error handling logic here
+        };
+
+        eventSource.onmessage = (event) => {
+          // Send the received messages to the widget
+          parent.postMessage({ pluginMessage: { type: 'update-messages', data: JSON.parse(event.data) } }, '*');
+        };
+
+        eventSource.onerror = (error) => {
+          console.error('EventSource failed:', error);
+          eventSource.close();
+        };
+      }
+    };
+  </script>
+</body>
+</html>

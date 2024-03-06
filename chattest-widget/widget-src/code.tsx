@@ -1,5 +1,5 @@
 const { widget, showUI, ui } = figma;
-const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG} = widget;
+const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG, useEffect} = widget;
 //import '@fontawesome/free-solid-svg-icons';
 
 
@@ -38,6 +38,8 @@ type Message = {
     upvotedUsers: string[];
     downvotedUsers: string[];
     directreply: number;
+    logId: number, // Include the logId in each message
+
 };
 
 
@@ -62,10 +64,21 @@ type MessageBubbleProps = {
     getTotalDirectReplies: (messageId: string) => number;
 
 };
-  
+
+function generateLogId() {
+  const randomString = Math.random().toString(36).substring(2, 8);
+  const dateString = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+  return `${dateString}-${randomString}`;
+}
 
 function ChatWidget() {
     //console.log("ChatWidget rendered2");
+
+   
+    
+    const logId = Date.now();
+    
+
    
     const [newMessage, setNewMessage] = useSyncedState('newMessage', '');
     const [replyToId, setReplyToId] = useSyncedState<string | null>('replyToId', null);
@@ -77,6 +90,40 @@ function ChatWidget() {
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
     let messageQueue: Message[] = [];
 
+
+    
+  
+    useEffect(() => {
+      console.log("update call");
+  if (logId !== 0) {
+    figma.showUI(__uiFiles__.check, { visible: false });
+    figma.ui.postMessage({ type: 'set-log-id', logId });
+
+    figma.ui.onmessage = (msg) => {
+      if (msg.type === 'update-messages') {
+        console.log("hello", messages);
+        console.log("data", msg.data);
+
+        if (Array.isArray([msg.data])) {
+          setMessages([msg.data]);
+        } else {
+          console.warn("Received data is not an array:", msg.data);
+        }
+
+        console.log("done", messages);
+      }
+    };
+
+    // Return a cleanup function to close the UI when the component unmounts
+    return () => {
+      console.log("CLOSE");
+      figma.ui.close();
+    };
+  }
+});
+    
+
+
     function isUserAuthorized(userName: string): boolean {
       // Example implementation: Check if the user is in the list of authorized users
       updateUserName();
@@ -86,25 +133,23 @@ function ChatWidget() {
     
 
 
-    function openMessageInputModal(): Promise<void> { // Specify the function returns a Promise<void>
-      // Return a new promise
-      return new Promise<void>((resolve, reject) => { // Explicitly declare Promise<void>
-        // Define the size and HTML content for the modal
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-    
-        // Listen for messages from the modal
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'new-message') {
-            const messageText = msg.payload;
-            handleAddMessage(messageText);
-            resolve();
-          } else if (msg.type === 'close-plugin') {
-            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-            resolve(); // Optionally resolve the promise here, since the action is completed
-          }
-        };
-      });
-    }
+  function openMessageInputModal(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+  
+      figma.ui.onmessage = async (msg) => {
+        if (msg.type === 'new-message') {
+          const messageText = msg.payload;
+          await handleAddMessage(messageText);
+          resolve();
+        } else if (msg.type === 'close-plugin') {
+          figma.closePlugin();
+          resolve();
+        }
+      };
+    });
+  }
+  
 
     /*
     const renderMessagesWithScroll = () => {
@@ -175,6 +220,35 @@ function ChatWidget() {
       setUserName(currentUserName);
       console.log(userName);
     };
+    /*
+    const checkLogId = async () => {
+      console.log("no log id");
+      if (logId == "None") {
+        try {
+          const response = await fetch('http://localhost:4000/create-widget', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+    
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+    
+          const data = await response.json();
+          console.log(data.logId);
+          return data.logId; // Return the new logId
+        } catch (error) {
+          console.error('Error creating widget:', error);
+        }
+      }
+      else{
+        console.log("logID already exists");
+      }
+      return logId; // Return the existing logId if it's not "None"
+    };
+    */
     const generateRandomString = (length = 6) => {
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let result = '';
@@ -195,8 +269,26 @@ function ChatWidget() {
     
 
     
-
-    const handleAddMessage = (messageText: string) => {
+    
+    const handleAddMessage = async (messageText: string) => {
+      console.log("logID:", logId);
+      let count = 10;
+      /*
+      while (logId == "None" && count > 0){
+        try {
+          const generatedLogId = await checkLogId();
+          console.log("Generated Log ID:", generatedLogId);
+          setLogId(generatedLogId);
+          console.log("Generated Log ID:", logId);
+      } catch (error) {
+          console.error("Error generating log ID:", error);
+          return;
+      }
+        count--;
+        delay(10000);
+        console.log("not set yet,", count);
+      }
+      */
       updateUserName(); // Assumes you have a function to set/update the userName
     
       if (messageText.trim() !== '') {
@@ -226,9 +318,34 @@ function ChatWidget() {
           deleted: false, // Initial deletion state
           upvotedUsers: [], // Initial upvote state
           downvotedUsers: [], // Initial downvote state
-          directreply: 0
+          directreply: 0,
+          logId: logId, // Include the logId in each message
         };
-    
+        try {
+          // Add the message to the state first
+          console.log('newMessage before sending:', newMessageObject);
+
+          // Then send the message to the server
+          const response = await fetch('http://localhost:4000/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newMessageObject),
+          });
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+      
+          // Optionally, you can handle the server response if needed
+          const data = await response.json();
+          console.log('Message added successfully:', data);
+        } catch (error) {
+          console.error('Error adding message:', error);
+          // Optionally, handle the error (e.g., show a notification to the user)
+        }
+        
         messageQueue.push(newMessageObject);
         delay(10000);
 
@@ -336,7 +453,8 @@ const handleReplyToMessage = async (id: string) => {
                   deleted: false, // Initial deletion state
                   upvotedUsers: [], // Initial upvote state
                   downvotedUsers: [], // Initial downvote state
-                  directreply: 0
+                  directreply: 0,
+                  logId: logId, // Include the logId in each message
                 };
                 console.log("newreply");
                 const updatedMessages = messages.map(message => {
@@ -653,6 +771,7 @@ const handleReplyToMessage = async (id: string) => {
           />
       ));
     };
+    
 
     
 

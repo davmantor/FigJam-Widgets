@@ -8,7 +8,10 @@
   "main": "dist/code.js",
   "ui": {
     "main": "dist/ui.html", 
-    "options": "dist/options.html"},
+    "options": "dist/options.html",
+    "check": "dist/events.html"},
   "widgetApi": "1.0.0",
-  "networkAccess": { "allowedDomains": ["none"] }
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:4000"]}
 }
