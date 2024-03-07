@@ -97,7 +97,7 @@ function ChatWidget() {
 
 
     
-  
+  /*
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {
@@ -126,6 +126,7 @@ function ChatWidget() {
     };
   }
 });
+*/
     
 
 
