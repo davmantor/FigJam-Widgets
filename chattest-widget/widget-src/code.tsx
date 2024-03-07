@@ -81,7 +81,7 @@ function ChatWidget() {
 
    
     
-    const logId = Date.now();
+    const [logId, setLogId] = useSyncedState('newMessage', Date.now());
     
 
    

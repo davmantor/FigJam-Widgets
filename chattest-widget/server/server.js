@@ -35,11 +35,13 @@ app.post('/create-widget', async (req, res) => {
 app.post('/messages', async (req, res) => {
   console.log("Starting", req.body);
   try {
+    console.log(req.body.logId);
     const message = new MessageModel(req.body);
     let log = await LogModel.findOne({ logId: req.body.logId });
+    console.log("ID:", log);
     if (!log) {
       console.log("Creating new log");
-      log = new LogModel({});
+      log = new LogModel({logId: req.body.logId});
       await log.save();
     }
     console.log("Log found or created", log);
