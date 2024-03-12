@@ -15,7 +15,7 @@
     }
     textarea {
       font-family: 'Inter', sans-serif;
-      width: calc(100% - 20px); /* Adjust width to account for padding */
+      width: 350px; /*calc(100% - 20px);  Adjust width to account for padding */
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
@@ -32,6 +32,7 @@
       cursor: pointer;
       font-size: 16px;
       transition: background-color 0.3s ease;
+      width: 350px;
     }
     button:hover {
       background-color: #0056b3; /* Darker blue on hover */
@@ -42,7 +43,7 @@
 <body>
   <textarea id="messageInput" placeholder="Type your message here..."></textarea>
   <button id="sendMessage">Send</button>
-  <button id="cancelButton">Cancel</button>
+  
 
   <script>
     // Handle incoming messages for editing or replying
