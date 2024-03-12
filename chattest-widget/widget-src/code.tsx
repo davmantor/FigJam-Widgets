@@ -27,7 +27,12 @@ const repliesup = '<svg fill="#007AFF" height="10px" width="10px" version="1.1" 
 const repliesdown = '<svg fill="#007AFF" height="10px" width="10px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z"></path> </g> </g> </g></svg>'
 
 
-const adminI = '<svg fill="#000000" height="18px" width="18px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 330 330" xml:space="preserve" stroke="#000000" stroke-width="0.0033"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="XMLID_509_"> <path id="XMLID_510_" d="M65,330h200c8.284,0,15-6.716,15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85 S80,38.131,80,85v45H65c-8.284,0-15,6.716-15,15v170C50,323.284,56.716,330,65,330z M180,234.986V255c0,8.284-6.716,15-15,15 s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986c0-13.785,11.215-25,25-25s25,11.215,25,25 C190,223.162,186.068,230.421,180,234.986z M110,85c0-30.327,24.673-55,55-55s55,24.673,55,55v45H110V85z"></path> </g> </g></svg>'
+//const adminI = '<svg fill="#000000" height="12px" width="12px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 330 330" xml:space="preserve" stroke="#000000" stroke-width="0.0033"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="XMLID_509_"> <path id="XMLID_510_" d="M65,330h200c8.284,0,15-6.716,15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85 S80,38.131,80,85v45H65c-8.284,0-15,6.716-15,15v170C50,323.284,56.716,330,65,330z M180,234.986V255c0,8.284-6.716,15-15,15 s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986c0-13.785,11.215-25,25-25s25,11.215,25,25 C190,223.162,186.068,230.421,180,234.986z M110,85c0-30.327,24.673-55,55-55s55,24.673,55,55v45H110V85z"></path> </g> </g></svg>'
+
+//const adminI = '<svg fill="#000000" height="12px" width="12px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="user-admin"> <path d="M22.3,16.7l1.4-1.4L20,11.6l-5.8,5.8c-0.5-0.3-1.1-0.4-1.7-0.4C10.6,17,9,18.6,9,20.5s1.6,3.5,3.5,3.5s3.5-1.6,3.5-3.5 c0-0.6-0.2-1.2-0.4-1.7l1.9-1.9l2.3,2.3l1.4-1.4l-2.3-2.3l1.1-1.1L22.3,16.7z M12.5,22c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5 s1.5,0.7,1.5,1.5S13.3,22,12.5,22z"></path> <path d="M2,19c0-3.9,3.1-7,7-7c2,0,3.9,0.9,5.3,2.4l1.5-1.3c-0.9-1-1.9-1.8-3.1-2.3C14.1,9.7,15,7.9,15,6c0-3.3-2.7-6-6-6 S3,2.7,3,6c0,1.9,0.9,3.7,2.4,4.8C2.2,12.2,0,15.3,0,19v5h8v-2H2V19z M5,6c0-2.2,1.8-4,4-4s4,1.8,4,4s-1.8,4-4,4S5,8.2,5,6z"></path> </g> </g></svg>'
+const adminI = '<svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+
+const plus = '<svg width="14px" height="14px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
 
 type Message = {
     id: string;
@@ -95,9 +100,11 @@ function ChatWidget() {
     const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
     let messageQueue: Message[] = [];
 
+    //const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
+
 
     
-  
+/*
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {
@@ -126,6 +133,7 @@ function ChatWidget() {
     };
   }
 });
+*/
     
 
 
@@ -140,7 +148,7 @@ function ChatWidget() {
 
   function openMessageInputModal(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
   
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
@@ -188,7 +196,7 @@ function ChatWidget() {
         if (messageToEdit) {
           // Open the UI modal with the message content
           console.log("opening modal");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.showUI(__uiFiles__.main, { width: 400, height:240 });
           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
           console.log("opened");
           figma.ui.onmessage = msg => {
@@ -447,7 +455,7 @@ const handleReplyToMessage = async (id: string) => {
         
         if (messageToReply) {
           // Open the UI for entering a reply message
-          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
           // Send the original message text to the UI, indicating a reply action
           figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
 
@@ -610,8 +618,11 @@ const handleReplyToMessage = async (id: string) => {
 
     };
 
-    
-    
+    /*
+    const updatePrompt = (prompt: string) => {
+      setPrompt(prompt);
+    }
+    */
     
     
     const getMessageDepth = (messageId: string) => {
@@ -683,7 +694,7 @@ const handleReplyToMessage = async (id: string) => {
         console.log("in options:" , userName);
         if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
-                figma.showUI(__uiFiles__.options, { width: 300, height: 200 });
+                figma.showUI(__uiFiles__.options, { width: 350, height: 100 });
     
                 // Listen for messages from the options.html iframe
                 figma.ui.onmessage = msg => {
@@ -695,7 +706,7 @@ const handleReplyToMessage = async (id: string) => {
                           // Open the UI modal with the message content
                           console.log(messageToEdit.deleted)
                           console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+                          figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
                           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
                           console.log("opened");
                           figma.ui.onmessage = msg => {
@@ -725,7 +736,7 @@ const handleReplyToMessage = async (id: string) => {
                           console.log('Message not found.');
                           reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
                         }
-                        
+
                     } else if (msg.type === 'delete-message') {
                         // Handle delete message action
                         handleDeleteMessage(id);
@@ -734,6 +745,7 @@ const handleReplyToMessage = async (id: string) => {
                         // Handle pin message action
                         handlePinMessage(id);
                         resolve();
+                        
                     } else if (msg.type === 'close-options') {
                         // Handle closing the options iframe
                         resolve();
@@ -742,6 +754,25 @@ const handleReplyToMessage = async (id: string) => {
             });
         }
     };
+
+    /*
+    const handlePromptClick = () => {
+    
+      figma.showUI(__uiFiles__.prompt, { width: 400, height: 240 });
+      figma.ui.onmessage = (msg) => {
+        if (msg.type === 'open-update-prompt-modal') {
+            figma.showUI(__html__, { width: 400, height: 250 });
+        } else if (msg.type === 'close-update-prompt-modal') {
+            figma.closePlugin();
+        } else if (msg.type === 'update-prompt') {
+            const updatedPrompt = msg.payload;
+            // Update your state or do whatever you need with the updated prompt
+            setPrompt(updatedPrompt);
+            figma.closePlugin();
+        }
+    };
+    }
+    */
 
     const getTotalDirectReplies = (messageId: string): number => {
       
@@ -762,6 +793,36 @@ const handleReplyToMessage = async (id: string) => {
           }
           return 0; // no change in order
       });
+
+      const filteredMessages = sortedMessages.filter(message => message.parentId === parentId);
+
+      if (filteredMessages.length === 0) {
+        // Show "No messages" when there are no messages
+        return <AutoLayout
+                padding={30}
+                direction="vertical"
+                spacing={20}
+                minWidth={450}
+                horizontalAlignItems={"center"}
+                >
+                  <Text
+                  fill="#60666D"
+                  fontSize={16}
+                  fontWeight={500}
+                  lineHeight={1.4}
+                  >
+                    No messages yet
+                  </Text>
+                  <Text
+                  fill="#8E939A"
+                  fontSize={14}
+                  lineHeight={1.4}
+                  >
+                    Send a message with the add message button below.
+                  </Text>
+              </AutoLayout>;
+      }
+
       return sortedMessages
       .filter(message => message.parentId === parentId)
       .map((message) => (
@@ -823,32 +884,70 @@ const handleReplyToMessage = async (id: string) => {
       direction="vertical"
       spacing={8}
       padding={8}
-      stroke="#DADCE0" // Outline color for the send area
+      stroke="#efefef" // Outline color for the send area
       strokeWidth={1} // Outline width for the send area
       cornerRadius={10} // Rounded corners for the send area
       onClick={updateUserName}
+      minWidth={495}
+      fill={'#FFFFFF'}
       >
       
     
       
-      <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName}>
-      <AutoLayout
-        direction="horizontal"
-        onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
-        fill="#007AFF" // Example button styling
-        padding={8}
-        cornerRadius={4}
-      >
-        <Text fill="#FFFFFF">Add Message</Text>
-      </AutoLayout>
-      {/* Remaining UI elements, like the message display area */}
-    </AutoLayout>
+        {/* <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName}>
+          <AutoLayout
+            direction="horizontal"
+            onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
+            fill="#007AFF" // Example button styling
+            padding={8}
+            cornerRadius={100}
+          >
+            <AutoLayout padding={2}>
+            <SVG src={plus}></SVG>
+            </AutoLayout>
+
+            <Text fill="#FFFFFF">Add Message  </Text>
+          </AutoLayout>
+        </AutoLayout> */}
+        <AutoLayout
+          padding={10}
+        >
+          <Text
+          fill="#333333"
+          fontSize={20}
+          fontWeight={600}
+          >
+            Chat
+          </Text>
+        </AutoLayout>
+
         <AutoLayout
             direction="vertical"
             spacing={1} //changed from 10
             padding={4}
+            stroke="#efefef"
+            cornerRadius={10}
+            minWidth={480}
         >
             {renderMessages()}
+        </AutoLayout>
+
+        <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={480}>
+          <AutoLayout
+            direction="horizontal"
+            onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
+            fill="#007AFF" // Example button styling
+            padding={8}
+            cornerRadius={100}
+            
+          >
+            <AutoLayout padding={2}>
+            <SVG src={plus}></SVG>
+            </AutoLayout>
+
+            <Text fill="#FFFFFF">Add Message  </Text>
+          </AutoLayout>
+          {/* Remaining UI elements, like the message display area */}
         </AutoLayout>
       </AutoLayout>
     );
@@ -873,7 +972,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const messageStyle = {
     fill: isBeingRepliedTo ? "#007AFF" : "#FFFFFF", // Blue if being replied to, otherwise white
     color: isBeingRepliedTo ? "#000000" : "#000000", // Text color white if being replied to, otherwise black
-    extra: isBeingRepliedTo ? "#007AFF" : "#FAFAFA", // Text color white if being replied to, otherwise black
+    extra: isBeingRepliedTo ? "#007AFF" : "#f0f0f0", // Text color white if being replied to, otherwise black
   };
 
   
@@ -942,15 +1041,16 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
       <AutoLayout
         direction="vertical"
         padding={{ top: 10, bottom: isDeleted ? 0 : 10, left: 8, right: 8 }}
-        stroke="#D3D3D3"
+        //stroke="#D3D3D3"
         strokeWidth={1}
         cornerRadius={4}
         fill={messageStyle.fill}
         width={470}
+        effect={[]}
       >
         <AutoLayout
           direction="horizontal"
-          width={430}
+          width={450}
           padding={{ top: 4, bottom: 1, left: 4, right: 8}}
         >
           <AutoLayout
@@ -974,12 +1074,29 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="end"
-            width={100}
+            padding={{ top: 2, bottom: 2, left: 8, right: 8 }}
+            width={90}
           >
             <Text fontSize={12} fill={messageStyle.color} horizontalAlignText={"right"}>
               {message.timestamp}
             </Text>
           </AutoLayout>
+
+          {message.text != "this message has been deleted" && admin && (
+            <AutoLayout
+                //fill="#007AFF"
+                cornerRadius={4}
+                padding={{ top: 2, bottom: 2, left: 8, right: 8 }}
+                onClick={onOptionsClick}
+            >
+                <SVG
+                  src={adminI}
+                  onClick={onOptionsClick}
+                />
+
+
+            </AutoLayout>
+          )}
 
         </AutoLayout>
 
@@ -1017,21 +1134,22 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           {message.text != "this message has been deleted" && (
               <AutoLayout
                     fill={messageStyle.extra}
-                    cornerRadius={4}
+                    cornerRadius={200}
                     //padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
                 >
                 <AutoLayout
                     //fill="#FFFFFF"
-                    cornerRadius={4}
+                    cornerRadius={200}
                     padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
                     onClick={() => onUpvote()}
                     //stroke={"007AFF"}
                 >
+                  <Text fontSize={14} fill="#FFFFFF"> </Text>
                   <SVG
                     src={upvotearrow}
                     //onClick={() => onUpvote()}
                   />
-                    <Text fontSize={14} fill="#FFFFFF"></Text>
+                    
                 </AutoLayout>
                 <AutoLayout
                     //fill="#FFFFFF"
@@ -1046,7 +1164,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 {/* Downvote Button - Arrow Down */}
                 <AutoLayout
                     //fill="#FFFFFF"
-                    cornerRadius={4}
+                    cornerRadius={200}
                     padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
                     onClick={() => onDownvote()}
                 >
@@ -1054,7 +1172,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                     src={downvotearrow}
                     //onClick={() => onDownvote()}
                   />
-                    <Text fontSize={14} fill="#FFFFFF"></Text>
+                    <Text fontSize={14} fill="#FFFFFF"> </Text>
                 </AutoLayout>
               </AutoLayout>
           )}
@@ -1064,12 +1182,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           { message.text != "this message has been deleted" && (
           <AutoLayout // Reply button with additional padding
             fill="#007AFF"
-            cornerRadius={4}
+            cornerRadius={200}
             padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
             onClick={onReply}
 
           >
+            <Text fontSize={14} fill="#007AFF"> </Text>
             <SVG
+            
               src={replyIconSrc}
               onClick={onReply}
             />
@@ -1125,21 +1245,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           
           
 
-          {message.text != "this message has been deleted" && admin && (
-                    <AutoLayout
-                        //fill="#007AFF"
-                        cornerRadius={4}
-                        padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
-                        onClick={onOptionsClick}
-                    >
-                        <SVG
-                          src={adminI}
-                          onClick={onOptionsClick}
-                        />
-
-
-                    </AutoLayout>
-                )}
+          
 
           {!repliesAvaliable && (
           <AutoLayout // show replies button with additional padding
@@ -1154,11 +1260,39 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             </Text>
           </AutoLayout>
           )}
+
+
+          {/* <AutoLayout // fake button with additional padding
+            fill="#FFFFFF"
+            cornerRadius={4}
+            padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
+
+          >
+            <Text fontSize={14} fill="#FFFFFF">FAKEFSKEDSD</Text>
+          </AutoLayout> */}
+
+
+
+          {/* {message.text != "this message has been deleted" && admin && (
+            <AutoLayout
+                //fill="#007AFF"
+                cornerRadius={4}
+                padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
+                onClick={onOptionsClick}
+            >
+                <SVG
+                  src={adminI}
+                  onClick={onOptionsClick}
+                />
+
+
+            </AutoLayout>
+          )} */}
           
 
           
 
-          {(
+          {/* {(
             isCurrentUserMessage ) && 
             message.text != "this message has been deleted" && 
             message.deleteConfirm && 
@@ -1176,13 +1310,13 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             />
               <Text fontSize={14} fill="#FF3B30"></Text>
             </AutoLayout>
-          )}
+          )} */}
 
 
 
 
 
-          {(
+          {/* {(
             isCurrentUserMessage) && 
             message.text != "this message has been deleted" && 
             !message.deleteConfirm && 
@@ -1197,11 +1331,11 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
               
               <Text fontSize={14} fill="#FF3B30">  </Text>
             </AutoLayout>
-          )}
+          )} */}
 
 
 
-          {(
+          {/* {(
             isCurrentUserMessage) && 
             message.text != "this message has been deleted" &&
             !message.deleteConfirm && 
@@ -1219,12 +1353,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             />
             <Text fontSize={14} fill="#FFFFFF"></Text>
           </AutoLayout>
-          )}
+          )} */}
 
           
           
 
-          {(
+          {/* {(
             isCurrentUserMessage) && 
             message.text != "this message has been deleted" && 
             message.deleteConfirm && 
@@ -1242,7 +1376,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             />
               <Text fontSize={14} fill="#808080"></Text>
             </AutoLayout>
-          )}
+          )} */}
 
           
 
@@ -1250,7 +1384,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           
           
 
-          {isCurrentUserMessage && (
+          {/* {isCurrentUserMessage && (
           <AutoLayout // Edit button with additional padding
             //fill="#808080"
             cornerRadius={4}
@@ -1263,22 +1397,16 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             />
             <Text fontSize={14} fill="#FFFFFF"></Text>
           </AutoLayout>
-          )}
+          )} */}
 
           
 
           
-
-          { message.text == "this message has been deleted" && (
-          <AutoLayout // fake button with additional padding
-            fill="#FFFFFF"
-            cornerRadius={4}
-            padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
-
-          >
-            <Text fontSize={14} fill="#FFFFFF">FAKE</Text>
-          </AutoLayout>
-          )}
+          
+          
+          
+          
+          
           
 
 
