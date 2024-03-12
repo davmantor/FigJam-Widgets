@@ -86,7 +86,7 @@ function ChatWidget() {
 
    
     
-    const logId = Date.now();
+    const [logId, setLogId] = useSyncedState('newMessage', Date.now());
     
 
    
@@ -102,9 +102,8 @@ function ChatWidget() {
 
     //const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
-
     
-/*
+  /*
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {

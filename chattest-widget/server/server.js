@@ -33,27 +33,27 @@ app.post('/create-widget', async (req, res) => {
 
 // Define a POST route to save messages
 app.post('/messages', async (req, res) => {
-  console.log("starting", req.body);
+  console.log("Starting", req.body);
   try {
-      const message = new MessageModel(req.body);
-      let log = await LogModel.findOne({ logId: req.body.logId });
-      if (!log){
-        log = new LogModel({});
-        await log.save();
-      }
-      console.log("log",log);
-      if (log) {
-          log.messages.push(message); // Push the entire message object
-          await log.save();
-          res.status(201).send(message);
-      } else {
-          res.status(404).send({ message: 'Log not found' });
-      }
+    console.log(req.body.logId);
+    const message = new MessageModel(req.body);
+    let log = await LogModel.findOne({ logId: req.body.logId });
+    console.log("ID:", log);
+    if (!log) {
+      console.log("Creating new log");
+      log = new LogModel({logId: req.body.logId});
+      await log.save();
+    }
+    console.log("Log found or created", log);
+    log.messages.push(message); // Push the entire message object
+    await log.save();
+    res.status(201).send(message);
   } catch (error) {
-      console.error(error);
-      res.status(500).send(error.message);
+    console.error("Error in /messages route:", error);
+    res.status(500).send(error.message);
   }
 });
+
 
   app.delete('/delete-widget/:logId', async (req, res) => {
     try {
