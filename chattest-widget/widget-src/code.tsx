@@ -103,7 +103,7 @@ function ChatWidget() {
     //const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     
-  /*
+  
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {
@@ -132,7 +132,7 @@ function ChatWidget() {
     };
   }
 });
-*/
+
     
 
 

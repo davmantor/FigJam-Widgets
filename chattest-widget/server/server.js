@@ -19,7 +19,7 @@ app.use(express.json()); // For parsing application/json
 app.post('/create-widget', async (req, res) => {
     console.log("creating widget");
     try {
-      const newLog = new LogModel({});
+      const newLog = new LogModel({logId: req.body.logId});
       await newLog.save();
       // Store the log ID in the widget or return it to the client as needed
       console.log(newLog._id);
@@ -124,7 +124,7 @@ app.delete('/delete-widget/:logId', async (req, res) => {
     let log = await LogModel.findOne({ logId: req.params.logId });
     if (!log) {
         console.log("making new");
-        log = new LogModel({});
+        log = new LogModel({logId: req.body.logId});
         await log.save();
     }
 
