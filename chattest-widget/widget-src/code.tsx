@@ -350,7 +350,7 @@ function ChatWidget() {
           console.log('newMessage before sending:', newMessageObject);
 
           // Then send the message to the server
-          const response = await fetch('https://figjam-widgets.onrender.com/messages', {
+          const response = await fetch(`https://figjam-widgets.onrender.com/messages`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
