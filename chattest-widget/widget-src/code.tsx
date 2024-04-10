@@ -202,10 +202,12 @@ function ChatWidget() {
           console.log("opened");
           figma.ui.onmessage = msg => {
             if (msg.type === 'update-message') {
-              console.log("updated");
+              console.log("updated---", msg.payload);
               // Process the updated message text
-              const updatedText = msg.payload;
-              const updatedMessage = { ...messageToEdit, text: updatedText, edited: true };
+              const updatedText = msg.payload.message;
+              const anonymous = msg.payload.anonymous;
+              console.log(updatedText, anonymous);
+              const updatedMessage = { ...messageToEdit, text: updatedText, anonymous: anonymous, edited: true };
                     //messageQueue.push(updatedMessage); // Add the updated message to the queue
                     //delay(10000);
 
@@ -468,7 +470,9 @@ const handleReplyToMessage = async (id: string) => {
             figma.ui.onmessage = msg => {
               if (msg.type === 'send-reply') {
                 // Extract the reply message text from the UI response
-                const replyText = msg.payload;
+                console.log(msg.payload);
+                const replyText = msg.payload.message;
+                const anonymous = msg.payload.anonymous; // Extract the anonymous value
                 // Create a new message object for the reply
                 const newMessage: Message = {
                   id: newId, // Generate a unique ID for the new message
@@ -485,7 +489,7 @@ const handleReplyToMessage = async (id: string) => {
                   downvotedUsers: [], // Initial downvote state
                   directreply: 0,
                   logId: logId, // Include the logId in each message
-                  anonymous: false
+                  anonymous: anonymous
                 };
                 console.log("newreply");
                 const updatedMessages = messages.map(message => {
@@ -719,10 +723,12 @@ const handleReplyToMessage = async (id: string) => {
                             if (msg.type === 'update-message') {
                               console.log("updated");
                               // Process the updated message text
-                              const updatedText = msg.payload;
+                              const updatedText = msg.payload.message;
+                              const anonymous = msg.payload.anonymous;
+                              console.log(msg.payload);
                               const updatedMessages = messages.map(message => {
                                 if (message.id === id) {
-                                  return { ...message, text: updatedText, edited: true };
+                                  return { ...message, text: updatedText, anonymous: anonymous, edited: true };
                                 }
                                 return message;
                               });
@@ -835,7 +841,7 @@ const handleReplyToMessage = async (id: string) => {
           <MessageBubble
               key={message.id}
               message={message}
-              onReply={() => handleReplyToMessage(message.id)}
+              onReply={() => handleReplyToMessage(message.id, )}
               onEdit={() => handleEditToMessage(message.id)}
               onDelete={() => handleDeleteMessage(message.id)}
               onDeleteConfirm={() => handleDeleteConfirm(message.id)}
