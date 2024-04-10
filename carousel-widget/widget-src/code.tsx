@@ -1,5 +1,12 @@
 const { widget } = figma;
-const { AutoLayout, Input, Text, useSyncedMap, SVG, useSyncedState, usePropertyMenu } = widget;
+const {
+  AutoLayout,
+  Input,
+  SVG,
+  useSyncedMap,
+  useSyncedState,
+  usePropertyMenu
+} = widget;
 
 const buttonSrc = `
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,10 +32,10 @@ function numToIndices(num: number): number[] {
 }
 
 function Table() {
-  var numCols = 1;
   const cells = useSyncedMap<string>("cells");
-  const [numRows, setRows] = useSyncedState('rows', 1);
-  const [index, setIndex] = useSyncedState('index', 1);
+  const [numRows, setRows] = useSyncedState('rows', 0);
+  const [index, setIndex] = useSyncedState('index', 0);
+  const [boxesPerSlide, setBoxesPerSlide] = useSyncedState('boxesPerSlide', 3);
 
   const propertyMenu: WidgetPropertyMenuItem[] = [
     {
@@ -43,26 +50,23 @@ function Table() {
       itemType: 'action',
     },
     {
-      tooltip: 'Card #: ' + index,
+      tooltip: 'Card #: ' + (index + 1),
       propertyName: 'index',
       itemType: 'action',
-    }
-  ];
-
-  if (numRows > 0) {
-    propertyMenu.push({
+    },
+    {
       tooltip: 'Decrement',
       propertyName: 'decrement',
       itemType: 'action',
       icon: downIconSrc,
-    });
-  }
+    }
+  ];
 
   usePropertyMenu(propertyMenu, ({ propertyName }) => {
-    if (propertyName === 'decrement') {
-      setRows(numRows - 1);
+    if (propertyName === 'decrement' && numRows > 1) {
+      setRows(numRows - boxesPerSlide);
     } else if (propertyName === 'increment') {
-      setRows(numRows + 1);
+      setRows(numRows + boxesPerSlide);
     }
   });
 
@@ -81,62 +85,43 @@ function Table() {
       <SVG
         src={buttonSrc}
         onClick={() => {
-          if (index > 1) {
-            setIndex(index - 1);
-          } else {
-            setIndex(numRows);
-          }
+          setIndex(Math.max(index - 1, 0));
         }}
       />
-
+      {numToIndices(numRows)
+  .slice(index * boxesPerSlide, (index + 1) * boxesPerSlide)
+  .map((_, idx) => {
+    const cellKey = `cell-${index * boxesPerSlide + idx}`;
+    const cellContents = cells.get(cellKey) || "";
+    return (
       <AutoLayout
-        key={index}
-        direction="horizontal"
-        horizontalAlignItems="start"
-        spacing={12}
-        verticalAlignItems="start"
+        key={cellKey}
+        cornerRadius={3}
+        direction="vertical"
+        fill="#fff"
+        stroke="#000"
+        padding={8}
+        height="hug-contents"
       >
-        {numToIndices(numCols).map((colIdx) => {
-          const cellKey = `${index}-${colIdx}`;
-          const cellContents = cells.get(cellKey) || "";
-
-          return (
-            <AutoLayout
-              key={colIdx}
-              cornerRadius={3}
-              direction="vertical"
-              fill="#fff"
-              stroke="#000"
-            >
-              <Input
-                inputFrameProps={{
-                  padding: 10,
-                }}
-                onTextEditEnd={(e) => cells.set(cellKey, e.characters)}
-                placeholder="Edit me..."
-                value={cellContents}
-                fontSize={14}
-                
-              />
-              <AutoLayout
-                direction="horizontal"
-                padding={{ bottom: 5, left: 5, right: 5 }}
-              >
-                {/* Add text if needed */}
-              </AutoLayout>
-            </AutoLayout>
-          );
-        })}
+        <AutoLayout
+          padding={{ top: 10, bottom: 10, left: 0, right: 0 }}
+          height="hug-contents"
+        >
+          <Input
+            onTextEditEnd={(e) => cells.set(cellKey, e.characters)}
+            placeholder="Edit me..."
+            value={cellContents}
+            fontSize={14}
+          />
+        </AutoLayout>
       </AutoLayout>
+    );
+})}
 
       <SVG
         src={buttonSrc}
         onClick={() => {
-          if (index < numRows) {
-            setIndex(index + 1);
-          } else {
-            setIndex(1);
-          }
+          setIndex(Math.min(index + 1, Math.ceil(numRows / boxesPerSlide) - 1));
         }}
       />
     </AutoLayout>
