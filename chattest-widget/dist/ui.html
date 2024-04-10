@@ -43,6 +43,10 @@
 <body>
   <textarea id="messageInput" placeholder="Type your message here..."></textarea>
   <button id="sendMessage">Send</button>
+  <label>
+  <input type="checkbox" id="anonymousCheckbox"> Send anonymously
+</label>
+
   
 
   <script>
@@ -64,10 +68,10 @@
 
     // Send button click handler
     document.getElementById('sendMessage').onclick = () => {
-      console.log("MODAL SEND");
       const message = document.getElementById('messageInput').value.trim();
+      const anonymous = document.getElementById('anonymousCheckbox').checked; // Get the checkbox value
       const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
-      parent.postMessage({ pluginMessage: { type: actionType, payload: message } }, '*');
+      parent.postMessage({ pluginMessage: { type: actionType, payload: { message, anonymous } } }, '*'); // Include the anonymous value
     };
     
     // Cancel button click handler

@@ -49,6 +49,7 @@ type Message = {
     downvotedUsers: string[];
     directreply: number;
     logId: number, // Include the logId in each message
+    anonymous: boolean;
 
 };
 
@@ -103,7 +104,7 @@ function ChatWidget() {
     //const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     
-  
+  /*
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {
@@ -132,6 +133,7 @@ function ChatWidget() {
     };
   }
 });
+*/
 
     
 
@@ -151,8 +153,8 @@ function ChatWidget() {
   
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
-          const messageText = msg.payload;
-          await handleAddMessage(messageText);
+          const { message, anonymous } = msg.payload; // Destructure the payload
+          await handleAddMessage({ messageText: message, anonymous: anonymous });
           resolve();
         } else if (msg.type === 'close-plugin') {
           figma.closePlugin();
@@ -294,8 +296,11 @@ function ChatWidget() {
 
     
     
-    const handleAddMessage = async (messageText: string) => {
-      console.log("logID:", logId);
+    const handleAddMessage = async (messageData: { messageText: string, anonymous: boolean }) => {
+      const { messageText, anonymous } = messageData; // Destructure the message data
+      console.log("anonymous:", anonymous);
+      console.log("messageText:", messageText);
+      console.log("messageData:", messageData);
       let count = 10;
       /*
       while (logId == "None" && count > 0){
@@ -344,6 +349,7 @@ function ChatWidget() {
           downvotedUsers: [], // Initial downvote state
           directreply: 0,
           logId: logId, // Include the logId in each message
+          anonymous: anonymous
         };
         try {
           // Add the message to the state first
@@ -479,6 +485,7 @@ const handleReplyToMessage = async (id: string) => {
                   downvotedUsers: [], // Initial downvote state
                   directreply: 0,
                   logId: logId, // Include the logId in each message
+                  anonymous: false
                 };
                 console.log("newreply");
                 const updatedMessages = messages.map(message => {
@@ -1059,7 +1066,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             spacing={3}
           >
             <Text fontSize={14} fill={messageStyle.color} horizontalAlignText={"left"}>
-              {isDeleted ? 'Anonymous' : message.sender}:
+              {(isDeleted || message.anonymous) ? 'Anonymous' : message.sender}:
             </Text>
 
             {message.pinned && (
