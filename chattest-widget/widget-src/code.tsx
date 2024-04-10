@@ -49,6 +49,7 @@ type Message = {
     downvotedUsers: string[];
     directreply: number;
     logId: number, // Include the logId in each message
+    anonymous: boolean;
 
 };
 
@@ -103,7 +104,7 @@ function ChatWidget() {
     //const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     
-  
+  /*
     useEffect(() => {
       console.log("update call");
   if (logId !== 0) {
@@ -132,6 +133,7 @@ function ChatWidget() {
     };
   }
 });
+*/
 
     
 
@@ -151,8 +153,8 @@ function ChatWidget() {
   
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
-          const messageText = msg.payload;
-          await handleAddMessage(messageText);
+          const { message, anonymous } = msg.payload; // Destructure the payload
+          await handleAddMessage({ messageText: message, anonymous: anonymous });
           resolve();
         } else if (msg.type === 'close-plugin') {
           figma.closePlugin();
@@ -200,10 +202,12 @@ function ChatWidget() {
           console.log("opened");
           figma.ui.onmessage = msg => {
             if (msg.type === 'update-message') {
-              console.log("updated");
+              console.log("updated---", msg.payload);
               // Process the updated message text
-              const updatedText = msg.payload;
-              const updatedMessage = { ...messageToEdit, text: updatedText, edited: true };
+              const updatedText = msg.payload.message;
+              const anonymous = msg.payload.anonymous;
+              console.log(updatedText, anonymous);
+              const updatedMessage = { ...messageToEdit, text: updatedText, anonymous: anonymous, edited: true };
                     //messageQueue.push(updatedMessage); // Add the updated message to the queue
                     //delay(10000);
 
@@ -294,8 +298,11 @@ function ChatWidget() {
 
     
     
-    const handleAddMessage = async (messageText: string) => {
-      console.log("logID:", logId);
+    const handleAddMessage = async (messageData: { messageText: string, anonymous: boolean }) => {
+      const { messageText, anonymous } = messageData; // Destructure the message data
+      console.log("anonymous:", anonymous);
+      console.log("messageText:", messageText);
+      console.log("messageData:", messageData);
       let count = 10;
       /*
       while (logId == "None" && count > 0){
@@ -344,13 +351,14 @@ function ChatWidget() {
           downvotedUsers: [], // Initial downvote state
           directreply: 0,
           logId: logId, // Include the logId in each message
+          anonymous: anonymous
         };
         try {
           // Add the message to the state first
           console.log('newMessage before sending:', newMessageObject);
 
           // Then send the message to the server
-          const response = await fetch('http://localhost:4000/messages', {
+          const response = await fetch(`https://figjam-widgets.onrender.com/messages`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -462,7 +470,9 @@ const handleReplyToMessage = async (id: string) => {
             figma.ui.onmessage = msg => {
               if (msg.type === 'send-reply') {
                 // Extract the reply message text from the UI response
-                const replyText = msg.payload;
+                console.log(msg.payload);
+                const replyText = msg.payload.message;
+                const anonymous = msg.payload.anonymous; // Extract the anonymous value
                 // Create a new message object for the reply
                 const newMessage: Message = {
                   id: newId, // Generate a unique ID for the new message
@@ -479,6 +489,7 @@ const handleReplyToMessage = async (id: string) => {
                   downvotedUsers: [], // Initial downvote state
                   directreply: 0,
                   logId: logId, // Include the logId in each message
+                  anonymous: anonymous
                 };
                 console.log("newreply");
                 const updatedMessages = messages.map(message => {
@@ -712,10 +723,12 @@ const handleReplyToMessage = async (id: string) => {
                             if (msg.type === 'update-message') {
                               console.log("updated");
                               // Process the updated message text
-                              const updatedText = msg.payload;
+                              const updatedText = msg.payload.message;
+                              const anonymous = msg.payload.anonymous;
+                              console.log(msg.payload);
                               const updatedMessages = messages.map(message => {
                                 if (message.id === id) {
-                                  return { ...message, text: updatedText, edited: true };
+                                  return { ...message, text: updatedText, anonymous: anonymous, edited: true };
                                 }
                                 return message;
                               });
@@ -828,7 +841,7 @@ const handleReplyToMessage = async (id: string) => {
           <MessageBubble
               key={message.id}
               message={message}
-              onReply={() => handleReplyToMessage(message.id)}
+              onReply={() => handleReplyToMessage(message.id, )}
               onEdit={() => handleEditToMessage(message.id)}
               onDelete={() => handleDeleteMessage(message.id)}
               onDeleteConfirm={() => handleDeleteConfirm(message.id)}
@@ -1059,7 +1072,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             spacing={3}
           >
             <Text fontSize={14} fill={messageStyle.color} horizontalAlignText={"left"}>
-              {isDeleted ? 'Anonymous' : message.sender}:
+              {(isDeleted || message.anonymous) ? 'Anonymous' : message.sender}:
             </Text>
 
             {message.pinned && (
