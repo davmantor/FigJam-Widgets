@@ -740,9 +740,9 @@ const handleReplyToMessage = async (id: string) => {
                               reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
                             } else if (msg.type === 'close-plugin') {
                               console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                        }
+                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                              resolve(); // Optionally resolve the promise here, since the action is completed
+                            }
                           };
                         } else {
                           console.log('Message not found.');
@@ -764,10 +764,12 @@ const handleReplyToMessage = async (id: string) => {
                             if (msg.type === 'update-message') {
                               console.log("updated");
                               // Process the updated message text
-                              const updatedText = msg.payload;
+                              const updatedText = msg.payload.message;
+                              const anonymous = msg.payload.anonymous;
+                              console.log(msg.payload);
                               const updatedMessages = messages.map(message => {
                                 if (message.id === id) {
-                                  return { ...message, sender: updatedText, edited: true };
+                                  return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
                                 }
                                 return message;
                               });
