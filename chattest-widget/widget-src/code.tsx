@@ -149,7 +149,7 @@ function ChatWidget() {
 
   function openMessageInputModal(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
+      figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
   
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
@@ -197,7 +197,7 @@ function ChatWidget() {
         if (messageToEdit) {
           // Open the UI modal with the message content
           console.log("opening modal");
-          figma.showUI(__uiFiles__.main, { width: 400, height:240 });
+          figma.showUI(__uiFiles__.main, { width: 400, height:270 });
           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
           console.log("opened");
           figma.ui.onmessage = msg => {
@@ -462,7 +462,7 @@ const handleReplyToMessage = async (id: string) => {
         
         if (messageToReply) {
           // Open the UI for entering a reply message
-          figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
+          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
           // Send the original message text to the UI, indicating a reply action
           figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
 
@@ -704,7 +704,7 @@ const handleReplyToMessage = async (id: string) => {
         console.log("in options:" , userName);
         if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
-                figma.showUI(__uiFiles__.options, { width: 350, height: 100 });
+                figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
     
                 // Listen for messages from the options.html iframe
                 figma.ui.onmessage = msg => {
@@ -716,7 +716,7 @@ const handleReplyToMessage = async (id: string) => {
                           // Open the UI modal with the message content
                           console.log(messageToEdit.deleted)
                           console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 240 });
+                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
                           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
                           console.log("opened");
                           figma.ui.onmessage = msg => {
@@ -743,6 +743,45 @@ const handleReplyToMessage = async (id: string) => {
                           figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
                           resolve(); // Optionally resolve the promise here, since the action is completed
                         }
+                          };
+                        } else {
+                          console.log('Message not found.');
+                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                        }
+
+                    } else if (msg.type === 'edit-user') {
+                      console.log("calling edit from options");
+                        // Handle edit message action
+                        const messageToEdit = messages.find(message => message.id === id);
+                        if (messageToEdit && !messageToEdit.deleted) {
+                          // Open the UI modal with the message content
+                          console.log(messageToEdit.deleted)
+                          console.log("opening modal");
+                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
+                          console.log("opened");
+                          figma.ui.onmessage = msg => {
+                            if (msg.type === 'update-message') {
+                              console.log("updated");
+                              // Process the updated message text
+                              const updatedText = msg.payload;
+                              const updatedMessages = messages.map(message => {
+                                if (message.id === id) {
+                                  return { ...message, sender: updatedText, edited: true };
+                                }
+                                return message;
+                              });
+                              setMessages(updatedMessages);
+                              figma.closePlugin();
+                              resolve(); // Resolve the promise when the message is updated, no value needed
+                            } else if (msg.type === 'cancel-edit') {
+                              console.log("canceled");
+                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                            } else if (msg.type === 'close-plugin') {
+                              console.log("closed");
+                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                              resolve(); // Optionally resolve the promise here, since the action is completed
+                            }
                           };
                         } else {
                           console.log('Message not found.');
