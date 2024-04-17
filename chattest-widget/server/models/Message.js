@@ -54,6 +54,9 @@ const MessageSchema = new mongoose.Schema({
     },
     logId:{
       type: Number,
+    },
+    anonymous:{
+      type: Boolean,
     }
   });
 
