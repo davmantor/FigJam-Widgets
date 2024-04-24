@@ -1,0 +1,52 @@
+{
+  "name": "xlsx-saver",
+  "version": "1.0.0",
+  "description": "Your Figma Plugin",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint --ext .ts,.tsx --ignore-pattern node_modules .",
+    "lint:fix": "eslint --ext .ts,.tsx --ignore-pattern node_modules --fix .",
+    "watch": "npm run build -- --watch"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@figma/eslint-plugin-figma-plugins": "*",
+    "@figma/plugin-typings": "^1.91.0",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@figma/figma-plugins/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "root": true,
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "figma": "^0.0.1",
+    "figma-plugin": "^3.3.0",
+    "sheetjs": "^2.0.0",
+    "xlsx": "^0.18.5"
+  }
+}
