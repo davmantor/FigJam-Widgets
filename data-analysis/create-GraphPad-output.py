@@ -725,7 +725,7 @@ race_data = get_proportions(winter24,
                             "Race/Ethnicity")
 race_donut = vega_lite_donut(race_data,
                              "Not represented")
-print(race_donut)
+#print(race_donut)
 
 
 academic_outc_data = get_proportions(winter24,
