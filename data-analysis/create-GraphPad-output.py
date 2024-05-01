@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 from pprint import pprint
+from collections import defaultdict
 
 # Load in data
 df = pd.read_excel('clean_merged_data.xlsx', engine='openpyxl')
@@ -23,7 +24,11 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
                            "1.0": "Hardly ever",
                            "2.0": "Sometimes",
                            "3.0": "Frequently",
-                           "4.0": "Always"}
+                           "4.0": "Always"},
+          "Pref4-a": {"1.0": "Please not this one!",
+                      "2.0": "Not excited, but ok...",
+                      "3.0": "This seems interesting",
+                      "4.0": "Would love this!"}
           }
 
 
@@ -223,6 +228,15 @@ def vega_lite_grouphstackbar(data):
     response_scale_key = matchOptions2Scale(scales, response_options)
     response_scale = list(scales[response_scale_key].values())
     final_domain = list(response_options - set(response_scale)) + response_scale
+    response_rank = {response: i for i, response in enumerate(final_domain)}
+    grouped_data = defaultdict(list) # Group data by 'Item'
+    for entry in proportions:
+        grouped_data[entry['Item']].append(entry)
+    sorted_data = [] # Sort each group and flatten the list
+    for item, responses in grouped_data.items():
+        sorted_responses = sorted(responses, key=lambda x: response_rank[x['Response']])
+        sorted_data.extend(sorted_responses)
+    proportions = sorted_data
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A horizontal group stacked bar chart",
@@ -396,4 +410,21 @@ academic_outc_data = item_group_proportions(winter24, academic_items, scales['Ag
 
 academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
 
-print(academic_outc_chart)
+#print(academic_outc_chart)
+
+erg_items = {
+    't1_erg1_pref': 'Brain-Inspired Neural Networks',
+    't1_erg2_pref': 'Sustainable Sensor Networks',
+    't1_erg3_pref': 'Explanatory AI for Autonomous Vehicles',
+    't1_erg4_pref': 'Accessibility, Communities, & Technology',
+    't1_erg5_pref': 'Testing Autonomous Vehicles',
+    't1_erg6_pref': '3D Faces',
+    't1_erg7_pref': 'Ed Tech',
+    't1_erg8_pref': 'Users in Design',
+    't1_erg9_pref': 'Aerial Robotics',
+    't1_erg10_pref': 'Personal Informatics',
+    't1_erg11_pref': 'Autonomous Security',
+    't1_erg12_pref': 'Air Quality Environmental Justice'
+}
+erg_pref_data = item_group_proportions(winter24, erg_items, scales['Pref4-a'])
+erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
