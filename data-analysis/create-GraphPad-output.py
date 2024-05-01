@@ -31,21 +31,48 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
                       "4.0": "Would love this!"}
           }
 
+def get_palette(domain):
+    scale_key = matchOptions2Scale(scales, domain)
+    scale_palettes = {"Agreement5-a": {"Not applicable": "#b3b3b3",
+                                       "Strongly disagree": "#d77217",
+                                       "Somewhat disagree": "#fdb72a",
+                                       "Neutral": "#fdf876",
+                                       "Somewhat agree": "#6ac8fd",
+                                       "Strongly agree": "#315bb6"},
+                      "Agreement4-a": {"0.0": "Not applicable",
+                                       "1.0": "Strongly disagree",
+                                       "2.0": "Somewhat disagree",
+                                       "3.0": "Somewhat agree",
+                                       "4.0": "Strongly agree"},
+                      "Frequency5-a": {"0.0": "Never",
+                                       "1.0": "Hardly ever",
+                                       "2.0": "Sometimes",
+                                       "3.0": "Frequently",
+                                       "4.0": "Always"},
+                      "Pref4-a": {"Please not this one!": "#f1f9e8",
+                                  "Not excited, but ok...": "#b9e3bf",
+                                  "This seems interesting": "#7bcdc4",
+                                  "Would love this!": "#315ab6"}}
 
-def get_color_palette(num_categories):
-    # Color palette to accommodate different numbers of categories
-    full_palette = [
+    # Retrieve the specific scale dictionary using the scale key
+    palette = scale_palettes.get(scale_key, {})
+    extra_colors = [
         "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c",
         "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00",
         "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"
-    ]
-    # Make sure there are enough colors by repeating the palette if more categories exist than colors
-    if num_categories > len(full_palette):
-        repeat_times = (num_categories // len(full_palette)) + 1
-        full_palette = full_palette * repeat_times
+    ]  # List of unique extra colors
+    # Assign unique colors to missing items
+    color_index = 0
+    for item in domain:
+        if item not in palette:
+            if item == "Missing":
+                palette[item] = "#e7e7e7"
+            else:
+                palette[item] = extra_colors[color_index % len(extra_colors)]
+                color_index += 1
+    hex_code_list = [palette[item] for item in domain if item in palette]
+    return [palette, hex_code_list]
 
-    # Slice the palette according to the number of categories
-    return full_palette[:num_categories]
 
 def matchOptions2Scale(scales, survey_responses):
     survey_responses = set(response.lower() for response in survey_responses)
@@ -109,7 +136,7 @@ def vega_lite_donut(data, catFocus,
     first_key, first_value = next(iter(proportions[0].items()))
     field = first_key
     domain = [item[field] for item in proportions]
-    palette = get_color_palette(len(domain))
+    palette_dict, palette = get_palette(domain)
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "Some title for the graph",
@@ -237,6 +264,7 @@ def vega_lite_grouphstackbar(data):
         sorted_responses = sorted(responses, key=lambda x: response_rank[x['Response']])
         sorted_data.extend(sorted_responses)
     proportions = sorted_data
+    palette_dict, palette = get_palette(final_domain)
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A horizontal group stacked bar chart",
@@ -328,13 +356,7 @@ def vega_lite_grouphstackbar(data):
                   "title": f"{max(num_responses.values())} Responses",
                   "scale": {
                     "domain": final_domain,
-                    "range": [
-                      "#c30d24",
-                      "#f3a583",
-                      "#cccccc",
-                      "#94c6da",
-                      "#1770ab"
-                    ],
+                    "range": palette,
                     "type": "ordinal"
                   },
                   "legend": {
@@ -399,7 +421,6 @@ race_data = get_proportions(winter24,
                             "Race/Ethnicity")
 race_donut = vega_lite_donut(race_data,
                              "Not represented")
-
 #print(race_donut)
 
 
@@ -407,10 +428,8 @@ academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting
                   't2_theme_discussions':'I enjoyed the weekly paper discussions',
                   't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
 academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
-
 academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
-
-#print(academic_outc_chart)
+print(academic_outc_chart)
 
 erg_items = {
     't1_erg1_pref': 'Brain-Inspired Neural Networks',
@@ -428,3 +447,4 @@ erg_items = {
 }
 erg_pref_data = item_group_proportions(winter24, erg_items, scales['Pref4-a'])
 erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
+#print(erg_pref_chart)
