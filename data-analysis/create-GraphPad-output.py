@@ -80,95 +80,117 @@ def vega_lite_donut(data, catFocus,
     palette = get_color_palette(len(domain))
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-          "description": description,
+          "description": "Some title for the graph",
           "width": 350,
           "height": 350,
           "title": {
-            "text": field,
-            "fontSize": 25,
-            "font": "Arial",
-            "anchor": "start",
-            "color": "black"
+              "text": field,
+              "subtitle": f"{num_responses} Responses",
+              "fontSize": 25,
+              "subtitleFontSize": 16,
+              "font": "Arial",
+              "anchor": "start",
+              "color": "black",
+              "offset": 20
           },
           "data": {
-            "values": proportions
+              "values": proportions
           },
           "transform": [
-            {
-              "window": [{"op": "sum", "field": "value", "as": "total"}],
-              "frame": [None, None]
-            },
-            {
-              "calculate": "datum.value / datum.total",
-              "as": "percent"
-            }
+              {
+                  "window": [
+                      {
+                          "op": "sum",
+                          "field": "value",
+                          "as": "total"
+                      }
+                  ],
+                  "frame": [
+                      None,
+                      None
+                  ]
+              },
+              {
+                  "calculate": "datum.value / datum.total",
+                  "as": "percent"
+              }
           ],
           "layer": [
-            {
-              "mark": {"type": "arc", "innerRadius": inner_radius},
-              "encoding": {
-                "theta": {
-                  "field": "value",
-                  "type": "quantitative"
-                },
-                "color": {
-                  "field": field,
-                  "type": "nominal",
-                  "scale": {
-                    "domain": domain,
-                    "range": palette
+              {
+                  "mark": {
+                      "type": "arc",
+                      "innerRadius": inner_radius
                   },
-                  "legend": {
-                    "orient": "top",
-                    "title": f"{num_responses} Responses",
-                    "titleLimit": 0,
-                    "titlePadding": 30,
-                    "labelLimit": 0,
-                    "symbolLimit": 0,
-                    "labelFontSize": 16,
-                    "titleFontSize": 16,
-                    "offset": 40,
-                    "direction": "vertical"
+                  "encoding": {
+                      "theta": {
+                          "field": "value",
+                          "type": "quantitative"
+                      },
+                      "color": {
+                          "field": field,
+                          "type": "nominal",
+                          "scale": {
+                              "domain": domain,
+                              "range": palette
+                          },
+                          "legend": {
+                              "orient": "bottom",
+                              "title": None,
+                              "titleLimit": 0,
+                              "titlePadding": 30,
+                              "labelLimit": 0,
+                              "symbolLimit": 0,
+                              "labelFontSize": 16,
+                              "titleFontSize": 16,
+                              "offset": 20,
+                              "direction": "vertical"
+                          }
+                      }
                   }
-                }
+              },
+              {
+                  "transform": [
+                      {
+                          "filter": f"datum['{field}'] === '{catFocus}'"
+                      }
+                  ],
+                  "mark": {
+                      "type": "text",
+                      "radiusOffset": 10,
+                      "fontSize": 55
+                  },
+                  "encoding": {
+                      "text": {
+                          "field": "percent",
+                          "type": "quantitative",
+                          "format": ".1%"
+                      },
+                      "theta": {
+                          "field": "value",
+                          "type": "quantitative"
+                      },
+                      "color": {
+                          "value": "black"
+                      }
+                  }
               }
-            },
-            {
-              "transform": [
-                {"filter": f"datum['{field}'] === '{catFocus}'"}
-              ],
-              "mark": {"type": "text", "radiusOffset": 10, "fontSize": 55},
-              "encoding": {
-                "text": {
-                  "field": "percent",
-                  "type": "quantitative",
-                  "format": ".1%"
-                },
-                "theta": {
-                  "field": "value",
-                  "type": "quantitative"
-                },
-                "color": {
-                  "value": "black"
-                }
-              }
-            }
           ],
           "config": {
-            "legend": {
-              "titlePadding": 10,
-              "padding": 5,
-              "labelFontSize": 12,
-              "titleFontSize": 14
-            }
+              "legend": {
+                  "titlePadding": 10,
+                  "padding": 5,
+                  "labelFontSize": 12,
+                  "titleFontSize": 14
+
+              }
           }
-        }
+      }
     return json.dumps(chart, indent=4)
 
 def vega_lite_hstackbar(data):
     proportions = data[0]
     num_responses = data[1]
-    pprint(proportions)
+    #pprint(proportions)
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A diverging stacked bar chart for sentiments towards a set of eight questions, displayed as percentages with neutral responses straddling the 0% mark",
@@ -703,7 +725,7 @@ race_data = get_proportions(winter24,
                             "Race/Ethnicity")
 race_donut = vega_lite_donut(race_data,
                              "Not represented")
-#print(race_donut)
+print(race_donut)
 
 
 academic_outc_data = get_proportions(winter24,
