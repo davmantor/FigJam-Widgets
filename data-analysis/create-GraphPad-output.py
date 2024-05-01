@@ -187,10 +187,10 @@ def vega_lite_donut(data, catFocus,
       }
     return json.dumps(chart, indent=4)
 
-def vega_lite_hstackbar(data):
+def vega_lite_grouphstackbar(data):
     proportions = data[0]
     num_responses = data[1]
-    #pprint(proportions)
+    pprint(proportions)
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A diverging stacked bar chart for sentiments towards a set of eight questions, displayed as percentages with neutral responses straddling the 0% mark",
@@ -200,7 +200,9 @@ def vega_lite_hstackbar(data):
             "text": "Student ERG preferences prior to taking the course",
             "fontSize": 50,
             "font": "Arial",
-            "anchor": "center",
+            "anchor": "start",
+            "subtitle": "12 Responses",
+            "subtitleFontSize": 35,
             "color": "black",
             "offset": 40
           },
@@ -209,361 +211,301 @@ def vega_lite_hstackbar(data):
               {
                 "question": "Brain Inspired Neural Networks",
                 "type": "Strongly Disagree",
-                "value": 24,
                 "percentage": 0.007
               },
               {
                 "question": "Brain Inspired Neural Networks",
                 "type": "Disagree",
-                "value": 294,
                 "percentage": 0.091
               },
               {
                 "question": "Brain Inspired Neural Networks",
                 "type": "Neither Agree nor Disagree",
-                "value": 594,
                 "percentage": 0.185
               },
               {
                 "question": "Brain Inspired Neural Networks",
                 "type": "Agree",
-                "value": 1927,
                 "percentage": 0.599
               },
               {
                 "question": "Brain Inspired Neural Networks",
                 "type": "Strongly Agree",
-                "value": 376,
                 "percentage": 0.117
               },
               {
-                "question": "Question 2",
+                "question": "Accessibility, Communities, & Technology",
                 "type": "Strongly Disagree",
-                "value": 2,
                 "percentage": 0.182
               },
               {
-                "question": "Question 2",
+                "question": "Accessibility, Communities, & Technology",
                 "type": "Disagree",
-                "value": 2,
                 "percentage": 0.182
               },
               {
-                "question": "Question 2",
+                "question": "Accessibility, Communities, & Technology",
                 "type": "Neither Agree nor Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
-                "question": "Question 2",
+                "question": "Accessibility, Communities, & Technology",
                 "type": "Agree",
-                "value": 7,
                 "percentage": 0.636
               },
               {
-                "question": "Question 2",
+                "question": "Accessibility, Communities, & Technology",
                 "type": "Strongly Agree",
-                "value": 11,
                 "percentage": 0
               },
               {
                 "question": "Question 3",
                 "type": "Strongly Disagree",
-                "value": 2,
                 "percentage": 0.2
               },
               {
                 "question": "Question 3",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 3",
                 "type": "Neither Agree nor Disagree",
-                "value": 2,
                 "percentage": 0.2
               },
               {
                 "question": "Question 3",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.4
               },
               {
                 "question": "Question 3",
                 "type": "Strongly Agree",
-                "value": 2,
                 "percentage": 0.2
               },
               {
                 "question": "Question 4",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 4",
                 "type": "Disagree",
-                "value": 2,
                 "percentage": 0.125
               },
               {
                 "question": "Question 4",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.063
               },
               {
                 "question": "Question 4",
                 "type": "Agree",
-                "value": 7,
                 "percentage": 0.438
               },
               {
                 "question": "Question 4",
                 "type": "Strongly Agree",
-                "value": 6,
                 "percentage": 0.375
               },
               {
                 "question": "Question 5",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 5",
                 "type": "Disagree",
-                "value": 1,
                 "percentage": 0.042
               },
               {
                 "question": "Question 5",
                 "type": "Neither Agree nor Disagree",
-                "value": 3,
                 "percentage": 0.125
               },
               {
                 "question": "Question 5",
                 "type": "Agree",
-                "value": 16,
                 "percentage": 0.667
               },
               {
                 "question": "Question 5",
                 "type": "Strongly Agree",
-                "value": 4,
                 "percentage": 0.167
               },
               {
                 "question": "Question 6",
                 "type": "Strongly Disagree",
-                "value": 1,
                 "percentage": 0.063
               },
               {
                 "question": "Question 6",
                 "type": "Disagree",
-                "value": 1,
                 "percentage": 0.063
               },
               {
                 "question": "Question 6",
                 "type": "Neither Agree nor Disagree",
-                "value": 2,
                 "percentage": 0.125
               },
               {
                 "question": "Question 6",
                 "type": "Agree",
-                "value": 9,
                 "percentage": 0.563
               },
               {
                 "question": "Question 6",
                 "type": "Strongly Agree",
-                "value": 3,
                 "percentage": 0.188
               },
               {
                 "question": "Question 7",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 7",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 7",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 7",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 7",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 8",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 8",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 8",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 8",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 8",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 9",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 9",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 9",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 9",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 9",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 10",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 10",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 10",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 10",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 10",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 11",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 11",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 11",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 11",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 11",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 12",
                 "type": "Strongly Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 12",
                 "type": "Disagree",
-                "value": 0,
                 "percentage": 0
               },
               {
                 "question": "Question 12",
                 "type": "Neither Agree nor Disagree",
-                "value": 1,
                 "percentage": 0.2
               },
               {
                 "question": "Question 12",
                 "type": "Agree",
-                "value": 4,
                 "percentage": 0.8
               },
               {
                 "question": "Question 12",
                 "type": "Strongly Agree",
-                "value": 0,
                 "percentage": 0
               }
             ]
@@ -625,9 +567,10 @@ def vega_lite_hstackbar(data):
                   "type": "nominal",
                   "title": None,
                   "axis": {
-                    "offset": 10,
+                    "offset": 15,
                     "ticks": False,
                     "minExtent": 60,
+                    "maxExtent": 60,
                     "domain": False,
                     "titleLimit": 0,
                     "labelLimit": 0,
@@ -657,16 +600,15 @@ def vega_lite_hstackbar(data):
                   },
                   "legend": {
                     "symbolType": "circle",
-                    "symbolSize": 200,
+                    "symbolSize": 400,
                     "orient": "right",
                     "titlePadding": 40,
                     "padding": 5,
+                    "title": None,
                     "columnPadding": 0,
                     "labelFontSize": 30,
                     "titleFontSize": 35,
                     "labelLimit": 0,
-                    "titleLimit": 0,
-                    "symbolLimit": 0,
                     "offset": 20
                   }
                 }
@@ -701,7 +643,7 @@ def vega_lite_hstackbar(data):
                 },
                 "color": {
                   "condition": {
-                    "test": "datum.percentage > 0.04",
+                    "test": "datum.percentage > 0.06",
                     "value": "black"
                   },
                   "value": None
@@ -713,12 +655,6 @@ def vega_lite_hstackbar(data):
     return json.dumps(chart, indent=4)
 
 
-"""
-academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
-                  't2_theme_discussions':'I enjoyed the weekly paper discussions',
-                  't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
-academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])"""
-
 
 race_data = get_proportions(winter24,
                             't1_RaceEthinicity_binary',
@@ -728,7 +664,7 @@ race_donut = vega_lite_donut(race_data,
 #print(race_donut)
 
 
-academic_outc_data = get_proportions(winter24,
-                                     't2_theme_emosupport',
-                                     "I gave or received emotional support")
-vega_lite_hstackbar(academic_outc_data)
+academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
+                  't2_theme_discussions':'I enjoyed the weekly paper discussions',
+                  't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
+academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
