@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 from pprint import pprint
 from collections import defaultdict
@@ -52,7 +53,18 @@ def get_palette(domain):
                       "Pref4-a": {"Please not this one!": "#f1f9e8",
                                   "Not excited, but ok...": "#b9e3bf",
                                   "This seems interesting": "#7bcdc4",
-                                  "Would love this!": "#315ab6"}}
+                                  "Would love this!": "#315ab6"},
+                      "color": {
+                                "field": "Category",
+                                "type": "nominal",
+                                "scale": {
+                                    "domain": ["Detractors (1-6)", "Neutrals (7-8)", "Promoters (9-10)"],
+                                    "range": ["#c30d24", "#F5F5DC", "#1770ab"]
+                                },
+                                "legend": None
+                            }
+                            }
+    
 
     # Retrieve the specific scale dictionary using the scale key
     palette = scale_palettes.get(scale_key, {})
@@ -415,13 +427,121 @@ def vega_lite_grouphstackbar(data):
         }
     return json.dumps(chart, indent=4)
 
+def vega_lite_simplebar(data, column='t2_recommend_theme'):
+    data['recode'] = data[column]
+    conditions = [
+        data['recode'].between(1, 6),
+        data['recode'].between(7, 8),
+        data['recode'].between(9, 10)
+    ]
+    choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
+    data['category'] = np.select(conditions, choices, default='Unknown')
+    category_counts = data['category'].value_counts(normalize=True) * 100
+    category_counts = category_counts.reindex(choices).fillna(0)
+    data_values = [{"Category": cat, "Percentage": pct / 100.0} for cat, pct in category_counts.items()]
+    chart_json = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "description": "A simple bar chart representing percentages of Promoters, Neutrals, and Detractors.",
+        "width": 300,
+        "title": {
+            "text": "Entire Class",
+            "subtitle": f"{data['category'].count()} Responses",
+            "subtitleFontSize": 16,
+            "fontSize": 30,
+            "font": "Arial",
+            "anchor": "start",
+            "color": "black",
+            "offset": 30
+        },
+        "data": {
+            "values": data_values
+        },
+        "config": {
+            "axis": {
+                "labelFontSize": 15,
+                "titleFontSize": 14
+            }
+        },
+        "mark": {"type": "bar", "size": 20},
+        "encoding": {
+            "x": {
+                "field": "Category",
+                "type": "nominal",
+                "scale": {
+                    "padding": 0.3
+                },
+                "axis": {
+                    "title": None,
+                    "labelAngle": 0,
+                    "labelLimit": 800,
+                    "labelFontSize": 15
+                }
+            },
+            "y": {
+                "field": "Percentage",
+                "type": "quantitative",
+                "axis": {
+                    "title": None,
+                    "grid": True,
+                    "format": ".0%"
+                }
+            },
+            "color": {
+                "field": "Category",
+                "type": "nominal",
+                "scale": {
+                    "domain": ["Detractors (1-6)", "Neutrals (7-8)", "Promoters (9-10)"],
+                    "range": ["#c30d24", "#F5F5DC", "#1770ab"]
+                },
+                "legend": None
+            }
+        },
+        "layer": [
+            {
+                "mark": "bar"
+            },
+            {
+                "mark": {
+                    "type": "text",
+                    "align": "center",
+                    "baseline": "middle",
+                    "dy": -15,
+                    "fontSize": 20,
+                    "fontWeight": "bold"
+                },
+                "encoding": {
+                    "x": {
+                        "field": "Category",
+                        "type": "nominal"
+                    },
+                    "y": {
+                        "field": "Percentage",
+                        "type": "quantitative",
+                        "scale": {"domain": [0, 1]}
+                    },
+                    "text": {
+                        "field": "Percentage",
+                        "type": "quantitative",
+                        "format": ".1%"
+                    },
+                    "color": {
+                        "value": "black"
+                    }
+                }
+            }
+        ]
+    }
+    return json.dumps(chart_json, indent=4)
+
+simplebar = vega_lite_simplebar(winter24)
+print(simplebar)
 
 race_data = get_proportions(winter24,
                             't1_RaceEthinicity_binary',
                             "Race/Ethnicity")
 race_donut = vega_lite_donut(race_data,
                              "Not represented")
-#print(race_donut)
+# print(race_donut)
 
 
 academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
@@ -429,7 +549,7 @@ academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting
                   't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
 academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
 academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
-print(academic_outc_chart)
+# print(academic_outc_chart)
 
 erg_items = {
     't1_erg1_pref': 'Brain-Inspired Neural Networks',
