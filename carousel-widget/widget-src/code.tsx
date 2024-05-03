@@ -31,11 +31,20 @@ function numToIndices(num: number): number[] {
   return new Array(num).fill(0).map((_, i) => i);
 }
 
+function getHeightBasedOnCharacterCount(charCount: number): number {
+  if (charCount < 100) {
+    return 100;
+  } else {
+    return charCount;
+  }
+}
+
 function Table() {
   const cells = useSyncedMap<string>("cells");
   const [numRows, setRows] = useSyncedState('rows', 0);
   const [index, setIndex] = useSyncedState('index', 0);
   const [boxesPerSlide, setBoxesPerSlide] = useSyncedState('boxesPerSlide', 3);
+  const [maxCharCount, setMaxCharCount] = useSyncedState('maxCharCount', 0);
 
   const propertyMenu: WidgetPropertyMenuItem[] = [
     {
@@ -65,10 +74,13 @@ function Table() {
   usePropertyMenu(propertyMenu, ({ propertyName }) => {
     if (propertyName === 'decrement' && numRows > 1) {
       setRows(numRows - boxesPerSlide);
+      setMaxCharCount(0); 
     } else if (propertyName === 'increment') {
       setRows(numRows + boxesPerSlide);
     }
   });
+
+  const calculatedHeight = getHeightBasedOnCharacterCount(maxCharCount);
 
   return (
     <AutoLayout
@@ -89,35 +101,35 @@ function Table() {
         }}
       />
       {numToIndices(numRows)
-  .slice(index * boxesPerSlide, (index + 1) * boxesPerSlide)
-  .map((_, idx) => {
-    const cellKey = `cell-${index * boxesPerSlide + idx}`;
-    const cellContents = cells.get(cellKey) || "";
-    return (
-      <AutoLayout
-        key={cellKey}
-        cornerRadius={3}
-        direction="vertical"
-        fill="#fff"
-        stroke="#000"
-        padding={8}
-        height="hug-contents"
-      >
-        <AutoLayout
-          padding={{ top: 10, bottom: 10, left: 0, right: 0 }}
-          height="hug-contents"
-        >
-          <Input
-            onTextEditEnd={(e) => cells.set(cellKey, e.characters)}
-            placeholder="Edit me..."
-            value={cellContents}
-            fontSize={14}
-          />
-        </AutoLayout>
-      </AutoLayout>
-    );
-})}
-
+        .slice(index * boxesPerSlide, (index + 1) * boxesPerSlide)
+        .map((_, idx) => {
+          const cellKey = `cell-${index * boxesPerSlide + idx}`;
+          const cellContents = cells.get(cellKey) || "";
+          return (
+            <AutoLayout
+              key={cellKey}
+              cornerRadius={3}
+              direction="vertical"
+              fill="#fff"
+              stroke="#000"
+              padding={8}
+              height={calculatedHeight}
+            >
+              <Input
+                onTextEditEnd={(e) => {
+                  const newCharCount = e.characters.length;
+                  if (newCharCount > maxCharCount) {
+                    setMaxCharCount(newCharCount);
+                  }
+                  cells.set(cellKey, e.characters);
+                }}
+                placeholder="Edit me..."
+                value={cellContents}
+                fontSize={14}
+              />
+            </AutoLayout>
+          );
+        })}
       <SVG
         src={buttonSrc}
         onClick={() => {
