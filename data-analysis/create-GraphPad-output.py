@@ -9,7 +9,6 @@ df = pd.read_excel('clean_merged_data.xlsx', engine='openpyxl')
 # Filter for specific quarter
 winter24 = df.query("t1_quarter == 2")
 
-
 scales = {"Agreement5-a": {"0.0": "Not applicable",
                            "1.0": "Strongly disagree",
                            "2.0": "Somewhat disagree",
@@ -26,11 +25,13 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
                            "2.0": "Sometimes",
                            "3.0": "Frequently",
                            "4.0": "Always"},
-          "Pref4-a": {"1.0": "Please not this one!",
-                      "2.0": "Not excited, but ok...",
-                      "3.0": "This seems interesting",
-                      "4.0": "Would love this!"}
-          }
+          "Pref4-a":      {"1.0": "Please not this one!",
+                           "2.0": "Not excited, but ok...",
+                           "3.0": "This seems interesting",
+                           "4.0": "Would love this!"},
+          "Nps3-a":       {"Detractor": "c30d24",
+                           "Neutral": "F5F5DC",
+                           "Promoter": "1770ab"}}
 
 def get_palette(domain):
     scale_key = matchOptions2Scale(scales, domain)
@@ -50,20 +51,13 @@ def get_palette(domain):
                                        "2.0": "Sometimes",
                                        "3.0": "Frequently",
                                        "4.0": "Always"},
-                      "Pref4-a": {"Please not this one!": "#f1f9e8",
-                                  "Not excited, but ok...": "#b9e3bf",
-                                  "This seems interesting": "#7bcdc4",
-                                  "Would love this!": "#315ab6"},
-                      "color": {
-                                "field": "Category",
-                                "type": "nominal",
-                                "scale": {
-                                    "domain": ["Detractors (1-6)", "Neutrals (7-8)", "Promoters (9-10)"],
-                                    "range": ["#c30d24", "#F5F5DC", "#1770ab"]
-                                },
-                                "legend": None
-                            }
-                            }
+                      "Pref4-a":      {"Please not this one!": "#f1f9e8",
+                                       "Not excited, but ok...": "#b9e3bf",
+                                       "This seems interesting": "#7bcdc4",
+                                       "Would love this!": "#315ab6"},
+                      "Nps3-a":       {"Detractor": "c30d24",
+                                       "Neutral": "F5F5DC",
+                                       "Promoter": "1770ab"}}
     
 
     # Retrieve the specific scale dictionary using the scale key
@@ -427,25 +421,17 @@ def vega_lite_grouphstackbar(data):
         }
     return json.dumps(chart, indent=4)
 
-def vega_lite_simplebar(data, column='t2_recommend_theme'):
-    data['recode'] = data[column]
-    conditions = [
-        data['recode'].between(1, 6),
-        data['recode'].between(7, 8),
-        data['recode'].between(9, 10)
-    ]
-    choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
-    data['category'] = np.select(conditions, choices, default='Unknown')
-    category_counts = data['category'].value_counts(normalize=True) * 100
-    category_counts = category_counts.reindex(choices).fillna(0)
-    data_values = [{"Category": cat, "Percentage": pct / 100.0} for cat, pct in category_counts.items()]
+def vega_lite_simplebar(data):
+    proportions, num_responses = data
+    domain = [entry["Category"] for entry in proportions]
+    palette_dict, palette = get_palette(domain)
     chart_json = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "A simple bar chart representing percentages of Promoters, Neutrals, and Detractors.",
         "width": 300,
         "title": {
             "text": "Entire Class",
-            "subtitle": f"{data['category'].count()} Responses",
+            "subtitle": f"{num_responses} Responses",
             "subtitleFontSize": 16,
             "fontSize": 30,
             "font": "Arial",
@@ -454,7 +440,7 @@ def vega_lite_simplebar(data, column='t2_recommend_theme'):
             "offset": 30
         },
         "data": {
-            "values": data_values
+            "values": proportions
         },
         "config": {
             "axis": {
@@ -490,8 +476,8 @@ def vega_lite_simplebar(data, column='t2_recommend_theme'):
                 "field": "Category",
                 "type": "nominal",
                 "scale": {
-                    "domain": ["Detractors (1-6)", "Neutrals (7-8)", "Promoters (9-10)"],
-                    "range": ["#c30d24", "#F5F5DC", "#1770ab"]
+                    "domain": domain,
+                    "range": palette,
                 },
                 "legend": None
             }
@@ -533,38 +519,54 @@ def vega_lite_simplebar(data, column='t2_recommend_theme'):
     }
     return json.dumps(chart_json, indent=4)
 
-simplebar = vega_lite_simplebar(winter24)
+
+# recoding for NPS_data for the different ratings on the recommendation score
+conditions = [
+    winter24['t2_recommend_theme'].between(1, 6),
+    winter24['t2_recommend_theme'].between(7, 8),
+    winter24['t2_recommend_theme'].between(9, 10)
+]
+choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
+winter24['t2_NPS_category'] = np.select(conditions, choices, default='Unknown')
+
+NPS_data = get_proportions(winter24, 
+                           't2_NPS_category',
+                           "Category") 
+
+simplebar = vega_lite_simplebar(NPS_data)
 print(simplebar)
 
-race_data = get_proportions(winter24,
-                            't1_RaceEthinicity_binary',
-                            "Race/Ethnicity")
-race_donut = vega_lite_donut(race_data,
-                             "Not represented")
+
+
+# race_data = get_proportions(winter24,
+#                             't1_RaceEthinicity_binary',
+#                             "Race/Ethnicity")
+# race_donut = vega_lite_donut(race_data,
+#                              "Not represented")
 # print(race_donut)
 
 
-academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
-                  't2_theme_discussions':'I enjoyed the weekly paper discussions',
-                  't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
-academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
-academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
+# academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
+#                   't2_theme_discussions':'I enjoyed the weekly paper discussions',
+#                   't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
+# academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
+# academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
 # print(academic_outc_chart)
 
-erg_items = {
-    't1_erg1_pref': 'Brain-Inspired Neural Networks',
-    't1_erg2_pref': 'Sustainable Sensor Networks',
-    't1_erg3_pref': 'Explanatory AI for Autonomous Vehicles',
-    't1_erg4_pref': 'Accessibility, Communities, & Technology',
-    't1_erg5_pref': 'Testing Autonomous Vehicles',
-    't1_erg6_pref': '3D Faces',
-    't1_erg7_pref': 'Ed Tech',
-    't1_erg8_pref': 'Users in Design',
-    't1_erg9_pref': 'Aerial Robotics',
-    't1_erg10_pref': 'Personal Informatics',
-    't1_erg11_pref': 'Autonomous Security',
-    't1_erg12_pref': 'Air Quality Environmental Justice'
-}
-erg_pref_data = item_group_proportions(winter24, erg_items, scales['Pref4-a'])
-erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
-#print(erg_pref_chart)
+# erg_items = {
+#     't1_erg1_pref': 'Brain-Inspired Neural Networks',
+#     't1_erg2_pref': 'Sustainable Sensor Networks',
+#     't1_erg3_pref': 'Explanatory AI for Autonomous Vehicles',
+#     't1_erg4_pref': 'Accessibility, Communities, & Technology',
+#     't1_erg5_pref': 'Testing Autonomous Vehicles',
+#     't1_erg6_pref': '3D Faces',
+#     't1_erg7_pref': 'Ed Tech',
+#     't1_erg8_pref': 'Users in Design',
+#     't1_erg9_pref': 'Aerial Robotics',
+#     't1_erg10_pref': 'Personal Informatics',
+#     't1_erg11_pref': 'Autonomous Security',
+#     't1_erg12_pref': 'Air Quality Environmental Justice'
+# }
+# erg_pref_data = item_group_proportions(winter24, erg_items, scales['Pref4-a'])
+# erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
+# print(erg_pref_chart)
