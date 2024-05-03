@@ -44,7 +44,12 @@
   <textarea id="messageInput" placeholder="Type your message here..."></textarea>
   <button id="sendMessage">Send</button>
   <label>
-  <input type="checkbox" id="anonymousCheckbox"> Send anonymously
+  
+<div id="anonymousContainer">
+  <label>
+    <input type="checkbox" id="anonymousCheckbox"> Send anonymously
+  </label>
+</div>
 </label>
 
   
@@ -58,11 +63,18 @@
         console.log("MODAL UPDATE");
         document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
         document.getElementById('sendMessage').innerText = 'Update'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'block'; // Show checkbox when editing a message
+      } else if (type === 'edit-prompt') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Prompt'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
       } else if (type === 'reply-message') {
         console.log("MODAL REPLY");
         document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
         document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...;` // Show reply-to message snippet
         document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
+        anonymousContainer.style.display = 'block'; // Show checkbox when replying to a message
       }
     };
 
