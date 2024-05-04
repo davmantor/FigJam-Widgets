@@ -26,7 +26,7 @@ const repliesdown = '<svg fill="#007AFF" height="18px" width="18px" version="1.1
 
 const adminI = '<svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
 
-const plus = '<svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+const plus = '<svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
 
 type Message = {
     id: string;
@@ -97,24 +97,27 @@ function ChatWidget() {
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
-    const [color, setColor] = useSyncedState("theme", "#000000");
+    //const [color, setColor] = useSyncedState("theme", "#000000");
+    const [borderColor, setBorderColor] = useSyncedState("pborderColor", "#FFFFFF");
+
+    const [promptColor, setPromptColor] = useSyncedState("promptColor", "#000000");
     
-    usePropertyMenu(
-      [
-        {
-          itemType: 'color-selector',
-          propertyName: 'colors',
-          tooltip: 'Color selector',
-          selectedOption: color,
-          options: [{option: "#000000", tooltip: "Black"}, {option: "#e06666", tooltip: "Red"}, {option: "#ffe599", tooltip: "Yellow"} ],
-        }
-      ],
-      ({propertyName, propertyValue}) => {
-        if (propertyName === "colors") {
-          setColor(String(propertyValue))
-        }
-      },
-    );
+    // usePropertyMenu(
+    //   [
+    //     {
+    //       itemType: 'color-selector',
+    //       propertyName: 'colors',
+    //       tooltip: 'Color selector',
+    //       selectedOption: color,
+    //       options: [{option: "#000000", tooltip: "Black"}, {option: "#e06666", tooltip: "Red"}, {option: "#ffe599", tooltip: "Yellow"} ],
+    //     }
+    //   ],
+    //   ({propertyName, propertyValue}) => {
+    //     if (propertyName === "colors") {
+    //       setColor(String(propertyValue))
+    //     }
+    //   },
+    // );
     
   /*
     useEffect(() => {
@@ -862,21 +865,23 @@ function ChatWidget() {
                 padding={30}
                 direction="vertical"
                 spacing={20}
-                minWidth={450}
+                width={800}
+                height={250}
                 horizontalAlignItems={"center"}
+                verticalAlignItems={"center"}
                 >
                   <Text
                   fill="#60666D"
-                  fontSize={16}
+                  fontSize={36}
                   fontWeight={500}
-                  lineHeight={1.4}
+                  lineHeight={20.4}
                   >
                     No messages yet
                   </Text>
                   <Text
                   fill="#8E939A"
-                  fontSize={14}
-                  lineHeight={1.4}
+                  fontSize={24}
+                  lineHeight={20.4}
                   >
                     Send a message with the add message button below.
                   </Text>
@@ -917,7 +922,7 @@ function ChatWidget() {
       console.log("in options:" , userName);
       if (isUserAuthorized(userName)) {
           return new Promise<void>((resolve, reject) => {
-              figma.showUI(__uiFiles__.optionsChat, { width: 350, height: 50 });
+              figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 50 });
   
               // Listen for messages from the options.html iframe
               figma.ui.onmessage = msg => {
@@ -943,6 +948,51 @@ function ChatWidget() {
                               resolve(); // Optionally resolve the promise here, since the action is completed
                             }
                           };
+
+                  } else if (msg.type === 'update-borderColor') {
+                    console.log("calling prompt from options");
+                    figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                    figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+                    console.log("opened");
+
+                    figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                            const updatedText = msg.payload.message;
+                            setBorderColor(updatedText);
+                            figma.closePlugin();
+                            resolve(); 
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
+                  } else if (msg.type === 'update-promptColor') {
+                    console.log("calling prompt from options");
+                    figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                    figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+                    console.log("opened");
+
+                    figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                            const updatedText = msg.payload.message;
+                            setPromptColor(updatedText);
+                            figma.closePlugin();
+                            resolve(); 
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
                   } else if (msg.type === 'close-options') {
                       // Handle closing the options iframe
                       resolve();
@@ -980,8 +1030,21 @@ function ChatWidget() {
         </AutoLayout>
       
        
-
+      
       </AutoLayout>*/
+      <AutoLayout
+      direction="vertical"
+      spacing={8}
+      padding={25}
+      stroke="#efefef" // Outline color for the send area
+      strokeWidth={2} // Outline width for the send area
+      cornerRadius={10} // Rounded corners for the send area
+      onClick={updateUserName}
+      minWidth={800}
+      fill={borderColor}
+      >
+
+      
       <AutoLayout
       direction="vertical"
       spacing={8}
@@ -1029,11 +1092,11 @@ function ChatWidget() {
           padding={{ top: 0, bottom: 20, left: 20 }}
         >
           <Text
-          fill={color}
-          fontSize={50}
-          fontWeight={600}
-          width={800}
-          lineHeight={65}
+          fill={promptColor}
+          fontSize={60}
+          fontWeight={700}
+          width={770}
+          lineHeight={75}
           >
             {inPrompt ? inPrompt : 'Chat'}
           </Text>
@@ -1057,18 +1120,20 @@ function ChatWidget() {
             direction="horizontal"
             onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
             fill="#007AFF" // Example button styling
-            padding={8}
+            padding={10}
             cornerRadius={100}
             
           >
-            <AutoLayout padding={6}>
+            <AutoLayout padding={8}>
             <SVG src={plus}></SVG>
             </AutoLayout>
 
-            <Text fontSize={30} fill="#FFFFFF">Add Message  </Text>
+            <Text fontSize={36} fill="#FFFFFF">Add Message  </Text>
           </AutoLayout>
           {/* Remaining UI elements, like the message display area */}
         </AutoLayout>
+      </AutoLayout>
+
       </AutoLayout>
     );
 }
@@ -1238,7 +1303,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             <Text width={60} fontSize={4} fill="#808080"> </Text>
             
             {isEdited && !isDeleted && (
-              <Text width={60} fontSize={12} fill="#808080">
+              <Text width={200} fontSize={25} fill="#808080">
                 (edited)
               </Text>
             )}
@@ -1249,7 +1314,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
         <AutoLayout // Container for Reply and Delete and Edit and Show Replies buttons
           direction="horizontal"
           padding={{ top: 20, bottom: 0, left: 4, right: 4 }}
-          spacing={8} // Space between buttons
+          spacing={12} // Space between buttons
         >
 
           {message.text != "this message has been deleted" && (
@@ -1261,7 +1326,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 <AutoLayout
                     //fill="#FFFFFF"
                     cornerRadius={200}
-                    padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
+                    padding={{ top: 14, bottom: 4, left: 10, right: 10 }}
                     onClick={() => onUpvote()}
                     //stroke={"007AFF"}
                 >
@@ -1275,7 +1340,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 <AutoLayout
                     //fill="#FFFFFF"
                     //cornerRadius={4}
-                    padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
+                    padding={{ top: 10, bottom: 6, left: 10, right: 10 }}
                     //onClick={() => onUpvote()}
                 >
                 {/* Display Score */}
@@ -1286,7 +1351,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 <AutoLayout
                     //fill="#FFFFFF"
                     cornerRadius={200}
-                    padding={{ top: 10, bottom: 4, left: 8, right: 8 }}
+                    padding={{ top: 14, bottom: 4, left: 10, right: 10 }}
                     onClick={() => onDownvote()}
                 >
                   <SVG
@@ -1304,7 +1369,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout // Reply button with additional padding
             fill="#007AFF"
             cornerRadius={200}
-            padding={{ top: 6, bottom: isDeleted ? 0 : 6, left: 8, right: 8 }} // Increased padding for the button
+            padding={{ top: 8, bottom: isDeleted ? 0 : 8, left: 10, right: 10 }} // Increased padding for the button
             onClick={onReply}
 
           >
@@ -1324,14 +1389,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             //fill={message.showReplies ? '#FFFFFF' : '#000033'}
             //stroke={'#000033'}
             cornerRadius={4}
-            padding={{ top: 6, bottom: isDeleted ? 15 : 0, left: 8, right: 8 }} // Increased padding for the button
+            padding={{ top: 8, bottom: isDeleted ? 15 : 0, left: 10, right: 10 }} // Increased padding for the button
             onClick={onShowReplies}
           >
             { message.showReplies && (
               <AutoLayout
               //fill="#FFFFFF"
               cornerRadius={4}
-              padding={{ top: 4, bottom: 4, left: 0, right: 0 }}
+              padding={{ top: 6, bottom: 6, left: 0, right: 0 }}
               onClick={onShowReplies}
               //stroke={"007AFF"}
               >
@@ -1347,7 +1412,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
               <AutoLayout
               //fill="#FFFFFF"
               cornerRadius={4}
-              padding={{ top: 4, bottom: 4, left: 0, right: 0 }}
+              padding={{ top: 6, bottom: 6, left: 0, right: 0 }}
               onClick={onShowReplies}
               //stroke={"007AFF"}
               >

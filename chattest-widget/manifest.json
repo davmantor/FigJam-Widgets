@@ -2,6 +2,7 @@
   "name": "chattest",
   "id": "1338970910141331132",
   "api": "1.0.0",
+  "documentAccess": "dynamic-page",
   "editorType": ["figjam"],
   "permissions": ["currentuser"], 
   "containsWidget": true,
@@ -9,7 +10,9 @@
   "ui": {
     "main": "dist/ui.html", 
     "options": "dist/options.html",
-    "check": "dist/events.html"},
+    "check": "dist/events.html",
+    "optionsChat": "dist/optionsChat.html"
+  },
   "widgetApi": "1.0.0",
   "networkAccess": {     "allowedDomains": ["*"],
   "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
