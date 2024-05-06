@@ -37,6 +37,10 @@
     button:hover {
       background-color: #0056b3; /* Darker blue on hover */
     }
+
+    button:disabled {
+      background-color: #a2a2a2; /* Gray color */
+    }
     
   </style>
 </head>
@@ -90,12 +94,15 @@
 
     // Send button click handler
     document.getElementById('sendMessage').onclick = () => {
+      document.getElementById('sendMessage').disabled = "false";
       const message = document.getElementById('messageInput').value.trim();
       const anonymous = document.getElementById('anonymousCheckbox').checked; // Get the checkbox value
       const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
       parent.postMessage({ pluginMessage: { type: actionType, payload: { message, anonymous } } }, '*'); // Include the anonymous value
+      document.getElementById('sendMessage').disabled = "true";
+      document.getElementById('sendMessage').innerText = 'Please Wait ...'; // Update button to indicate reply action
     };
-    
+
     
     // Cancel button click handler
     document.getElementById('cancelButton').onclick = () => {
