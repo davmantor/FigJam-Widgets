@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carousel Populator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #5a5a5a;
+        }
+        label, select, input, button {
+            font-size: 14px;
+            padding: 8px;
+            margin: 4px 0;
+        }
+        select, input {
+            width: calc(100% - 18px);
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-group {
+            margin-top: 10px;
+        }
+        .button-group button {
+            margin-right: 5px;
+        }
+        div {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Carousel Populator</h1>
+    <div>
+        <label for="column-select">Select Column:</label>
+        <select id="column-select"></select>
+    </div>
+    <div>
+        <label for="num-cards">Number of Cards:</label>
+        <input id="num-cards" type="number" value="3" min="1" />
+    </div>
+    <button id="populate-carousel">Populate Carousel</button>
+    <div class="button-group">
+        <button id="prevButton">Prev</button>
+        <button id="nextButton">Next</button>
+    </div>
+
+    <script>
+        parent.postMessage({ pluginMessage: { type: 'request-columns' } }, '*');
+        
+        window.onmessage = (event) => {
+            const { type, columns } = event.data.pluginMessage;
+            if (type === 'columns-data') {
+                const selectElement = document.getElementById('column-select');
+                columns.forEach((column, index) => {
+                    let option = new Option(column, index);
+                    selectElement.add(option);
+                });
+            }
+        };
+        
+        document.getElementById('populate-carousel').addEventListener('click', () => {
+            const columnIndex = parseInt(document.getElementById('column-select').value, 10);
+            const numCards = parseInt(document.getElementById('num-cards').value, 10);
+            parent.postMessage({ pluginMessage: { type: 'populate-carousel', columnIndex, numCards } }, '*');
+        });
+        
+        document.getElementById('nextButton').addEventListener('click', () => {
+            parent.postMessage({ pluginMessage: { type: 'navigate', direction: 'next' } }, '*');
+        });
+        
+        document.getElementById('prevButton').addEventListener('click', () => {
+            parent.postMessage({ pluginMessage: { type: 'navigate', direction: 'prev' } }, '*');
+        });
+    </script>
+</body>
+</html>

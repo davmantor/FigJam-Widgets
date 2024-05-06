@@ -1,143 +1,85 @@
-const { widget } = figma;
-const {
-  AutoLayout,
-  Input,
-  SVG,
-  useSyncedMap,
-  useSyncedState,
-  usePropertyMenu
-} = widget;
+const { widget, showUI, ui } = figma;
+const { AutoLayout, Text, useEffect, useSyncedState } = widget;
 
-const buttonSrc = `
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="16" cy="16" r="15.5" stroke="black" stroke-opacity="0.1" fill="white"/>
-  <path fill-rule="evenodd" clip-rule="evenodd" d="M17 8H15V15H8V17H15V24H17V17H24V15H17V8Z" fill="black" fill-opacity="0.8"/>
-  </svg>
-`;
-
-const downIconSrc = `
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M7.08 0.079998H9.08L9.08 12.08L14.58 6.58L16 8L8.08 15.92L0.160004 8L1.58 6.58L7.08 12.08L7.08 0.079998Z" fill="white"/>
-  </svg>
-`;
-
-const upIconSrc = `
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M9.08001 15.92L7.08001 15.92L7.08001 3.92002L1.58001 9.42002L0.160007 8.00002L8.08001 0.0800171L16 8.00002L14.58 9.42002L9.08001 3.92002L9.08001 15.92Z" fill="white"/>
-  </svg>
-`;
-
-function numToIndices(num: number): number[] {
-  return new Array(num).fill(0).map((_, i) => i);
+interface ButtonProps {
+  onClick: () => void;
+  children: string;
 }
 
-function getHeightBasedOnCharacterCount(charCount: number): number {
-  if (charCount < 100) {
-    return 100;
-  } else {
-    return charCount;
-  }
-}
-
-function Table() {
-  const cells = useSyncedMap<string>("cells");
-  const [numRows, setRows] = useSyncedState('rows', 0);
-  const [index, setIndex] = useSyncedState('index', 0);
-  const [boxesPerSlide, setBoxesPerSlide] = useSyncedState('boxesPerSlide', 3);
-  const [maxCharCount, setMaxCharCount] = useSyncedState('maxCharCount', 0);
-
-  const propertyMenu: WidgetPropertyMenuItem[] = [
-    {
-      tooltip: 'Increment',
-      propertyName: 'increment',
-      itemType: 'action',
-      icon: upIconSrc,
-    },
-    {
-      tooltip: 'Card Count: ' + numRows,
-      propertyName: 'count',
-      itemType: 'action',
-    },
-    {
-      tooltip: 'Card #: ' + (index + 1),
-      propertyName: 'index',
-      itemType: 'action',
-    },
-    {
-      tooltip: 'Decrement',
-      propertyName: 'decrement',
-      itemType: 'action',
-      icon: downIconSrc,
-    }
-  ];
-
-  usePropertyMenu(propertyMenu, ({ propertyName }) => {
-    if (propertyName === 'decrement' && numRows > 1) {
-      setRows(numRows - boxesPerSlide);
-      setMaxCharCount(0); 
-    } else if (propertyName === 'increment') {
-      setRows(numRows + boxesPerSlide);
-    }
-  });
-
-  const calculatedHeight = getHeightBasedOnCharacterCount(maxCharCount);
-
+function Button({ onClick, children }: ButtonProps) {
   return (
-    <AutoLayout
-      cornerRadius={3}
-      direction="horizontal"
-      fill="#FFFFFF"
-      height="hug-contents"
-      horizontalAlignItems="center"
-      padding={8}
-      spacing={12}
-      stroke="#000"
-      verticalAlignItems="center"
-    >
-      <SVG
-        src={buttonSrc}
-        onClick={() => {
-          setIndex(Math.max(index - 1, 0));
-        }}
-      />
-      {numToIndices(numRows)
-        .slice(index * boxesPerSlide, (index + 1) * boxesPerSlide)
-        .map((_, idx) => {
-          const cellKey = `cell-${index * boxesPerSlide + idx}`;
-          const cellContents = cells.get(cellKey) || "";
-          return (
-            <AutoLayout
-              key={cellKey}
-              cornerRadius={3}
-              direction="vertical"
-              fill="#fff"
-              stroke="#000"
-              padding={8}
-              height={calculatedHeight}
-            >
-              <Input
-                onTextEditEnd={(e) => {
-                  const newCharCount = e.characters.length;
-                  if (newCharCount > maxCharCount) {
-                    setMaxCharCount(newCharCount);
-                  }
-                  cells.set(cellKey, e.characters);
-                }}
-                placeholder="Edit me..."
-                value={cellContents}
-                fontSize={14}
-              />
-            </AutoLayout>
-          );
-        })}
-      <SVG
-        src={buttonSrc}
-        onClick={() => {
-          setIndex(Math.min(index + 1, Math.ceil(numRows / boxesPerSlide) - 1));
-        }}
-      />
+    <AutoLayout fill="#007AFF" padding={8} cornerRadius={4} onClick={onClick} horizontalAlignItems="center" verticalAlignItems="center">
+      <Text fill="#FFFFFF" fontSize={16} verticalAlignText="center" horizontalAlignText="center">{children}</Text>
     </AutoLayout>
   );
 }
 
-widget.register(Table);
+function CarouselWidget() {
+  const [selectedData, setSelectedData] = useSyncedState<string[]>('selectedData', []);
+  const [cardCount, setCardCount] = useSyncedState<number>('cardCount', 3);
+  const [currentIndex, setCurrentIndex] = useSyncedState<number>('currentIndex', 0);
+  const [isDataLoaded, setIsDataLoaded] = useSyncedState<boolean>('isDataLoaded', false);
+  
+  useEffect(() => {
+    ui.on('message', message => {
+      if (message.type === 'select-column') {
+        setSelectedData(message.data.columnData);
+        setCardCount(message.data.cardCount);
+        setIsDataLoaded(true);
+      }
+    });
+  });
+
+  const handleButtonClick = () => {
+    return new Promise<void>((resolve) => {
+      showUI(__uiFiles__.main, { width: 300, height: 200 });
+      ui.on('message', message => {
+        if (message.type === 'select-column') {
+          if (Array.isArray(message.data.columnData)) {
+            setSelectedData(message.data.columnData);
+            setCardCount(message.data.cardCount);
+            setIsDataLoaded(true);
+            figma.ui.close();
+            resolve();
+          } else {
+            console.error('Expected an array for column data, received:', message.data.columnData);
+            setIsDataLoaded(false);
+            setSelectedData([]); // Reset or handle as needed
+            resolve();
+          }
+        }
+      });
+    });
+  };
+
+  const navigateCarousel = (direction: 'next' | 'prev') => {
+    setCurrentIndex(prevIndex => {
+      const maxIndex = Math.max(0, selectedData.length - cardCount);
+      return direction === 'next' ? Math.min(prevIndex + cardCount, maxIndex) : Math.max(prevIndex - cardCount, 0);
+    });
+  };
+
+  const currentPage = Math.floor(currentIndex / cardCount) + 1;
+  const totalPages = Math.ceil(selectedData.length / cardCount);
+
+  return (
+    <AutoLayout direction="vertical" spacing={10} padding={8}>
+      {!isDataLoaded && <Button onClick={handleButtonClick}>Load xlsx and Select Column</Button>}
+      <AutoLayout direction="horizontal" spacing={10}>
+        <Button onClick={() => navigateCarousel('prev')}>Prev</Button>
+        {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
+          <AutoLayout key={index} fill="#E1E1E1" padding={10} cornerRadius={4} width={400} minHeight={600} direction="vertical" verticalAlignItems="center" horizontalAlignItems="center">
+            <Text fontSize={14}>Card #{currentIndex + index + 1}</Text>
+            <Text fontSize={14} width={230} verticalAlignText="center" horizontalAlignText="center">
+              {data || 'No data'}
+            </Text>
+          </AutoLayout>
+        ))}
+        <Button onClick={() => navigateCarousel('next')}>Next</Button>
+      </AutoLayout>
+      <Text fontSize={16} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
+    </AutoLayout>
+  );
+}
+
+widget.register(CarouselWidget);

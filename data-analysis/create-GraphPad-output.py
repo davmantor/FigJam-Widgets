@@ -28,10 +28,7 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
           "Pref4-a":      {"1.0": "Please not this one!",
                            "2.0": "Not excited, but ok...",
                            "3.0": "This seems interesting",
-                           "4.0": "Would love this!"},
-          "Nps3-a":       {"Detractor": "c30d24",
-                           "Neutral": "F5F5DC",
-                           "Promoter": "1770ab"}}
+                           "4.0": "Would love this!"}}
 
 def get_palette(domain):
     scale_key = matchOptions2Scale(scales, domain)
@@ -54,12 +51,8 @@ def get_palette(domain):
                       "Pref4-a":      {"Please not this one!": "#f1f9e8",
                                        "Not excited, but ok...": "#b9e3bf",
                                        "This seems interesting": "#7bcdc4",
-                                       "Would love this!": "#315ab6"},
-                      "Nps3-a":       {"Detractor": "c30d24",
-                                       "Neutral": "F5F5DC",
-                                       "Promoter": "1770ab"}}
+                                       "Would love this!": "#315ab6"}}
     
-
     # Retrieve the specific scale dictionary using the scale key
     palette = scale_palettes.get(scale_key, {})
     extra_colors = [
@@ -423,8 +416,12 @@ def vega_lite_grouphstackbar(data):
 
 def vega_lite_simplebar(data):
     proportions, num_responses = data
-    domain = [entry["Category"] for entry in proportions]
-    palette_dict, palette = get_palette(domain)
+    domain = [{'Category': 'Detractors (1-6)'},
+              {'Category': 'Neutrals (7-8)'},
+              {'Category': 'Promoters (9-10)'}]
+    domain = [entry['Category'] for entry in domain]
+    palette = get_palette(domain)
+    palette = palette[-1]
     chart_json = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "A simple bar chart representing percentages of Promoters, Neutrals, and Detractors.",
@@ -528,15 +525,17 @@ conditions = [
 ]
 choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
 winter24['t2_NPS_category'] = np.select(conditions, choices, default='Unknown')
-
-NPS_data = get_proportions(winter24, 
-                           't2_NPS_category',
-                           "Category") 
-
+# gets the data
+NPS_data = get_proportions(winter24, 't2_NPS_category', "Category") 
+# filters out the 'unknown' category
+filtered_proportions = [entry for entry in NPS_data[0] if entry['Category'] != 'Unknown']
+# turns the data into percentages
+transformed_proportions = [{'Category': entry['Category'], 'Percentage': entry['value'] / 100} for entry in filtered_proportions]
+NPS_data[0] = transformed_proportions
+# creates JSON
 simplebar = vega_lite_simplebar(NPS_data)
+
 print(simplebar)
-
-
 
 # race_data = get_proportions(winter24,
 #                             't1_RaceEthinicity_binary',
