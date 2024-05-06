@@ -1,8 +1,10 @@
 {
   "name": "Carousel",
-  "id": "1354877352868705883",
+  "id": "1365382260824892340",
   "api": "1.0.0",
   "main": "dist/code.js",
+  "ui": {
+    "main": "dist/ui.html"},
   "capabilities": [],
   "enableProposedApi": false,
   "editorType": [
@@ -13,7 +15,7 @@
   "widgetApi": "1.0.0",
   "networkAccess": {
     "allowedDomains": [
-      "none"
+      "https://cdnjs.cloudflare.com"
     ]
   },
   "documentAccess": "dynamic-page"
