@@ -8,84 +8,84 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        
-        h1 {
-            text-align: center;
-        }
-        
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        input[type="file"],
-        select,
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        
-        button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #4caf50;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        
-        button:hover {
-            background-color: #45a049;
-        }
-        
-        button:active {
-            background-color: #3e8e41;
-        }
-        
-        /* Optional: Style the file input button */
-        #fileInput {
-            cursor: pointer;
-        }
-        
-        /* Optional: Style the select dropdown */
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 5px center;
-            background-size: 12px;
-        }
-        
-        /* Optional: Style the number input buttons */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            appearance: none;
-            margin: 0;
-        }
-        
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="file"],
+select,
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:active {
+    background-color: #3e8e41;
+}
+
+/* Optional: Style the file input button */
+#fileInput {
+    cursor: pointer;
+}
+
+/* Optional: Style the select dropdown */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 12px;
+}
+
+/* Optional: Style the number input buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
     </style>
 </head>
 <body>
@@ -105,15 +105,16 @@
         <input type="number" id="cardCount" value="3" min="1" required>
         <br><br>
 
+        <label for="cardColor">Card Color (hex):</label>
+        <input type="text" id="cardColor" placeholder="#FFFFFF" required>
+
         <label for="conditionColumn">Condition Column (optional):</label>
         <select id="conditionColumn" onchange="updateConditionValues()">
-            <!-- Options will be populated here -->
         </select>
         <br><br>
 
         <label for="conditionValue">Condition Value (optional):</label>
         <select id="conditionValue">
-            <!-- Options for condition values will be populated based on the selected column -->
         </select>
         <br><br>
 
@@ -121,6 +122,8 @@
     </form>
 
     <script>
+
+        
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -181,6 +184,15 @@
                 const cardCount = parseInt(document.getElementById('cardCount').value);
                 const conditionColumnIndex = parseInt(document.getElementById('conditionColumn').value);
                 const conditionValue = document.getElementById('conditionValue').value;
+                const cardColor = document.getElementById('cardColor').value;
+
+                parent.postMessage({
+                    pluginMessage: {
+                      type: 'update-color',
+                      data: { newColor: document.getElementById('cardColor').value }
+                    }
+                  }, '*');
+                  
         
                 // Filter data based on condition, if specified
                 let columnData = [];

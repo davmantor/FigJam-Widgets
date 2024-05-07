@@ -3,50 +3,50 @@ const { AutoLayout, Text, useEffect, useSyncedState } = widget;
 
 interface ButtonProps {
   onClick: () => void;
-  children: string;
+  direction?: 'prev' | 'next';  // Make direction optional
+  children?:  string;      // Add a children prop to accept any React node
 }
 
-function Button({ onClick, children }: ButtonProps) {
+function Button({ onClick, direction, children }: ButtonProps) {
+  const arrow = direction ? (direction === 'next' ? '⟶' : '⟵') : null;  // Check for direction before using it
   return (
-    <AutoLayout fill="#007AFF" padding={8} cornerRadius={4} onClick={onClick} horizontalAlignItems="center" verticalAlignItems="center">
-      <Text fill="#FFFFFF" fontSize={16} verticalAlignText="center" horizontalAlignText="center">{children}</Text>
+    <AutoLayout fill="#007AFF" cornerRadius={8} onClick={onClick} horizontalAlignItems="center" verticalAlignItems="center" padding={10}>
+      {children && <Text fill="#FFFFFF" fontSize={24} verticalAlignText="center" horizontalAlignText="center">{children}</Text>}
+      {arrow && <Text fill="#FFFFFF" fontSize={24} verticalAlignText="center" horizontalAlignText="center">{arrow}</Text>}
     </AutoLayout>
   );
 }
 
+
 function CarouselWidget() {
   const [selectedData, setSelectedData] = useSyncedState<string[]>('selectedData', []);
+  const [cardColor, setCardColor] = useSyncedState<string>('cardColor', '#F0F0F0'); // Default color
   const [cardCount, setCardCount] = useSyncedState<number>('cardCount', 3);
   const [currentIndex, setCurrentIndex] = useSyncedState<number>('currentIndex', 0);
   const [isDataLoaded, setIsDataLoaded] = useSyncedState<boolean>('isDataLoaded', false);
-  
+
   useEffect(() => {
     ui.on('message', message => {
       if (message.type === 'select-column') {
         setSelectedData(message.data.columnData);
         setCardCount(message.data.cardCount);
         setIsDataLoaded(true);
+      } else if (message.type === 'update-color') {
+        setCardColor(message.data.newColor); // Handle color updates
       }
     });
   });
 
   const handleButtonClick = () => {
     return new Promise<void>((resolve) => {
-      showUI(__uiFiles__.main, { width: 300, height: 200 });
+      showUI(__uiFiles__.main, { width: 300, height: 300 }); // Adjust UI dimensions as needed
       ui.on('message', message => {
         if (message.type === 'select-column') {
-          if (Array.isArray(message.data.columnData)) {
-            setSelectedData(message.data.columnData);
-            setCardCount(message.data.cardCount);
-            setIsDataLoaded(true);
-            figma.ui.close();
-            resolve();
-          } else {
-            console.error('Expected an array for column data, received:', message.data.columnData);
-            setIsDataLoaded(false);
-            setSelectedData([]); // Reset or handle as needed
-            resolve();
-          }
+          setSelectedData(message.data.columnData);
+          setCardCount(message.data.cardCount);
+          setIsDataLoaded(true);
+          figma.ui.close();
+          resolve();
         }
       });
     });
@@ -63,23 +63,25 @@ function CarouselWidget() {
   const totalPages = Math.ceil(selectedData.length / cardCount);
 
   return (
-    <AutoLayout direction="vertical" spacing={10} padding={8}>
-      {!isDataLoaded && <Button onClick={handleButtonClick}>Load xlsx and Select Column</Button>}
-      <AutoLayout direction="horizontal" spacing={10}>
-        <Button onClick={() => navigateCarousel('prev')}>Prev</Button>
+    <AutoLayout direction="vertical" spacing={12} padding={10}>
+      {!isDataLoaded && <Button onClick={handleButtonClick} children="Load xlsx and Select Column" />}
+      <AutoLayout direction="horizontal" spacing={12}>
+        <Button onClick={() => navigateCarousel('prev')} direction="prev" />
         {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
-          <AutoLayout key={index} fill="#E1E1E1" padding={10} cornerRadius={4} width={400} minHeight={600} direction="vertical" verticalAlignItems="center" horizontalAlignItems="center">
-            <Text fontSize={14}>Card #{currentIndex + index + 1}</Text>
-            <Text fontSize={14} width={230} verticalAlignText="center" horizontalAlignText="center">
+          <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={460} height={460} direction="vertical" spacing={10} horizontalAlignItems="center">
+            <Text fontSize={18} horizontalAlignText="center">{currentIndex + index + 1}</Text>
+            <Text fontSize={18} width={450} verticalAlignText="center" horizontalAlignText="left">
               {data || 'No data'}
             </Text>
           </AutoLayout>
         ))}
-        <Button onClick={() => navigateCarousel('next')}>Next</Button>
+        <Button onClick={() => navigateCarousel('next')} direction="next" />
       </AutoLayout>
-      <Text fontSize={16} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
+      <Text fontSize={25} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
     </AutoLayout>
   );
 }
 
 widget.register(CarouselWidget);
+
+
