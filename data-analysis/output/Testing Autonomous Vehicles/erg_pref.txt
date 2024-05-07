@@ -1,0 +1,329 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "description": "A horizontal group stacked bar chart",
+    "height": 350,
+    "width": 250,
+    "title": {
+        "text": "Student ERG preferences prior to taking the course",
+        "fontSize": 50,
+        "font": "Arial",
+        "align": "left",
+        "subtitle": "7 Responses",
+        "subtitleFontSize": 35,
+        "color": "black",
+        "offset": 40,
+        "dx": -900
+    },
+    "data": {
+        "values": [
+            {
+                "Item": "Brain-Inspired Neural Networks",
+                "Response": "This seems interesting",
+                "Value": 0.857
+            },
+            {
+                "Item": "Brain-Inspired Neural Networks",
+                "Response": "Would love this!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Sustainable Sensor Networks",
+                "Response": "Please not this one!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Sustainable Sensor Networks",
+                "Response": "This seems interesting",
+                "Value": 0.429
+            },
+            {
+                "Item": "Sustainable Sensor Networks",
+                "Response": "Would love this!",
+                "Value": 0.429
+            },
+            {
+                "Item": "Explanatory AI for Autonomous Vehicles",
+                "Response": "Not excited, but ok...",
+                "Value": 0.143
+            },
+            {
+                "Item": "Explanatory AI for Autonomous Vehicles",
+                "Response": "This seems interesting",
+                "Value": 0.143
+            },
+            {
+                "Item": "Explanatory AI for Autonomous Vehicles",
+                "Response": "Would love this!",
+                "Value": 0.714
+            },
+            {
+                "Item": "Accessibility, Communities, & Technology",
+                "Response": "Please not this one!",
+                "Value": 0.286
+            },
+            {
+                "Item": "Accessibility, Communities, & Technology",
+                "Response": "Not excited, but ok...",
+                "Value": 0.286
+            },
+            {
+                "Item": "Accessibility, Communities, & Technology",
+                "Response": "This seems interesting",
+                "Value": 0.143
+            },
+            {
+                "Item": "Accessibility, Communities, & Technology",
+                "Response": "Would love this!",
+                "Value": 0.286
+            },
+            {
+                "Item": "Testing Autonomous Vehicles",
+                "Response": "Would love this!",
+                "Value": 1.0
+            },
+            {
+                "Item": "3D Faces",
+                "Response": "Not excited, but ok...",
+                "Value": 0.571
+            },
+            {
+                "Item": "3D Faces",
+                "Response": "This seems interesting",
+                "Value": 0.429
+            },
+            {
+                "Item": "Ed Tech",
+                "Response": "Please not this one!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Ed Tech",
+                "Response": "Not excited, but ok...",
+                "Value": 0.429
+            },
+            {
+                "Item": "Ed Tech",
+                "Response": "This seems interesting",
+                "Value": 0.286
+            },
+            {
+                "Item": "Ed Tech",
+                "Response": "Would love this!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Users in Design",
+                "Response": "Please not this one!",
+                "Value": 0.429
+            },
+            {
+                "Item": "Users in Design",
+                "Response": "Not excited, but ok...",
+                "Value": 0.286
+            },
+            {
+                "Item": "Users in Design",
+                "Response": "This seems interesting",
+                "Value": 0.143
+            },
+            {
+                "Item": "Users in Design",
+                "Response": "Would love this!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Aerial Robotics",
+                "Response": "This seems interesting",
+                "Value": 0.571
+            },
+            {
+                "Item": "Aerial Robotics",
+                "Response": "Would love this!",
+                "Value": 0.429
+            },
+            {
+                "Item": "Personal Informatics",
+                "Response": "Please not this one!",
+                "Value": 0.286
+            },
+            {
+                "Item": "Personal Informatics",
+                "Response": "Not excited, but ok...",
+                "Value": 0.429
+            },
+            {
+                "Item": "Personal Informatics",
+                "Response": "This seems interesting",
+                "Value": 0.143
+            },
+            {
+                "Item": "Personal Informatics",
+                "Response": "Would love this!",
+                "Value": 0.143
+            },
+            {
+                "Item": "Autonomous Security",
+                "Response": "This seems interesting",
+                "Value": 0.571
+            },
+            {
+                "Item": "Autonomous Security",
+                "Response": "Would love this!",
+                "Value": 0.429
+            },
+            {
+                "Item": "Air Quality Environmental Justice",
+                "Response": "Please not this one!",
+                "Value": 0.286
+            },
+            {
+                "Item": "Air Quality Environmental Justice",
+                "Response": "Not excited, but ok...",
+                "Value": 0.429
+            },
+            {
+                "Item": "Air Quality Environmental Justice",
+                "Response": "This seems interesting",
+                "Value": 0.286
+            }
+        ]
+    },
+    "transform": [
+        {
+            "stack": "Value",
+            "as": [
+                "v1",
+                "v2"
+            ],
+            "groupby": [
+                "Item"
+            ]
+        },
+        {
+            "joinaggregate": [
+                {
+                    "field": "signed_percentage",
+                    "op": "sum",
+                    "as": "offset"
+                }
+            ],
+            "groupby": [
+                "Item"
+            ]
+        },
+        {
+            "calculate": "datum.v1 - datum.offset",
+            "as": "nx"
+        },
+        {
+            "calculate": "datum.v2 - datum.offset",
+            "as": "nx2"
+        },
+        {
+            "calculate": "(datum.nx + datum.nx2) / 2",
+            "as": "midPoint"
+        }
+    ],
+    "layer": [
+        {
+            "mark": {
+                "type": "bar",
+                "stroke": null
+            },
+            "encoding": {
+                "x": {
+                    "field": "nx",
+                    "type": "quantitative",
+                    "title": "Percentage",
+                    "axis": null
+                },
+                "x2": {
+                    "field": "nx2"
+                },
+                "y": {
+                    "field": "Item",
+                    "type": "nominal",
+                    "title": null,
+                    "axis": {
+                        "offset": 15,
+                        "ticks": false,
+                        "domain": false,
+                        "labelLimit": 0,
+                        "labelFontSize": 35
+                    }
+                },
+                "color": {
+                    "field": "Response",
+                    "type": "nominal",
+                    "title": "7 Responses",
+                    "scale": {
+                        "domain": [
+                            "Please not this one!",
+                            "Not excited, but ok...",
+                            "This seems interesting",
+                            "Would love this!"
+                        ],
+                        "range": [
+                            "#f1f9e8",
+                            "#b9e3bf",
+                            "#7bcdc4",
+                            "#315ab6"
+                        ],
+                        "type": "ordinal"
+                    },
+                    "legend": {
+                        "symbolType": "circle",
+                        "symbolSize": 1200,
+                        "orient": "none",
+                        "direction": "horizontal",
+                        "titlePadding": 40,
+                        "padding": 5,
+                        "title": null,
+                        "labelFontSize": 35,
+                        "titleFontSize": 35,
+                        "labelLimit": 0,
+                        "offset": 0,
+                        "legendX": -1100,
+                        "legendY": 1420
+                    }
+                }
+            }
+        },
+        {
+            "mark": {
+                "type": "text",
+                "align": "center",
+                "baseline": "middle",
+                "fontSize": 35
+            },
+            "encoding": {
+                "x": {
+                    "field": "midPoint",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "y": {
+                    "field": "Item",
+                    "type": "nominal"
+                },
+                "text": {
+                    "field": "Value",
+                    "type": "quantitative",
+                    "format": ".1%"
+                },
+                "color": {
+                    "condition": {
+                        "test": "datum.Value > 0.06",
+                        "value": "black"
+                    },
+                    "value": null
+                }
+            }
+        }
+    ]
+}

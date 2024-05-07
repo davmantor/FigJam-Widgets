@@ -1,0 +1,127 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "description": "A simple bar chart representing percentages of Promoters, Neutrals, and Detractors.",
+    "width": 900,
+    "height": 500,
+    "title": {
+        "text": "Your ERG",
+        "subtitle": "6 Responses",
+        "subtitleFontSize": 30,
+        "fontSize": 50,
+        "font": "Arial",
+        "anchor": "start",
+        "color": "black",
+        "offset": 30
+    },
+    "data": {
+        "values": [
+            {
+                "Category": "Detractors (1-6)",
+                "value": 0.5
+            },
+            {
+                "Category": "Neutrals (7-8)",
+                "value": 0.3333
+            },
+            {
+                "Category": "Promoters (9-10)",
+                "value": 0.16670000000000001
+            }
+        ]
+    },
+    "config": {
+        "axis": {
+            "labelFontSize": 30,
+            "titleFontSize": 30
+        }
+    },
+    "mark": {
+        "type": "bar",
+        "size": 5
+    },
+    "encoding": {
+        "x": {
+            "field": "Category",
+            "type": "nominal",
+            "scale": {
+                "padding": 0.5
+            },
+            "axis": {
+                "title": null,
+                "labelAngle": 0,
+                "labelLimit": 800,
+                "labelFontSize": 40
+            }
+        },
+        "y": {
+            "field": "value",
+            "type": "quantitative",
+            "axis": {
+                "title": null,
+                "grid": true,
+                "format": ".0%"
+            }
+        },
+        "color": {
+            "field": "Category",
+            "type": "nominal",
+            "scale": {
+                "domain": [
+                    "Detractors (1-6)",
+                    "Neutrals (7-8)",
+                    "Promoters (9-10)"
+                ],
+                "range": [
+                    "#C30D24",
+                    "#F5F5DC",
+                    "#1770AB"
+                ]
+            },
+            "legend": null
+        }
+    },
+    "layer": [
+        {
+            "mark": "bar"
+        },
+        {
+            "mark": {
+                "type": "text",
+                "align": "center",
+                "baseline": "middle",
+                "dy": -25,
+                "fontSize": 40,
+                "fontWeight": "bold"
+            },
+            "encoding": {
+                "x": {
+                    "field": "Category",
+                    "type": "nominal"
+                },
+                "y": {
+                    "field": "value",
+                    "type": "quantitative",
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    },
+                    "axis": {
+                        "format": "%",
+                        "tickCount": 6,
+                        "title": "Percentage"
+                    }
+                },
+                "text": {
+                    "field": "value",
+                    "type": "quantitative",
+                    "format": ".1%"
+                },
+                "color": {
+                    "value": "black"
+                }
+            }
+        }
+    ]
+}

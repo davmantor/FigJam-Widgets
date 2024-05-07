@@ -1,0 +1,122 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "description": "Some title for the graph",
+    "width": 490,
+    "height": 490,
+    "title": {
+        "text": "Years at UCSC",
+        "subtitle": "7 Responses",
+        "fontSize": 40,
+        "subtitleFontSize": 30,
+        "font": "Arial",
+        "anchor": "start",
+        "color": "black",
+        "offset": 20
+    },
+    "data": {
+        "values": [
+            {
+                "Years at UCSC": "First 2 years",
+                "value": 85.71
+            },
+            {
+                "Years at UCSC": "Missing",
+                "value": 14.29
+            }
+        ]
+    },
+    "transform": [
+        {
+            "window": [
+                {
+                    "op": "sum",
+                    "field": "value",
+                    "as": "total"
+                }
+            ],
+            "frame": [
+                null,
+                null
+            ]
+        },
+        {
+            "calculate": "datum.value / datum.total",
+            "as": "percent"
+        }
+    ],
+    "layer": [
+        {
+            "mark": {
+                "type": "arc",
+                "innerRadius": 130
+            },
+            "encoding": {
+                "theta": {
+                    "field": "value",
+                    "type": "quantitative"
+                },
+                "color": {
+                    "field": "Years at UCSC",
+                    "type": "nominal",
+                    "scale": {
+                        "domain": [
+                            "First 2 years",
+                            "Missing"
+                        ],
+                        "range": [
+                            "#a6cee3",
+                            "#e7e7e7"
+                        ]
+                    },
+                    "legend": {
+                        "orient": "bottom",
+                        "symbolSize": 400,
+                        "title": null,
+                        "titleLimit": 0,
+                        "titlePadding": 30,
+                        "labelLimit": 0,
+                        "symbolLimit": 0,
+                        "labelFontSize": 30,
+                        "titleFontSize": 16,
+                        "offset": 20,
+                        "direction": "vertical"
+                    }
+                }
+            }
+        },
+        {
+            "transform": [
+                {
+                    "filter": "datum['Years at UCSC'] === 'First 2 years'"
+                }
+            ],
+            "mark": {
+                "type": "text",
+                "radiusOffset": 10,
+                "fontSize": 55
+            },
+            "encoding": {
+                "text": {
+                    "field": "percent",
+                    "type": "quantitative",
+                    "format": ".1%"
+                },
+                "theta": {
+                    "field": "value",
+                    "type": "quantitative"
+                },
+                "color": {
+                    "value": "black"
+                }
+            }
+        }
+    ],
+    "config": {
+        "legend": {
+            "titlePadding": 10,
+            "padding": 5,
+            "labelFontSize": 12,
+            "titleFontSize": 14
+        }
+    }
+}
