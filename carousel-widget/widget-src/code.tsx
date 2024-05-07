@@ -89,14 +89,14 @@ function CarouselWidget() {
         {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
           <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={460} height={460} direction="vertical" spacing={10} horizontalAlignItems="center">
             <Text fontSize={18*2} horizontalAlignText="center">{currentIndex + index + 1}</Text>
-            <Text fontSize={18} width={450} verticalAlignText="center" horizontalAlignText="left">
+            <Text fontSize={22} width={450} verticalAlignText="center" horizontalAlignText="left">
               {data || 'No data'}
             </Text>
           </AutoLayout>
         ))}
         <Button onClick={() => navigateCarousel('next')} direction="next" />
       </AutoLayout>
-      <Text fontSize={25*2} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
+      <Text fontSize={36} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
     </AutoLayout>
   );
 }
