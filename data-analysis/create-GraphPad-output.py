@@ -7,7 +7,7 @@ from collections import defaultdict
 # Load in data
 df = pd.read_excel('clean_merged_data.xlsx', engine='openpyxl')
 # Filter for specific quarter
-winter24 = df.query("t1_quarter == 2")
+spring24 = df.query("t1_quarter == 3").copy()
 
 scales = {"Agreement5-a": {"0.0": "Not applicable",
                            "1.0": "Strongly disagree",
@@ -28,7 +28,11 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
           "Pref4-a":      {"1.0": "Please not this one!",
                            "2.0": "Not excited, but ok...",
                            "3.0": "This seems interesting",
-                           "4.0": "Would love this!"}}
+                           "4.0": "Would love this!"},
+          "NPS3-a": {"1.0": "Detractors (1-6)",
+                      "2.0": "Neutrals (7-8)",
+                      "3.0": "Promoters (9-10)"}
+          }
 
 def get_palette(domain):
     scale_key = matchOptions2Scale(scales, domain)
@@ -51,7 +55,11 @@ def get_palette(domain):
                       "Pref4-a":      {"Please not this one!": "#f1f9e8",
                                        "Not excited, but ok...": "#b9e3bf",
                                        "This seems interesting": "#7bcdc4",
-                                       "Would love this!": "#315ab6"}}
+                                       "Would love this!": "#315ab6"},
+                      "NPS3-a": {"Detractors (1-6)": "#C30D24",
+                                 "Neutrals (7-8)": "#F5F5DC",
+                                 "Promoters (9-10)": "#1770AB"
+                                 }}
     
     # Retrieve the specific scale dictionary using the scale key
     palette = scale_palettes.get(scale_key, {})
@@ -117,7 +125,7 @@ def item_group_proportions(data, items_dict, group_scale):
 
 def vega_lite_donut(data, catFocus,
                     description="A simple donut chart with embedded data.",
-                    inner_radius=110):
+                    inner_radius=130):
     """
     Create a Vega-Lite donut chart.
 
@@ -139,8 +147,8 @@ def vega_lite_donut(data, catFocus,
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "Some title for the graph",
-          "width": 350,
-          "height": 350,
+          "width": 490,
+          "height": 490,
           "title": {
               "text": field,
               "subtitle": f"{num_responses} Responses",
@@ -267,17 +275,18 @@ def vega_lite_grouphstackbar(data):
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A horizontal group stacked bar chart",
-          "height": 270,
+          "height": 350,
           "width": 250,
           "title": {
             "text": "Student ERG preferences prior to taking the course",
             "fontSize": 50,
             "font": "Arial",
-            "anchor": "start",
+            "align": "left",
             "subtitle": f"{max(num_responses.values())} Responses",
             "subtitleFontSize": 35,
             "color": "black",
-            "offset": 40
+            "offset": 40,
+            "dx": -900
           },
           "data": {
             "values": proportions
@@ -341,10 +350,7 @@ def vega_lite_grouphstackbar(data):
                   "axis": {
                     "offset": 15,
                     "ticks": False,
-                    "minExtent": 60,
-                    "maxExtent": 60,
                     "domain": False,
-                    "titleLimit": 0,
                     "labelLimit": 0,
                     "labelFontSize": 30
                   }
@@ -361,15 +367,15 @@ def vega_lite_grouphstackbar(data):
                   "legend": {
                     "symbolType": "circle",
                     "symbolSize": 400,
-                    "orient": "right",
+                    "orient": "bottom-right",
+                    "direction": "horizontal",
                     "titlePadding": 40,
                     "padding": 5,
                     "title": None,
-                    "columnPadding": 0,
-                    "labelFontSize": 30,
+                    "labelFontSize": 25,
                     "titleFontSize": 35,
                     "labelLimit": 0,
-                    "offset": 20
+                    "offset": -60
                   }
                 }
               }
@@ -416,21 +422,23 @@ def vega_lite_grouphstackbar(data):
 
 def vega_lite_simplebar(data):
     proportions, num_responses = data
-    domain = [{'Category': 'Detractors (1-6)'},
-              {'Category': 'Neutrals (7-8)'},
-              {'Category': 'Promoters (9-10)'}]
-    domain = [entry['Category'] for entry in domain]
-    palette = get_palette(domain)
-    palette = palette[-1]
+    # Iterate through each item in the list and update the 'value'
+    for item in proportions:
+        item['value'] = item['value'] / 100
+    first_key, first_value = next(iter(proportions[0].items()))
+    field = first_key
+    domain = [item[field] for item in proportions]
+    palette_dict, palette = get_palette(domain)
     chart_json = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "A simple bar chart representing percentages of Promoters, Neutrals, and Detractors.",
-        "width": 300,
+        "width": 900,
+        "height": 500,
         "title": {
             "text": "Entire Class",
             "subtitle": f"{num_responses} Responses",
-            "subtitleFontSize": 16,
-            "fontSize": 30,
+            "subtitleFontSize": 30,
+            "fontSize": 50,
             "font": "Arial",
             "anchor": "start",
             "color": "black",
@@ -441,27 +449,27 @@ def vega_lite_simplebar(data):
         },
         "config": {
             "axis": {
-                "labelFontSize": 15,
-                "titleFontSize": 14
+                "labelFontSize": 30,
+                "titleFontSize": 30
             }
         },
-        "mark": {"type": "bar", "size": 20},
+        "mark": {"type": "bar", "size": 5},
         "encoding": {
             "x": {
                 "field": "Category",
                 "type": "nominal",
                 "scale": {
-                    "padding": 0.3
+                    "padding": 0.5
                 },
                 "axis": {
                     "title": None,
                     "labelAngle": 0,
                     "labelLimit": 800,
-                    "labelFontSize": 15
+                    "labelFontSize": 40
                 }
             },
             "y": {
-                "field": "Percentage",
+                "field": "value",
                 "type": "quantitative",
                 "axis": {
                     "title": None,
@@ -488,8 +496,8 @@ def vega_lite_simplebar(data):
                     "type": "text",
                     "align": "center",
                     "baseline": "middle",
-                    "dy": -15,
-                    "fontSize": 20,
+                    "dy": -25,
+                    "fontSize": 40,
                     "fontWeight": "bold"
                 },
                 "encoding": {
@@ -498,12 +506,15 @@ def vega_lite_simplebar(data):
                         "type": "nominal"
                     },
                     "y": {
-                        "field": "Percentage",
+                        "field": "value",
                         "type": "quantitative",
-                        "scale": {"domain": [0, 1]}
+                        "scale": {"domain": [0, 1]},
+                        "axis": {"format": "%",
+                                 "tickCount": 6,
+                                 "title": "Percentage"}
                     },
                     "text": {
-                        "field": "Percentage",
+                        "field": "value",
                         "type": "quantitative",
                         "format": ".1%"
                     },
@@ -516,28 +527,31 @@ def vega_lite_simplebar(data):
     }
     return json.dumps(chart_json, indent=4)
 
+# recoding transfer variable into categories
+spring24['t1_transfer_recode'] = spring24['t1_transfer']
+transfer_recodemap = {
+    1: 'Yes',
+    2: 'No'
+}
+spring24['t1_transfer_recode'] = spring24['t1_transfer_recode'].map(transfer_recodemap)
 
 # recoding for NPS_data for the different ratings on the recommendation score
-conditions = [
-    winter24['t2_recommend_theme'].between(1, 6),
-    winter24['t2_recommend_theme'].between(7, 8),
-    winter24['t2_recommend_theme'].between(9, 10)
+NPS_conditions = [
+    spring24['t2_recommend_theme'].between(1, 6),
+    spring24['t2_recommend_theme'].between(7, 8),
+    spring24['t2_recommend_theme'].between(9, 10)
 ]
-choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
-winter24['t2_NPS_category'] = np.select(conditions, choices, default='Unknown')
+NPS_choices = ['Detractors (1-6)', 'Neutrals (7-8)', 'Promoters (9-10)']
+spring24['t2_NPS_category'] = np.select(NPS_conditions, NPS_choices, default='Unknown')
 # gets the data
-NPS_data = get_proportions(winter24, 't2_NPS_category', "Category") 
-# filters out the 'unknown' category
-filtered_proportions = [entry for entry in NPS_data[0] if entry['Category'] != 'Unknown']
-# turns the data into percentages
-transformed_proportions = [{'Category': entry['Category'], 'Percentage': entry['value'] / 100} for entry in filtered_proportions]
-NPS_data[0] = transformed_proportions
+NPS_data = get_proportions(spring24, 't2_NPS_category', "Category")
 # creates JSON
-simplebar = vega_lite_simplebar(NPS_data)
+NPS_simplebar = vega_lite_simplebar(NPS_data)
 
-print(simplebar)
+#print(NPS_simplebar)
 
-# race_data = get_proportions(winter24,
+
+# race_data = get_proportions(spring24,
 #                             't1_RaceEthinicity_binary',
 #                             "Race/Ethnicity")
 # race_donut = vega_lite_donut(race_data,
@@ -548,24 +562,64 @@ print(simplebar)
 # academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
 #                   't2_theme_discussions':'I enjoyed the weekly paper discussions',
 #                   't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
-# academic_outc_data = item_group_proportions(winter24, academic_items, scales['Agreement5-a'])
+# academic_outc_data = item_group_proportions(spring24, academic_items, scales['Agreement5-a'])
 # academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
 # print(academic_outc_chart)
 
-# erg_items = {
-#     't1_erg1_pref': 'Brain-Inspired Neural Networks',
-#     't1_erg2_pref': 'Sustainable Sensor Networks',
-#     't1_erg3_pref': 'Explanatory AI for Autonomous Vehicles',
-#     't1_erg4_pref': 'Accessibility, Communities, & Technology',
-#     't1_erg5_pref': 'Testing Autonomous Vehicles',
-#     't1_erg6_pref': '3D Faces',
-#     't1_erg7_pref': 'Ed Tech',
-#     't1_erg8_pref': 'Users in Design',
-#     't1_erg9_pref': 'Aerial Robotics',
-#     't1_erg10_pref': 'Personal Informatics',
-#     't1_erg11_pref': 'Autonomous Security',
-#     't1_erg12_pref': 'Air Quality Environmental Justice'
-# }
-# erg_pref_data = item_group_proportions(winter24, erg_items, scales['Pref4-a'])
+erg_items = {
+    't1_erg1_pref': 'Brain-Inspired Neural Networks',
+    't1_erg2_pref': 'Sustainable Sensor Networks',
+    't1_erg3_pref': 'Explanatory AI for Autonomous Vehicles',
+    't1_erg4_pref': 'Accessibility, Communities, & Technology',
+    't1_erg5_pref': 'Testing Autonomous Vehicles',
+    't1_erg6_pref': '3D Faces',
+    't1_erg7_pref': 'Ed Tech',
+    't1_erg8_pref': 'Users in Design',
+    't1_erg9_pref': 'Aerial Robotics',
+    't1_erg10_pref': 'Personal Informatics',
+    't1_erg11_pref': 'Autonomous Security',
+    't1_erg12_pref': 'Air Quality Environmental Justice'
+}
+# erg_pref_data = item_group_proportions(spring24, erg_items, scales['Pref4-a'])
 # erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
 # print(erg_pref_chart)
+
+
+for erg in spring24['phase1_group'].dropna().unique():
+    data_subset = spring24.query(f"phase1_group == '{erg}'").copy()
+
+    # create gender donut chart
+    gender_data = get_proportions(data_subset,
+                                't1_Gender_binary',
+                                "Gender")
+    gender_donut = vega_lite_donut(gender_data,
+                                  "Non-male")
+    #print(gender_donut)
+
+    # create year at UCSC donut chart
+    years_data = get_proportions(data_subset,
+                                 "t1_YearsAtUCSC_2023",
+                                 "Years at UCSC")
+    years_donut = vega_lite_donut(years_data,
+                                  "First 2 years")
+    #print(years_donut)
+
+    # create transfer donut chart
+    transfer_data = get_proportions(data_subset,
+                                    "t1_transfer_recode",
+                                    "Transfer Students")
+    transfer_donut = vega_lite_donut(transfer_data,
+                                     "Yes")
+    #print(transfer_donut)
+
+    # create NPS bar graph
+    NPS_data = get_proportions(data_subset, 't2_NPS_category', "Category")
+    NPS_simplebar = vega_lite_simplebar(NPS_data)
+    #print(NPS_simplebar)
+
+    # create erg preference horizontal bar graph
+    erg_pref_data = item_group_proportions(data_subset, erg_items, scales['Pref4-a'])
+    erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
+    #print(erg_pref_chart)
+
+    break
