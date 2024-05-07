@@ -3,11 +3,12 @@ import numpy as np
 import json
 from pprint import pprint
 from collections import defaultdict
+import os
 
 # Load in data
 df = pd.read_excel('clean_merged_data.xlsx', engine='openpyxl')
 # Filter for specific quarter
-spring24 = df.query("t1_quarter == 3").copy()
+spring24 = df.query("t1_quarter == 3 and phase1_group.notna()").copy()
 
 scales = {"Agreement5-a": {"0.0": "Not applicable",
                            "1.0": "Strongly disagree",
@@ -152,8 +153,8 @@ def vega_lite_donut(data, catFocus,
           "title": {
               "text": field,
               "subtitle": f"{num_responses} Responses",
-              "fontSize": 25,
-              "subtitleFontSize": 16,
+              "fontSize": 40,
+              "subtitleFontSize": 30,
               "font": "Arial",
               "anchor": "start",
               "color": "black",
@@ -201,12 +202,13 @@ def vega_lite_donut(data, catFocus,
                           },
                           "legend": {
                               "orient": "bottom",
+                              "symbolSize": 400,
                               "title": None,
                               "titleLimit": 0,
                               "titlePadding": 30,
                               "labelLimit": 0,
                               "symbolLimit": 0,
-                              "labelFontSize": 16,
+                              "labelFontSize": 30,
                               "titleFontSize": 16,
                               "offset": 20,
                               "direction": "vertical"
@@ -257,7 +259,7 @@ def vega_lite_grouphstackbar(data):
     proportions, num_responses = data
     # Convert percentage values to decimal format
     for entry in proportions:
-        entry['Value'] = round(entry['Value'] / 100.0, 2)
+        entry['Value'] = round(entry['Value'] / 100.0, 3)
     response_options = {entry['Response'] for entry in proportions}
     response_scale_key = matchOptions2Scale(scales, response_options)
     response_scale = list(scales[response_scale_key].values())
@@ -352,7 +354,7 @@ def vega_lite_grouphstackbar(data):
                     "ticks": False,
                     "domain": False,
                     "labelLimit": 0,
-                    "labelFontSize": 30
+                    "labelFontSize": 35
                   }
                 },
                 "color": {
@@ -366,16 +368,18 @@ def vega_lite_grouphstackbar(data):
                   },
                   "legend": {
                     "symbolType": "circle",
-                    "symbolSize": 400,
-                    "orient": "bottom-right",
+                    "symbolSize": 1200,
+                    "orient": "none",
                     "direction": "horizontal",
                     "titlePadding": 40,
                     "padding": 5,
                     "title": None,
-                    "labelFontSize": 25,
+                    "labelFontSize": 35,
                     "titleFontSize": 35,
                     "labelLimit": 0,
-                    "offset": -60
+                    "offset": 0,
+                    "legendX": -1100,
+                    "legendY": 1420
                   }
                 }
               }
@@ -385,7 +389,7 @@ def vega_lite_grouphstackbar(data):
                 "type": "text",
                 "align": "center",
                 "baseline": "middle",
-                "fontSize": 25
+                "fontSize": 35
               },
               "encoding": {
                 "x": {
@@ -420,7 +424,7 @@ def vega_lite_grouphstackbar(data):
         }
     return json.dumps(chart, indent=4)
 
-def vega_lite_simplebar(data):
+def vega_lite_simplebar(data, title="Entire Class"):
     proportions, num_responses = data
     # Iterate through each item in the list and update the 'value'
     for item in proportions:
@@ -435,7 +439,7 @@ def vega_lite_simplebar(data):
         "width": 900,
         "height": 500,
         "title": {
-            "text": "Entire Class",
+            "text": f"{title}",
             "subtitle": f"{num_responses} Responses",
             "subtitleFontSize": 30,
             "fontSize": 50,
@@ -527,6 +531,146 @@ def vega_lite_simplebar(data):
     }
     return json.dumps(chart_json, indent=4)
 
+def vega_lite_groupvbar(data, title="Entire Class"):
+    proportions, num_responses = data
+    # Convert percentage values to decimal format
+    for entry in proportions:
+        entry['Value'] = round(entry['Value'] / 100.0, 2)
+    response_options = {entry['Response'] for entry in proportions}
+    response_scale_key = matchOptions2Scale(scales, response_options)
+    response_scale = list(scales[response_scale_key].values())
+    final_domain = list(response_options - set(response_scale)) + response_scale
+    response_rank = {response: i for i, response in enumerate(final_domain)}
+    grouped_data = defaultdict(list)  # Group data by 'Item'
+    for entry in proportions:
+        grouped_data[entry['Item']].append(entry)
+    sorted_data = []  # Sort each group and flatten the list
+    for item, responses in grouped_data.items():
+        sorted_responses = sorted(responses, key=lambda x: response_rank[x['Response']])
+        sorted_data.extend(sorted_responses)
+    proportions = sorted_data
+    palette_dict, palette = get_palette(final_domain)
+    chart = {
+          "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+          "description": "A detailed bar chart with embedded data.",
+          "width": 1500,
+          "height": 300,
+          "title": {
+            "text": f"{title}",
+            "subtitle": f"{max(num_responses.values())} Responses",
+            "fontSize": 40,
+            "subtitleFontSize": 30,
+            "font": "Arial",
+            "anchor": "start",
+            "color": "black",
+            "offset": 30
+          },
+          "data": {
+            "values": proportions
+          },
+          "config": {
+            "axis": {
+              "labelFontSize": 30
+            },
+            "legend": {
+              "symbolType": "circle",
+              "symbolSize": 400,
+              "orient": "bottom",
+              "titlePadding": 40,
+              "padding": 5,
+              "columnPadding": 0,
+              "labelFontSize": 25,
+              "labelLimit": 0,
+              "titleLimit": 0,
+              "symbolLimit": 0,
+              "offset": 20
+            }
+          },
+          "layer": [
+            {
+              "mark": {
+                "type": "bar",
+                "tooltip": True
+              },
+              "encoding": {
+                "x": {
+                  "field": "Item",
+                  "type": "nominal",
+                  "axis": {
+                    "labelAngle": 0,
+                    "labelLimit": 0,
+                    "labelExpr": "[slice(datum.label, 0, length(datum.label)/2), slice(datum.label, length(datum.label)/2)]",
+                    "labelFontSize": 25,
+                    "labelLineHeight": 30,
+                    "title": None
+                  }
+                },
+                "y": {
+                  "field": "Value",
+                  "type": "quantitative",
+                  "axis": {
+                    "title": None,
+                    "grid": True,
+                    "format": ".0%",
+                    "tickCount": 5
+                  },
+                  "scale": {
+                    "domain": [
+                      0,
+                      1
+                    ]
+                  }
+                },
+                "xOffset": {
+                  "field": "Response",
+                  "type": "ordinal",
+                  "sort": final_domain
+                },
+                "color": {
+                  "field": "Response",
+                  "type": "nominal",
+                  "title": "",
+                  "scale": {
+                    "domain": final_domain,
+                    "range": palette
+                  }
+                }
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "center",
+                "baseline": "middle",
+                "dy": -15,
+                "fontSize": 25,
+                "fontWeight": "normal"
+              },
+              "encoding": {
+                "x": {
+                  "field": "Item",
+                  "type": "nominal"
+                },
+                "xOffset": {
+                  "field": "Response",
+                  "type": "ordinal",
+                  "sort": final_domain
+                },
+                "y": {
+                  "field": "Value",
+                  "type": "quantitative"
+                },
+                "text": {
+                  "field": "Value",
+                  "type": "quantitative",
+                  "format": ".1%"
+                }
+              }
+            }
+          ]
+        }
+    return json.dumps(chart, indent=4)
+
 # recoding transfer variable into categories
 spring24['t1_transfer_recode'] = spring24['t1_transfer']
 transfer_recodemap = {
@@ -534,6 +678,7 @@ transfer_recodemap = {
     2: 'No'
 }
 spring24['t1_transfer_recode'] = spring24['t1_transfer_recode'].map(transfer_recodemap)
+
 
 # recoding for NPS_data for the different ratings on the recommendation score
 NPS_conditions = [
@@ -548,24 +693,30 @@ NPS_data = get_proportions(spring24, 't2_NPS_category', "Category")
 # creates JSON
 NPS_simplebar = vega_lite_simplebar(NPS_data)
 
-#print(NPS_simplebar)
-
-
-# race_data = get_proportions(spring24,
-#                             't1_RaceEthinicity_binary',
-#                             "Race/Ethnicity")
-# race_donut = vega_lite_donut(race_data,
-#                              "Not represented")
-# print(race_donut)
-
-
-# academic_items = {'t2_theme_readingpresenting':'I enjoyed reading and presenting insights from my assigned paper',
-#                   't2_theme_discussions':'I enjoyed the weekly paper discussions',
-#                   't2_theme_gettoknow':'I got to know someone in a research lab I can ask questions of'}
-# academic_outc_data = item_group_proportions(spring24, academic_items, scales['Agreement5-a'])
-# academic_outc_chart = vega_lite_grouphstackbar(academic_outc_data)
-# print(academic_outc_chart)
-
+# define some columns for future graphs
+majors = {
+    't1_major_1': 'Anthropology',
+    't1_major_2': 'Applied mathematics',
+    't1_major_3': 'Art',
+    't1_major_4': 'Art and design: GPM',
+    't1_major_5': 'Biomolecular engineering and bioinformatics',
+    't1_major_6': 'Business management economics',
+    't1_major_7': 'Cognitive science',
+    't1_major_8': 'Computer engineering',
+    't1_major_9': 'Computer science',
+    't1_major_10': 'Computer game design',
+    't1_major_11': 'Economics',
+    't1_major_12': 'Electrical engineering',
+    't1_major_13': 'Literature',
+    't1_major_14': 'Music',
+    't1_major_15': 'Network and digital technology',
+    't1_major_16': 'Philosophy',
+    't1_major_17': 'Psychology',
+    't1_major_18': 'Robotics engineering',
+    't1_major_19': 'Sociology',
+    't1_major_20': 'Technology and information management',
+    't1_major_21': 'Other'
+}
 erg_items = {
     't1_erg1_pref': 'Brain-Inspired Neural Networks',
     't1_erg2_pref': 'Sustainable Sensor Networks',
@@ -580,13 +731,46 @@ erg_items = {
     't1_erg11_pref': 'Autonomous Security',
     't1_erg12_pref': 'Air Quality Environmental Justice'
 }
-# erg_pref_data = item_group_proportions(spring24, erg_items, scales['Pref4-a'])
-# erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
-# print(erg_pref_chart)
+interpersonal_items = {'t2_theme_relationships':'I developed good relationships with others in my group',
+                       't2_theme_profsupport':'I gave/received academic/career support from others in my group at some point during the group',
+                       't2_theme_emosupport':'I gave/received emotional support from others in my group at some point during the group',
+                       't2_theme_encouraged':'I encouraged/was encouraged to pursue interests/opportunities',
+                       't2_theme_gettoknow':'I enjoyed the get-to-know-you questions at the beginning of each session'}
+interpersonal_data = item_group_proportions(spring24,
+                                            interpersonal_items,
+                                            scales['Agreement5-a'])
+interpersonal_chart = vega_lite_groupvbar(interpersonal_data)
 
+# save overall graphs for ENTIRE CLASS
+os.makedirs('output', exist_ok=True)
+open('output/overall_NPS.txt', 'w').write(NPS_simplebar)
+open('output/overall_interpersonal.txt', 'w').write(interpersonal_chart)
 
 for erg in spring24['phase1_group'].dropna().unique():
+    # create directory for ERG-specific graphs
+    os.makedirs(f'output/{erg}', exist_ok=True)
     data_subset = spring24.query(f"phase1_group == '{erg}'").copy()
+    write_ins = data_subset.query("t2_dashboard_notice != 0")[['hash', 't2_NPS_category', 't2_recommend_theme_WI', 't2_improve_theme_WI']].copy()
+    write_ins.to_excel(f"output/{erg}/write-ins.xlsx")
+    sub_t2_n = data_subset['t1_Finished'].value_counts().get(1)
+
+    major_percentages = dict()
+    for major_var in majors:
+        major = majors[major_var]
+        major_count = data_subset[major_var].value_counts().get(1, 0)
+        major_percentage = round((major_count / sub_t2_n) * 100, 3)
+        major_percentages[major] = major_percentage
+    major_percentages = sorted(major_percentages.items(), key=lambda x: x[1], reverse=True)
+    major_percentages = pd.DataFrame(major_percentages, columns=['Major (select all that apply)', '% of your ERG'])
+    major_percentages.to_excel(f"output/{erg}/checked_majors.xlsx", index=False)
+
+    # create URM donut chart
+    URM_data = get_proportions(data_subset,
+                               "t1_URM",
+                               "Diversity")
+    URM_donut = vega_lite_donut(URM_data,
+                                "URM")
+    open(f'output/{erg}/donut_URM.txt', 'w').write(URM_donut)
 
     # create gender donut chart
     gender_data = get_proportions(data_subset,
@@ -594,7 +778,7 @@ for erg in spring24['phase1_group'].dropna().unique():
                                 "Gender")
     gender_donut = vega_lite_donut(gender_data,
                                   "Non-male")
-    #print(gender_donut)
+    open(f'output/{erg}/donut_gender.txt', 'w').write(gender_donut)
 
     # create year at UCSC donut chart
     years_data = get_proportions(data_subset,
@@ -602,7 +786,7 @@ for erg in spring24['phase1_group'].dropna().unique():
                                  "Years at UCSC")
     years_donut = vega_lite_donut(years_data,
                                   "First 2 years")
-    #print(years_donut)
+    open(f'output/{erg}/donut_years.txt', 'w').write(years_donut)
 
     # create transfer donut chart
     transfer_data = get_proportions(data_subset,
@@ -610,16 +794,21 @@ for erg in spring24['phase1_group'].dropna().unique():
                                     "Transfer Students")
     transfer_donut = vega_lite_donut(transfer_data,
                                      "Yes")
-    #print(transfer_donut)
+    open(f'output/{erg}/donut_transfer.txt', 'w').write(transfer_donut)
 
     # create NPS bar graph
     NPS_data = get_proportions(data_subset, 't2_NPS_category', "Category")
-    NPS_simplebar = vega_lite_simplebar(NPS_data)
-    #print(NPS_simplebar)
+    NPS_simplebar = vega_lite_simplebar(NPS_data, title="Your ERG")
+    open(f'output/{erg}/NPS.txt', 'w').write(NPS_simplebar)
 
     # create erg preference horizontal bar graph
     erg_pref_data = item_group_proportions(data_subset, erg_items, scales['Pref4-a'])
     erg_pref_chart = vega_lite_grouphstackbar(erg_pref_data)
-    #print(erg_pref_chart)
+    open(f'output/{erg}/erg_pref.txt', 'w').write(erg_pref_chart)
 
-    break
+    # create interpersonal outcomes chart
+    interpersonal_data = item_group_proportions(data_subset,
+                                                interpersonal_items,
+                                                scales['Agreement5-a'])
+    interpersonal_chart = vega_lite_groupvbar(interpersonal_data, title="Your ERG")
+    open(f'output/{erg}/interpersonal.txt', 'w').write(interpersonal_chart)

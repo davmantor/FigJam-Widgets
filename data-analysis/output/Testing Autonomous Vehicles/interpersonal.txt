@@ -1,0 +1,237 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "description": "A detailed bar chart with embedded data.",
+    "width": 1500,
+    "height": 300,
+    "title": {
+        "text": "Your ERG",
+        "subtitle": "7 Responses",
+        "fontSize": 40,
+        "subtitleFontSize": 30,
+        "font": "Arial",
+        "anchor": "start",
+        "color": "black",
+        "offset": 30
+    },
+    "data": {
+        "values": [
+            {
+                "Item": "I developed good relationships with others in my group",
+                "Response": "Missing",
+                "Value": 0.29
+            },
+            {
+                "Item": "I developed good relationships with others in my group",
+                "Response": "Somewhat agree",
+                "Value": 0.43
+            },
+            {
+                "Item": "I developed good relationships with others in my group",
+                "Response": "Strongly agree",
+                "Value": 0.29
+            },
+            {
+                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Response": "Missing",
+                "Value": 0.29
+            },
+            {
+                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Response": "Somewhat disagree",
+                "Value": 0.29
+            },
+            {
+                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Response": "Somewhat agree",
+                "Value": 0.43
+            },
+            {
+                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Response": "Missing",
+                "Value": 0.29
+            },
+            {
+                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Response": "Strongly disagree",
+                "Value": 0.57
+            },
+            {
+                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Response": "Somewhat agree",
+                "Value": 0.14
+            },
+            {
+                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Response": "Missing",
+                "Value": 0.29
+            },
+            {
+                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Response": "Somewhat disagree",
+                "Value": 0.29
+            },
+            {
+                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Response": "Somewhat agree",
+                "Value": 0.14
+            },
+            {
+                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Response": "Strongly agree",
+                "Value": 0.29
+            },
+            {
+                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Response": "Missing",
+                "Value": 0.29
+            },
+            {
+                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Response": "Neutral",
+                "Value": 0.14
+            },
+            {
+                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Response": "Somewhat agree",
+                "Value": 0.14
+            },
+            {
+                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Response": "Strongly agree",
+                "Value": 0.43
+            }
+        ]
+    },
+    "config": {
+        "axis": {
+            "labelFontSize": 30
+        },
+        "legend": {
+            "symbolType": "circle",
+            "symbolSize": 400,
+            "orient": "bottom",
+            "titlePadding": 40,
+            "padding": 5,
+            "columnPadding": 0,
+            "labelFontSize": 25,
+            "labelLimit": 0,
+            "titleLimit": 0,
+            "symbolLimit": 0,
+            "offset": 20
+        }
+    },
+    "layer": [
+        {
+            "mark": {
+                "type": "bar",
+                "tooltip": true
+            },
+            "encoding": {
+                "x": {
+                    "field": "Item",
+                    "type": "nominal",
+                    "axis": {
+                        "labelAngle": 0,
+                        "labelLimit": 0,
+                        "labelExpr": "[slice(datum.label, 0, length(datum.label)/2), slice(datum.label, length(datum.label)/2)]",
+                        "labelFontSize": 25,
+                        "labelLineHeight": 30,
+                        "title": null
+                    }
+                },
+                "y": {
+                    "field": "Value",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": null,
+                        "grid": true,
+                        "format": ".0%",
+                        "tickCount": 5
+                    },
+                    "scale": {
+                        "domain": [
+                            0,
+                            1
+                        ]
+                    }
+                },
+                "xOffset": {
+                    "field": "Response",
+                    "type": "ordinal",
+                    "sort": [
+                        "Missing",
+                        "Not applicable",
+                        "Strongly disagree",
+                        "Somewhat disagree",
+                        "Neutral",
+                        "Somewhat agree",
+                        "Strongly agree"
+                    ]
+                },
+                "color": {
+                    "field": "Response",
+                    "type": "nominal",
+                    "title": "",
+                    "scale": {
+                        "domain": [
+                            "Missing",
+                            "Not applicable",
+                            "Strongly disagree",
+                            "Somewhat disagree",
+                            "Neutral",
+                            "Somewhat agree",
+                            "Strongly agree"
+                        ],
+                        "range": [
+                            "#e7e7e7",
+                            "#b3b3b3",
+                            "#d77217",
+                            "#fdb72a",
+                            "#fdf876",
+                            "#6ac8fd",
+                            "#315bb6"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "mark": {
+                "type": "text",
+                "align": "center",
+                "baseline": "middle",
+                "dy": -15,
+                "fontSize": 25,
+                "fontWeight": "normal"
+            },
+            "encoding": {
+                "x": {
+                    "field": "Item",
+                    "type": "nominal"
+                },
+                "xOffset": {
+                    "field": "Response",
+                    "type": "ordinal",
+                    "sort": [
+                        "Missing",
+                        "Not applicable",
+                        "Strongly disagree",
+                        "Somewhat disagree",
+                        "Neutral",
+                        "Somewhat agree",
+                        "Strongly agree"
+                    ]
+                },
+                "y": {
+                    "field": "Value",
+                    "type": "quantitative"
+                },
+                "text": {
+                    "field": "Value",
+                    "type": "quantitative",
+                    "format": ".1%"
+                }
+            }
+        }
+    ]
+}
