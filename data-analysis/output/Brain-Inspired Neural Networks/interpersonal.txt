@@ -16,117 +16,117 @@
     "data": {
         "values": [
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Missing",
                 "Value": 0.05
             },
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Neutral",
                 "Value": 0.05
             },
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Somewhat agree",
                 "Value": 0.16
             },
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Strongly agree",
                 "Value": 0.74
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Missing",
                 "Value": 0.05
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Neutral",
                 "Value": 0.21
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Somewhat agree",
                 "Value": 0.32
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Strongly agree",
                 "Value": 0.42
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Missing",
                 "Value": 0.05
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Not applicable",
                 "Value": 0.16
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Strongly disagree",
                 "Value": 0.11
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Somewhat disagree",
                 "Value": 0.05
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Neutral",
                 "Value": 0.21
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Somewhat agree",
                 "Value": 0.21
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Strongly agree",
                 "Value": 0.21
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Missing",
                 "Value": 0.05
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Neutral",
                 "Value": 0.21
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Somewhat agree",
                 "Value": 0.47
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Strongly agree",
                 "Value": 0.26
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Missing",
                 "Value": 0.05
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Somewhat disagree",
                 "Value": 0.05
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Somewhat agree",
                 "Value": 0.11
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Strongly agree",
                 "Value": 0.79
             }
@@ -163,7 +163,7 @@
                     "axis": {
                         "labelAngle": 0,
                         "labelLimit": 0,
-                        "labelExpr": "[slice(datum.label, 0, length(datum.label)/2), slice(datum.label, length(datum.label)/2)]",
+                        "labelExpr": "split(datum.label, '  ')",
                         "labelFontSize": 25,
                         "labelLineHeight": 30,
                         "title": null

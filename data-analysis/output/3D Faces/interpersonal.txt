@@ -16,97 +16,97 @@
     "data": {
         "values": [
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Missing",
                 "Value": 0.25
             },
             {
-                "Item": "I developed good relationships with others in my group",
+                "Item": "I developed good relationships with  others in my group",
                 "Response": "Strongly agree",
                 "Value": 0.75
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Missing",
                 "Value": 0.25
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Neutral",
                 "Value": 0.12
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Somewhat agree",
                 "Value": 0.5
             },
             {
-                "Item": "I gave/received academic/career support from others in my group at some point during the group",
+                "Item": "I gave/received academic/career support  from others in my group at some point  during the group",
                 "Response": "Strongly agree",
                 "Value": 0.12
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Missing",
                 "Value": 0.25
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Not applicable",
                 "Value": 0.12
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Neutral",
                 "Value": 0.12
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Somewhat agree",
                 "Value": 0.25
             },
             {
-                "Item": "I gave/received emotional support from others in my group at some point during the group",
+                "Item": "I gave/received emotional support from  others in my group at some point during  the group",
                 "Response": "Strongly agree",
                 "Value": 0.25
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Missing",
                 "Value": 0.25
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Not applicable",
                 "Value": 0.12
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Neutral",
                 "Value": 0.12
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Somewhat agree",
                 "Value": 0.25
             },
             {
-                "Item": "I encouraged/was encouraged to pursue interests/opportunities",
+                "Item": "I encouraged/was encouraged to pursue  interests/opportunities",
                 "Response": "Strongly agree",
                 "Value": 0.25
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Missing",
                 "Value": 0.25
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Somewhat agree",
                 "Value": 0.25
             },
             {
-                "Item": "I enjoyed the get-to-know-you questions at the beginning of each session",
+                "Item": "I enjoyed the get-to-know-you questions  at the beginning of each session",
                 "Response": "Strongly agree",
                 "Value": 0.5
             }
@@ -143,7 +143,7 @@
                     "axis": {
                         "labelAngle": 0,
                         "labelLimit": 0,
-                        "labelExpr": "[slice(datum.label, 0, length(datum.label)/2), slice(datum.label, length(datum.label)/2)]",
+                        "labelExpr": "split(datum.label, '  ')",
                         "labelFontSize": 25,
                         "labelLineHeight": 30,
                         "title": null
