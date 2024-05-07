@@ -35,6 +35,21 @@ scales = {"Agreement5-a": {"0.0": "Not applicable",
                       "3.0": "Promoters (9-10)"}
           }
 
+def breakup_string(string, N=40):
+    words = string.split()  # Split the string into words
+    current_line = ''
+    lines = []
+    for word in words:
+        # Check if adding this word would exceed the length `N`
+        if len(current_line + word) > N:
+            # Add current line to lines and reset current line
+            lines.append(current_line.strip())
+            current_line = word + ' '  # Start a new line with the current word
+        else:
+            current_line += word + ' '  # Add word to current line
+    lines.append(current_line.strip())  # Add the last line to lines
+    return "  ".join(lines)  # Join lines with double space
+
 def get_palette(domain):
     scale_key = matchOptions2Scale(scales, domain)
     scale_palettes = {"Agreement5-a": {"Not applicable": "#b3b3b3",
@@ -550,6 +565,8 @@ def vega_lite_groupvbar(data, title="Entire Class"):
         sorted_data.extend(sorted_responses)
     proportions = sorted_data
     palette_dict, palette = get_palette(final_domain)
+    for item in proportions:
+        item['Item'] = breakup_string(item['Item'])
     chart = {
           "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
           "description": "A detailed bar chart with embedded data.",
@@ -599,7 +616,7 @@ def vega_lite_groupvbar(data, title="Entire Class"):
                   "axis": {
                     "labelAngle": 0,
                     "labelLimit": 0,
-                    "labelExpr": "[slice(datum.label, 0, length(datum.label)/2), slice(datum.label, length(datum.label)/2)]",
+                    "labelExpr": "split(datum.label, '  ')",
                     "labelFontSize": 25,
                     "labelLineHeight": 30,
                     "title": None
