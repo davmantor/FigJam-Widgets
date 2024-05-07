@@ -19,7 +19,13 @@
           setSelectedData(message.data.columnData);
           setCardCount(message.data.cardCount);
           setIsDataLoaded(true);
-        } else if (message.type === "update-color") {
+        }
+      });
+    });
+    useEffect(() => {
+      ui.on("message", (message) => {
+        if (message.type === "update-color") {
+          console.log("Color received: ", message.data.newColor);
           setCardColor(message.data.newColor);
         }
       });

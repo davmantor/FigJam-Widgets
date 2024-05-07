@@ -31,8 +31,14 @@ function CarouselWidget() {
         setSelectedData(message.data.columnData);
         setCardCount(message.data.cardCount);
         setIsDataLoaded(true);
-      } else if (message.type === 'update-color') {
-        setCardColor(message.data.newColor); // Handle color updates
+      } 
+    });
+  });
+  useEffect(() => {
+    ui.on('message', message => {
+      if (message.type === 'update-color') {
+        console.log('Color received: ', message.data.newColor);
+        setCardColor(message.data.newColor); // Make sure newColor is being sent correctly
       }
     });
   });
