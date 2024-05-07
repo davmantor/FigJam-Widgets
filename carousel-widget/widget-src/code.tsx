@@ -89,7 +89,7 @@ function CarouselWidget() {
         {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
           <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={460} height={460} direction="vertical" spacing={10} horizontalAlignItems="center">
             <Text fontSize={18*2} horizontalAlignText="center">{currentIndex + index + 1}</Text>
-            <Text fontSize={18*2} width={450} verticalAlignText="center" horizontalAlignText="left">
+            <Text fontSize={18} width={450} verticalAlignText="center" horizontalAlignText="left">
               {data || 'No data'}
             </Text>
           </AutoLayout>
