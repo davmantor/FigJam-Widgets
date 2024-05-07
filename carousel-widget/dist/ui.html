@@ -122,6 +122,8 @@ input[type="number"]::-webkit-outer-spin-button {
     </form>
 
     <script>
+
+        
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -184,6 +186,13 @@ input[type="number"]::-webkit-outer-spin-button {
                 const conditionValue = document.getElementById('conditionValue').value;
                 const cardColor = document.getElementById('cardColor').value;
 
+                parent.postMessage({
+                    pluginMessage: {
+                      type: 'update-color',
+                      data: { newColor: document.getElementById('cardColor').value }
+                    }
+                  }, '*');
+                  
         
                 // Filter data based on condition, if specified
                 let columnData = [];
