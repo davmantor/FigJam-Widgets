@@ -60,13 +60,26 @@ function CarouselWidget() {
 
   const navigateCarousel = (direction: 'next' | 'prev') => {
     setCurrentIndex(prevIndex => {
-      const maxIndex = Math.max(0, selectedData.length - cardCount);
-      return direction === 'next' ? Math.min(prevIndex + cardCount, maxIndex) : Math.max(prevIndex - cardCount, 0);
-    });
-  };
+        const step = cardCount; // The step size is the number of cards per page
+        const totalItems = selectedData.length;
+        const totalPages = Math.ceil(totalItems / step);
 
-  const currentPage = Math.floor(currentIndex / cardCount) + 1;
+        let newPage = currentPage; // currentPage should be tracked in state or calculated
+
+        if (direction === 'next' && currentPage < totalPages) {
+            newPage = currentPage + 1;
+        } else if (direction === 'prev' && currentPage > 1) {
+            newPage = currentPage - 1;
+        }
+
+        // Calculate the new index based on the new page number
+        return (newPage - 1) * step;
+    });
+};
+
   const totalPages = Math.ceil(selectedData.length / cardCount);
+  const currentPage = Math.floor(currentIndex / cardCount) + 1;
+
 
   return (
     <AutoLayout direction="vertical" spacing={12} padding={10}>
@@ -75,15 +88,15 @@ function CarouselWidget() {
         <Button onClick={() => navigateCarousel('prev')} direction="prev" />
         {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
           <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={460} height={460} direction="vertical" spacing={10} horizontalAlignItems="center">
-            <Text fontSize={18} horizontalAlignText="center">{currentIndex + index + 1}</Text>
-            <Text fontSize={18} width={450} verticalAlignText="center" horizontalAlignText="left">
+            <Text fontSize={18*2} horizontalAlignText="center">{currentIndex + index + 1}</Text>
+            <Text fontSize={18*2} width={450} verticalAlignText="center" horizontalAlignText="left">
               {data || 'No data'}
             </Text>
           </AutoLayout>
         ))}
         <Button onClick={() => navigateCarousel('next')} direction="next" />
       </AutoLayout>
-      <Text fontSize={25} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
+      <Text fontSize={25*2} verticalAlignText="center" horizontalAlignText="center">Page {currentPage} of {totalPages}</Text>
     </AutoLayout>
   );
 }
