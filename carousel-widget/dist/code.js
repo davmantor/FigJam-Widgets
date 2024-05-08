@@ -12,6 +12,8 @@
     const [cardColor, setCardColor] = useSyncedState("cardColor", "#F0F0F0");
     const [cardCount, setCardCount] = useSyncedState("cardCount", 3);
     const [currentIndex, setCurrentIndex] = useSyncedState("currentIndex", 0);
+    const [cardWidth, setCardWidth] = useSyncedState("cardWidth", 480);
+    const [cardHeight, setCardHeight] = useSyncedState("cardHeight", 480);
     const [isDataLoaded, setIsDataLoaded] = useSyncedState("isDataLoaded", false);
     useEffect(() => {
       ui.on("message", (message) => {
@@ -27,6 +29,14 @@
         if (message.type === "update-color") {
           console.log("Color received: ", message.data.newColor);
           setCardColor(message.data.newColor);
+        }
+      });
+    });
+    useEffect(() => {
+      ui.on("message", (message) => {
+        if (message.type === "update-size") {
+          setCardWidth(parseInt(message.data.newWidth));
+          setCardHeight(parseInt(message.data.newHeight));
         }
       });
     });
@@ -60,7 +70,7 @@
     };
     const totalPages = Math.ceil(selectedData.length / cardCount);
     const currentPage = Math.floor(currentIndex / cardCount) + 1;
-    return /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "vertical", spacing: 12, padding: 10 }, !isDataLoaded && /* @__PURE__ */ figma.widget.h(Button, { onClick: handleButtonClick, children: "Load xlsx and Select Column" }), /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", spacing: 12 }, /* @__PURE__ */ figma.widget.h(Button, { onClick: () => navigateCarousel("prev"), direction: "prev" }), selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => /* @__PURE__ */ figma.widget.h(AutoLayout, { fill: cardColor, cornerRadius: 12, padding: 12, width: 460, height: 460, direction: "vertical", spacing: 10, horizontalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(Text, { fontSize: 18 * 2, horizontalAlignText: "center" }, currentIndex + index + 1), /* @__PURE__ */ figma.widget.h(Text, { fontSize: 22, width: 450, verticalAlignText: "center", horizontalAlignText: "left" }, data || "No data"))), /* @__PURE__ */ figma.widget.h(Button, { onClick: () => navigateCarousel("next"), direction: "next" })), /* @__PURE__ */ figma.widget.h(Text, { fontSize: 36, verticalAlignText: "center", horizontalAlignText: "center" }, "Page ", currentPage, " of ", totalPages));
+    return /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "vertical", spacing: 12, padding: 10 }, !isDataLoaded && /* @__PURE__ */ figma.widget.h(Button, { onClick: handleButtonClick, children: "Load xlsx and Select Column" }), /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", spacing: 12 }, /* @__PURE__ */ figma.widget.h(Button, { onClick: () => navigateCarousel("prev"), direction: "prev" }), selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => /* @__PURE__ */ figma.widget.h(AutoLayout, { fill: cardColor, cornerRadius: 12, padding: 12, width: cardWidth, height: cardHeight, direction: "vertical", spacing: 10, horizontalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(Text, { fontSize: 18 * 2, horizontalAlignText: "center" }, currentIndex + index + 1), /* @__PURE__ */ figma.widget.h(Text, { fontSize: 22, width: cardWidth - 20, verticalAlignText: "center", horizontalAlignText: "left" }, data || "No data"))), /* @__PURE__ */ figma.widget.h(Button, { onClick: () => navigateCarousel("next"), direction: "next" })), /* @__PURE__ */ figma.widget.h(Text, { fontSize: 36, verticalAlignText: "center", horizontalAlignText: "center" }, "Page ", currentPage, " of ", totalPages));
   }
   widget.register(CarouselWidget);
 })();

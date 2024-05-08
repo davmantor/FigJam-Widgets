@@ -8,84 +8,86 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
 
-h1 {
-    text-align: center;
-}
+        h1 {
+            text-align: center;
+            color: #333;
+        }
 
-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 16px;
+        }
 
-input[type="file"],
-select,
-input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+        input[type="file"],
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
 
-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #4caf50;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+        input[type="file"]:hover,
+        input[type="number"]:hover,
+        input[type="text"]:hover,
+        select:hover {
+            border-color: #aaa;
+        }
 
-button:hover {
-    background-color: #45a049;
-}
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-button:active {
-    background-color: #3e8e41;
-}
+        button:hover {
+            background-color: #0056b3;
+        }
 
-/* Optional: Style the file input button */
-#fileInput {
-    cursor: pointer;
-}
+        button:active {
+            background-color: #004494;
+        }
 
-/* Optional: Style the select dropdown */
-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 5px center;
-    background-size: 12px;
-}
+        select {
+            cursor: pointer;
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
 
-/* Optional: Style the number input buttons */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-}
-
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -107,6 +109,12 @@ input[type="number"]::-webkit-outer-spin-button {
 
         <label for="cardColor">Card Color (hex):</label>
         <input type="text" id="cardColor" value="#F0F0F0">
+
+        <label for="cardColor">Card Width (px):</label>
+        <input type="text" id="cardWidth" value="480">
+
+        <label for="cardColor">Card Height (px):</label>
+        <input type="text" id="cardHeight" value="480">
 
         <label for="conditionColumn">Condition Column (optional):</label>
         <select id="conditionColumn" onchange="updateConditionValues()">
@@ -185,13 +193,22 @@ input[type="number"]::-webkit-outer-spin-button {
                 const conditionColumnIndex = parseInt(document.getElementById('conditionColumn').value);
                 const conditionValue = document.getElementById('conditionValue').value;
                 const cardColor = document.getElementById('cardColor').value;
+                const cardWidth = document.getElementById('cardWidth').value;
+                const cardHeight = document.getElementById('cardHeight').value;
 
-                console.log('Card color loaded:', cardColor);
+                //console.log('Card color loaded:', cardColor);
 
                 parent.postMessage({
                     pluginMessage: {
                       type: 'update-color',
                       data: { newColor: document.getElementById('cardColor').value }
+                    }
+                  }, '*');
+
+                  parent.postMessage({
+                    pluginMessage: {
+                      type: 'update-size',
+                      data: { newWidth: document.getElementById('cardWidth').value,  newHeight: document.getElementById('cardHeight').value }
                     }
                   }, '*');
                   

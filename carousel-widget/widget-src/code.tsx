@@ -20,9 +20,11 @@ function Button({ onClick, direction, children }: ButtonProps) {
 
 function CarouselWidget() {
   const [selectedData, setSelectedData] = useSyncedState<string[]>('selectedData', []);
-  const [cardColor, setCardColor] = useSyncedState<string>('cardColor', '#F0F0F0'); // Default color
+  const [cardColor, setCardColor] = useSyncedState<string>('cardColor', '#F0F0F0');
   const [cardCount, setCardCount] = useSyncedState<number>('cardCount', 3);
   const [currentIndex, setCurrentIndex] = useSyncedState<number>('currentIndex', 0);
+  const [cardWidth, setCardWidth] = useSyncedState<number>('cardWidth', 480); // Default width
+  const [cardHeight, setCardHeight] = useSyncedState<number>('cardHeight', 480); // Default height
   const [isDataLoaded, setIsDataLoaded] = useSyncedState<boolean>('isDataLoaded', false);
 
   useEffect(() => {
@@ -39,6 +41,15 @@ function CarouselWidget() {
       if (message.type === 'update-color') {
         console.log('Color received: ', message.data.newColor);
         setCardColor(message.data.newColor); // Make sure newColor is being sent correctly
+      }
+    });
+  });
+
+  useEffect(() => {
+    ui.on('message', message => {
+      if (message.type === 'update-size') {
+        setCardWidth(parseInt(message.data.newWidth));
+        setCardHeight(parseInt(message.data.newHeight));
       }
     });
   });
@@ -87,9 +98,9 @@ function CarouselWidget() {
       <AutoLayout direction="horizontal" spacing={12}>
         <Button onClick={() => navigateCarousel('prev')} direction="prev" />
         {selectedData.slice(currentIndex, currentIndex + cardCount).map((data, index) => (
-          <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={460} height={460} direction="vertical" spacing={10} horizontalAlignItems="center">
+          <AutoLayout fill={cardColor} cornerRadius={12} padding={12} width={cardWidth} height={cardHeight} direction="vertical" spacing={10} horizontalAlignItems="center">
             <Text fontSize={18*2} horizontalAlignText="center">{currentIndex + index + 1}</Text>
-            <Text fontSize={22} width={450} verticalAlignText="center" horizontalAlignText="left">
+            <Text fontSize={22} width={cardWidth - 20} verticalAlignText="center" horizontalAlignText="left">
               {data || 'No data'}
             </Text>
           </AutoLayout>
