@@ -11,18 +11,26 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Define the database and collection for testing
 DATABASE = 'test'
-COLLECTION = 'logs'
+COLLECTION = 'messages'
 
 # Function to keep MongoDB server alive
 def keep_mongo_alive():
     try:
         client.admin.command('ping')
         now = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
+        heartbeat_doc = {
+            'timestamp': now,
+            'message': 'Keep-alive ping',
+            'id': datetime.now().isoformat()
+        }
+
         print(f"Pinged your deployment at {now}. You successfully connected to MongoDB!")
 
         # Access the test database and collection
         db = client[DATABASE]
         collection = db[COLLECTION]
+
+        collection.insert_one(heartbeat_doc)
 
         # Execute a simple query like counting documents
         count = collection.count_documents({})
