@@ -25,7 +25,7 @@ def keep_mongo_alive():
             # 'id': datetime.now().isoformat()
             'logId': datetime.now().isoformat(), 
             'messages': [{
-                'id':  uuid.uuid4(),
+                'id':  str(uuid.uuid4()),
                 'text': 'This is a temporary message',
                 'sender': 'System'
                 }]
@@ -46,7 +46,7 @@ def keep_mongo_alive():
         print(f"Error pinging MongoDB server: {e}")
 
 # Schedule the keep-alive functions to run every x minutes
-schedule.every(0.1).minutes.do(keep_mongo_alive)
+schedule.every(10).minutes.do(keep_mongo_alive)
 
 # Run the keep-alive job periodically
 if __name__ == "__main__":
