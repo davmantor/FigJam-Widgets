@@ -3,6 +3,7 @@ import schedule
 from datetime import datetime
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+import uuid
 
 uri = "mongodb+srv://keepAlive:BdELkiIYGDV2LZCo@init-cluster.plnn1mm.mongodb.net/?retryWrites=true&w=majority&appName=init-cluster"
 
@@ -11,7 +12,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Define the database and collection for testing
 DATABASE = 'test'
-COLLECTION = 'messages'
+COLLECTION = 'logs'
 
 # Function to keep MongoDB server alive
 def keep_mongo_alive():
@@ -19,9 +20,15 @@ def keep_mongo_alive():
         client.admin.command('ping')
         now = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
         heartbeat_doc = {
-            'timestamp': now,
-            'message': 'Keep-alive ping',
-            'id': datetime.now().isoformat()
+            # 'timestamp': now,
+            # 'message': 'Keep-alive ping',
+            # 'id': datetime.now().isoformat()
+            'logId': datetime.now().isoformat(), 
+            'messages': [{
+                'id':  uuid.uuid4(),
+                'text': 'This is a temporary message',
+                'sender': 'System'
+                }]
         }
 
         print(f"Pinged your deployment at {now}. You successfully connected to MongoDB!")
