@@ -6,13 +6,24 @@ from pymongo.server_api import ServerApi
 import uuid
 
 uri = "mongodb+srv://keepAlive:BdELkiIYGDV2LZCo@init-cluster.plnn1mm.mongodb.net/?retryWrites=true&w=majority&appName=init-cluster"
+url = "https://figjam-widgets.onrender.com/messages"
+
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Define the database and collection for testing
 DATABASE = 'test'
-COLLECTION = 'logs'
+COLLECTION = 'messages'
+
+# need API to communicate with the server
+# const response = await fetch(`https://figjam-widgets.onrender.com/messages`, {
+#             method: 'POST',
+#             headers: {
+#               'Content-Type': 'application/json',
+#             },
+#             body: JSON.stringify(newMessageObject),
+#           });
 
 # Function to keep MongoDB server alive
 def keep_mongo_alive():
@@ -26,7 +37,7 @@ def keep_mongo_alive():
             'logId': datetime.now().isoformat(), 
             'messages': [{
                 'id':  str(uuid.uuid4()),
-                'text': 'This is a temporary message',
+                'text': 'This is a heartbeat message',
                 'sender': 'System'
                 }]
         }
@@ -46,7 +57,7 @@ def keep_mongo_alive():
         print(f"Error pinging MongoDB server: {e}")
 
 # Schedule the keep-alive functions to run every x minutes
-schedule.every(10).minutes.do(keep_mongo_alive)
+schedule.every(0.1).minutes.do(keep_mongo_alive)
 
 # Run the keep-alive job periodically
 if __name__ == "__main__":
