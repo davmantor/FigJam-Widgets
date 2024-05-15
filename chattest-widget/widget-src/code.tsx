@@ -1289,14 +1289,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
        
         <AutoLayout
           direction="horizontal"
-          padding={{ top: 20, bottom: 4, left: 4, right: 4 }}
+          padding={{ top: 20, bottom: 4, left: 10, right: 4 }}
           fill={messageStyle.fill}
           
         >
           <AutoLayout 
             direction="vertical"
           >
-            <Text width={380} fontSize={35}>
+            <Text width={740} fontSize={35} >
               {isDeleted ? 'this message has been deleted' : message.text}
             </Text>
 

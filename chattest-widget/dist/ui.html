@@ -41,6 +41,18 @@
     button:disabled {
       background-color: #a2a2a2; /* Gray color */
     }
+    /* Define the animation */
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Apply the animation to the button text */
+    button.waiting:after {
+      content: " ..."; /* Add ellipsis to indicate waiting */
+      animation: pulse 1s infinite; /* Apply the pulse animation */
+    }
     
   </style>
 </head>
@@ -100,7 +112,8 @@
       const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
       parent.postMessage({ pluginMessage: { type: actionType, payload: { message, anonymous } } }, '*'); // Include the anonymous value
       document.getElementById('sendMessage').disabled = "true";
-      document.getElementById('sendMessage').innerText = 'Please Wait ...'; // Update button to indicate reply action
+      document.getElementById('sendMessage').innerText = 'Please Wait'; // Update button to indicate reply action
+      document.getElementById('sendMessage').classList.add('waiting');
     };
 
     
