@@ -44,6 +44,7 @@ type Message = {
     directreply: number;
     logId: number, // Include the logId in each message
     anonymous: boolean;
+    userIcon: string | null;
 
 };
 
@@ -350,6 +351,7 @@ function ChatWidget() {
         const formattedHours = hours % 12 || 12; // Convert to 12-hour format
         const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+        const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
         
         const newMessageObject = {
           id: newId,
@@ -366,6 +368,7 @@ function ChatWidget() {
           downvotedUsers: [], // Initial downvote state
           directreply: 0,
           logId: logId, // Include the logId in each message
+          userIcon: userIcon,
           anonymous: anonymous
         };
         try {
@@ -472,6 +475,8 @@ function ChatWidget() {
             const formattedHours = hours % 12 || 12; // Convert to 12-hour format
             const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
             const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+            const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null; // Add this line
+
             // Find the message being replied to
             const messageToReply = messages.find(message => message.id === id);
             
@@ -503,7 +508,8 @@ function ChatWidget() {
                       upvotedUsers: [], // Initial upvote state
                       downvotedUsers: [], // Initial downvote state
                       directreply: 0,
-                      logId: logId, // Include the logId in each message
+                      logId: logId, // Include the logId in each message,
+                      userIcon: userIcon,
                       anonymous: anonymous
                     };
                     console.log("newreply");
@@ -1151,6 +1157,8 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const upvoteCount = message.upvotedUsers.length;
   const downvoteCount = message.downvotedUsers.length;
 
+  const firstName = message.sender.split(' ')[0];
+
   //console.log(`Message ID: ${message.id}, ReplyTo ID: ${replyToId}, Is Being Replied To: ${isBeingRepliedTo}`);
 
   // Define the style for the message bubble
@@ -1245,9 +1253,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={520}
             spacing={20}
           >
-            <Text fontSize={30} fill={messageStyle.color} horizontalAlignText={"left"}>
-              {(isDeleted || message.anonymous) ? 'Anonymous' : message.sender}:
-            </Text>
+            {message.userIcon ? ( // Add this block to display the user icon
+                            <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
+                        ) : (
+                            <SVG src="<svg>...<svg>" width={30} height={30} /> // SVG code for question mark icon
+                        )}
+              <Text fontSize={30} fill={messageStyle.color} horizontalAlignText={"left"}>
+                  {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
+              </Text>
 
             {message.pinned && (
             <SVG
