@@ -1,0 +1,19 @@
+{
+  "name": "ResponsiveBar",
+  "id": "1391125209120751898",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}
