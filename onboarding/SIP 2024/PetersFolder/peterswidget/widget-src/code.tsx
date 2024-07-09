@@ -22,7 +22,7 @@ function BarGraphWidget() {
     <Frame width={frame_w} height={frame_h}>
       <Text
         x={frame_w / 2 - 110}
-        y={10}
+        y={50}
         fontSize={16}
         fontWeight="bold"
         fill={`#00FF00`}
@@ -31,7 +31,7 @@ function BarGraphWidget() {
         </Text>
       {sampleData.map((value, index) => (
         <>
-         <Text fontSize={32} width={42} x={barSpacing * index + 20} horizontalAlignText={'center'}>
+         <Text fontSize={22} width={42} x={barSpacing * index + 20} horizontalAlignText={'center'} y={barBaseY - value - 50}>
         {value}
       </Text>
       <Rectangle
