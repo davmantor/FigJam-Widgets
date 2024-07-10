@@ -6,7 +6,7 @@ const sampleData = [10, 20, 30, 40, 50, 60];
 function BarGraphWidget() {
   const [data, setData] = useSyncedState('data', sampleData);
   const frame_h = 300
-  const frame_w = 400
+  const frame_w = 200
   const barWidth = 40
   const barSpacing = 60
   const barBaseY = frame_h - 30;
@@ -26,6 +26,12 @@ function BarGraphWidget() {
   }
   return (
     <AutoLayout
+    minHeight={300}
+    direction="horizontal"
+    verticalAlignItems="end"
+    horizontalAlignItems={"start"}
+    //horizontalAlignItems
+    //direction=""
     
     >
     <Frame width={frame_w} height={frame_h}>
@@ -40,6 +46,13 @@ function BarGraphWidget() {
       onClick={addBar}
     ></SVG>
     </Frame>
+    <AutoLayout
+    verticalAlignItems="end"
+    direction="horizontal"
+    spacing={30}>
+    
+      
+
     <Text
         x={frame_w / 2 - 110}
         y={50}
@@ -51,6 +64,11 @@ function BarGraphWidget() {
         </Text>
           {data.map((value, index) => (
         <>
+        <AutoLayout
+        horizontalAlignItems={"end"}
+        direction="vertical"
+        spacing={10}
+        >
          <Text fontSize={22} width={42} x={barSpacing * index + 20} horizontalAlignText={'center'} y={barBaseY - value - 50}>
         {value}
       </Text>
@@ -83,8 +101,10 @@ function BarGraphWidget() {
         >
           input {index + 1}
           </Text>
+          </AutoLayout>
           </>
        ))}
+       </AutoLayout>
     </AutoLayout>
   )
 }
