@@ -12,7 +12,7 @@ function BarGraphWidget() {
   const [data] = useSyncedState("data", SampleData); // Use synced state to manage the bar data (in case we decide to change it)
 
   // Define key variables
-  const frameWidth = 400;
+  const frameWidth = 1000;
   const frameHeight = 200;
   const barWidth = 40;
   const barSpacing = 60;
@@ -21,6 +21,9 @@ function BarGraphWidget() {
   const title = "Some title for the graph"
 
   return (
+    <AutoLayout>
+      
+   
     <Frame width={frameWidth} height={frameHeight}>
       <Text
         x={frameWidth / 2 - 110} // Centering the title (approximation)
@@ -41,15 +44,19 @@ function BarGraphWidget() {
             fill={`#${colors[index]}`} // Fill color for the bar
           />
            <SVG
-    src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="30" height="30" rx="15" fill="white"/>
-    <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
-    <rect x="10" y="20" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-    </svg>`}
-    onClick={() => {
-        //setCount(count + 1)
-    }}
-/>
+              src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="30" height="30" rx="15" fill="white"/>
+              <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
+              <rect x="10" y="20" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+              </svg>`}
+              x = {barSpacing * index + 20} 
+              y = {barBaseY} 
+              width= {30} 
+              height= {30}
+              onClick={() => {
+                  //setCount(count + 1)
+              }}
+            />
         <Text
             key={`label-${index}`} // Unique key for each label
             x={barSpacing * index + 25} // X-coordinate for each label
@@ -61,7 +68,8 @@ function BarGraphWidget() {
           </>
       ))}
     </Frame>
+    </AutoLayout>
   );
 }
 
-widget.register(BarGraphWidget) // Register the widget with Figma
+widget.register(BarGraphWidget) // Register the widget with Figma 
