@@ -1,0 +1,19 @@
+{
+  "name": "Text Entry Widget",
+  "id": "1391195703137776986",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma",
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "ui": "ui.html",
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:3000"]}
+}

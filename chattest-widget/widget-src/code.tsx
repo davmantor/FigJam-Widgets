@@ -1,5 +1,8 @@
 const { widget, showUI, ui } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG, useEffect, colorMapToOptions, usePropertyMenu} = widget;
+
+const questionMarkIcon = '<svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 318.293 318.293" xml:space="preserve"><g><path d="M159.148,0c-52.696,0-95.544,39.326-95.544,87.662h47.736c0-22.007,21.438-39.927,47.808-39.927 c26.367,0,47.804,17.92,47.804,39.927v6.929c0,23.39-10.292,34.31-25.915,50.813c-20.371,21.531-45.744,48.365-45.744,105.899 h47.745c0-38.524,15.144-54.568,32.692-73.12c17.368-18.347,38.96-41.192,38.96-83.592v-6.929C254.689,39.326,211.845,0,159.148,0z"/> <rect x="134.475" y="277.996" width="49.968" height="40.297"/></g></svg>'
+
 //import '@fontawesome/free-solid-svg-icons';
 
 
@@ -1158,6 +1161,10 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const downvoteCount = message.downvotedUsers.length;
 
   const firstName = message.sender.split(' ')[0];
+  //const string = "Ashwin M Chembu"
+  //const array = string.split(" ")
+  //array = [Ashwin, M, Chembu]
+  // 0        1
 
   //console.log(`Message ID: ${message.id}, ReplyTo ID: ${replyToId}, Is Being Replied To: ${isBeingRepliedTo}`);
 
@@ -1253,11 +1260,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={520}
             spacing={20}
           >
-            {message.userIcon ? ( // Add this block to display the user icon
-                            <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
-                        ) : (
-                            <SVG src="<svg>...<svg>" width={30} height={30} /> // SVG code for question mark icon
-                        )}
+            {message.userIcon ? (
+                  <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
+              ) : (
+                  <Image src={questionMarkIcon} width={40} height={40} />
+              )}
+
               <Text fontSize={30} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
