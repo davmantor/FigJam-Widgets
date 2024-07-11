@@ -8,7 +8,7 @@ const sampleData = [10,20,30,40,50,60]
 function BarGraphWidget() {
   const [data, setData] = useSyncedState("data", sampleData)
   const frameWidth = 400;
-  const frameHeight = 200;
+  const frameHeight = 220;
   const barWidth = 40;
   const barSpacing = 60;
   const barBaseY = frameHeight - 70;
