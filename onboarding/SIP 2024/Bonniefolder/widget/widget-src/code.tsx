@@ -22,20 +22,18 @@ function BarGraphWidget() {
     newData[index] += 10;
     setData(newData)
 }
-
-const decrementValue = (index:number) => {
-  const newData = [...data];
-  newData[index] -= 10;
-  setData(newData)
+  const decrementValue = (index:number) => {
+    const newData = [...data];
+    newData[index] -= 10;
+    setData(newData)
 }
 
-
-const addingbar = () =>
-const newdata = [...data,90]
-setData(newdata)
-console.log(data)
-console.log(newdata)
-
+  const addingbar = () => {
+    const newdata = [...data, 90]
+    setData(newdata)
+    console.log(data)
+    console.log(newdata)
+}
   
 return (
   <AutoLayout direction="horizontal" x={10} y={10} verticalAlignItems="end" horizontalAlignItems={"center"}>
@@ -52,7 +50,7 @@ return (
             y={barBaseY}
             width={barWidth}
             height={value}
-            fill={`#${colors[index]}`}
+            fill={`#${colors[index % colors.length]}`}
             rotation={180}
           />
           <Text x={barSpacing * index + 20} y={labelY} fontSize={12}>
@@ -62,24 +60,13 @@ return (
           x={barSpacing * index + 32} y={barBaseY - value - 15} fontSize={12}>
             {value}
           </Text>
-          
-          <Input
-              type="text"
-              value={label}
-              onChange={() => handleLabelChange(index)}
-              onBlur={() => handleLabelBlur(index)}
-            />
-
-          
-          
-          
           <SVG
             key={`button-${index}`}
             width={20}
             height={20}
             x={barSpacing * index + 30}
             y={labelY + 20}
-           onClick={() => incrementValue(index)} 
+            onClick={() => incrementValue(index)} 
             src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="30" height="30" rx="15" fill="white"/>
               <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
@@ -94,20 +81,19 @@ return (
             y={labelY + 45}
             onClick={() => decrementValue(index)}
             src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="30" height="30" rx="15" fill="white"/>
-        <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
-        <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-        </svg>`}
+              <rect width="30" height="30" rx="15" fill="white"/>
+              <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
+              <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+              </svg>`}
           />
-
-<SVG   
-  key={`button-${index}`}
-   width={20}
-   height={20}
-   x={30}
-   y={labelY + 20}
-   onClick={() => addingbar(value)} 
-   src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <SVG   
+            key={`button-${index}`}
+            width={20}
+            height={20}
+            x={30}
+            y={labelY - 20}
+            onClick={() => addingbar()} 
+            src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="30" height="30" rx="15" fill="white"/>
               <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
               <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
