@@ -1,5 +1,8 @@
 const { widget, showUI, ui } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG, useEffect, colorMapToOptions, usePropertyMenu} = widget;
+
+const questionMarkIcon = '<svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 318.293 318.293" xml:space="preserve"><g><path d="M159.148,0c-52.696,0-95.544,39.326-95.544,87.662h47.736c0-22.007,21.438-39.927,47.808-39.927 c26.367,0,47.804,17.92,47.804,39.927v6.929c0,23.39-10.292,34.31-25.915,50.813c-20.371,21.531-45.744,48.365-45.744,105.899 h47.745c0-38.524,15.144-54.568,32.692-73.12c17.368-18.347,38.96-41.192,38.96-83.592v-6.929C254.689,39.326,211.845,0,159.148,0z"/> <rect x="134.475" y="277.996" width="49.968" height="40.297"/></g></svg>'
+
 //import '@fontawesome/free-solid-svg-icons';
 
 
@@ -62,13 +65,13 @@ type MessageBubbleProps = {
     getMessageDepth: (messageId: string) => number;
     onPin: (id: string) => void;
     totalReplies: number
-    allowedUsersToPin: Set<string>;
+    adminUsers: Set<string>;
     onUpvote: () => void;
     onDownvote: () => void; // Add this line
     onOptionsClick: () => void;
     updateUserName: () => void;
     getTotalDirectReplies: (messageId: string) => number;
-
+    messageFontSize: number
 };
 
 function generateLogId() {
@@ -93,7 +96,7 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
-    const allowedUsersToPin = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza']);
+    const adminUsers = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza', 'Mustafa Ajmal']);
     let messageQueue: Message[] = [];
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
@@ -102,6 +105,13 @@ function ChatWidget() {
     const [borderColor, setBorderColor] = useSyncedState("pborderColor", "#FFFFFF");
 
     const [promptColor, setPromptColor] = useSyncedState("promptColor", "#000000");
+    const [widgetWidth, setWidgetWidth] = useSyncedState('widgetWidth', 800);
+
+    const [titleFontSize, setTitleFontSize] = useSyncedState('titleFontSize', 60);
+    const [messageFontSize, setMessageFontSize] = useSyncedState('messageFontSize', 35);
+    const [borderWidth, setBorderWidth] = useSyncedState('borderWidth', 2);
+
+
     
     // usePropertyMenu(
     //   [
@@ -157,8 +167,8 @@ function ChatWidget() {
     function isUserAuthorized(userName: string): boolean {
       // Example implementation: Check if the user is in the list of authorized users
       updateUserName();
-      console.log(allowedUsersToPin.has(userName));
-      return allowedUsersToPin.has(userName);
+      console.log(adminUsers.has(userName));
+      return adminUsers.has(userName);
   }
     
 
@@ -680,7 +690,7 @@ function ChatWidget() {
     };
 
     const handlePinMessage = (id: string) => {
-      if (allowedUsersToPin.has(userName)) {
+      if (adminUsers.has(userName)) {
         setMessages(prevMessages => prevMessages.map(message => {
             if (message.id === id) {
                 const isPinned = message.pinned !== undefined ? message.pinned : false;
@@ -911,102 +921,187 @@ function ChatWidget() {
               getMessageDepth={getMessageDepth}
               onPin={handlePinMessage}
               totalReplies={getTotalReplies(message.id)}
-              allowedUsersToPin={allowedUsersToPin}
+              adminUsers={adminUsers}
               onUpvote={() => onUpvote(message.id)}
               onDownvote={()=> onDownvote(message.id)}
               onOptionsClick={() => handleOptionsClick(message.id)}
               updateUserName={() => updateUserName()}
               getTotalDirectReplies = {(messageID) => getTotalDirectReplies(message.id)}
+              messageFontSize={messageFontSize}
           />
       ));
     };
+const handleOptionsClickChat = () => {
+  updateUserName();
+  console.log("in options:", userName);
+  if (isUserAuthorized(userName)) {
+      return new Promise<void>((resolve, reject) => {
+          figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 100 });
 
-    const handleOptionsClickChat = () => {
-      // Here you can add logic to check if the user is authorized
-      // For example, let's assume you have a function `isUserAuthorized` that checks this
-      updateUserName();
-      console.log("in options:" , userName);
-      if (isUserAuthorized(userName)) {
-          return new Promise<void>((resolve, reject) => {
-              figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 50 });
-  
-              // Listen for messages from the options.html iframe
-              figma.ui.onmessage = msg => {
-                  if (msg.type === 'update-prompt') {
-                      console.log("calling prompt from options");
-                      figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-prompt') {
+                  console.log("calling prompt from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-                      figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-                      console.log("opened");
+                  figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+                  console.log("opened");
 
-                      figma.ui.onmessage = msg => {
-                        if (msg.type === 'update-message') {
-                              const updatedText = msg.payload.message;
-                              setPrompt(updatedText);
-                              figma.closePlugin();
-                              resolve(); 
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-
-                  } else if (msg.type === 'update-borderColor') {
-                    console.log("calling prompt from options");
-                    figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                    figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-                    console.log("opened");
-
-                    figma.ui.onmessage = msg => {
+                  figma.ui.onmessage = msg => {
                       if (msg.type === 'update-message') {
-                            const updatedText = msg.payload.message;
-                            setBorderColor(updatedText);
-                            figma.closePlugin();
-                            resolve(); 
-                          } else if (msg.type === 'cancel-edit') {
-                            console.log("canceled");
-                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                          } else if (msg.type === 'close-plugin') {
-                            console.log("closed");
-                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                            resolve(); // Optionally resolve the promise here, since the action is completed
-                          }
-                        };
-                  } else if (msg.type === 'update-promptColor') {
-                    console.log("calling prompt from options");
-                    figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+                          const updatedText = msg.payload.message;
+                          setPrompt(updatedText);
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
 
-                    figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-                    console.log("opened");
+              } else if (msg.type === 'update-width') {
+                  console.log("calling width from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-                    figma.ui.onmessage = msg => {
+                  figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
                       if (msg.type === 'update-message') {
-                            const updatedText = msg.payload.message;
-                            setPromptColor(updatedText);
-                            figma.closePlugin();
-                            resolve(); 
-                          } else if (msg.type === 'cancel-edit') {
-                            console.log("canceled");
-                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                          } else if (msg.type === 'close-plugin') {
-                            console.log("closed");
-                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                            resolve(); // Optionally resolve the promise here, since the action is completed
-                          }
-                        };
-                  } else if (msg.type === 'close-options') {
-                      // Handle closing the options iframe
-                      resolve();
-                  }
-              };
-          });
-      }
-  };
+                          const updatedWidth = msg.payload.message;
+                          setWidgetWidth(parseInt(updatedWidth, 10));
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+                } else if (msg.type === 'update-borderWidth') {
+                  console.log("calling width from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                  figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                          const updatedBorderWidth = msg.payload.message;
+                          setBorderWidth(parseInt(updatedBorderWidth, 10));
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+                } else if (msg.type === 'update-titleFontSize') {
+                  console.log("calling width from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                  figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                          const updatedTitleFontSize = msg.payload.message;
+                          setTitleFontSize(parseInt(updatedTitleFontSize, 10));
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+              } else if (msg.type === 'update-borderColor') {
+                  console.log("calling prompt from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                  figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                          const updatedText = msg.payload.message;
+                          setBorderColor(updatedText);
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+                } else if (msg.type === 'update-messageFontSize') {
+                  console.log("calling prompt from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                  figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                          const updatedMessageFontSize = msg.payload.message;
+                          setMessageFontSize(parseInt(updatedMessageFontSize, 10));
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+              } else if (msg.type === 'update-promptColor') {
+                  console.log("calling prompt from options");
+                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                  figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+                  console.log("opened");
+
+                  figma.ui.onmessage = msg => {
+                      if (msg.type === 'update-message') {
+                          const updatedText = msg.payload.message;
+                          setPromptColor(updatedText);
+                          figma.closePlugin();
+                          resolve();
+                      } else if (msg.type === 'cancel-edit') {
+                          console.log("canceled");
+                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                      } else if (msg.type === 'close-plugin') {
+                          console.log("closed");
+                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                          resolve(); // Optionally resolve the promise here, since the action is completed
+                      }
+                  };
+              } else if (msg.type === 'close-options') {
+                  // Handle closing the options iframe
+                  resolve();
+              }
+          };
+      });
+  }
+};
     
 
     
@@ -1037,31 +1132,29 @@ function ChatWidget() {
       
        
       
-      </AutoLayout>*/
-      <AutoLayout
+    </AutoLayout>*/
+    <AutoLayout
       direction="vertical"
       spacing={8}
-      padding={25}
-      stroke="#efefef" // Outline color for the send area
-      strokeWidth={2} // Outline width for the send area
-      cornerRadius={10} // Rounded corners for the send area
+      padding={borderWidth}
+      stroke="#efefef"
+      strokeWidth={2}
+      cornerRadius={10}
       onClick={updateUserName}
-      minWidth={800}
+      minWidth={widgetWidth}
       fill={borderColor}
-      >
-
-      
-      <AutoLayout
+    >
+    <AutoLayout
       direction="vertical"
       spacing={8}
-      padding={20}
-      stroke="#efefef" // Outline color for the send area
-      strokeWidth={2} // Outline width for the send area
-      cornerRadius={10} // Rounded corners for the send area
+      padding={borderWidth}
+      stroke="#efefef"
+      strokeWidth={2}
+      cornerRadius={10}
       onClick={updateUserName}
-      minWidth={800}
+      minWidth={widgetWidth}
       fill={'#FFFFFF'}
-      >
+    >
       
     
       
@@ -1099,7 +1192,7 @@ function ChatWidget() {
         >
           <Text
           fill={promptColor}
-          fontSize={60}
+          fontSize={titleFontSize}
           fontWeight={700}
           width={770}
           lineHeight={75}
@@ -1145,7 +1238,7 @@ function ChatWidget() {
 }
 
 
-function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, allowedUsersToPin, onUpvote, onDownvote,  onOptionsClick, updateUserName}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, adminUsers, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -1158,6 +1251,10 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const downvoteCount = message.downvotedUsers.length;
 
   const firstName = message.sender.split(' ')[0];
+  //const string = "Ashwin M Chembu"
+  //const array = string.split(" ")
+  //array = [Ashwin, M, Chembu]
+  // 0        1
 
   //console.log(`Message ID: ${message.id}, ReplyTo ID: ${replyToId}, Is Being Replied To: ${isBeingRepliedTo}`);
 
@@ -1190,7 +1287,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   //const isUpvoted = message.upvotedUsers.has(user);
   var admin = false;
   console.log("USER:" , user);
-  if (allowedUsersToPin.has(user)){
+  if (adminUsers.has(user)){
     console.log("inside", admin);
     admin = true;
   }
@@ -1253,11 +1350,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={520}
             spacing={20}
           >
-            {message.userIcon ? ( // Add this block to display the user icon
-                            <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
-                        ) : (
-                            <SVG src="<svg>...<svg>" width={30} height={30} /> // SVG code for question mark icon
-                        )}
+            {message.userIcon ? (
+                  <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
+              ) : (
+                  <Image src={questionMarkIcon} width={40} height={40} />
+              )}
+
               <Text fontSize={30} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
@@ -1309,7 +1407,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout 
             direction="vertical"
           >
-            <Text width={740} fontSize={35} >
+            <Text width={740} fontSize={messageFontSize} >
               {isDeleted ? 'this message has been deleted' : message.text}
             </Text>
 

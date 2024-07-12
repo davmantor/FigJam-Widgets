@@ -1,0 +1,54 @@
+{
+  "name": "Text-Entry-Widget",
+  "version": "1.0.0",
+  "description": "Your Figma widget",
+  "scripts": {
+    "build": "esbuild widget-src/code.tsx --bundle --outfile=dist/code.js --target=es6",
+    "lint": "eslint --ext .ts,.tsx --ignore-pattern node_modules .",
+    "lint:fix": "eslint --ext .ts,.tsx --ignore-pattern node_modules --fix .",
+    "tsc": "tsc --noEmit -p widget-src",
+    "watch": "npm run build -- --watch"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@figma/eslint-plugin-figma-plugins": "*",
+    "@figma/plugin-typings": "*",
+    "@figma/widget-typings": "*",
+    "@types/node": "^20.14.10",
+    "@types/node-fetch": "^2.6.11",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "esbuild": "*",
+    "eslint": "^8.54.0",
+    "typescript": "^5.5.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@figma/figma-plugins/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./widget-src/tsconfig.json"
+    },
+    "root": true,
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.0"
+  }
+}
