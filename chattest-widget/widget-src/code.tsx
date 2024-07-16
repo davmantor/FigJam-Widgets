@@ -1,35 +1,6 @@
 const { widget, showUI, ui } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG, useEffect, colorMapToOptions, usePropertyMenu} = widget;
-
-const questionMarkIcon = '<svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 318.293 318.293" xml:space="preserve"><g><path d="M159.148,0c-52.696,0-95.544,39.326-95.544,87.662h47.736c0-22.007,21.438-39.927,47.808-39.927 c26.367,0,47.804,17.92,47.804,39.927v6.929c0,23.39-10.292,34.31-25.915,50.813c-20.371,21.531-45.744,48.365-45.744,105.899 h47.745c0-38.524,15.144-54.568,32.692-73.12c17.368-18.347,38.96-41.192,38.96-83.592v-6.929C254.689,39.326,211.845,0,159.148,0z"/> <rect x="134.475" y="277.996" width="49.968" height="40.297"/></g></svg>'
-
 //import '@fontawesome/free-solid-svg-icons';
-
-
-
-const replyIconSrc = '<svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 17V15.8C20 14.1198 20 13.2798 19.673 12.638C19.3854 12.0735 18.9265 11.6146 18.362 11.327C17.7202 11 16.8802 11 15.2 11H4M4 11L8 7M4 11L8 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-
-const delete1 = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-
-const deleteNO = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 12L14 16M14 12L10 16M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-const deleteYES = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff5252"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 14L11 16L15 12M18 6L17.1991 18.0129C17.129 19.065 17.0939 19.5911 16.8667 19.99C16.6666 20.3412 16.3648 20.6235 16.0011 20.7998C15.588 21 15.0607 21 14.0062 21H9.99377C8.93927 21 8.41202 21 7.99889 20.7998C7.63517 20.6235 7.33339 20.3412 7.13332 19.99C6.90607 19.5911 6.871 19.065 6.80086 18.0129L6 6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6" stroke="#ff5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-
-const pin = '<svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1218 1.87023C15.7573 0.505682 13.4779 0.76575 12.4558 2.40261L9.61062 6.95916C9.61033 6.95965 9.60913 6.96167 9.6038 6.96549C9.59728 6.97016 9.58336 6.97822 9.56001 6.9848C9.50899 6.99916 9.44234 6.99805 9.38281 6.97599C8.41173 6.61599 6.74483 6.22052 5.01389 6.87251C4.08132 7.22378 3.61596 8.03222 3.56525 8.85243C3.51687 9.63502 3.83293 10.4395 4.41425 11.0208L7.94975 14.5563L1.26973 21.2363C0.879206 21.6269 0.879206 22.26 1.26973 22.6506C1.66025 23.0411 2.29342 23.0411 2.68394 22.6506L9.36397 15.9705L12.8995 19.5061C13.4808 20.0874 14.2853 20.4035 15.0679 20.3551C15.8881 20.3044 16.6966 19.839 17.0478 18.9065C17.6998 17.1755 17.3043 15.5086 16.9444 14.5375C16.9223 14.478 16.9212 14.4114 16.9355 14.3603C16.9421 14.337 16.9502 14.3231 16.9549 14.3165C16.9587 14.3112 16.9606 14.31 16.9611 14.3098L21.5177 11.4645C23.1546 10.4424 23.4147 8.16307 22.0501 6.79853L17.1218 1.87023ZM14.1523 3.46191C14.493 2.91629 15.2528 2.8296 15.7076 3.28445L20.6359 8.21274C21.0907 8.66759 21.0041 9.42737 20.4584 9.76806L15.9019 12.6133C14.9572 13.2032 14.7469 14.3637 15.0691 15.2327C15.3549 16.0037 15.5829 17.1217 15.1762 18.2015C15.1484 18.2752 15.1175 18.3018 15.0985 18.3149C15.0743 18.3316 15.0266 18.3538 14.9445 18.3589C14.767 18.3699 14.5135 18.2916 14.3137 18.0919L5.82846 9.6066C5.62872 9.40686 5.55046 9.15333 5.56144 8.97583C5.56651 8.8937 5.58877 8.84605 5.60548 8.82181C5.61855 8.80285 5.64516 8.7719 5.71886 8.74414C6.79869 8.33741 7.91661 8.56545 8.68762 8.85128C9.55668 9.17345 10.7171 8.96318 11.3071 8.01845L14.1523 3.46191Z" fill="#0F0F0F"></path> </g></svg>'
-const pinYES = '<svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#1cb566"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z" fill="#1cb566"></path> </g></svg>'
-
-const upvotearrow = '<svg fill="#303030" height="18px" width="18px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z"></path> </g> </g> </g></svg>'
-const downvotearrow = '<svg fill="#303030" height="18px" width="18px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z"></path> </g> </g> </g></svg>'
-
-const edit = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#000000"></path> </g></svg>'
-
-const repliesup = '<svg fill="#007AFF" height="18px" width="18px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z"></path> </g> </g> </g></svg>'
-const repliesdown = '<svg fill="#007AFF" height="18px" width="18px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z"></path> </g> </g> </g></svg>'
-
-
-
-const adminI = '<svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-
-const plus = '<svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
 
 type Message = {
     id: string;
@@ -72,6 +43,7 @@ type MessageBubbleProps = {
     updateUserName: () => void;
     getTotalDirectReplies: (messageId: string) => number;
     messageFontSize: number
+    widgetWidth: number
 };
 
 function generateLogId() {
@@ -96,7 +68,7 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
-    const adminUsers = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza', 'Mustafa Ajmal']);
+    const adminUsers = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza', 'Mustafa Ajmal', 'tiauna', 'Matthew', 'Ian Phan', 'Zia', 'Peter Yang', 'Nidhi', 'Bonnie Wang']);
     let messageQueue: Message[] = [];
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
@@ -112,7 +84,50 @@ function ChatWidget() {
     const [borderWidth, setBorderWidth] = useSyncedState('borderWidth', 2);
 
 
+    // useEffect(() => {
+    //   if (widgetWidth < minWidth) {
+    //       setWidgetWidth(minWidth);
+    //   } else if (widgetWidth > maxWidth) {
+    //       setWidgetWidth(maxWidth);
+    //   }
+    // }, [widgetWidth]);
+
+
+    function getWidgetValue(input: number): number {
+      const currentWidgetWidth = widgetWidth; // Get the current widget width
+      const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
+      return Math.floor(input * scalingRatio); // Scale the input value by the ratio
+    }
+
+    //const scale = 1.5; // Example scale factor
+    const plus = `<svg width="${getWidgetValue(28)}px" height="${getWidgetValue(28)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_iconCarrier">
+      <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="${3.0}" stroke-linecap="round" stroke-linejoin="round"></path>
+    </g>
+    </svg>`;
+
+    const adminI = `<svg width="${getWidgetValue(30)}px" height="${getWidgetValue(30)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_iconCarrier">
+      <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="${3}" stroke-linecap="round" stroke-linejoin="round"></path>
+    </g>
+    </svg>`;
+
+    const delete1 = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
+
+    const deleteNO = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 12L14 16M14 12L10 16M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
+    const deleteYES = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff5252"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 14L11 16L15 12M18 6L17.1991 18.0129C17.129 19.065 17.0939 19.5911 16.8667 19.99C16.6666 20.3412 16.3648 20.6235 16.0011 20.7998C15.588 21 15.0607 21 14.0062 21H9.99377C8.93927 21 8.41202 21 7.99889 20.7998C7.63517 20.6235 7.33339 20.3412 7.13332 19.99C6.90607 19.5911 6.871 19.065 6.80086 18.0129L6 6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6" stroke="#ff5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
+  
+    const pin = `<svg width="${getWidgetValue(35)}px" height="${getWidgetValue(35)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1218 1.87023C15.7573 0.505682 13.4779 0.76575 12.4558 2.40261L9.61062 6.95916C9.61033 6.95965 9.60913 6.96167 9.6038 6.96549C9.59728 6.97016 9.58336 6.97822 9.56001 6.9848C9.50899 6.99916 9.44234 6.99805 9.38281 6.97599C8.41173 6.61599 6.74483 6.22052 5.01389 6.87251C4.08132 7.22378 3.61596 8.03222 3.56525 8.85243C3.51687 9.63502 3.83293 10.4395 4.41425 11.0208L7.94975 14.5563L1.26973 21.2363C0.879206 21.6269 0.879206 22.26 1.26973 22.6506C1.66025 23.0411 2.29342 23.0411 2.68394 22.6506L9.36397 15.9705L12.8995 19.5061C13.4808 20.0874 14.2853 20.4035 15.0679 20.3551C15.8881 20.3044 16.6966 19.839 17.0478 18.9065C17.6998 17.1755 17.3043 15.5086 16.9444 14.5375C16.9223 14.478 16.9212 14.4114 16.9355 14.3603C16.9421 14.337 16.9502 14.3231 16.9549 14.3165C16.9587 14.3112 16.9606 14.31 16.9611 14.3098L21.5177 11.4645C23.1546 10.4424 23.4147 8.16307 22.0501 6.79853L17.1218 1.87023ZM14.1523 3.46191C14.493 2.91629 15.2528 2.8296 15.7076 3.28445L20.6359 8.21274C21.0907 8.66759 21.0041 9.42737 20.4584 9.76806L15.9019 12.6133C14.9572 13.2032 14.7469 14.3637 15.0691 15.2327C15.3549 16.0037 15.5829 17.1217 15.1762 18.2015C15.1484 18.2752 15.1175 18.3018 15.0985 18.3149C15.0743 18.3316 15.0266 18.3538 14.9445 18.3589C14.767 18.3699 14.5135 18.2916 14.3137 18.0919L5.82846 9.6066C5.62872 9.40686 5.55046 9.15333 5.56144 8.97583C5.56651 8.8937 5.58877 8.84605 5.60548 8.82181C5.61855 8.80285 5.64516 8.7719 5.71886 8.74414C6.79869 8.33741 7.91661 8.56545 8.68762 8.85128C9.55668 9.17345 10.7171 8.96318 11.3071 8.01845L14.1523 3.46191Z" fill="#0F0F0F"></path> </g></svg>`
+    const edit = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#000000"></path> </g></svg>`
     
+  
+    
+    
+    // const plus = '<svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
     // usePropertyMenu(
     //   [
     //     {
@@ -185,6 +200,8 @@ function ChatWidget() {
         } else if (msg.type === 'close-plugin') {
           figma.closePlugin();
           resolve();
+        } else if (msg.type === 'back-action') {
+          reject('New message canceled by user.');
         }
       };
     });
@@ -223,7 +240,7 @@ function ChatWidget() {
         if (messageToEdit) {
           // Open the UI modal with the message content
           console.log("opening modal");
-          figma.showUI(__uiFiles__.main, { width: 400, height:270 });
+          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
           console.log("opened");
           figma.ui.onmessage = msg => {
@@ -722,7 +739,7 @@ function ChatWidget() {
         console.log("in options:" , userName);
         if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
-                figma.showUI(__uiFiles__.options, { width: 350, height:50 });
+                figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
     
                 // Listen for messages from the options.html iframe
                 figma.ui.onmessage = msg => {
@@ -878,26 +895,26 @@ function ChatWidget() {
       if (filteredMessages.length === 0) {
         // Show "No messages" when there are no messages
         return <AutoLayout
-                padding={30}
+                padding={getWidgetValue(30)}
                 direction="vertical"
-                spacing={20}
-                width={800}
-                height={250}
+                spacing={getWidgetValue(20)}
+                width={getWidgetValue(800)}
+                height={getWidgetValue(250)}
                 horizontalAlignItems={"center"}
                 verticalAlignItems={"center"}
                 >
                   <Text
                   fill="#60666D"
-                  fontSize={36}
+                  fontSize={getWidgetValue(36)}
                   fontWeight={500}
-                  lineHeight={20.4}
+                  lineHeight={getWidgetValue(20.4)}
                   >
                     No messages yet
                   </Text>
                   <Text
                   fill="#8E939A"
-                  fontSize={24}
-                  lineHeight={20.4}
+                  fontSize={getWidgetValue(24)}
+                  lineHeight={getWidgetValue(20.4)}
                   >
                     Send a message with the add message button below.
                   </Text>
@@ -928,180 +945,204 @@ function ChatWidget() {
               updateUserName={() => updateUserName()}
               getTotalDirectReplies = {(messageID) => getTotalDirectReplies(message.id)}
               messageFontSize={messageFontSize}
+              widgetWidth={widgetWidth}
           />
       ));
     };
+
 const handleOptionsClickChat = () => {
   updateUserName();
   console.log("in options:", userName);
   if (isUserAuthorized(userName)) {
-      return new Promise<void>((resolve, reject) => {
-          figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 100 });
+    return new Promise<void>((resolve, reject) => {
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 125 });
+      //GOTO HERE
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-prompt') {
+          console.log("calling prompt from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+          console.log("opened");
 
           figma.ui.onmessage = msg => {
-              if (msg.type === 'update-prompt') {
-                  console.log("calling prompt from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedText = msg.payload.message;
-                          setPrompt(updatedText);
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-
-              } else if (msg.type === 'update-width') {
-                  console.log("calling width from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedWidth = msg.payload.message;
-                          setWidgetWidth(parseInt(updatedWidth, 10));
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-                } else if (msg.type === 'update-borderWidth') {
-                  console.log("calling width from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedBorderWidth = msg.payload.message;
-                          setBorderWidth(parseInt(updatedBorderWidth, 10));
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-                } else if (msg.type === 'update-titleFontSize') {
-                  console.log("calling width from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedTitleFontSize = msg.payload.message;
-                          setTitleFontSize(parseInt(updatedTitleFontSize, 10));
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-              } else if (msg.type === 'update-borderColor') {
-                  console.log("calling prompt from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedText = msg.payload.message;
-                          setBorderColor(updatedText);
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-                } else if (msg.type === 'update-messageFontSize') {
-                  console.log("calling prompt from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedMessageFontSize = msg.payload.message;
-                          setMessageFontSize(parseInt(updatedMessageFontSize, 10));
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-              } else if (msg.type === 'update-promptColor') {
-                  console.log("calling prompt from options");
-                  figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                  figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-                  console.log("opened");
-
-                  figma.ui.onmessage = msg => {
-                      if (msg.type === 'update-message') {
-                          const updatedText = msg.payload.message;
-                          setPromptColor(updatedText);
-                          figma.closePlugin();
-                          resolve();
-                      } else if (msg.type === 'cancel-edit') {
-                          console.log("canceled");
-                          reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                      } else if (msg.type === 'close-plugin') {
-                          console.log("closed");
-                          figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                          resolve(); // Optionally resolve the promise here, since the action is completed
-                      }
-                  };
-              } else if (msg.type === 'close-options') {
-                  // Handle closing the options iframe
-                  resolve();
-              }
+            if (msg.type === 'update-message') {
+              const updatedText = msg.payload.message;
+              setPrompt(updatedText);
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
           };
-      });
+
+        } else if (msg.type === 'update-width') {
+          console.log("calling width from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedWidth = msg.payload.message;
+              setWidgetWidth(parseInt(updatedWidth, 10));
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'update-borderWidth') {
+          console.log("calling width from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedBorderWidth = msg.payload.message;
+              setBorderWidth(parseInt(updatedBorderWidth, 10));
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'update-titleFontSize') {
+          console.log("calling width from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedTitleFontSize = msg.payload.message;
+              setTitleFontSize(parseInt(updatedTitleFontSize, 10));
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'update-borderColor') {
+          console.log("calling prompt from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedText = msg.payload.message;
+              setBorderColor(updatedText);
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'update-messageFontSize') {
+          console.log("calling prompt from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedMessageFontSize = msg.payload.message;
+              setMessageFontSize(parseInt(updatedMessageFontSize, 10));
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'update-promptColor') {
+          console.log("calling prompt from options");
+          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+          figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+          console.log("opened");
+
+          figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+              const updatedText = msg.payload.message;
+              setPromptColor(updatedText);
+              figma.closePlugin();
+              resolve();
+            } else if (msg.type === 'cancel-edit') {
+              console.log("canceled");
+              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+            } else if (msg.type === 'close-plugin') {
+              console.log("closed");
+              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+              resolve(); // Optionally resolve the promise here, since the action is completed
+            } else if (msg.type === 'back-action') {
+              console.log("back");
+              handleOptionsClickChat();
+            }
+          };
+        } else if (msg.type === 'close-options') {
+          // Handle closing the options iframe
+          resolve();
+        }
+      };
+    });
   }
 };
+
     
 
     
@@ -1135,11 +1176,11 @@ const handleOptionsClickChat = () => {
     </AutoLayout>*/
     <AutoLayout
       direction="vertical"
-      spacing={8}
+      spacing={getWidgetValue(8)}
       padding={borderWidth}
       stroke="#efefef"
-      strokeWidth={2}
-      cornerRadius={10}
+      strokeWidth={getWidgetValue(2)}
+      cornerRadius={getWidgetValue(10)}
       onClick={updateUserName}
       minWidth={widgetWidth}
       fill={borderColor}
@@ -1149,8 +1190,8 @@ const handleOptionsClickChat = () => {
       spacing={8}
       padding={borderWidth}
       stroke="#efefef"
-      strokeWidth={2}
-      cornerRadius={10}
+      strokeWidth={getWidgetValue(2)}
+      cornerRadius={getWidgetValue(10)}
       onClick={updateUserName}
       minWidth={widgetWidth}
       fill={'#FFFFFF'}
@@ -1175,8 +1216,8 @@ const handleOptionsClickChat = () => {
         </AutoLayout> */}
         <AutoLayout
                 //fill="#007AFF"
-                cornerRadius={4}
-                padding={{ top: 15, bottom: 2, left: 770, right: 10 }}
+                cornerRadius={getWidgetValue(4)}
+                padding={{ top: getWidgetValue(15), bottom: getWidgetValue(2), left: getWidgetValue(770), right: getWidgetValue(10) }}
                 onClick={handleOptionsClickChat}
             >
                 <SVG
@@ -1188,14 +1229,14 @@ const handleOptionsClickChat = () => {
         </AutoLayout>
 
         <AutoLayout
-          padding={{ top: 0, bottom: 20, left: 20 }}
+          padding={{ top: 0, bottom: getWidgetValue(20), left: getWidgetValue(20) }}
         >
           <Text
           fill={promptColor}
-          fontSize={titleFontSize}
+          fontSize={getWidgetValue(titleFontSize)}
           fontWeight={700}
-          width={770}
-          lineHeight={75}
+          width={getWidgetValue(770)}
+          lineHeight={getWidgetValue(65)}
           >
             {inPrompt ? inPrompt : 'Chat'}
           </Text>
@@ -1205,29 +1246,29 @@ const handleOptionsClickChat = () => {
 
         <AutoLayout
             direction="vertical"
-            spacing={1} //changed from 10
-            padding={8}
+            spacing={getWidgetValue(1)} //changed from 10
+            padding={getWidgetValue(8)}
             stroke="#efefef"
-            cornerRadius={10}
-            minWidth={480}
+            cornerRadius={getWidgetValue(10)}
+            minWidth={getWidgetValue(480)}
         >
             {renderMessages()}
         </AutoLayout>
 
-        <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={800}>
+        <AutoLayout direction="vertical" spacing={getWidgetValue(8)} padding={getWidgetValue(8)} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={widgetWidth}>
           <AutoLayout
             direction="horizontal"
             onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
             fill="#007AFF" // Example button styling
-            padding={10}
-            cornerRadius={100}
+            padding={getWidgetValue(10)}
+            cornerRadius={getWidgetValue(100)}
             
           >
-            <AutoLayout padding={8}>
-            <SVG src={plus}></SVG>
+            <AutoLayout padding={getWidgetValue(8)}>
+            <SVG src={plus} width={getWidgetValue(30)} height={getWidgetValue(30)}></SVG>
             </AutoLayout>
 
-            <Text fontSize={36} fill="#FFFFFF">Add Message  </Text>
+            <Text fontSize={getWidgetValue(36)} fill="#FFFFFF">Add Message  </Text>
           </AutoLayout>
           {/* Remaining UI elements, like the message display area */}
         </AutoLayout>
@@ -1238,11 +1279,33 @@ const handleOptionsClickChat = () => {
 }
 
 
-function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, adminUsers, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, adminUsers, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
+  function getWidgetValue(input: number): number {
+    const currentWidgetWidth = widgetWidth; // Get the current widget width
+    const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
+    return Math.floor(input * scalingRatio); // Scale the input value by the ratio
+  }
+
+  const adminI = `<svg width="${getWidgetValue(30)}px" height="${getWidgetValue(30)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_iconCarrier">
+      <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="${3}" stroke-linecap="round" stroke-linejoin="round"></path>
+    </g>
+    </svg>`;
+
+  const replyIconSrc = `<svg width="${getWidgetValue(32)}px" height="${getWidgetValue(32)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 17V15.8C20 14.1198 20 13.2798 19.673 12.638C19.3854 12.0735 18.9265 11.6146 18.362 11.327C17.7202 11 16.8802 11 15.2 11H4M4 11L8 7M4 11L8 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`;
+
+  const pinYES = `<svg width="${getWidgetValue(35)}px" height="${getWidgetValue(35)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#1cb566"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z" fill="#1cb566"></path> </g></svg>`;
   
+  const upvotearrow = `<svg fill="#303030" height="${getWidgetValue(18)}px" width="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
+  const downvotearrow = `<svg fill="#303030" height="${getWidgetValue(18)}px" width="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
+  
+  const repliesup = `<svg width="${getWidgetValue(18)}px" height="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
+  const repliesdown = `<svg width="${getWidgetValue(18)}px" height="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
 
   const isReply = message.parentId !== null;
   const isBeingRepliedTo = replyToId === message.id;
@@ -1251,10 +1314,6 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const downvoteCount = message.downvotedUsers.length;
 
   const firstName = message.sender.split(' ')[0];
-  //const string = "Ashwin M Chembu"
-  //const array = string.split(" ")
-  //array = [Ashwin, M, Chembu]
-  // 0        1
 
   //console.log(`Message ID: ${message.id}, ReplyTo ID: ${replyToId}, Is Being Replied To: ${isBeingRepliedTo}`);
 
@@ -1294,9 +1353,9 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
 
 
   // Adjust the right padding based on the message depth
-  var adjustedRightPadding = 160;
+  var adjustedRightPadding = getWidgetValue(160);
   if (messageDepth == 0){
-    adjustedRightPadding = 160;
+    adjustedRightPadding = getWidgetValue(160);
   }
 
 
@@ -1330,33 +1389,31 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
     >    
       <AutoLayout
         direction="vertical"
-        padding={{ top: 15, bottom: isDeleted ? 0 : 15, left: 12, right: 12 }}
+        padding={{ top: getWidgetValue(15), bottom: isDeleted ? 0 : getWidgetValue(15), left: getWidgetValue(12), right: getWidgetValue(12) }}
         //stroke="#D3D3D3"
-        strokeWidth={2}
-        cornerRadius={4}
-        spacing={20}
+        strokeWidth={getWidgetValue(2)}
+        cornerRadius={getWidgetValue(4)}
+        spacing={getWidgetValue(20)}
         fill={messageStyle.fill}
-        width={800}
         effect={[]}
       >
         <AutoLayout
           direction="horizontal"
-          width={800}
-          padding={{ top: 10, bottom: 1, left: 4, right: 8}}
+          width={getWidgetValue(800)}
+          padding={{ top: getWidgetValue(10), bottom: getWidgetValue(1), left: getWidgetValue(4), right: getWidgetValue(8)}}
         >
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="start"
-            width={520}
-            spacing={20}
+            width={getWidgetValue(520)}
+            spacing={getWidgetValue(20)}
           >
-            {message.userIcon ? (
-                  <Image src={message.userIcon} width={40} height={40} cornerRadius={15} />
-              ) : (
-                  <Image src={questionMarkIcon} width={40} height={40} />
-              )}
-
-              <Text fontSize={30} fill={messageStyle.color} horizontalAlignText={"left"}>
+            {message.userIcon ? ( // Add this block to display the user icon
+                            <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
+                        ) : (
+                            <SVG src="<svg>...<svg>" width={getWidgetValue(30)} height={getWidgetValue(30)} /> // SVG code for question mark icon
+                        )}
+              <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
 
@@ -1371,10 +1428,10 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="end"
-            padding={{ top: 2, bottom: 2, left: 8, right: 8 }}
-            width={200}
+            padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(8), right: getWidgetValue(8) }}
+            width={getWidgetValue(200)}
           >
-            <Text fontSize={25} fill={messageStyle.color} horizontalAlignText={"right"}>
+            <Text fontSize={getWidgetValue(25)} fill={messageStyle.color} horizontalAlignText={"right"}>
               {message.timestamp}
             </Text>
           </AutoLayout>
@@ -1383,7 +1440,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             <AutoLayout
                 //fill="#007AFF"
                 cornerRadius={4}
-                padding={{ top: 2, bottom: 2, left: 8, right: 8 }}
+                padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(8), right: getWidgetValue(8) }}
                 onClick={onOptionsClick}
             >
                 <SVG
@@ -1400,21 +1457,21 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
        
         <AutoLayout
           direction="horizontal"
-          padding={{ top: 20, bottom: 4, left: 10, right: 4 }}
+          padding={{ top: getWidgetValue(20), bottom: getWidgetValue(4), left: getWidgetValue(10), right: getWidgetValue(4) }}
           fill={messageStyle.fill}
           
         >
           <AutoLayout 
             direction="vertical"
           >
-            <Text width={740} fontSize={messageFontSize} >
+            <Text width={getWidgetValue(740)} fontSize={getWidgetValue(messageFontSize)} >
               {isDeleted ? 'this message has been deleted' : message.text}
             </Text>
 
-            <Text width={60} fontSize={4} fill="#808080"> </Text>
+            <Text width={getWidgetValue(60)} fontSize={4} fill="#808080"> </Text>
             
             {isEdited && !isDeleted && (
-              <Text width={200} fontSize={25} fill="#808080">
+              <Text width={getWidgetValue(200)} fontSize={getWidgetValue(25)} fill="#808080">
                 (edited)
               </Text>
             )}
@@ -1424,24 +1481,24 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
         
         <AutoLayout // Container for Reply and Delete and Edit and Show Replies buttons
           direction="horizontal"
-          padding={{ top: 20, bottom: 0, left: 4, right: 4 }}
+          padding={{ top: getWidgetValue(20), bottom: 0, left: getWidgetValue(4), right: getWidgetValue(4) }}
           spacing={12} // Space between buttons
         >
 
           {message.text != "this message has been deleted" && (
               <AutoLayout
                     fill={messageStyle.extra}
-                    cornerRadius={200}
+                    cornerRadius={getWidgetValue(200)}
                     //padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
                 >
                 <AutoLayout
                     //fill="#FFFFFF"
-                    cornerRadius={200}
-                    padding={{ top: 14, bottom: 4, left: 10, right: 10 }}
+                    cornerRadius={getWidgetValue(200)}
+                    padding={{ top: getWidgetValue(14), bottom: getWidgetValue(4), left: getWidgetValue(10), right: getWidgetValue(10) }}
                     onClick={() => onUpvote()}
                     //stroke={"007AFF"}
                 >
-                  <Text fontSize={25} fill="#FFFFFF"> </Text>
+                  <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> </Text>
                   <SVG
                     src={upvotearrow}
                     //onClick={() => onUpvote()}
@@ -1451,25 +1508,25 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 <AutoLayout
                     //fill="#FFFFFF"
                     //cornerRadius={4}
-                    padding={{ top: 10, bottom: 6, left: 10, right: 10 }}
+                    padding={{ top: getWidgetValue(10), bottom: getWidgetValue(6), left: getWidgetValue(10), right: getWidgetValue(10) }}
                     //onClick={() => onUpvote()}
                 >
                 {/* Display Score */}
-                <Text fontSize={25} fill="#000000">{score}</Text>
+                <Text fontSize={getWidgetValue(25)} fill="#000000">{score}</Text>
                 </AutoLayout>
 
                 {/* Downvote Button - Arrow Down */}
                 <AutoLayout
                     //fill="#FFFFFF"
-                    cornerRadius={200}
-                    padding={{ top: 14, bottom: 4, left: 10, right: 10 }}
+                    cornerRadius={getWidgetValue(200)}
+                    padding={{ top: getWidgetValue(14), bottom: getWidgetValue(4), left: getWidgetValue(10), right: getWidgetValue(10) }}
                     onClick={() => onDownvote()}
                 >
                   <SVG
                     src={downvotearrow}
                     //onClick={() => onDownvote()}
                   />
-                    <Text fontSize={25} fill="#FFFFFF"> </Text>
+                    <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> </Text>
                 </AutoLayout>
               </AutoLayout>
           )}
@@ -1479,18 +1536,18 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           { message.text != "this message has been deleted" && (
           <AutoLayout // Reply button with additional padding
             fill="#007AFF"
-            cornerRadius={200}
-            padding={{ top: 8, bottom: isDeleted ? 0 : 8, left: 10, right: 10 }} // Increased padding for the button
+            cornerRadius={getWidgetValue(200)}
+            padding={{ top: getWidgetValue(8), bottom: isDeleted ? 0 : getWidgetValue(8), left: getWidgetValue(10), right: getWidgetValue(10) }} // Increased padding for the button
             onClick={onReply}
 
           >
-            <Text fontSize={25} fill="#007AFF"> </Text>
+            <Text fontSize={getWidgetValue(25)} fill="#007AFF"> </Text>
             <SVG
             
               src={replyIconSrc}
               onClick={onReply}
             />
-            <Text fontSize={25} fill="#FFFFFF"> Reply  </Text>
+            <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> Reply  </Text>
           </AutoLayout>
           )}
 
@@ -1499,15 +1556,15 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout // show replies button with additional padding
             //fill={message.showReplies ? '#FFFFFF' : '#000033'}
             //stroke={'#000033'}
-            cornerRadius={4}
-            padding={{ top: 8, bottom: isDeleted ? 15 : 0, left: 10, right: 10 }} // Increased padding for the button
+            cornerRadius={getWidgetValue(4)}
+            padding={{ top: getWidgetValue(8), bottom: isDeleted ? getWidgetValue(15) : 0, left: getWidgetValue(10), right: getWidgetValue(10) }} // Increased padding for the button
             onClick={onShowReplies}
           >
             { message.showReplies && (
               <AutoLayout
               //fill="#FFFFFF"
-              cornerRadius={4}
-              padding={{ top: 6, bottom: 6, left: 0, right: 0 }}
+              cornerRadius={getWidgetValue(4)}
+              padding={{ top: getWidgetValue(6), bottom: getWidgetValue(6), left: 0, right: 0 }}
               onClick={onShowReplies}
               //stroke={"007AFF"}
               >
@@ -1523,7 +1580,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
               <AutoLayout
               //fill="#FFFFFF"
               cornerRadius={4}
-              padding={{ top: 6, bottom: 6, left: 0, right: 0 }}
+              padding={{ top: getWidgetValue(6), bottom: getWidgetValue(6), left: 0, right: 0 }}
               onClick={onShowReplies}
               //stroke={"007AFF"}
               >
@@ -1534,7 +1591,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
               </AutoLayout>  
             )}
             
-            <Text fontSize={25} fill={message.showReplies ? '#007AFF' : '#007AFF'}>  {totalReplies} Replies </Text>
+            <Text fontSize={getWidgetValue(25)} fill={message.showReplies ? '#007AFF' : '#007AFF'}>  {totalReplies} Replies </Text>
             
           </AutoLayout>
           )}
@@ -1559,7 +1616,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           direction="vertical"
           //spacing={-100} // Adjusted space between reply chains
           width={"fill-parent"}
-          padding={{ top: isDeleted ? 0 : 10, bottom: isDeleted ? 0 : 10, left: 32, right: 8 }}
+          padding={{ top: isDeleted ? 0 : getWidgetValue(10), bottom: isDeleted ? 0 : getWidgetValue(10), left: getWidgetValue(32), right: getWidgetValue(8) }}
         >
           {replyChain}
         </AutoLayout>

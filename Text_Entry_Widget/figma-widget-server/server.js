@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-const cors = require('cors'); // Import the cors package
+const cors = require('cors');
 
 const db = process.env.MONGODB_URI;
 
@@ -28,8 +28,7 @@ app.post('/refresh', async (req, res) => {
   try {
     let widget = await Widget.findOne({ widgetId });
     if (!widget) {
-      const timestamp = new Date().toISOString();
-      widget = new Widget({ widgetId: timestamp, previous: [], current: "", showPrevious: false });
+      widget = new Widget({ widgetId, previous: [], current: "", showPrevious: false });
       await widget.save();
       return res.json({ status: 'new', widget });
     } else {
@@ -46,15 +45,15 @@ app.post('/submit', async (req, res) => {
 
   try {
     let widget = await Widget.findOne({ widgetId });
-    if (!widget) {
-      const timestamp = new Date().toISOString();
-      widget = new Widget({ widgetId: timestamp, previous: [], current: response, showPrevious: false });
-      await widget.save();
-      return res.json({ status: 'new', widget });
-    } else {
+    if (widget) {
+      widget.previous.push(widget.current);
       widget.current = response;
       await widget.save();
       return res.json({ status: 'updated', widget });
+    } else {
+      widget = new Widget({ widgetId, previous: [], current: response, showPrevious: false });
+      await widget.save();
+      return res.json({ status: 'new', widget });
     }
   } catch (error) {
     console.error(error);

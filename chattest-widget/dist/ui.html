@@ -34,8 +34,22 @@
       transition: background-color 0.3s ease;
       width: 350px;
     }
+    .back-button {
+      padding: 10px 20px;
+      background-color: #a2a2a2;; /* A nice blue */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: 350px;
+    }
     button:hover {
       background-color: #0056b3; /* Darker blue on hover */
+    }
+    .back-button:hover {
+      background-color: #8c8c8c; /* Darker blue on hover */
     }
 
     button:disabled {
@@ -59,6 +73,7 @@
 <body>
   <textarea id="messageInput" placeholder="Type your message here..."></textarea>
   <button id="sendMessage">Send</button>
+  <button class="back-button" id="backButton">Back</button>
   <label>
   
 <div id="anonymousContainer">
@@ -103,7 +118,7 @@
       } else if (type === 'edit-titleFontSize') {
         console.log("MODAL UPDATE");
         document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
-        document.getElementById('sendMessage').innerText = 'Update Title Font Sie'; // Change button text to indicate update action
+        document.getElementById('sendMessage').innerText = 'Update Prompt Font Sie'; // Change button text to indicate update action
         anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
       } else if (type === 'edit-borderWidth') {
         console.log("MODAL UPDATE");
@@ -118,7 +133,7 @@
       } else if (type === 'reply-message') {
         console.log("MODAL REPLY");
         document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
-        document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...;` // Show reply-to message snippet
+        document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...` // Show reply-to message snippet
         document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
         anonymousContainer.style.display = 'block'; // Show checkbox when replying to a message
       }
@@ -136,6 +151,10 @@
       document.getElementById('sendMessage').classList.add('waiting');
     };
 
+    document.getElementById('backButton').onclick = () => {
+      console.log("Back button clicked");
+      parent.postMessage({ pluginMessage: { type: 'back-action' } }, '*');
+    };
     
     // Cancel button click handler
     document.getElementById('cancelButton').onclick = () => {
