@@ -44,51 +44,40 @@ return (
   verticalAlignItems="end"
   horizontalAlignItems={"center"}
 >
-  
-<Frame width={frameWidth} height={frameHeight}>
-</Frame>
+<Text
+   x={frameWidth/2 - 30} y={20} fontSize={16} fontWeight="bold">
+  {title}
+</Text>
 
 <AutoLayout
 direction="horizontal"
 verticalAlignItems="end"
 spacing={20} >
 
+{data.map((value, index) => (
+
 <AutoLayout
-direction="vertical"
-horizontalAlignItems={"end"}
-spacing={15}>
-
-
-
-
-
-<Text
-   x={frameWidth/2 - 30} y={20} fontSize={16} fontWeight="bold">
-        {title}
-</Text>
-
-</AutoLayout>
+    direction="vertical"
+    horizontalAlignItems={"end"}
+    spacing={15}>
       
-      {data.map((value, index) => (
-        <>
+      <Text  fontSize={12}> 
+        {value}
+        </Text>
+        
           <Rectangle
             key={`bar-${index}`}
-            x={barSpacing * index + 60}
-            y={barBaseY}
             width={barWidth}
             height={value}
             fill={`#${colors[index % colors.length]}`}
             rotation={180}
-          />
+            />
 
-
- 
-          <Text x={barSpacing * index + 20} y={labelY} fontSize={12}>
-            {labels[index]}
-          </Text>
+         
+        
           <Text
-          x={barSpacing * index + 32} y={barBaseY - value - 15} fontSize={12}>
-            {value}
+         fontSize={12}>
+        {labels[index]}
           </Text>
           
   
@@ -97,8 +86,7 @@ spacing={15}>
             key={`button-${index}`}
             width={20}
             height={20}
-            x={barSpacing * index + 30}
-            y={labelY + 20}
+           
            onClick={() => incrementValue(index)} 
             src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="30" height="30" rx="15" fill="white"/>
@@ -113,8 +101,7 @@ spacing={15}>
             key={`button-${index}`}
             width={20}
             height={20}
-            x={barSpacing * index + 30}
-            y={labelY + 45}
+           
             onClick={() => decrementValue(index)}
             src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="30" height="30" rx="15" fill="white"/>
@@ -124,12 +111,14 @@ spacing={15}>
           />
 
 
-           <SVG   
-        key={`button-${index}`}
+</AutoLayout>
+))}
+
+         <SVG   
+       
         width={20}
         height={20}
-        x={360}
-        y={labelY - 125}
+       
         onClick={() => addingbar()} 
         src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="30" height="30" rx="15" fill="white"/>
@@ -138,10 +127,28 @@ spacing={15}>
               </svg>`}
           />
 
-        </>
+
+
+
+
+
+
+      
+  
+
+
+ 
+    
+
+
+
+
+    
+
+       
       
         
-      ))}
+   
 
 </AutoLayout>
 </AutoLayout>
