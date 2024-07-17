@@ -1,8 +1,6 @@
 const { widget } = figma
 const { useSyncedState, usePropertyMenu,Text, SVG, Rectangle, Frame,AutoLayout,Input} = widget
-
 const colors = ["8dd3c7", "ffffb3", "bebada", "fb8072", "80b1d3", "fdb462"];
-const labels = ["input 1", "input 2", "input 3", "input 4", "input 5", "input 6"];
 const sampleData = [10,20,30,40,50,60]
 
 
@@ -77,7 +75,7 @@ spacing={20} >
         
           <Text
          fontSize={12}>
-        {labels[index]}
+        {"input"+[index+1]}
           </Text>
           
   
