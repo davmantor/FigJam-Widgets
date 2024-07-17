@@ -11,7 +11,7 @@ function BarGraphWidget() {
   const frameHeight = 200;
   const barWidth = 40;
   const barSpacing = 60;
-  const barBaseY = frameHeight - 70;
+  const barBaseY = frameHeight - 80;
   const labelY = barBaseY + 5;
   const title = "chart"
  
@@ -43,7 +43,7 @@ return (
   horizontalAlignItems={"center"}
 >
 <Text
-   x={frameWidth/2 - 30} y={20} fontSize={16} fontWeight="bold">
+   x={frameWidth/2 -80} y={60} fontSize={16} fontWeight="bold">
   {title}
 </Text>
 
@@ -56,7 +56,7 @@ spacing={20} >
 
 <AutoLayout
     direction="vertical"
-    horizontalAlignItems={"end"}
+    horizontalAlignItems={"center"}
     spacing={15}>
       
       <Text  fontSize={12}> 
