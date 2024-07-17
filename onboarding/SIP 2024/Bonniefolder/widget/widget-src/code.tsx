@@ -39,7 +39,6 @@ console.log(newdata)
 }
   
 return (
-<<<<<<< Updated upstream
 <AutoLayout
   direction="vertical"
   verticalAlignItems="end"
@@ -66,35 +65,12 @@ spacing={20} >
         {value}
         </Text>
         
-=======
-<AutoLayout 
-  direction="vertical"
-  verticalAlignItems="end"
-  horizontalAlignItems={"center"}>
-
-<AutoLayout
-  verticalAlignItems="end"
-  direction="horizontal"
-  spacing={10} >
-
-
-<Text 
-   x={frameWidth/2 - 30} y={20} fontSize={16} fontWeight="bold">
-        {title}
-</Text>
-
-
-      
-      {data.map((value, index) => (
-        <>
->>>>>>> Stashed changes
           <Rectangle
             key={`bar-${index}`}
             width={barWidth}
             height={value}
             fill={`#${colors[index % colors.length]}`}
             rotation={180}
-<<<<<<< Updated upstream
             />
 
          
@@ -106,20 +82,6 @@ spacing={20} >
           
   
 
-=======
-          />
-    
- 
-          <Text x={barSpacing * index + 20} y={labelY} fontSize={12}>
-            {labels[index]}
-          </Text>
-          <Text
-          x={barSpacing * index + 32} y={barBaseY - value - 15} fontSize={12}>
-            {value}
-          </Text>
-  
-
->>>>>>> Stashed changes
           <SVG
             key={`button-${index}`}
             width={20}
@@ -149,7 +111,6 @@ spacing={20} >
           />
 
 
-<<<<<<< Updated upstream
 </AutoLayout>
 ))}
 
@@ -158,14 +119,6 @@ spacing={20} >
         width={20}
         height={20}
        
-=======
-           <SVG   
-        key={`button-${index}`}
-        width={20}
-        height={20}
-        x={360}
-        y={labelY - 125}
->>>>>>> Stashed changes
         onClick={() => addingbar()} 
         src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="30" height="30" rx="15" fill="white"/>
@@ -174,7 +127,6 @@ spacing={20} >
               </svg>`}
           />
 
-<<<<<<< Updated upstream
 
 
 
@@ -202,19 +154,6 @@ spacing={20} >
 </AutoLayout>
 
 
-=======
-        </>
-        
-      ))}
-
-<AutoLayout
-verticalAlignItems="end"
-direction="vertical" >
-</AutoLayout>
-
-</AutoLayout> 
-  </AutoLayout>
->>>>>>> Stashed changes
 );
 }
 
