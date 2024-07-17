@@ -1,4 +1,5 @@
-
+// Simple widget to display some data as a vertical bar graph
+// No interactivity or labels
  
 const { widget } = figma // Import necessary modules from Figma widget API
 const { useSyncedState, usePropertyMenu, AutoLayout, Text, SVG, Rectangle, Frame, Input} = widget // Destructure components from the widget module
@@ -24,7 +25,7 @@ function BarGraphWidget() {
     setData(newData);
   };
   const addBar = () => { 
-    const newData = [...data, 100];
+    const newData = [...data, 50];
     setData(newData);
     console.log(data);
     console.log(newData);
@@ -37,6 +38,14 @@ function BarGraphWidget() {
     verticalAlignItems="end"
     horizontalAlignItems={"center"}
     >
+    <AutoLayout
+        horizontalAlignItems={"end"}
+        direction="vertical"
+        spacing={1}
+        >
+      <Text>{title}</Text>
+    </AutoLayout>
+
     <Frame width={frameWidth} height={frameHeight}>
 
     </Frame>
@@ -45,15 +54,16 @@ function BarGraphWidget() {
     direction="horizontal"
     spacing={30}>
 
-      <Text
+
+ 
+      {/* <Text
         x={frameWidth / 2 - 110} // Centering the title (approximation)
         y={50} // Positioning the title near the top
         fontSize={16}
         fontWeight="bold"
         fill={`#00FF00`}
       >
-         {title}
-      </Text>
+      </Text> */}
         {data.map((value, index) => ( // Iterate over the data to create bars and labels
         <>
 
@@ -107,14 +117,14 @@ function BarGraphWidget() {
           </>
       ))}
 
-{/* <SVG
+{ <SVG
       src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="30" height="30" rx="15" fill="white"/>
       <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
       <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
       </svg>`}
       onClick={addBar}
-    ></SVG> */}
+    ></SVG> }
        </AutoLayout>
     </AutoLayout>
   )
