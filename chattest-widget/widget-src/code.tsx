@@ -36,7 +36,6 @@ type MessageBubbleProps = {
     getMessageDepth: (messageId: string) => number;
     onPin: (id: string) => void;
     totalReplies: number
-    adminUsers: Set<string>;
     onUpvote: () => void;
     onDownvote: () => void; // Add this line
     onOptionsClick: () => void;
@@ -68,13 +67,13 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
-    const adminUsers = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza', 'Mustafa Ajmal', 'tiauna', 'Matthew', 'Ian Phan', 'Zia', 'Peter Yang', 'Nidhi', 'Bonnie Wang']);
     let messageQueue: Message[] = [];
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     //const [color, setColor] = useSyncedState("theme", "#000000");
     const [borderColor, setBorderColor] = useSyncedState("pborderColor", "#FFFFFF");
+    const [widgetButtonColor, setWidgetButtonColor] = useSyncedState('widgetButtonColor', "");
 
     const [promptColor, setPromptColor] = useSyncedState("promptColor", "#000000");
     const [widgetWidth, setWidgetWidth] = useSyncedState('widgetWidth', 800);
@@ -82,6 +81,7 @@ function ChatWidget() {
     const [titleFontSize, setTitleFontSize] = useSyncedState('titleFontSize', 60);
     const [messageFontSize, setMessageFontSize] = useSyncedState('messageFontSize', 35);
     const [borderWidth, setBorderWidth] = useSyncedState('borderWidth', 2);
+
 
 
     // useEffect(() => {
@@ -175,18 +175,6 @@ function ChatWidget() {
   }
 });
 */
-
-    
-
-
-    function isUserAuthorized(userName: string): boolean {
-      // Example implementation: Check if the user is in the list of authorized users
-      updateUserName();
-      console.log(adminUsers.has(userName));
-      return adminUsers.has(userName);
-  }
-    
-
 
   function openMessageInputModal(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
@@ -707,18 +695,13 @@ function ChatWidget() {
     };
 
     const handlePinMessage = (id: string) => {
-      if (adminUsers.has(userName)) {
-        setMessages(prevMessages => prevMessages.map(message => {
-            if (message.id === id) {
-                const isPinned = message.pinned !== undefined ? message.pinned : false;
-                return { ...message, pinned: !isPinned }; // Toggle the pinned state
-            }
-            return message;
-        }));
-      } else {
-          // Optionally, handle the case where the user is not 'Ashwin Chembu'
-          //console.log("Only Ashwin Chembu can pin messages.");
-    }
+      setMessages(prevMessages => prevMessages.map(message => {
+          if (message.id === id) {
+              const isPinned = message.pinned !== undefined ? message.pinned : false;
+              return { ...message, pinned: !isPinned }; // Toggle the pinned state
+          }
+          return message;
+      }));
     };
 
 
@@ -737,133 +720,131 @@ function ChatWidget() {
         // For example, let's assume you have a function `isUserAuthorized` that checks this
         updateUserName();
         console.log("in options:" , userName);
-        if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
-                figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
-    
-                // Listen for messages from the options.html iframe
-                figma.ui.onmessage = msg => {
-                    if (msg.type === 'edit-message') {
-                      console.log("calling edit from options");
-                        // Handle edit message action
-                        const messageToEdit = messages.find(message => message.id === id);
-                        if (messageToEdit && !messageToEdit.deleted) {
-                          // Open the UI modal with the message content
-                          console.log(messageToEdit.deleted)
-                          console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
-                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
-                          console.log("opened");
-                          figma.ui.onmessage = msg => {
-                            if (msg.type === 'update-message') {
-                              console.log("updated");
-                              // Process the updated message text
-                              const updatedText = msg.payload.message;
-                              const anonymous = msg.payload.anonymous;
-                              console.log(msg.payload);
-                              const updatedMessages = messages.map(message => {
-                                if (message.id === id) {
-                                  return { ...message, text: updatedText, anonymous: anonymous, edited: true };
-                                }
-                                return message;
-                              });
-                              setMessages(updatedMessages);
-                              figma.closePlugin();
-                              resolve(); // Resolve the promise when the message is updated, no value needed
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-                        } else {
-                          console.log('Message not found.');
-                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
-                        }
-
-                    } else if (msg.type === 'edit-user') {
-                      console.log("calling edit from options");
-                        // Handle edit message action
-                        const messageToEdit = messages.find(message => message.id === id);
-                        if (messageToEdit && !messageToEdit.deleted) {
-                          // Open the UI modal with the message content
-                          console.log(messageToEdit.deleted)
-                          console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
-                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
-                          console.log("opened");
-                          figma.ui.onmessage = msg => {
-                            if (msg.type === 'update-message') {
-                              console.log("updated");
-                              // Process the updated message text
-                              const updatedText = msg.payload.message;
-                              const anonymous = msg.payload.anonymous;
-                              console.log(msg.payload);
-                              const updatedMessages = messages.map(message => {
-                                if (message.id === id) {
-                                  return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
-                                }
-                                return message;
-                              });
-                              setMessages(updatedMessages);
-                              figma.closePlugin();
-                              resolve(); // Resolve the promise when the message is updated, no value needed
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-                        } else {
-                          console.log('Message not found.');
-                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
-                        }
-
-                    } else if (msg.type === 'update-prompt') {
-                        console.log("calling prompt from options");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                        figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+              figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
+  
+              // Listen for messages from the options.html iframe
+              figma.ui.onmessage = msg => {
+                  if (msg.type === 'edit-message') {
+                    console.log("calling edit from options");
+                      // Handle edit message action
+                      const messageToEdit = messages.find(message => message.id === id);
+                      if (messageToEdit && !messageToEdit.deleted) {
+                        // Open the UI modal with the message content
+                        console.log(messageToEdit.deleted)
+                        console.log("opening modal");
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
                         console.log("opened");
-
                         figma.ui.onmessage = msg => {
                           if (msg.type === 'update-message') {
-                                const updatedText = msg.payload.message;
-                                setPrompt(updatedText);
-                                figma.closePlugin();
-                                resolve(); 
-                              } else if (msg.type === 'cancel-edit') {
-                                console.log("canceled");
-                                reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                              } else if (msg.type === 'close-plugin') {
-                                console.log("closed");
-                                figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                                resolve(); // Optionally resolve the promise here, since the action is completed
+                            console.log("updated");
+                            // Process the updated message text
+                            const updatedText = msg.payload.message;
+                            const anonymous = msg.payload.anonymous;
+                            console.log(msg.payload);
+                            const updatedMessages = messages.map(message => {
+                              if (message.id === id) {
+                                return { ...message, text: updatedText, anonymous: anonymous, edited: true };
                               }
-                            };
+                              return message;
+                            });
+                            setMessages(updatedMessages);
+                            figma.closePlugin();
+                            resolve(); // Resolve the promise when the message is updated, no value needed
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
+                      } else {
+                        console.log('Message not found.');
+                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                      }
 
-                    } else if (msg.type === 'delete-message') {
-                        // Handle delete message action
-                        handleDeleteMessage(id);
-                        resolve();
-                    } else if (msg.type === 'pin-message') {
-                        // Handle pin message action
-                        handlePinMessage(id);
-                        resolve();
-                        
-                    } else if (msg.type === 'close-options') {
-                        // Handle closing the options iframe
-                        resolve();
-                    }
-                };
-            });
-        }
+                  } else if (msg.type === 'edit-user') {
+                    console.log("calling edit from options");
+                      // Handle edit message action
+                      const messageToEdit = messages.find(message => message.id === id);
+                      if (messageToEdit && !messageToEdit.deleted) {
+                        // Open the UI modal with the message content
+                        console.log(messageToEdit.deleted)
+                        console.log("opening modal");
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
+                        console.log("opened");
+                        figma.ui.onmessage = msg => {
+                          if (msg.type === 'update-message') {
+                            console.log("updated");
+                            // Process the updated message text
+                            const updatedText = msg.payload.message;
+                            const anonymous = msg.payload.anonymous;
+                            console.log(msg.payload);
+                            const updatedMessages = messages.map(message => {
+                              if (message.id === id) {
+                                return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
+                              }
+                              return message;
+                            });
+                            setMessages(updatedMessages);
+                            figma.closePlugin();
+                            resolve(); // Resolve the promise when the message is updated, no value needed
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
+                      } else {
+                        console.log('Message not found.');
+                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                      }
+
+                  } else if (msg.type === 'update-prompt') {
+                      console.log("calling prompt from options");
+                      figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                      figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+                      console.log("opened");
+
+                      figma.ui.onmessage = msg => {
+                        if (msg.type === 'update-message') {
+                              const updatedText = msg.payload.message;
+                              setPrompt(updatedText);
+                              figma.closePlugin();
+                              resolve(); 
+                            } else if (msg.type === 'cancel-edit') {
+                              console.log("canceled");
+                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                            } else if (msg.type === 'close-plugin') {
+                              console.log("closed");
+                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                              resolve(); // Optionally resolve the promise here, since the action is completed
+                            }
+                          };
+
+                  } else if (msg.type === 'delete-message') {
+                      // Handle delete message action
+                      handleDeleteMessage(id);
+                      resolve();
+                  } else if (msg.type === 'pin-message') {
+                      // Handle pin message action
+                      handlePinMessage(id);
+                      resolve();
+                      
+                  } else if (msg.type === 'close-options') {
+                      // Handle closing the options iframe
+                      resolve();
+                  }
+              };
+          });
     };
 
 
@@ -938,7 +919,6 @@ function ChatWidget() {
               getMessageDepth={getMessageDepth}
               onPin={handlePinMessage}
               totalReplies={getTotalReplies(message.id)}
-              adminUsers={adminUsers}
               onUpvote={() => onUpvote(message.id)}
               onDownvote={()=> onDownvote(message.id)}
               onOptionsClick={() => handleOptionsClick(message.id)}
@@ -953,194 +933,217 @@ function ChatWidget() {
 const handleOptionsClickChat = () => {
   updateUserName();
   console.log("in options:", userName);
-  if (isUserAuthorized(userName)) {
-    return new Promise<void>((resolve, reject) => {
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 125 });
-      //GOTO HERE
-      figma.ui.onmessage = msg => {
-        if (msg.type === 'update-prompt') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+  return new Promise<void>((resolve, reject) => {
+    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 125 });
+    //GOTO HERE
+    figma.ui.onmessage = msg => {
+      if (msg.type === 'update-prompt') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setPrompt(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setPrompt(updatedText);
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
 
-        } else if (msg.type === 'update-width') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+      } else if (msg.type === 'update-width') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedWidth = msg.payload.message;
-              setWidgetWidth(parseInt(updatedWidth, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-borderWidth') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedWidth = msg.payload.message;
+            setWidgetWidth(parseInt(updatedWidth, 10));
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-borderWidth') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedBorderWidth = msg.payload.message;
-              setBorderWidth(parseInt(updatedBorderWidth, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-titleFontSize') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedBorderWidth = msg.payload.message;
+            setBorderWidth(parseInt(updatedBorderWidth, 10));
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-titleFontSize') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedTitleFontSize = msg.payload.message;
-              setTitleFontSize(parseInt(updatedTitleFontSize, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-borderColor') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedTitleFontSize = msg.payload.message;
+            setTitleFontSize(parseInt(updatedTitleFontSize, 10));
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-borderColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setBorderColor(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-messageFontSize') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setBorderColor(updatedText);
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-messageFontSize') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedMessageFontSize = msg.payload.message;
-              setMessageFontSize(parseInt(updatedMessageFontSize, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-promptColor') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedMessageFontSize = msg.payload.message;
+            setMessageFontSize(parseInt(updatedMessageFontSize, 10));
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-promptColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-          console.log("opened");
+        figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+        console.log("opened");
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setPromptColor(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'close-options') {
-          // Handle closing the options iframe
-          resolve();
-        }
-      };
-    });
-  }
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setPromptColor(updatedText);
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-widgetButtonColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+        figma.ui.postMessage({ type: 'edit-widgetButtonColor', payload: widgetButtonColor });
+        console.log("opened");
+
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setPromptColor(updatedText);
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'cancel-edit') {
+            console.log("canceled");
+            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+            resolve(); // Optionally resolve the promise here, since the action is completed
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'close-options') {
+        // Handle closing the options iframe
+        resolve();
+      }
+    };
+  });
 };
 
     
@@ -1279,7 +1282,7 @@ const handleOptionsClickChat = () => {
 }
 
 
-function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, adminUsers, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -1339,18 +1342,6 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   // Calculate the depth of the current message
   const messageDepth = getMessageDepth(message.id);
   const score = message.upvotedUsers.length - message.downvotedUsers.length;
-
-
-
-
-  //const isUpvoted = message.upvotedUsers.has(user);
-  var admin = false;
-  console.log("USER:" , user);
-  if (adminUsers.has(user)){
-    console.log("inside", admin);
-    admin = true;
-  }
-
 
   // Adjust the right padding based on the message depth
   var adjustedRightPadding = getWidgetValue(160);
@@ -1436,7 +1427,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             </Text>
           </AutoLayout>
 
-          {message.text != "this message has been deleted" && admin && (
+          {message.text != "this message has been deleted" && (
             <AutoLayout
                 //fill="#007AFF"
                 cornerRadius={4}
