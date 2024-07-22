@@ -6,7 +6,6 @@ const { useSyncedState, usePropertyMenu, AutoLayout, Text, SVG, Rectangle, Frame
 
 const SampleData = [10, 20, 30, 40, 50, 60]; // Sample data for the bar heights
 const colors = ["8dd3c7", "ffffb3", "bebada", "fb8072", "80b1d3", "fdb462"]; // Colors for each bar
-const labels = ["Bar 1", "Bar 2", "Bar 3", "Bar 4", "Bar 5", "Bar 6"]; // Labels for each bar
 
 function BarGraphWidget() {
   const [data, setData] = useSyncedState('data', SampleData); // Use synced state to manage the bar data (in case we decide to change it)
@@ -23,15 +22,26 @@ function BarGraphWidget() {
     const newData = [...data];
     newData[index] += 10;
     setData(newData);
+
+   
+
   };
   const addBar = () => { 
     const newData = [...data, 50];
     setData(newData);
-    console.log(data);
-    console.log(newData);
-
+    console.log(data); 
   }
 
+  const decrementValue = (index: number) => {
+    const nData = [...data];
+    nData[index] -= 10;
+    if (nData[index] < 0) {
+      nData[index] = 0;
+    }
+    setData(nData);
+  };
+
+  
   return (
     <AutoLayout
     direction="vertical"
@@ -103,6 +113,18 @@ function BarGraphWidget() {
                   //setCount(count + 1)
               }}
             />
+<SVG
+      src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="30" height="30" rx="15" fill="white"/>
+                        <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
+                        <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+                      </svg>`}
+                key={`minus-${index}`}
+                x={barSpacing * index + 26}
+                y={barBaseY + 2}
+                onClick={() => decrementValue(index)}
+              />
+
         <Text
             key={`label-${index}`} // Unique key for each label
             x={barSpacing * index + 25} // X-coordinate for each label
@@ -110,7 +132,8 @@ function BarGraphWidget() {
             fontSize={12}
           >   
 
-            {labels[index]} 
+            Bar {index + 1} 
+            
             
           </Text>
           </AutoLayout>
