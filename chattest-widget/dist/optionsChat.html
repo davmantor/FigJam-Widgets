@@ -35,141 +35,12 @@
             margin: 5px;
             border: none;
             border-radius: 200px;
-            background-color: #577590;
+            background-color: #007aff;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
             font-size: 14px;
             
-        }
-        .button2 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #43aa8b;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button3 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #90be6d;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button4 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #f9c74f;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button5 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #f8961e;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button6 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #f3722c;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button7 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #f94144;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button8 {
-            display: inline-flex; /* Use inline-flex to enable flexbox for inline elements */
-            /*align-items: center;*/
-            vertical-align: middle;
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 200px;
-            background-color: #f94144;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-            
-        }
-        .button8:hover {
-            background-color: #fa7c7c;
-        }
-        .button7:hover {
-            background-color: #fa7c7c;
-        }
-        .button6:hover {
-            background-color: #f68856;
-        }
-        .button5:hover {
-            background-color: #faaa55;
-        }
-        .button4:hover {
-            background-color: #fcd573;
-        }
-        .button3:hover {
-            background-color: #aadf83;
-        }
-        .button2:hover {
-            background-color: #62bc9e;
-        }
-        .button1:hover {
-            background-color: #7089a6;
         }
         .icon {
             margin-top: 1px;
@@ -208,64 +79,116 @@
             <div class="button1" onclick="updatePrompt()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                 Prompt
+                </svg>          
+                Prompt
             </div> 
 
-            <div class="button2" onclick="updateBorderColor()">
+            <div id="borderColorButton" class="button1" onclick="updateBorderColor()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Border Color
+                Border Color: 
             </div> 
 
-            <div class="button3" onclick="updatePromptColor()">
+            <div id="promptColorButton" class="button1" onclick="updatePromptColor()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Prompt Color
+                Prompt Color: 
             </div> 
 
-            <div class="button4" onclick="updateWidth()">
+            <div id="boxWidthButton" class="button1" onclick="updateWidth()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Box Width
+                Box Width:
             </div> 
 
-            <div class="button5" onclick="updateBorderWidth()">
+            <div id="borderWidthButton" class="button1" onclick="updateBorderWidth()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Border Width
+                Border Width:
             </div> 
 
-            <div class="button6" onclick="updateTitleFontSize()">
+            <div id="titleFontSizeButton" class="button1" onclick="updateTitleFontSize()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Title Font Size
+                Title Size:
             </div> 
 
-            <div class="button7" onclick="updateMessageFontSize()">
+            <div id="messageFontSizeButton" class="button1" onclick="updateMessageFontSize()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Message Font Size
+                Message Size:
             </div> 
 
-            <div class="button8" onclick="updateWidgetButtonColor()">
+            <div id="widgetButtonColorButton" class="button1" onclick="updateWidgetButtonColor()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
                 </svg>
-                 Widget Button Color
+                Button Color:
+            </div> 
+
+            <div id="widgetCornerRadiusButton" class="button1" onclick="updateWidgetCornerRadius()">
+                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
+                </svg>
+                Corner Radius:
             </div> 
 
         </div>
     </div>
 
     <script>
-        var correctPin = "312cmpm15"; // Set your desired PIN here
+        window.onmessage = function(event) {
+            console.log("called!");
+            var messageType = event.data.pluginMessage.type;
+            var payload = event.data.pluginMessage.payload;
+            console.log(payload);
+            switch (messageType) {
+                case 'current-borderColor':
+                    document.getElementById('borderColorButton').insertAdjacentHTML("beforeend", payload);
+                    break;
+                case 'current-promptColor':
+                    document.getElementById('promptColorButton').insertAdjacentHTML("beforeend", payload);
+                    break;
+                case 'current-widthValue':
+                    document.getElementById('boxWidthButton').insertAdjacentHTML("beforeend", payload + "px");
+                    break;
+                case 'current-borderWidthValue':
+                    document.getElementById('borderWidthButton').insertAdjacentHTML("beforeend", payload + "px");
+                    break;
+                case 'current-titleFontSize':
+                    document.getElementById('titleFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
+                    break;
+                case 'current-messageFontSize':
+                    document.getElementById('messageFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
+                    break;
+                case 'current-widgetCornerRadius':
+                    document.getElementById('widgetCornerRadiusButton').insertAdjacentHTML("beforeend", payload + "px");
+                    console.log(payload)
+                    break;
+                case 'current-widgetButtonColor':
+                    document.getElementById('widgetButtonColorButton').insertAdjacentHTML("beforeend", payload);
+                    const buttons = document.querySelectorAll('.button1');
+                    buttons.forEach(button => {
+                        button.style.backgroundColor = "#" + payload;
+                    });
+                    break;
+                case 'alreadyLoggedIn':
+                    console.log("hello")
+                    if (payload) {
+                        document.getElementById("pinForm").style.display = "none";
+                        document.getElementById("adminControls").style.display = "block";
+                    }
+                    break;
+            }
+        };
+
+        var correctPin = "312cmpm15";
         var deleteConfirmation = false;
 
         function checkPin() {
@@ -276,7 +199,6 @@
             } else {
                 alert("Incorrect PIN.");
                 parent.postMessage({ pluginMessage: { type: 'close-options' } }, '*');
-
             }
         }
 
@@ -318,6 +240,11 @@
         function updateWidgetButtonColor() {
             // Send a message to the plugin to update the widget button color
             parent.postMessage({ pluginMessage: {type: 'update-widgetButtonColor'} }, '*');
+        }
+
+        function updateWidgetCornerRadius() {
+            // Send a message to the plugin to update the widget button color
+            parent.postMessage({ pluginMessage: {type: 'update-widgetCornerRadius'} }, '*');
         }
 
     </script>
