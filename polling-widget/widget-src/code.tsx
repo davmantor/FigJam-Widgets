@@ -6,6 +6,7 @@
 //a
 const { widget } = figma
 const { useSyncedState, AutoLayout, Input, Text, SVG, Frame } = widget
+
 // Define the types of properties that our EditableText component will use.
 interface EditableTextProps {
   initialValue: string // The initial text to show in the component.
@@ -32,8 +33,6 @@ function EditableText({ initialValue, onValueChange, isEditable }: EditableTextP
       cornerRadius={4}  // Rounded corners of the border.
       stroke={isEditing ? '#24CE16' : '#E6E6E6'}  // Border color changes when editing.
       strokeWidth={2}  // How thick the border is.
-      //index * 0 is just a test
-      
     >
       {isEditing && isEditable ? (
         <Input
@@ -57,20 +56,10 @@ function EditableText({ initialValue, onValueChange, isEditable }: EditableTextP
               onClick={() => setIsEditing(true)}
             ></SVG>
           )}
-              <SVG
-                src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="30" height="30" rx="15" fill="white"/>
-                        <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
-                        <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-                      </svg>`}
-              />
         </AutoLayout>
-        
       )}
-      
     </AutoLayout>
   )
-  
 }
 
 // The main part of our widget where we put everything together.
@@ -105,13 +94,6 @@ function PollingWidget() {
         onValueChange={handleValueChange}
         isEditable={!isSubmitted}
       />
-                              <SVG
-                src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="30" height="30" rx="15" fill="white"/>
-                        <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
-                        <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-                      </svg>`}
-              />
       {!isSubmitted && (
         <Frame
           width={100}  // Width of the button.
@@ -120,7 +102,6 @@ function PollingWidget() {
           fill="#24CE16"  // Color of the button.
           onClick={handleSubmit}  // What to do when clicked.
         >
-
           <Text fontSize={14} fill="#FFFFFF">
             Submit
           </Text>
