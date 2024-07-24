@@ -2,7 +2,7 @@
 // Once submitted, the text option becomes non-editable. The widget consists of two main components:
 // 1. EditableText: Handles displaying and editing of a single text entry.
 // 2. PollingWidget: Manages the overall layout and state, including submission of the text entry.
-
+// test
 const { widget } = figma
 const { useSyncedState, AutoLayout, Input, Text, SVG, Frame } = widget
 
