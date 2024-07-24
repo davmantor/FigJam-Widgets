@@ -130,6 +130,16 @@
         document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
         document.getElementById('sendMessage').innerText = 'Update Message Font Size'; // Change button text to indicate update action
         anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-widgetButtonColor') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Widget Button Color'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-widgetCornerRadius') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Widget Corner Radius'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
       } else if (type === 'reply-message') {
         console.log("MODAL REPLY");
         document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
@@ -161,6 +171,7 @@
       console.log("MODAL CANCEL");
       parent.postMessage({ pluginMessage: { type: 'close-plugin' } }, '*');
     };
+
   </script>
 </body>
 </html>

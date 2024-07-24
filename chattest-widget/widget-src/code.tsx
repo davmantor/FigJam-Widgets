@@ -36,7 +36,6 @@ type MessageBubbleProps = {
     getMessageDepth: (messageId: string) => number;
     onPin: (id: string) => void;
     totalReplies: number
-    adminUsers: Set<string>;
     onUpvote: () => void;
     onDownvote: () => void; // Add this line
     onOptionsClick: () => void;
@@ -44,6 +43,7 @@ type MessageBubbleProps = {
     getTotalDirectReplies: (messageId: string) => number;
     messageFontSize: number
     widgetWidth: number
+    widgetButtonColor: string
 };
 
 function generateLogId() {
@@ -51,6 +51,9 @@ function generateLogId() {
   const dateString = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
   return `${dateString}-${randomString}`;
 }
+
+let alreadyLoggedIn = false;
+let thenFlag = false;
 
 function ChatWidget() {
     //console.log("ChatWidget rendered2");
@@ -68,13 +71,13 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
-    const adminUsers = new Set(['Neel Walse', 'Ashwin Chembu', 'David M Torres-Mendoza', 'Mustafa Ajmal', 'tiauna', 'Matthew', 'Ian Phan', 'Zia', 'Peter Yang', 'Nidhi', 'Bonnie Wang']);
     let messageQueue: Message[] = [];
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     //const [color, setColor] = useSyncedState("theme", "#000000");
     const [borderColor, setBorderColor] = useSyncedState("pborderColor", "#FFFFFF");
+    const [widgetButtonColor, setWidgetButtonColor] = useSyncedState('widgetButtonColor', "#007aff");
 
     const [promptColor, setPromptColor] = useSyncedState("promptColor", "#000000");
     const [widgetWidth, setWidgetWidth] = useSyncedState('widgetWidth', 800);
@@ -82,16 +85,7 @@ function ChatWidget() {
     const [titleFontSize, setTitleFontSize] = useSyncedState('titleFontSize', 60);
     const [messageFontSize, setMessageFontSize] = useSyncedState('messageFontSize', 35);
     const [borderWidth, setBorderWidth] = useSyncedState('borderWidth', 2);
-
-
-    // useEffect(() => {
-    //   if (widgetWidth < minWidth) {
-    //       setWidgetWidth(minWidth);
-    //   } else if (widgetWidth > maxWidth) {
-    //       setWidgetWidth(maxWidth);
-    //   }
-    // }, [widgetWidth]);
-
+    const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState('widgetCornerRadius', 10);
 
     function getWidgetValue(input: number): number {
       const currentWidgetWidth = widgetWidth; // Get the current widget width
@@ -123,70 +117,6 @@ function ChatWidget() {
   
     const pin = `<svg width="${getWidgetValue(35)}px" height="${getWidgetValue(35)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1218 1.87023C15.7573 0.505682 13.4779 0.76575 12.4558 2.40261L9.61062 6.95916C9.61033 6.95965 9.60913 6.96167 9.6038 6.96549C9.59728 6.97016 9.58336 6.97822 9.56001 6.9848C9.50899 6.99916 9.44234 6.99805 9.38281 6.97599C8.41173 6.61599 6.74483 6.22052 5.01389 6.87251C4.08132 7.22378 3.61596 8.03222 3.56525 8.85243C3.51687 9.63502 3.83293 10.4395 4.41425 11.0208L7.94975 14.5563L1.26973 21.2363C0.879206 21.6269 0.879206 22.26 1.26973 22.6506C1.66025 23.0411 2.29342 23.0411 2.68394 22.6506L9.36397 15.9705L12.8995 19.5061C13.4808 20.0874 14.2853 20.4035 15.0679 20.3551C15.8881 20.3044 16.6966 19.839 17.0478 18.9065C17.6998 17.1755 17.3043 15.5086 16.9444 14.5375C16.9223 14.478 16.9212 14.4114 16.9355 14.3603C16.9421 14.337 16.9502 14.3231 16.9549 14.3165C16.9587 14.3112 16.9606 14.31 16.9611 14.3098L21.5177 11.4645C23.1546 10.4424 23.4147 8.16307 22.0501 6.79853L17.1218 1.87023ZM14.1523 3.46191C14.493 2.91629 15.2528 2.8296 15.7076 3.28445L20.6359 8.21274C21.0907 8.66759 21.0041 9.42737 20.4584 9.76806L15.9019 12.6133C14.9572 13.2032 14.7469 14.3637 15.0691 15.2327C15.3549 16.0037 15.5829 17.1217 15.1762 18.2015C15.1484 18.2752 15.1175 18.3018 15.0985 18.3149C15.0743 18.3316 15.0266 18.3538 14.9445 18.3589C14.767 18.3699 14.5135 18.2916 14.3137 18.0919L5.82846 9.6066C5.62872 9.40686 5.55046 9.15333 5.56144 8.97583C5.56651 8.8937 5.58877 8.84605 5.60548 8.82181C5.61855 8.80285 5.64516 8.7719 5.71886 8.74414C6.79869 8.33741 7.91661 8.56545 8.68762 8.85128C9.55668 9.17345 10.7171 8.96318 11.3071 8.01845L14.1523 3.46191Z" fill="#0F0F0F"></path> </g></svg>`
     const edit = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#000000"></path> </g></svg>`
-    
-  
-    
-    
-    // const plus = '<svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
-    // usePropertyMenu(
-    //   [
-    //     {
-    //       itemType: 'color-selector',
-    //       propertyName: 'colors',
-    //       tooltip: 'Color selector',
-    //       selectedOption: color,
-    //       options: [{option: "#000000", tooltip: "Black"}, {option: "#e06666", tooltip: "Red"}, {option: "#ffe599", tooltip: "Yellow"} ],
-    //     }
-    //   ],
-    //   ({propertyName, propertyValue}) => {
-    //     if (propertyName === "colors") {
-    //       setColor(String(propertyValue))
-    //     }
-    //   },
-    // );
-    
-  /*
-    useEffect(() => {
-      console.log("update call");
-  if (logId !== 0) {
-    figma.showUI(__uiFiles__.check, { visible: false });
-    figma.ui.postMessage({ type: 'set-log-id', logId });
-
-    figma.ui.onmessage = (msg) => {
-      if (msg.type === 'update-messages') {
-        console.log("hello", messages);
-        console.log("data", msg.data);
-
-        if (Array.isArray([msg.data])) {
-          setMessages([msg.data]);
-        } else {
-          console.warn("Received data is not an array:", msg.data);
-        }
-
-        console.log("done", messages);
-      }
-    };
-
-    // Return a cleanup function to close the UI when the component unmounts
-    return () => {
-      console.log("CLOSE");
-      figma.ui.close();
-    };
-  }
-});
-*/
-
-    
-
-
-    function isUserAuthorized(userName: string): boolean {
-      // Example implementation: Check if the user is in the list of authorized users
-      updateUserName();
-      console.log(adminUsers.has(userName));
-      return adminUsers.has(userName);
-  }
-    
-
 
   function openMessageInputModal(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
@@ -206,28 +136,6 @@ function ChatWidget() {
       };
     });
   }
-  
-
-    /*
-    const renderMessagesWithScroll = () => {
-      return (
-        <Frame // Use Frame to create a container
-          width={400} // Ensure the Frame takes the full width of the parent
-          height={500} // Set a fixed height to simulate a 'maxHeight'
-          overflow="scroll" // Allow scrolling for overflow content
-        >
-          <AutoLayout
-            direction="vertical"
-            spacing={-100} // Adjust as needed
-            padding={4}
-          >
-            {renderMessages()}
-          </AutoLayout>
-        </Frame>
-      );
-      
-    };
-    */
     function delay(ms: number) {
       let rand = ms * 70 * Math.random();
       return new Promise( resolve => setTimeout(resolve, ms) );
@@ -288,35 +196,6 @@ function ChatWidget() {
       setUserName(currentUserName);
       console.log(userName);
     };
-    /*
-    const checkLogId = async () => {
-      console.log("no log id");
-      if (logId == "None") {
-        try {
-          const response = await fetch('http://localhost:4000/create-widget', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-    
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-    
-          const data = await response.json();
-          console.log(data.logId);
-          return data.logId; // Return the new logId
-        } catch (error) {
-          console.error('Error creating widget:', error);
-        }
-      }
-      else{
-        console.log("logID already exists");
-      }
-      return logId; // Return the existing logId if it's not "None"
-    };
-    */
     const generateRandomString = (length = 6) => {
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let result = '';
@@ -328,10 +207,10 @@ function ChatWidget() {
     const processMessageQueue = () => {
       if (messageQueue.length > 0) {
         delay(10000);
-        const messageToAdd = messageQueue.shift(); // Get the first message from the queue
+        const messageToAdd = messageQueue.shift();
 
         if (messageToAdd) {
-          setMessages((prevMessages) => [...prevMessages, messageToAdd]); // Add the message to the state
+          setMessages((prevMessages) => [...prevMessages, messageToAdd]);
           
         }
 
@@ -342,32 +221,17 @@ function ChatWidget() {
     
     
     const handleAddMessage = async (messageData: { messageText: string, anonymous: boolean }) => {
-      const { messageText, anonymous } = messageData; // Destructure the message data
+      const { messageText, anonymous } = messageData;
       console.log("anonymous:", anonymous);
       console.log("messageText:", messageText);
       console.log("messageData:", messageData);
       let count = 10;
-      /*
-      while (logId == "None" && count > 0){
-        try {
-          const generatedLogId = await checkLogId();
-          console.log("Generated Log ID:", generatedLogId);
-          setLogId(generatedLogId);
-          console.log("Generated Log ID:", logId);
-      } catch (error) {
-          console.error("Error generating log ID:", error);
-          return;
-      }
-        count--;
-        delay(10000);
-        console.log("not set yet,", count);
-      }
-      */
-      updateUserName(); // Assumes you have a function to set/update the userName
+
+      updateUserName();
     
       if (messageText.trim() !== '') {
-        const timestamp = Date.now(); // Current time in milliseconds
-        const randomString = generateRandomString(); // Generate a random string
+        const timestamp = Date.now();
+        const randomString = generateRandomString();
         const newId = `${timestamp}${randomString}${userName}`;
         console.log(newId);
         const timestampDate = new Date(timestamp);
@@ -430,9 +294,6 @@ function ChatWidget() {
         processMessageQueue();      
       }
     };
-    
-    
-   
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
@@ -485,10 +346,6 @@ function ChatWidget() {
         }));
     };
   
-  
-  
-  
-
     // This function is triggered when a user clicks to reply to a message.
     const handleReplyToMessage = async (id: string) => {
             const timestamp = Date.now(); // Current time in milliseconds
@@ -707,18 +564,13 @@ function ChatWidget() {
     };
 
     const handlePinMessage = (id: string) => {
-      if (adminUsers.has(userName)) {
-        setMessages(prevMessages => prevMessages.map(message => {
-            if (message.id === id) {
-                const isPinned = message.pinned !== undefined ? message.pinned : false;
-                return { ...message, pinned: !isPinned }; // Toggle the pinned state
-            }
-            return message;
-        }));
-      } else {
-          // Optionally, handle the case where the user is not 'Ashwin Chembu'
-          //console.log("Only Ashwin Chembu can pin messages.");
-    }
+      setMessages(prevMessages => prevMessages.map(message => {
+          if (message.id === id) {
+              const isPinned = message.pinned !== undefined ? message.pinned : false;
+              return { ...message, pinned: !isPinned }; // Toggle the pinned state
+          }
+          return message;
+      }));
     };
 
 
@@ -737,133 +589,131 @@ function ChatWidget() {
         // For example, let's assume you have a function `isUserAuthorized` that checks this
         updateUserName();
         console.log("in options:" , userName);
-        if (isUserAuthorized(userName)) {
             return new Promise<void>((resolve, reject) => {
-                figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
-    
-                // Listen for messages from the options.html iframe
-                figma.ui.onmessage = msg => {
-                    if (msg.type === 'edit-message') {
-                      console.log("calling edit from options");
-                        // Handle edit message action
-                        const messageToEdit = messages.find(message => message.id === id);
-                        if (messageToEdit && !messageToEdit.deleted) {
-                          // Open the UI modal with the message content
-                          console.log(messageToEdit.deleted)
-                          console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
-                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
-                          console.log("opened");
-                          figma.ui.onmessage = msg => {
-                            if (msg.type === 'update-message') {
-                              console.log("updated");
-                              // Process the updated message text
-                              const updatedText = msg.payload.message;
-                              const anonymous = msg.payload.anonymous;
-                              console.log(msg.payload);
-                              const updatedMessages = messages.map(message => {
-                                if (message.id === id) {
-                                  return { ...message, text: updatedText, anonymous: anonymous, edited: true };
-                                }
-                                return message;
-                              });
-                              setMessages(updatedMessages);
-                              figma.closePlugin();
-                              resolve(); // Resolve the promise when the message is updated, no value needed
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-                        } else {
-                          console.log('Message not found.');
-                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
-                        }
-
-                    } else if (msg.type === 'edit-user') {
-                      console.log("calling edit from options");
-                        // Handle edit message action
-                        const messageToEdit = messages.find(message => message.id === id);
-                        if (messageToEdit && !messageToEdit.deleted) {
-                          // Open the UI modal with the message content
-                          console.log(messageToEdit.deleted)
-                          console.log("opening modal");
-                          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
-                          figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
-                          console.log("opened");
-                          figma.ui.onmessage = msg => {
-                            if (msg.type === 'update-message') {
-                              console.log("updated");
-                              // Process the updated message text
-                              const updatedText = msg.payload.message;
-                              const anonymous = msg.payload.anonymous;
-                              console.log(msg.payload);
-                              const updatedMessages = messages.map(message => {
-                                if (message.id === id) {
-                                  return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
-                                }
-                                return message;
-                              });
-                              setMessages(updatedMessages);
-                              figma.closePlugin();
-                              resolve(); // Resolve the promise when the message is updated, no value needed
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-                        } else {
-                          console.log('Message not found.');
-                          reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
-                        }
-
-                    } else if (msg.type === 'update-prompt') {
-                        console.log("calling prompt from options");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                        figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+              figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
+  
+              // Listen for messages from the options.html iframe
+              figma.ui.onmessage = msg => {
+                  if (msg.type === 'edit-message') {
+                    console.log("calling edit from options");
+                      // Handle edit message action
+                      const messageToEdit = messages.find(message => message.id === id);
+                      if (messageToEdit && !messageToEdit.deleted) {
+                        // Open the UI modal with the message content
+                        console.log(messageToEdit.deleted)
+                        console.log("opening modal");
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
                         console.log("opened");
-
                         figma.ui.onmessage = msg => {
                           if (msg.type === 'update-message') {
-                                const updatedText = msg.payload.message;
-                                setPrompt(updatedText);
-                                figma.closePlugin();
-                                resolve(); 
-                              } else if (msg.type === 'cancel-edit') {
-                                console.log("canceled");
-                                reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                              } else if (msg.type === 'close-plugin') {
-                                console.log("closed");
-                                figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                                resolve(); // Optionally resolve the promise here, since the action is completed
+                            console.log("updated");
+                            // Process the updated message text
+                            const updatedText = msg.payload.message;
+                            const anonymous = msg.payload.anonymous;
+                            console.log(msg.payload);
+                            const updatedMessages = messages.map(message => {
+                              if (message.id === id) {
+                                return { ...message, text: updatedText, anonymous: anonymous, edited: true };
                               }
-                            };
+                              return message;
+                            });
+                            setMessages(updatedMessages);
+                            figma.closePlugin();
+                            resolve(); // Resolve the promise when the message is updated, no value needed
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
+                      } else {
+                        console.log('Message not found.');
+                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                      }
 
-                    } else if (msg.type === 'delete-message') {
-                        // Handle delete message action
-                        handleDeleteMessage(id);
-                        resolve();
-                    } else if (msg.type === 'pin-message') {
-                        // Handle pin message action
-                        handlePinMessage(id);
-                        resolve();
-                        
-                    } else if (msg.type === 'close-options') {
-                        // Handle closing the options iframe
-                        resolve();
-                    }
-                };
-            });
-        }
+                  } else if (msg.type === 'edit-user') {
+                    console.log("calling edit from options");
+                      // Handle edit message action
+                      const messageToEdit = messages.find(message => message.id === id);
+                      if (messageToEdit && !messageToEdit.deleted) {
+                        // Open the UI modal with the message content
+                        console.log(messageToEdit.deleted)
+                        console.log("opening modal");
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
+                        console.log("opened");
+                        figma.ui.onmessage = msg => {
+                          if (msg.type === 'update-message') {
+                            console.log("updated");
+                            // Process the updated message text
+                            const updatedText = msg.payload.message;
+                            const anonymous = msg.payload.anonymous;
+                            console.log(msg.payload);
+                            const updatedMessages = messages.map(message => {
+                              if (message.id === id) {
+                                return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
+                              }
+                              return message;
+                            });
+                            setMessages(updatedMessages);
+                            figma.closePlugin();
+                            resolve(); // Resolve the promise when the message is updated, no value needed
+                          } else if (msg.type === 'cancel-edit') {
+                            console.log("canceled");
+                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                          } else if (msg.type === 'close-plugin') {
+                            console.log("closed");
+                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                            resolve(); // Optionally resolve the promise here, since the action is completed
+                          }
+                        };
+                      } else {
+                        console.log('Message not found.');
+                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
+                      }
+
+                  } else if (msg.type === 'update-prompt') {
+                      console.log("calling prompt from options");
+                      figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+                      figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+                      console.log("opened");
+
+                      figma.ui.onmessage = msg => {
+                        if (msg.type === 'update-message') {
+                              const updatedText = msg.payload.message;
+                              setPrompt(updatedText);
+                              figma.closePlugin();
+                              resolve(); 
+                            } else if (msg.type === 'cancel-edit') {
+                              console.log("canceled");
+                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
+                            } else if (msg.type === 'close-plugin') {
+                              console.log("closed");
+                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
+                              resolve(); // Optionally resolve the promise here, since the action is completed
+                            }
+                          };
+
+                  } else if (msg.type === 'delete-message') {
+                      // Handle delete message action
+                      handleDeleteMessage(id);
+                      resolve();
+                  } else if (msg.type === 'pin-message') {
+                      // Handle pin message action
+                      handlePinMessage(id);
+                      resolve();
+                      
+                  } else if (msg.type === 'close-options') {
+                      // Handle closing the options iframe
+                      resolve();
+                  }
+              };
+          });
     };
 
 
@@ -938,7 +788,6 @@ function ChatWidget() {
               getMessageDepth={getMessageDepth}
               onPin={handlePinMessage}
               totalReplies={getTotalReplies(message.id)}
-              adminUsers={adminUsers}
               onUpvote={() => onUpvote(message.id)}
               onDownvote={()=> onDownvote(message.id)}
               onOptionsClick={() => handleOptionsClick(message.id)}
@@ -946,340 +795,365 @@ function ChatWidget() {
               getTotalDirectReplies = {(messageID) => getTotalDirectReplies(message.id)}
               messageFontSize={messageFontSize}
               widgetWidth={widgetWidth}
+              widgetButtonColor={widgetButtonColor}
           />
       ));
     };
 
 const handleOptionsClickChat = () => {
   updateUserName();
+  console.log("already logged in")
   console.log("in options:", userName);
-  if (isUserAuthorized(userName)) {
-    return new Promise<void>((resolve, reject) => {
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 125 });
-      //GOTO HERE
-      figma.ui.onmessage = msg => {
-        if (msg.type === 'update-prompt') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+  return new Promise((resolve, reject) => {
 
-          figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-          console.log("opened");
+    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+    figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
+    figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
+    figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
+    figma.ui.postMessage({ type: 'current-titleFontSize',      payload: titleFontSize });
+    figma.ui.postMessage({ type: 'current-borderColor',        payload: borderColor });
+    figma.ui.postMessage({ type: 'current-messageFontSize',    payload: messageFontSize });
+    figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
+    figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
+    figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+    console.log(widgetButtonColor);
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setPrompt(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
+    figma.ui.onmessage = msg => {
+      if (msg.type === 'update-prompt') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-        } else if (msg.type === 'update-width') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setPrompt(updatedText);
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-width') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedWidth = msg.payload.message;
-              setWidgetWidth(parseInt(updatedWidth, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-borderWidth') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedWidth = msg.payload.message;
+            setWidgetWidth(parseInt(updatedWidth, 10));
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-borderWidth') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedBorderWidth = msg.payload.message;
-              setBorderWidth(parseInt(updatedBorderWidth, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-titleFontSize') {
-          console.log("calling width from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedBorderWidth = msg.payload.message;
+            setBorderWidth(parseInt(updatedBorderWidth, 10));
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-titleFontSize') {
+        console.log("calling width from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedTitleFontSize = msg.payload.message;
-              setTitleFontSize(parseInt(updatedTitleFontSize, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-borderColor') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedTitleFontSize = msg.payload.message;
+            setTitleFontSize(parseInt(updatedTitleFontSize, 10));
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-borderColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setBorderColor(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-messageFontSize') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setBorderColor(updatedText);
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-messageFontSize') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedMessageFontSize = msg.payload.message;
-              setMessageFontSize(parseInt(updatedMessageFontSize, 10));
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'update-promptColor') {
-          console.log("calling prompt from options");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+        figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
+        console.log("opened");
 
-          figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-          console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedMessageFontSize = msg.payload.message;
+            setMessageFontSize(parseInt(updatedMessageFontSize, 10));
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-promptColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-          figma.ui.onmessage = msg => {
-            if (msg.type === 'update-message') {
-              const updatedText = msg.payload.message;
-              setPromptColor(updatedText);
-              figma.closePlugin();
-              resolve();
-            } else if (msg.type === 'cancel-edit') {
-              console.log("canceled");
-              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-            } else if (msg.type === 'close-plugin') {
-              console.log("closed");
-              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-              resolve(); // Optionally resolve the promise here, since the action is completed
-            } else if (msg.type === 'back-action') {
-              console.log("back");
-              handleOptionsClickChat();
-            }
-          };
-        } else if (msg.type === 'close-options') {
-          // Handle closing the options iframe
-          resolve();
-        }
-      };
-    });
-  }
-};
+        figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+        console.log("opened");
 
-    
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setPromptColor(updatedText);
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-widgetButtonColor') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
 
-    
+        figma.ui.postMessage({ type: 'edit-widgetButtonColor', payload: widgetButtonColor });
+        console.log("opened");
 
-    return (
-      /*
-      <AutoLayout 
-          direction="horizontal" 
-          spacing={210}//changed from 100
-          padding={8} 
-          stroke={inputActive ? "#007AFF" : "#DADCE0"} // Set the border color to blue by default
-          strokeWidth={1} 
-          cornerRadius={4} 
-      >
-        <Input
-            placeholder={inputPlaceholder}
-            value={newMessage}
-            onTextEditEnd={(e) => setNewMessage(e.characters)}
-        />
-        <AutoLayout // Send button with additional styling
-            fill="#007AFF"
-            padding={8}
-            cornerRadius={4}
-            onClick={handleAddMessage}
-        >
-            <Text fontSize={14} fill="#FFFFFF">Send</Text>
-        </AutoLayout>
-      
-       
-      
-    </AutoLayout>*/
-    <AutoLayout
-      direction="vertical"
-      spacing={getWidgetValue(8)}
-      padding={borderWidth}
-      stroke="#efefef"
-      strokeWidth={getWidgetValue(2)}
-      cornerRadius={getWidgetValue(10)}
-      onClick={updateUserName}
-      minWidth={widgetWidth}
-      fill={borderColor}
-    >
-    <AutoLayout
-      direction="vertical"
-      spacing={8}
-      padding={borderWidth}
-      stroke="#efefef"
-      strokeWidth={getWidgetValue(2)}
-      cornerRadius={getWidgetValue(10)}
-      onClick={updateUserName}
-      minWidth={widgetWidth}
-      fill={'#FFFFFF'}
-    >
-      
-    
-      
-        {/* <AutoLayout direction="vertical" spacing={8} padding={8} onClick={updateUserName}>
-          <AutoLayout
-            direction="horizontal"
-            onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
-            fill="#007AFF" // Example button styling
-            padding={8}
-            cornerRadius={100}
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setWidgetButtonColor(updatedText);
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+            handleOptionsClickChat();
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'update-widgetCornerRadius') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+
+        figma.ui.postMessage({ type: 'edit-widgetCornerRadius', payload: widgetCornerRadius });
+        console.log("opened");
+
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setWidgetCornerRadius(updatedText);
+            alreadyLoggedIn = true;
+            thenFlag = true;
+            resolve(thenFlag);
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            figma.closePlugin();
+            thenFlag = false;
+            resolve(thenFlag);
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
+      } else if (msg.type === 'close-options') {
+        // Handle closing the options iframe
+        thenFlag = false;
+        resolve(thenFlag);
+      }};
+  }).then((thenFlag) => {
+    if (thenFlag) {
+      console.log("entering");
+      figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
+      figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
+      figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
+      figma.ui.postMessage({ type: 'current-titleFontSize',      payload: titleFontSize });
+      figma.ui.postMessage({ type: 'current-borderColor',        payload: borderColor });
+      figma.ui.postMessage({ type: 'current-messageFontSize',    payload: messageFontSize });
+      figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
+      figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
+      figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+      console.log(widgetCornerRadius);
+      console.log("post_message");
+      handleOptionsClickChat();
+    }
+    console.log("thenFlag:", thenFlag)});
+  };
+  return (
+  <AutoLayout
+    direction="vertical"
+    spacing={getWidgetValue(8)}
+    padding={borderWidth}
+    stroke="#efefef"
+    strokeWidth={getWidgetValue(2)}
+    cornerRadius={getWidgetValue(widgetCornerRadius)}
+    onClick={updateUserName}
+    minWidth={widgetWidth}
+    fill={'#efefef'}
+  >
+  <AutoLayout
+    direction="vertical"
+    spacing={8}
+    padding={borderWidth}
+    stroke="#efefef"
+    strokeWidth={getWidgetValue(2)}
+    cornerRadius={getWidgetValue(widgetCornerRadius)}
+    onClick={updateUserName}
+    minWidth={widgetWidth}
+    fill={'#FFFFFF'}
+  >
+      <AutoLayout
+              cornerRadius={getWidgetValue(4)}
+              padding={{ top: getWidgetValue(15), bottom: getWidgetValue(2), left: getWidgetValue(770), right: getWidgetValue(10) }}
+              onClick={handleOptionsClickChat}
           >
-            <AutoLayout padding={2}>
-            <SVG src={plus}></SVG>
-            </AutoLayout>
-
-            <Text fill="#FFFFFF">Add Message  </Text>
-          </AutoLayout>
-        </AutoLayout> */}
-        <AutoLayout
-                //fill="#007AFF"
-                cornerRadius={getWidgetValue(4)}
-                padding={{ top: getWidgetValue(15), bottom: getWidgetValue(2), left: getWidgetValue(770), right: getWidgetValue(10) }}
+              <SVG
+                src={adminI}
                 onClick={handleOptionsClickChat}
-            >
-                <SVG
-                  src={adminI}
-                  onClick={handleOptionsClickChat}
-                />
-
-
-        </AutoLayout>
-
-        <AutoLayout
-          padding={{ top: 0, bottom: getWidgetValue(20), left: getWidgetValue(20) }}
+              />
+      </AutoLayout>
+      <AutoLayout
+        padding={{ top: 0, bottom: getWidgetValue(20), left: getWidgetValue(20) }}
+      >
+        <Text
+        fill={promptColor}
+        fontSize={getWidgetValue(titleFontSize)}
+        fontWeight={700}
+        width={getWidgetValue(770)}
+        lineHeight={getWidgetValue(65)}
         >
-          <Text
-          fill={promptColor}
-          fontSize={getWidgetValue(titleFontSize)}
-          fontWeight={700}
-          width={getWidgetValue(770)}
-          lineHeight={getWidgetValue(65)}
-          >
-            {inPrompt ? inPrompt : 'Chat'}
-          </Text>
-        </AutoLayout>
+          {inPrompt ? inPrompt : 'Chat'}
+        </Text>
+      </AutoLayout>
+      <AutoLayout
+          direction="vertical"
+          spacing={getWidgetValue(1)}
+          padding={getWidgetValue(8)}
+          stroke="#efefef"
+          cornerRadius={getWidgetValue(10)}
+          minWidth={getWidgetValue(480)}
+      >
+          {renderMessages()}
+      </AutoLayout>
 
-
-
+      <AutoLayout direction="vertical" spacing={getWidgetValue(8)} padding={getWidgetValue(8)} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={widgetWidth}>
         <AutoLayout
-            direction="vertical"
-            spacing={getWidgetValue(1)} //changed from 10
-            padding={getWidgetValue(8)}
-            stroke="#efefef"
-            cornerRadius={getWidgetValue(10)}
-            minWidth={getWidgetValue(480)}
+          direction="horizontal"
+          onClick={openMessageInputModal}
+          fill={widgetButtonColor}
+          padding={getWidgetValue(10)}
+          cornerRadius={getWidgetValue(100)}
         >
-            {renderMessages()}
-        </AutoLayout>
-
-        <AutoLayout direction="vertical" spacing={getWidgetValue(8)} padding={getWidgetValue(8)} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={widgetWidth}>
-          <AutoLayout
-            direction="horizontal"
-            onClick={openMessageInputModal} // Use an AutoLayout, Frame, or similar widget as a button
-            fill="#007AFF" // Example button styling
-            padding={getWidgetValue(10)}
-            cornerRadius={getWidgetValue(100)}
-            
-          >
-            <AutoLayout padding={getWidgetValue(8)}>
-            <SVG src={plus} width={getWidgetValue(30)} height={getWidgetValue(30)}></SVG>
-            </AutoLayout>
-
-            <Text fontSize={getWidgetValue(36)} fill="#FFFFFF">Add Message  </Text>
+          <AutoLayout padding={getWidgetValue(8)}>
+          <SVG src={plus} width={getWidgetValue(30)} height={getWidgetValue(30)}></SVG>
           </AutoLayout>
-          {/* Remaining UI elements, like the message display area */}
+          <Text fontSize={getWidgetValue(36)} fill="#FFFFFF">Add Message  </Text>
         </AutoLayout>
       </AutoLayout>
+    </AutoLayout>
 
-      </AutoLayout>
-    );
+    </AutoLayout>
+  );
 }
 
 
-function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, adminUsers, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth, widgetButtonColor}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -1319,15 +1193,10 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
 
   // Define the style for the message bubble
   const messageStyle = {
-    fill: isBeingRepliedTo ? "#007AFF" : "#FFFFFF", // Blue if being replied to, otherwise white
+    fill: isBeingRepliedTo ? widgetButtonColor : "#FFFFFF", // Blue if being replied to, otherwise white
     color: isBeingRepliedTo ? "#000000" : "#000000", // Text color white if being replied to, otherwise black
-    extra: isBeingRepliedTo ? "#007AFF" : "#f0f0f0", // Text color white if being replied to, otherwise black
+    extra: isBeingRepliedTo ? widgetButtonColor : "#f0f0f0", // Text color white if being replied to, otherwise black
   };
-
-  
-
-  // Log the message style for debugging
-  //console.log(messageStyle);
 
   //variable to hide the delete and edit buttons
   const isCurrentUserMessage = message.sender === user;
@@ -1340,41 +1209,17 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const messageDepth = getMessageDepth(message.id);
   const score = message.upvotedUsers.length - message.downvotedUsers.length;
 
-
-
-
-  //const isUpvoted = message.upvotedUsers.has(user);
-  var admin = false;
-  console.log("USER:" , user);
-  if (adminUsers.has(user)){
-    console.log("inside", admin);
-    admin = true;
-  }
-
-
   // Adjust the right padding based on the message depth
   var adjustedRightPadding = getWidgetValue(160);
   if (messageDepth == 0){
     adjustedRightPadding = getWidgetValue(160);
   }
 
-
-  //debugging
-  //console.log("edited", isEdited);
-  //console.log("user", user);
-  //console.log("sender", message.sender);
-  //console.log(isCurrentUserMessage);
-
-  //show the sow replies button or not
   var repliesAvaliable = false;
   if(messageDepth >= 1){
     repliesAvaliable = true;
   }
 
-  //console.log("users upvoted", message.upvotedUsers);
-
-
-  
   var showNoRepliesDeleted = true;
   if(message.text == "this message has been deleted"){
     showNoRepliesDeleted = false;
@@ -1436,9 +1281,8 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             </Text>
           </AutoLayout>
 
-          {message.text != "this message has been deleted" && admin && (
+          {message.text != "this message has been deleted" && (
             <AutoLayout
-                //fill="#007AFF"
                 cornerRadius={4}
                 padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(8), right: getWidgetValue(8) }}
                 onClick={onOptionsClick}
@@ -1492,11 +1336,9 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                     //padding={{ top: 6, bottom: 6, left: 8, right: 8 }}
                 >
                 <AutoLayout
-                    //fill="#FFFFFF"
                     cornerRadius={getWidgetValue(200)}
                     padding={{ top: getWidgetValue(14), bottom: getWidgetValue(4), left: getWidgetValue(10), right: getWidgetValue(10) }}
                     onClick={() => onUpvote()}
-                    //stroke={"007AFF"}
                 >
                   <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> </Text>
                   <SVG
@@ -1535,13 +1377,13 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
 
           { message.text != "this message has been deleted" && (
           <AutoLayout // Reply button with additional padding
-            fill="#007AFF"
+            fill={widgetButtonColor}
             cornerRadius={getWidgetValue(200)}
             padding={{ top: getWidgetValue(8), bottom: isDeleted ? 0 : getWidgetValue(8), left: getWidgetValue(10), right: getWidgetValue(10) }} // Increased padding for the button
             onClick={onReply}
 
           >
-            <Text fontSize={getWidgetValue(25)} fill="#007AFF"> </Text>
+            <Text fontSize={getWidgetValue(25)} fill={widgetButtonColor}> </Text>
             <SVG
             
               src={replyIconSrc}
@@ -1562,27 +1404,22 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           >
             { message.showReplies && (
               <AutoLayout
-              //fill="#FFFFFF"
               cornerRadius={getWidgetValue(4)}
               padding={{ top: getWidgetValue(6), bottom: getWidgetValue(6), left: 0, right: 0 }}
               onClick={onShowReplies}
-              //stroke={"007AFF"}
               >
                 <SVG
                     src={repliesup}
                     onClick={onShowReplies}
-                    //stroke={"007AFF"}
                   />
               </AutoLayout>
             )}
               
             { !message.showReplies && (
               <AutoLayout
-              //fill="#FFFFFF"
               cornerRadius={4}
               padding={{ top: getWidgetValue(6), bottom: getWidgetValue(6), left: 0, right: 0 }}
               onClick={onShowReplies}
-              //stroke={"007AFF"}
               >
                 <SVG
                   src={repliesdown}
@@ -1590,31 +1427,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                 />  
               </AutoLayout>  
             )}
-            
-            <Text fontSize={getWidgetValue(25)} fill={message.showReplies ? '#007AFF' : '#007AFF'}>  {totalReplies} Replies </Text>
-            
+            <Text fontSize={getWidgetValue(25)} fill={widgetButtonColor}>  {totalReplies} Replies </Text>
           </AutoLayout>
           )}
-
-          
-          
-
-
-
-
-
         </AutoLayout>
-        
-        
-        
-
       </AutoLayout>
-
-      
       {message.showReplies && replyChain && (
         <AutoLayout
           direction="vertical"
-          //spacing={-100} // Adjusted space between reply chains
           width={"fill-parent"}
           padding={{ top: isDeleted ? 0 : getWidgetValue(10), bottom: isDeleted ? 0 : getWidgetValue(10), left: getWidgetValue(32), right: getWidgetValue(8) }}
         >
@@ -1626,8 +1446,5 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
 
   );
 }
-
-  
-  
 
 widget.register(ChatWidget);
