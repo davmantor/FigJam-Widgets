@@ -3,6 +3,7 @@
 // 1. EditableText: Handles displaying and editing of a single text entry.
 // 2. PollingWidget: Manages the overall layout and state, including submission of the text entry.
 // test
+//a
 const { widget } = figma
 const { useSyncedState, AutoLayout, Input, Text, SVG, Frame } = widget
 
