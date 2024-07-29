@@ -12,10 +12,12 @@ interface EditableTextProps {
   initialValue: string; // The initial text to show in the component.
   onValueChange: (index: number, newValue: string) => void; // What to do when the text changes.
   isEditable: boolean; // Can we edit this text?
+  fill: string;
+  placeholder?: string;
 }
 
 // This component can either let you edit text or just show you the text.
-function EditableText({ index, initialValue, onValueChange, isEditable }: EditableTextProps) {
+function EditableText({ index, initialValue, onValueChange, isEditable, fill, placeholder}: EditableTextProps) {
   // 'isEditing' tracks if we're currently editing text. 'setIsEditing' changes this status.
   const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
   // 'inputValue' holds the current text. 'setInputValue' updates this text.
@@ -37,7 +39,7 @@ function EditableText({ index, initialValue, onValueChange, isEditable }: Editab
       {isEditing && isEditable ? (
         <Input
           value={inputValue}  // Show the current text.
-          placeholder="Enter option"  // Placeholder when nothing is typed yet.
+          placeholder={placeholder || "Enter option"}  // Placeholder when nothing is typed yet.
           onTextEditEnd={(e) => {
             setInputValue(e.characters);
             setIsEditing(false);
@@ -47,7 +49,7 @@ function EditableText({ index, initialValue, onValueChange, isEditable }: Editab
         />
       ) : (
         <AutoLayout spacing={8} verticalAlignItems={'center'}>
-          <Text fontSize={16}>{inputValue || "Enter option"}</Text>
+          <Text fontSize={16}>{inputValue || placeholder || "Enter option"}</Text>
           {isEditable && (
             <SVG
               src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -103,6 +105,26 @@ function PollingWidget() {
       fill={'#FFFFFF'}  // Background color.
       stroke={'#E6E6E6'}  // Border color.
     >
+            <AutoLayout
+      fill={'#808080'}
+      stroke={'#E7E7E7'}
+      direction="vertical"
+
+        spacing={12}
+        padding={12}
+        cornerRadius={8}
+
+      >
+      <EditableText
+              key={-1}
+              index={-1}
+          initialValue={''}
+          onValueChange={handleValueChange}
+          isEditable={!isSubmitted}
+          placeholder="Enter poll question here"
+          fill={'FF0000'}
+        />
+        </AutoLayout>
       {textArray.map((item, index) => (
         <EditableText
           key={index}
@@ -110,8 +132,10 @@ function PollingWidget() {
           initialValue={item.initialValue}
           onValueChange={handleValueChange}
           isEditable={!isSubmitted}
+          fill={'FFFFFF'}
         />
       ))}
+
       {!isSubmitted && (
       <SVG
         src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
