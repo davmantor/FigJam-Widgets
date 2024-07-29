@@ -12,6 +12,9 @@ interface EditableTextProps {
   onValueChange: (newValue: string) => void // What to do when the text changes.
   isEditable: boolean // Can we edit this text?
 }
+const textArray: EditableTextProps[] = [
+
+]
 
 // This component can either let you edit text or just show you the text.
 function EditableText({ initialValue, onValueChange, isEditable }: EditableTextProps) {
@@ -31,8 +34,7 @@ function EditableText({ initialValue, onValueChange, isEditable }: EditableTextP
       padding={8}  // Space around the edges inside.
       cornerRadius={4}  // Rounded corners of the border.
       stroke={isEditing ? '#24CE16' : '#E6E6E6'}  // Border color changes when editing.
-      strokeWidth={2}  // How thick the border is.
-      //index * 0 is just a test
+      strokeWidth={2}  // How thick the border is
       
     >
       {isEditing && isEditable ? (
@@ -78,6 +80,7 @@ function PollingWidget() {
   // Keep track of the text and whether the form has been submitted.
   const [inputValue, setInputValue] = useSyncedState('inputValue', '')
   const [isSubmitted, setIsSubmitted] = useSyncedState('isSubmitted', false)
+  const [textArray, setTextArray] = useSyncedState('textArray', { initialValue: "test", onValueChange: () => {}, isEditable: true})
 
   // Handles what happens when text changes.
   const handleValueChange = (newValue: string) => {
@@ -89,8 +92,15 @@ function PollingWidget() {
     setIsSubmitted(true)  // Mark the form as submitted.
   }
 
-  // How our widget is laid out.
+  const handleAddTextField = () => {
+    const newTextArray = [...textArray, { initialValue: "addedtest", onValueChange: () => {}, isEditable: true}]
+    setTextArray(newTextArray);
+  }
+
+
+  // How our widget is laid out
   return (
+   // textArray.map(() => (
     <AutoLayout
       direction="vertical"  // Stack elements vertically.
       verticalAlignItems="start"  // Align items to the start.
@@ -100,19 +110,23 @@ function PollingWidget() {
       fill={'#FFFFFF'}  // Background color.
       stroke={'#E6E6E6'}  // Border color.
     >
-      <EditableText
+      
+      <EditableText //remove hardcode so that handleAddTextField {} adds a new instance of this, use array and map
         initialValue={inputValue}
         onValueChange={handleValueChange}
         isEditable={!isSubmitted}
       />
-                              <SVG
-                src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="30" height="30" rx="15" fill="white"/>
-                        <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
-                        <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-                      </svg>`}
-              />
+       <SVG
+      src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+       <rect width="30" height="30" rx="15" fill="white"/>
+       <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
+       <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+       </svg>`}
+       onClick={handleAddTextField }
+      />
+      
       {!isSubmitted && (
+        <AutoLayout>
         <Frame
           width={100}  // Width of the button.
           height={32}  // Height of the button.
@@ -120,13 +134,14 @@ function PollingWidget() {
           fill="#24CE16"  // Color of the button.
           onClick={handleSubmit}  // What to do when clicked.
         >
-
           <Text fontSize={14} fill="#FFFFFF">
             Submit
           </Text>
         </Frame>
+        </AutoLayout>
       )}
     </AutoLayout>
+   // ))
   )
 }
 
