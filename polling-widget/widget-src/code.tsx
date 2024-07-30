@@ -11,13 +11,13 @@ interface EditableTextProps {
   initialValue: string; // The initial text to show in the component.
   onValueChange: (index: number, newValue: string) => void; // What to do when the text changes.
   isEditable: boolean; // Can we edit this text?
+  votes: number;
   fill?: string;
   placeholder?: string;
 }
 
 // This component can either let you edit text or just show you the text.
-function EditableText({ index, initialValue, onValueChange, isEditable, fill, placeholder }: EditableTextProps) {
-  // 'isEditing' tracks if we're currently editing text. 'setIsEditing' changes this status.
+function EditableText({ index, initialValue, onValueChange, isEditable, votes, fill, placeholder }: EditableTextProps) {
   const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
   // 'inputValue' holds the current text. 'setInputValue' updates this text.
   const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, initialValue);
@@ -57,6 +57,12 @@ function EditableText({ index, initialValue, onValueChange, isEditable, fill, pl
           >
             {inputValue || placeholder || "Enter option"}
           </Text>
+          <Text
+            fontSize={14} >
+            {isFirstTextEntry? '' : votes}
+            
+          </Text>
+          
           {isEditable && (
             <SVG
               src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,9 +81,9 @@ function EditableText({ index, initialValue, onValueChange, isEditable, fill, pl
 function PollingWidget() {
   // Keep track of the text and whether the form has been submitted.
   const [isSubmitted, setIsSubmitted] = useSyncedState('isSubmitted', false);
-  const [textArray, setTextArray] = useSyncedState('textArray', [
-    { initialValue: "", isEditable: true }
-  ]);
+  const [textArray, setTextArray] = useSyncedState('textArray', [{ initialValue: "", isEditable: true }]);
+  const [voteArray, setVoteArray] = useSyncedState('voteArray', [0]);
+  const [userName, setUserName] = useSyncedState<string>("userName", "");
 
   // Handles what happens when text changes.
   const handleValueChange = (index: number, newValue: string) => {
@@ -96,9 +102,23 @@ function PollingWidget() {
     setTextArray(textArray.map(item => ({ ...item, isEditable: false })));
   };
 
+
+
+  const handleVote = (index: number) => {
+    if (isSubmitted) {
+      const updatedVoteArray = [...voteArray];
+      updatedVoteArray[index] = updatedVoteArray[index] + 1;
+      setVoteArray(updatedVoteArray);
+      const name = figma.currentUser?.name || "User";
+      setUserName(name);
+    }
+  };
+
   const handleAddTextField = () => {
     const newTextArray = [...textArray, { initialValue: "", isEditable: true }];
+    const newVoteArray = [...voteArray, 0];
     setTextArray(newTextArray);
+    setVoteArray(newVoteArray);
   };
 
   // How our widget is laid out
@@ -125,19 +145,24 @@ function PollingWidget() {
           initialValue={''}
           onValueChange={handleValueChange}
           isEditable={!isSubmitted}
+          votes={0}
           placeholder="Enter poll question here"
-          fill={'FF0000'}
         />
       </AutoLayout>
       {textArray.map((item, index) => (
-        <EditableText
-          key={index}
-          index={index}
-          initialValue={item.initialValue}
-          onValueChange={handleValueChange}
-          isEditable={!isSubmitted}
-          fill={'FFFFFF'}
-        />
+        <AutoLayout
+          onClick={() => isSubmitted ? handleVote(index) : undefined}
+        >
+          <EditableText
+             key={index}
+            index={index}
+            initialValue={item.initialValue}
+            onValueChange={handleValueChange}
+            isEditable={!isSubmitted}
+            votes={voteArray[index]}
+            fill={'#FFFFFF'} 
+          />
+        </AutoLayout>
       ))}
 
       {!isSubmitted && (
