@@ -83,7 +83,7 @@ function Widget() {
       const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
       try {
-        const res = await fetch('http://localhost:3001/add-response', {
+        const res = await fetch('https://figjam-widgets-gy8v.onrender.com/add-response', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ function Widget() {
   
     // Update showPrevious to false
     try {
-      const res = await fetch('http://localhost:3001/reset-widget', {
+      const res = await fetch('https://figjam-widgets-gy8v.onrender.com/reset-widget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -146,7 +146,7 @@ function Widget() {
     const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
     try {
-      const res = await fetch('http://localhost:3001/submit', {
+      const res = await fetch('https://figjam-widgets-gy8v.onrender.com/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -173,7 +173,7 @@ function Widget() {
     const data = { widgetId: currentWidgetId };
 
     try {
-      const res = await fetch('http://localhost:3001/refresh', {
+      const res = await fetch('https://figjam-widgets-gy8v.onrender.com/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -195,7 +195,7 @@ function Widget() {
   const handleRevealAll = async () => {
     const data = { widgetId: widgetId ?? "" };
     try {
-      const res = await fetch('http://localhost:3001/reveal-all', {
+      const res = await fetch('https://figjam-widgets-gy8v.onrender.com/reveal-all', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
