@@ -1,113 +1,440 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Figma Widget Admin</title>
+  <title>Admin Menu</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #f0f0f0;
+      background-color: #f9f9f9;
+      color: #333;
     }
     .container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 400px;
-      align-items: center;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      align-items: flex-start;
+      width: 800px;
+      height: 400px;
+      overflow-y: auto;
     }
-    .hidden {
-      display: none;
-    }
-    textarea {
-      width: 100%;
-      max-width: 100%;
-      min-height: 50px;
-      resize: vertical;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      align-self: center;
-      padding: 10px 20px;
-      border: none;
+    .button {
       background-color: #007BFF;
       color: white;
-      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 50px;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
+      font-size: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    button:hover {
+    .button:hover {
       background-color: #0056b3;
     }
-    input[type="password"], input[type="number"] {
+    .label {
+      font-size: 18px;
+      margin: 10px 0 5px;
+    }
+    .input {
       padding: 10px;
+      margin: 5px 0 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
       width: 100%;
       box-sizing: border-box;
+      font-size: 16px;
+    }
+    .input-small {
+      width: 30%;
+    }
+    .input-large {
+      width: 100%;
+      height: 100px; /* Increase the height as needed */
+    }
+    .input-label {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .new-response {
+      display: flex;
+      flex-direction: column;
+      background-color: #f1f1f1;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+    }
+    #adminMenu {
+      display: none;
+    }
+    #passwordScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .response-container {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0;
+      width: 100%;
+    }
+    .response-item {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+    .response-header {
+      cursor: pointer;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .response-content {
+      display: none;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+    #widgetIdDisplay {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="password-container">
-    <input type="password" id="password" placeholder="Enter password">
-    <button id="submit-password">Submit</button>
+  <div id="passwordScreen">
+    <label class="label" for="passwordInput">Enter Password:</label>
+    <input class="input" type="password" id="passwordInput">
+    <button class="button" id="submitPasswordButton">Submit</button>
   </div>
-  <div class="container hidden" id="main-container">
-    <textarea id="response-textarea" class="hidden" placeholder="Enter text"></textarea>
-    <button id="refresh-button">Refresh</button>
-    <button id="reveal-all-button">Reveal All</button>
-    <input type="number" id="width" placeholder="Width">
-    <input type="number" id="height" placeholder="Height">
-    <button id="resize-button">Resize</button>
-    <button id="close-button">Close</button>
+  
+  <div id="widgetIdDisplay">Widget ID: </div>
+  
+  <div class="container" id="adminMenu">
+    <button class="button" id="refreshButton">Refresh</button>
+    <button class="button" id="revealAllButton">Reveal All</button>
+    <button class="button" id="resetResponseButton">Reset Response</button>
+    <div>
+      <label class="label" for="widthInput">Width:</label>
+      <input class="input" type="number" id="widthInput" value="800">
+    </div>
+    <div>
+      <label class="label" for="heightInput">Height:</label>
+      <input class="input" type="number" id="heightInput" value="400">
+    </div>
+    <div>
+      <label class="label" for="borderColorInput">Border Color:</label>
+      <input class="input" type="color" id="borderColorInput" value="#000000">
+    </div>
+    <div>
+      <label class="label" for="borderWidthInput">Border Width:</label>
+      <input class="input" type="number" id="borderWidthInput" value="1">
+    </div>
+    <div>
+      <label class="label" for="fontSizeInput">Font Size:</label>
+      <input class="input" type="number" id="fontSizeInput" value="16">
+    </div>
+    <div class="new-response">
+      <label class="label" for="newResponseInput">New Response:</label>
+      <input class="input input-large" type="text" id="newResponseInput">
+      <label class="label" for="newUserNameInput">User Name:</label>
+      <input class="input input-small" type="text" id="newUserNameInput">
+      <button class="button" id="addResponseButton">Add Response</button>
+      
+    </div>
+    <div id="previousResponsesContainer" class="response-container"></div>
   </div>
-  <script>
-    const password = 'yourpassword'; // Change this to the desired password
 
-    document.getElementById('submit-password').onclick = () => {
-      const inputPassword = document.getElementById('password').value;
-      if (inputPassword === password) {
-        document.getElementById('password-container').classList.add('hidden');
-        document.getElementById('main-container').classList.remove('hidden');
-      } else {
-        alert('Incorrect password');
+  <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); z-index: 1000;">
+    <p>Unsaved changes! Do you want to save them?</p>
+    <button class="button" id="popupSaveButton">Save</button>
+    <button class="button" id="popupCancelButton">Cancel</button>
+  </div>
+  
+  <script>
+    const refreshButton = document.getElementById('refreshButton');
+    const revealAllButton = document.getElementById('revealAllButton');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const borderColorInput = document.getElementById('borderColorInput');
+    const borderWidthInput = document.getElementById('borderWidthInput');
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    const passwordScreen = document.getElementById('passwordScreen');
+    const adminMenu = document.getElementById('adminMenu');
+    const submitPasswordButton = document.getElementById('submitPasswordButton');
+    const passwordInput = document.getElementById('passwordInput');
+    const previousResponsesContainer = document.getElementById('previousResponsesContainer');
+    const newResponseInput = document.getElementById('newResponseInput');
+    const newUserNameInput = document.getElementById('newUserNameInput');
+    const addResponseButton = document.getElementById('addResponseButton');
+    const popup = document.getElementById('popup');
+    const popupSaveButton = document.getElementById('popupSaveButton');
+    const popupCancelButton = document.getElementById('popupCancelButton');
+    const widgetIdDisplay = document.getElementById('widgetIdDisplay');
+    const resetResponseButton = document.getElementById('resetResponseButton');
+
+    let widgetId;
+    let unsavedResponse = null;
+    let unsavedUserName = null;
+    let currentEditingIndex = null;
+    
+    window.onmessage = (event) => {
+      const { type, widgetId: receivedWidgetId } = event.data.pluginMessage;
+      if (type === 'initialize') {
+        widgetId = receivedWidgetId;
+        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+        fetchPreviousResponses();
       }
     };
 
-    document.getElementById('refresh-button').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'refresh' } }, '*');
+    submitPasswordButton.onclick = () => {
+      const password = passwordInput.value;
+      if (password === '312cmpm15') {
+        passwordScreen.style.display = 'none';
+        adminMenu.style.display = 'flex';
+        fetchPreviousResponses();
+      } else {
+        alert('Incorrect password, please try again.');
+      }
     };
 
-    document.getElementById('reveal-all-button').onclick = () => {
+    resetResponseButton.onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'resetResponse' } }, '*');
+    };
+    
+    refreshButton.onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'refresh' } }, '*');
+      fetchPreviousResponses();
+    };
+
+    revealAllButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
     };
 
-    document.getElementById('resize-button').onclick = () => {
-      const width = parseInt(document.getElementById('width').value, 10);
-      const height = parseInt(document.getElementById('height').value, 10);
-      parent.postMessage({ pluginMessage: { type: 'resize', width, height } }, '*');
+    widthInput.onchange = (event) => {
+      const width = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'resize', width, height: parseInt(heightInput.value, 10) } }, '*');
     };
 
-    document.getElementById('close-button').onclick = () => {
-      const responseText = document.getElementById('response-textarea').value;
-      parent.postMessage({ pluginMessage: { type: 'updateText', text: responseText } }, '*');
-      parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+    heightInput.onchange = (event) => {
+      const height = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'resize', width: parseInt(widthInput.value, 10), height } }, '*');
     };
+
+    borderColorInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateBorderColor', color: event.target.value } }, '*');
+    };
+
+    borderWidthInput.onchange = (event) => {
+      const width = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'updateBorderWidth', width } }, '*');
+    };
+
+    fontSizeInput.onchange = (event) => {
+      const size = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'updateFontSize', size } }, '*');
+    };
+
+    addResponseButton.onclick = () => {
+      const newResponse = newResponseInput.value.trim();
+      const newUserName = newUserNameInput.value.trim();
+      if (newResponse && newUserName) {
+        addResponse(newResponse, newUserName);
+      } else {
+        alert('Both response and user name are required.');
+      }
+    };
+
+    function fetchPreviousResponses() {
+      console.log('Fetching previous responses for widgetId:', widgetId);
+      fetch('http://localhost:3001/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'updated' || data.status === 'new') {
+          widgetId = data.widget.widgetId;
+          previousResponsesContainer.innerHTML = '';
+          data.widget.previous.forEach((response, index) => {
+            const responseItem = document.createElement('div');
+            responseItem.className = 'response-item';
+
+            const responseHeader = document.createElement('div');
+            responseHeader.className = 'response-header';
+            responseHeader.innerText = `Response from ${response.userName}`;
+            responseHeader.onclick = () => {
+              handleUnsavedChanges(index, responseHeader);
+            };
+
+            const responseContent = document.createElement('div');
+            responseContent.className = 'response-content';
+
+            const userNameLabel = document.createElement('label');
+            userNameLabel.className = 'input-label';
+            userNameLabel.innerText = 'User Name:';
+
+            const userNameInput = document.createElement('input');
+            userNameInput.className = 'input input-small';
+            userNameInput.type = 'text';
+            userNameInput.value = response.userName;
+            userNameInput.oninput = (event) => {
+              unsavedUserName = event.target.value;
+              unsavedResponse = responseInput.value;
+              currentEditingIndex = index;
+            };
+
+            const responseLabel = document.createElement('label');
+            responseLabel.className = 'input-label';
+            responseLabel.innerText = 'Response:';
+
+            const responseInput = document.createElement('input');
+            responseInput.className = 'input input-large';
+            responseInput.type = 'text';
+            responseInput.value = response.response;
+            responseInput.oninput = (event) => {
+              unsavedResponse = event.target.value;
+              unsavedUserName = userNameInput.value;
+              currentEditingIndex = index;
+            };
+
+            const saveButton = document.createElement('button');
+            saveButton.className = 'button';
+            saveButton.innerText = 'Save';
+            saveButton.onclick = () => {
+              updateResponse(index, responseInput.value, userNameInput.value);
+              unsavedResponse = null;
+              unsavedUserName = null;
+              currentEditingIndex = null;
+            };
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'button';
+            deleteButton.innerText = 'Delete';
+            deleteButton.onclick = () => deleteResponse(index);
+
+            responseContent.appendChild(userNameLabel);
+            responseContent.appendChild(userNameInput);
+            responseContent.appendChild(responseLabel);
+            responseContent.appendChild(responseInput);
+            responseContent.appendChild(saveButton);
+            responseContent.appendChild(deleteButton);
+
+            responseItem.appendChild(responseHeader);
+            responseItem.appendChild(responseContent);
+
+            previousResponsesContainer.appendChild(responseItem);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching previous responses:', error);
+      });
+    }
+
+    function handleUnsavedChanges(index, responseHeader) {
+      if (unsavedResponse !== null && currentEditingIndex !== index) {
+        popup.style.display = 'block';
+        popupSaveButton.onclick = () => {
+          updateResponse(currentEditingIndex, unsavedResponse, unsavedUserName);
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+          popup.style.display = 'none';
+          showResponseContent(responseHeader);
+        };
+        popupCancelButton.onclick = () => {
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+          popup.style.display = 'none';
+          showResponseContent(responseHeader);
+        };
+      } else {
+        showResponseContent(responseHeader);
+      }
+    }
+
+    function showResponseContent(responseHeader) {
+      const responseContent = responseHeader.nextElementSibling;
+      responseContent.style.display = responseContent.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function addResponse(response, userName) {
+      fetch('http://localhost:3001/add-response', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId, response, userName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'added') {
+          fetchPreviousResponses();
+          newResponseInput.value = '';
+          newUserNameInput.value = '';
+        } else {
+          console.error('Failed to add response');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding response:', error);
+      });
+    }
+
+    function updateResponse(index, newResponse, newUserName) {
+      fetch('http://localhost:3001/edit-response', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId, responseIndex: index, newResponse, newUserName })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'updated') {
+          fetchPreviousResponses();
+        } else {
+          console.error('Failed to update response');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating response:', error);
+      });
+    }
+
+    function deleteResponse(index) {
+      fetch('http://localhost:3001/delete-response', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId, responseIndex: index })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'deleted') {
+          fetchPreviousResponses();
+        } else {
+          console.error('Failed to delete response');
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting response:', error);
+      });
+    }
   </script>
 </body>
 </html>
