@@ -112,6 +112,7 @@ function PollingWidget() {
       const name = figma.currentUser?.name || "User";
       setUserName(name);
     }
+    console.log(userName)
   };
 
   const handleAddTextField = () => {
