@@ -84,6 +84,7 @@ function PollingWidget() {
   const [textArray, setTextArray] = useSyncedState('textArray', [{ initialValue: "", isEditable: true }]);
   const [voteArray, setVoteArray] = useSyncedState('voteArray', [0]);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
+  const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
 
   // Handles what happens when text changes.
   const handleValueChange = (index: number, newValue: string) => {
@@ -106,11 +107,20 @@ function PollingWidget() {
 
   const handleVote = (index: number) => {
     if (isSubmitted) {
-      const updatedVoteArray = [...voteArray];
-      updatedVoteArray[index] = updatedVoteArray[index] + 1;
-      setVoteArray(updatedVoteArray);
-      const name = figma.currentUser?.name || "User";
-      setUserName(name);
+      const currentUser = figma.currentUser?.name || "User";
+      const userVote = userVotes[currentUser];
+
+      if (userVote === undefined) {
+        const updatedVoteArray = [...voteArray];
+        updatedVoteArray[index] = updatedVoteArray[index] + 1;
+        setVoteArray(updatedVoteArray);
+
+        setUserVotes({
+          ...userVotes,
+          [currentUser]: index
+        });
+        setUserName(currentUser);
+      }
     }
     console.log(userName)
   };
