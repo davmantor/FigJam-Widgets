@@ -42,6 +42,27 @@ const widgetSchema = new mongoose.Schema({
 
 const Widget = mongoose.model('Widget', widgetSchema);
 
+app.post('/reset-widget', async (req, res) => {
+  const { widgetId } = req.body;
+
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { widgetId },
+      { $set: { showPrevious: false } },
+      { new: true }
+    );
+    if (widget) {
+      res.json({ status: 'success', widget });
+    } else {
+      res.status(404).send('Widget not found');
+    }
+  } catch (error) {
+    console.error('Error resetting widget:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 app.post('/refresh', async (req, res) => {
   const { widgetId } = req.body;
 

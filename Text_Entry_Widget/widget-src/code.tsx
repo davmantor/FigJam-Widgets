@@ -105,7 +105,29 @@ function Widget() {
   
     setResponse("");
     setSubmitted(false);
+  
+    // Update showPrevious to false
+    try {
+      const res = await fetch('http://localhost:3001/reset-widget', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId: widgetId ?? "" })
+      });
+  
+      const result = await res.json();
+      if (res.status === 200) {
+        setShowPrevious(false); // Update the state
+        console.log('Widget reset successfully');
+      } else {
+        console.error('Failed to reset widget.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
+  
 
   const handleSubmit = async () => {
     if (response.trim() === "") {
