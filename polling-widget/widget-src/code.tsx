@@ -22,8 +22,6 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
   // 'inputValue' holds the current text. 'setInputValue' updates this text.
   const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, initialValue);
 
-  const isFirstTextEntry = (index === -1);
-
   // This is what the component looks like on the screen.
   // Creates a vertically stacked container that either displays an editable text input 
   // (when editing is allowed and active) or static text with an optional edit icon (when editing is not active). 
@@ -52,14 +50,14 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
         <AutoLayout spacing={8} verticalAlignItems={'center'}>
           <Text
             fontSize={16}
-            fill={inputValue ? '#000000' : (isFirstTextEntry ? '#808080' : '#000000')}  
-            fontWeight={inputValue ? 'normal' : (isFirstTextEntry ? 'bold' : 'normal')} 
+            fill={inputValue ? '#000000' : (index === -1 ? '#808080' : '#000000')}  
+            fontWeight={inputValue ? 'normal' : (index === -1? 'bold' : 'normal')} 
           >
             {inputValue || placeholder || "Enter option"}
           </Text>
           <Text
             fontSize={14} >
-            {isFirstTextEntry? '' : votes}
+            {index === -1? '' : votes}
             
           </Text>
           
@@ -70,6 +68,14 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
                     </svg>`}
               onClick={() => setIsEditing(true)}
             />
+          )}
+          {isEditable && index !== -1 && (
+            <SVG  src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="30" height="30" rx="15" fill="white"/>
+                    <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
+                    <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+                    </svg>`}
+            ></SVG>
           )}
         </AutoLayout>
       )}
