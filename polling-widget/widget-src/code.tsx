@@ -107,7 +107,8 @@ function PollingWidget() {
     if (isSubmitted) {
       const currentUser = figma.currentUser?.name || "User";
       const userVote = userVotes[currentUser];
-      const previousVote = userVotes[currentUser] || undefined;
+      console.log(userVote);
+      const previousVote = userVote;
       console.log(previousVote)
       console.log(userVotes)
       console.log(userVotes[currentUser])
