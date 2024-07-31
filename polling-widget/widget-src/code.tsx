@@ -103,24 +103,31 @@ function PollingWidget() {
     setTextArray(textArray.map(item => ({ ...item, isEditable: false })));
   };
 
-
-
   const handleVote = (index: number) => {
     if (isSubmitted) {
       const currentUser = figma.currentUser?.name || "User";
       const userVote = userVotes[currentUser];
+      const previousVote = userVotes[currentUser] || undefined;
+      console.log(previousVote)
+      console.log(userVotes)
+      console.log(userVotes[currentUser])
 
-      if (userVote === undefined) {
+      if (previousVote == userVotes[currentUser]) {
+        const updatedVoteArray = [...voteArray];
+        updatedVoteArray[previousVote] = updatedVoteArray[previousVote] - 1;
+        updatedVoteArray[index] = (updatedVoteArray[index]) + 1;
+        setVoteArray(updatedVoteArray);
+      } else {
         const updatedVoteArray = [...voteArray];
         updatedVoteArray[index] = updatedVoteArray[index] + 1;
         setVoteArray(updatedVoteArray);
-
-        setUserVotes({
-          ...userVotes,
-          [currentUser]: index
-        });
-        setUserName(currentUser);
       }
+
+      setUserVotes({ ...userVotes, [currentUser]: index });
+      console.log(previousVote)
+      console.log(userVotes)
+      console.log(userVotes[currentUser])
+      setUserName(currentUser);
     }
     console.log(userName)
   };
