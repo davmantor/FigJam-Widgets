@@ -107,11 +107,7 @@ function PollingWidget() {
     if (isSubmitted) {
       const currentUser = figma.currentUser?.name || "User";
       const userVote = userVotes[currentUser];
-      console.log(userVote);
-      const previousVote = userVote;
-      console.log(previousVote)
-      console.log(userVotes)
-      console.log(userVotes[currentUser])
+      const previousVote = userVote ?? undefined;
 
       if (previousVote == userVotes[currentUser]) {
         const updatedVoteArray = [...voteArray];
@@ -125,9 +121,6 @@ function PollingWidget() {
       }
 
       setUserVotes({ ...userVotes, [currentUser]: index });
-      console.log(previousVote)
-      console.log(userVotes)
-      console.log(userVotes[currentUser])
       setUserName(currentUser);
     }
     console.log(userName)
@@ -139,6 +132,7 @@ function PollingWidget() {
     setTextArray(newTextArray);
     setVoteArray(newVoteArray);
   };
+
 
   // How our widget is laid out
   return (
