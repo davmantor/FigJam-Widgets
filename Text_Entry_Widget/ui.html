@@ -9,6 +9,11 @@
       padding: 20px;
       background-color: #f9f9f9;
       color: #333;
+      padding-bottom: 100px;
+      overflow: hidder; 
+
+
+
     }
     .container {
       display: flex;
@@ -16,7 +21,9 @@
       align-items: flex-start;
       width: 800px;
       height: 400px;
-      overflow-y: auto;
+      padding-bottom: 100px;
+      overflow: auto;
+      
     }
     .button {
       background-color: #007BFF;
@@ -53,7 +60,11 @@
     }
     .input-large {
       width: 100%;
-      height: 100px; /* Increase the height as needed */
+      height: auto;
+      resize: vertical;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     .input-label {
       font-size: 14px;
@@ -116,7 +127,6 @@
     <button class="button" id="submitPasswordButton">Submit</button>
   </div>
   
-  <div id="widgetIdDisplay">Widget ID: </div>
   
   <div class="container" id="adminMenu">
     <button class="button" id="refreshButton">Refresh</button>
@@ -142,22 +152,53 @@
       <label class="label" for="fontSizeInput">Font Size:</label>
       <input class="input" type="number" id="fontSizeInput" value="16">
     </div>
+
+    
+
+    <div>
+      <label class="label" for="shadowColorInput">Shadow Color:</label>
+      <input class="input" type="color" id="shadowColorInput" value="#000000">
+    </div>
+    <div>
+      <label class="label" for="shadowOffsetXInput">Shadow Offset X:</label>
+      <input class="input" type="number" id="shadowOffsetXInput" value="0">
+    </div>
+    <div>
+      <label class="label" for="shadowOffsetYInput">Shadow Offset Y:</label>
+      <input class="input" type="number" id="shadowOffsetYInput" value="2">
+    </div>
+    <div>
+      <label class="label" for="shadowBlurInput">Shadow Blur:</label>
+      <input class="input" type="number" id="shadowBlurInput" value="10">
+    </div>
+    <div>
+      <label class="label" for="shadowSpreadInput">Shadow Spread:</label>
+      <input class="input" type="number" id="shadowSpreadInput" value="0">
+    </div>
+    
     <div class="new-response">
       <label class="label" for="newResponseInput">New Response:</label>
-      <input class="input input-large" type="text" id="newResponseInput">
+      <textarea class="input input-large" id="newResponseInput"></textarea>
       <label class="label" for="newUserNameInput">User Name:</label>
       <input class="input input-small" type="text" id="newUserNameInput">
       <button class="button" id="addResponseButton">Add Response</button>
       
     </div>
     <div id="previousResponsesContainer" class="response-container"></div>
+
+    <div id="widgetIdDisplay">Widget ID: </div>
   </div>
+
+  
+
 
   <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); z-index: 1000;">
     <p>Unsaved changes! Do you want to save them?</p>
     <button class="button" id="popupSaveButton">Save</button>
     <button class="button" id="popupCancelButton">Cancel</button>
   </div>
+
+  
   
   <script>
     const refreshButton = document.getElementById('refreshButton');
@@ -187,13 +228,32 @@
     let currentEditingIndex = null;
     
     window.onmessage = (event) => {
-      const { type, widgetId: receivedWidgetId } = event.data.pluginMessage;
+      const { type, widgetId: receivedWidgetId, params } = event.data.pluginMessage;
       if (type === 'initialize') {
+        console.log('Received initialize message with params:', params);
         widgetId = receivedWidgetId;
         widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
         fetchPreviousResponses();
+        updateParameters(params);
       }
     };
+
+    function updateParameters(params) {
+      if (params) {
+        console.log("updated params", params.width);
+        widthInput.value = params.width;
+        heightInput.value = params.height;
+        borderColorInput.value = params.borderColor;
+        borderWidthInput.value = params.borderWidth;
+        fontSizeInput.value = params.fontSize;
+        shadowColorInput.value = params.shadowColor;
+        shadowOffsetXInput.value = params.shadowOffsetX;
+        shadowOffsetYInput.value = params.shadowOffsetY;
+        shadowBlurInput.value = params.shadowBlur;
+        shadowSpreadInput.value = params.shadowSpread;
+      }
+    }
+    
 
     submitPasswordButton.onclick = () => {
       const password = passwordInput.value;
@@ -243,6 +303,27 @@
       parent.postMessage({ pluginMessage: { type: 'updateFontSize', size } }, '*');
     };
 
+
+    shadowColorInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowColor', color: event.target.value } }, '*');
+    };
+    
+    shadowOffsetXInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowOffsetX', offset: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowOffsetYInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowOffsetY', offset: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowBlurInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowBlur', blur: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowSpreadInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowSpread', spread: parseInt(event.target.value, 10) } }, '*');
+    };
+    
     addResponseButton.onclick = () => {
       const newResponse = newResponseInput.value.trim();
       const newUserName = newUserNameInput.value.trim();
@@ -270,21 +351,21 @@
           data.widget.previous.forEach((response, index) => {
             const responseItem = document.createElement('div');
             responseItem.className = 'response-item';
-
+        
             const responseHeader = document.createElement('div');
             responseHeader.className = 'response-header';
             responseHeader.innerText = `Response from ${response.userName}`;
             responseHeader.onclick = () => {
               handleUnsavedChanges(index, responseHeader);
             };
-
+        
             const responseContent = document.createElement('div');
             responseContent.className = 'response-content';
-
+        
             const userNameLabel = document.createElement('label');
             userNameLabel.className = 'input-label';
             userNameLabel.innerText = 'User Name:';
-
+        
             const userNameInput = document.createElement('input');
             userNameInput.className = 'input input-small';
             userNameInput.type = 'text';
@@ -294,14 +375,13 @@
               unsavedResponse = responseInput.value;
               currentEditingIndex = index;
             };
-
+        
             const responseLabel = document.createElement('label');
             responseLabel.className = 'input-label';
             responseLabel.innerText = 'Response:';
-
-            const responseInput = document.createElement('input');
+        
+            const responseInput = document.createElement('textarea');
             responseInput.className = 'input input-large';
-            responseInput.type = 'text';
             responseInput.value = response.response;
             responseInput.oninput = (event) => {
               unsavedResponse = event.target.value;
@@ -437,4 +517,5 @@
     }
   </script>
 </body>
+  
 </html>

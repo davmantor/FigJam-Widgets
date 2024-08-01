@@ -30,6 +30,12 @@ function Widget() {
   const [fontSize, setFontSize] = useSyncedState<number>("fontSize", 16);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
   const [userPhotoUrl, setUserPhotoUrl] = useSyncedState<string | null>("userPhotoUrl", null);
+  const [shadowColor, setShadowColor] = useSyncedState<string>("shadowColor", "#000000");
+  const [shadowOffsetX, setShadowOffsetX] = useSyncedState<number>("shadowOffsetX", 0);
+  const [shadowOffsetY, setShadowOffsetY] = useSyncedState<number>("shadowOffsetY", 2);
+  const [shadowBlur, setShadowBlur] = useSyncedState<number>("shadowBlur", 10);
+  const [shadowSpread, setShadowSpread] = useSyncedState<number>("shadowSpread", 0);
+
 
   useEffect(() => {
     const initializeWidgetId = () => {
@@ -39,11 +45,16 @@ function Widget() {
         handleRefresh(newWidgetId);
       }
     };
-
+  
     if (widgetId === null) {
       initializeWidgetId();
     }
 
+    if (widgetId != null) {
+      handleRefresh(widgetId);
+    }
+
+  
     figma.ui.onmessage = (msg) => {
       console.log("Received message:", msg);
       if (msg.type === 'close') {
@@ -68,11 +79,27 @@ function Widget() {
       if (msg.type === 'updateFontSize') {
         setFontSize(msg.size);
       }
+      if (msg.type === 'updateShadowColor') {
+        setShadowColor(msg.color);
+      }
+      if (msg.type === 'updateShadowOffsetX') {
+        setShadowOffsetX(msg.offset);
+      }
+      if (msg.type === 'updateShadowOffsetY') {
+        setShadowOffsetY(msg.offset);
+      }
+      if (msg.type === 'updateShadowBlur') {
+        setShadowBlur(msg.blur);
+      }
+      if (msg.type === 'updateShadowSpread') {
+        setShadowSpread(msg.spread);
+      }
       if (msg.type === 'resetResponse') { // New message type
         resetResponse();
       }
     };
   });
+  
 
   const resetResponse = async () => {
     if (response.trim() !== "") {
@@ -215,10 +242,26 @@ function Widget() {
   };
 
   const openAdminMenu = () => {
-    figma.showUI(__html__, { width:1000, height: 400 });
-    figma.ui.postMessage({ type: 'initialize', widgetId: widgetId ?? "" });
+    const params = {
+      width,
+      height,
+      borderColor,
+      borderWidth,
+      fontSize,
+      shadowColor,
+      shadowOffsetX,
+      shadowOffsetY,
+      shadowBlur,
+      shadowSpread,
+    };
+  
+    console.log('Opening admin menu with params:', params);
+  
+    figma.showUI(__html__, { width: 1000, height: 400 });
+    figma.ui.postMessage({ type: 'initialize', widgetId: widgetId ?? "", params });
     return new Promise(() => {});
   };
+  
 
   return (
     <AutoLayout
@@ -233,10 +276,10 @@ function Widget() {
       strokeWidth={borderWidth}
       effect={{
         type: 'drop-shadow',
-        color: '#000000',
-        offset: { x: 0, y: 2 },
-        blur: 10,
-        spread: 0,
+        color: shadowColor,
+        offset: { x: shadowOffsetX, y: shadowOffsetY },
+        blur: shadowBlur,
+        spread: shadowSpread,
       }}
     >
       <AutoLayout
@@ -245,7 +288,8 @@ function Widget() {
         horizontalAlignItems="end"
         onClick={openAdminMenu}
       >
-        <SVG src={AdminMenuIcon} />
+        <SVG src={AdminMenuIcon} width={fontSize}
+  height={fontSize}/>
       </AutoLayout>
       {!submitted && (
         <>
@@ -291,9 +335,9 @@ function Widget() {
           spacing={5}
         >
           {userPhotoUrl ? (
-            <Image src={userPhotoUrl} width={20} height={20} cornerRadius={15} />
+            <Image src={userPhotoUrl} width={fontSize+5} height={fontSize+5} cornerRadius={fontSize/1.5} />
           ) : (
-            <SVG src={AnonSVG} width={20} height={20} />
+            <SVG src={AnonSVG} width={fontSize+5} height={fontSize+5} />
           )}
           <Text fontSize={fontSize} fill="#333" width="fill-parent">
             {userName}: {response}
