@@ -85,6 +85,8 @@ function PollingWidget() {
   const [voteArray, setVoteArray] = useSyncedState('voteArray', [0]);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
   const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
+  const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
+
 
   // Handles what happens when text changes.
   const handleValueChange = (index: number, newValue: string) => {
@@ -104,10 +106,12 @@ function PollingWidget() {
   };
 
   const handleVote = (index: number) => {
+    const currentUser = figma.currentUser?.name || "User";
+    const previousVote = userVotes[currentUser] ?? undefined;
     if (isSubmitted) {
-      const currentUser = figma.currentUser?.name || "User";
-      const userVote = userVotes[currentUser];
-      const previousVote = userVote ?? undefined;
+      const sum = voteArray.reduce((accumulation, votes) => accumulation + votes, 0);
+      setTotalVotes(sum);
+
 
       if (previousVote == userVotes[currentUser]) {
         const updatedVoteArray = [...voteArray];
@@ -118,8 +122,8 @@ function PollingWidget() {
         const updatedVoteArray = [...voteArray];
         updatedVoteArray[index] = updatedVoteArray[index] + 1;
         setVoteArray(updatedVoteArray);
+        
       }
-
       setUserVotes({ ...userVotes, [currentUser]: index });
       setUserName(currentUser);
     }
@@ -161,6 +165,7 @@ function PollingWidget() {
           votes={0}
           placeholder="Enter poll question here"
         />
+
       </AutoLayout>
       {textArray.map((item, index) => (
         <AutoLayout
@@ -203,6 +208,11 @@ function PollingWidget() {
           </Text>
         </AutoLayout>
       )}
+      {isSubmitted && (
+             <Text>
+          {totalVotes}
+        </Text>
+        )}
     </AutoLayout>
   );
 }
