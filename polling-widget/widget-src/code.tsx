@@ -55,12 +55,13 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
           >
             {inputValue || placeholder || "Enter option"}
           </Text>
-          <Text
+          {!isEditable && (
+            <Text
             fontSize={14} >
             {index === -1? '' : votes}
             
           </Text>
-          
+          )}
           {isEditable && (
             <SVG
               src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,6 +92,8 @@ function PollingWidget() {
   const [voteArray, setVoteArray] = useSyncedState('voteArray', [0]);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
   const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
+  const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
+
 
   // Handles what happens when text changes.
   const handleValueChange = (index: number, newValue: string) => {
@@ -109,26 +112,33 @@ function PollingWidget() {
     setTextArray(textArray.map(item => ({ ...item, isEditable: false })));
   };
 
-
-
   const handleVote = (index: number) => {
+    const currentUser = figma.currentUser?.name || "User";
+    const previousVote = userVotes[currentUser] ?? undefined;
+
+    //logic: check if user has already voted. if not, add their vote to the selected option. if they have, subtract their previous vote
+    //       and add the new vote. finally, update the userVotes state.
+    // previous logic was calculating and setting totalVotes before any changes to the voteArray happened, so it would always
+    // reflect the state BEFORE the current vote is counted.
     if (isSubmitted) {
-      const currentUser = figma.currentUser?.name || "User";
-      const userVote = userVotes[currentUser];
-
-      if (userVote === undefined) {
-        const updatedVoteArray = [...voteArray];
-        updatedVoteArray[index] = updatedVoteArray[index] + 1;
-        setVoteArray(updatedVoteArray);
-
-        setUserVotes({
-          ...userVotes,
-          [currentUser]: index
-        });
-        setUserName(currentUser);
+      const updatedVoteArray = [...voteArray];
+  
+      if (previousVote !== undefined && previousVote !== index) {
+        // user has previously voted and is changing their vote
+        updatedVoteArray[previousVote] -= 1;
+        updatedVoteArray[index] += 1;
+      } else if (previousVote === undefined) {
+        // user is voting for the first time
+        updatedVoteArray[index] += 1;
       }
+  
+      setVoteArray(updatedVoteArray);
+      setUserVotes({ ...userVotes, [currentUser]: index });
+  
+      // update total votes
+      const sum = updatedVoteArray.reduce((accumulation, votes) => accumulation + votes, 0);
+      setTotalVotes(sum);
     }
-    console.log(userName)
   };
 
   const handleAddTextField = () => {
@@ -137,6 +147,7 @@ function PollingWidget() {
     setTextArray(newTextArray);
     setVoteArray(newVoteArray);
   };
+
 
   // How our widget is laid out
   return (
@@ -150,10 +161,9 @@ function PollingWidget() {
       stroke={'#E6E6E6'}  // Border color.
     >
       <AutoLayout
-        stroke={'#E7E7E7'}
+        stroke={'#878584'}
         direction="vertical"
-        spacing={12}
-        padding={12}
+        padding={4}
         cornerRadius={8}
       >
         <EditableText
@@ -165,6 +175,7 @@ function PollingWidget() {
           votes={0}
           placeholder="Enter poll question here"
         />
+
       </AutoLayout>
       {textArray.map((item, index) => (
         <AutoLayout
@@ -207,6 +218,11 @@ function PollingWidget() {
           </Text>
         </AutoLayout>
       )}
+      {isSubmitted && (
+             <Text fontSize={10} fill="#808080">
+          {'Total votes: ' + totalVotes}
+        </Text>
+        )}
     </AutoLayout>
   );
 }
