@@ -79,12 +79,16 @@ function PollingWidget() {
   const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
 
   const handleValueChange = (index: number, newValue: string) => {
-    setEntries(entries.map((item, i) => (i === index ? { ...item, text: newValue } : item)));
+    const updatedEntries = entries.map((item, i) => (i === index ? { ...item, text: newValue } : item));
+    setEntries(updatedEntries);
+    console.log("Entries after value change:", updatedEntries);
   };
 
   const handleSubmit = () => {
     setIsSubmitted(true);
-    setEntries(entries.map(item => ({ ...item, isEditable: false })));
+    const updatedEntries = entries.map(item => ({ ...item, isEditable: false }));
+    setEntries(updatedEntries);
+    console.log("Entries after submission:", updatedEntries);
   };
 
   const handleVote = (index: number) => {
@@ -102,14 +106,23 @@ function PollingWidget() {
       }
 
       setEntries(updatedEntries);
+      console.log("Entries after vote:", updatedEntries);
       setUserVotes({ ...userVotes, [currentUser]: index });
       setTotalVotes(updatedEntries.reduce((acc, entry) => acc + entry.voters.length, 0));
     }
   };
 
-  const handleAddTextField = () => setEntries([...entries, { text: "", voters: [], isEditable: true }]);
+  const handleAddTextField = () => {
+    const newEntries = [...entries, { text: "", voters: [], isEditable: true }];
+    setEntries(newEntries);
+    console.log("Entries after adding text field:", newEntries);
+  };
 
-  const removeTextField = (index: number) => setEntries(entries.filter((_, i) => i !== index));
+  const removeTextField = (index: number) => {
+    const updatedEntries = entries.filter((_, i) => i !== index);
+    setEntries(updatedEntries);
+    console.log("Entries after removing text field:", updatedEntries);
+  };
 
   const handleVoteClick = (index: number) => {
     if (isSubmitted) {
