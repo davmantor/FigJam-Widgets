@@ -93,6 +93,8 @@ function PollingWidget() {
 
   const handleVote = (index: number) => {
     const currentUser = figma.currentUser?.name || "User";
+    const userIcon = figma.currentUser?.photoUrl || "";
+    console.log(userIcon)
     const previousVote = userVotes[currentUser];
 
     if (isSubmitted) {
