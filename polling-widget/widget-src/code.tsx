@@ -55,12 +55,13 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
           >
             {inputValue || placeholder || "Enter option"}
           </Text>
-          <Text
+          {!isEditable && (
+            <Text
             fontSize={14} >
             {index === -1? '' : votes}
             
           </Text>
-          
+          )}
           {isEditable && (
             <SVG
               src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,10 +161,9 @@ function PollingWidget() {
       stroke={'#E6E6E6'}  // Border color.
     >
       <AutoLayout
-        stroke={'#E7E7E7'}
+        stroke={'#878584'}
         direction="vertical"
-        spacing={12}
-        padding={12}
+        padding={4}
         cornerRadius={8}
       >
         <EditableText
