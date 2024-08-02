@@ -108,26 +108,30 @@ function PollingWidget() {
   const handleVote = (index: number) => {
     const currentUser = figma.currentUser?.name || "User";
     const previousVote = userVotes[currentUser] ?? undefined;
+
+    //logic: check if user has already voted. if not, add their vote to the selected option. if they have, subtract their previous vote
+    //       and add the new vote. finally, update the userVotes state.
+    // previous logic was calculating and setting totalVotes before any changes to the voteArray happened, so it would always
+    // reflect the state BEFORE the current vote is counted.
     if (isSubmitted) {
-      const sum = voteArray.reduce((accumulation, votes) => accumulation + votes, 0);
-      setTotalVotes(sum);
-
-
-      if (previousVote == userVotes[currentUser]) {
-        const updatedVoteArray = [...voteArray];
-        updatedVoteArray[previousVote] = updatedVoteArray[previousVote] - 1;
-        updatedVoteArray[index] = (updatedVoteArray[index]) + 1;
-        setVoteArray(updatedVoteArray);
-      } else {
-        const updatedVoteArray = [...voteArray];
-        updatedVoteArray[index] = updatedVoteArray[index] + 1;
-        setVoteArray(updatedVoteArray);
-        
+      const updatedVoteArray = [...voteArray];
+  
+      if (previousVote !== undefined && previousVote !== index) {
+        // user has previously voted and is changing their vote
+        updatedVoteArray[previousVote] -= 1;
+        updatedVoteArray[index] += 1;
+      } else if (previousVote === undefined) {
+        // user is voting for the first time
+        updatedVoteArray[index] += 1;
       }
+  
+      setVoteArray(updatedVoteArray);
       setUserVotes({ ...userVotes, [currentUser]: index });
-      setUserName(currentUser);
+  
+      // update total votes
+      const sum = updatedVoteArray.reduce((accumulation, votes) => accumulation + votes, 0);
+      setTotalVotes(sum);
     }
-    console.log(userName)
   };
 
   const handleAddTextField = () => {
@@ -209,8 +213,8 @@ function PollingWidget() {
         </AutoLayout>
       )}
       {isSubmitted && (
-             <Text>
-          {totalVotes}
+             <Text fontSize={10} fill="#808080">
+          {'Total votes: ' + totalVotes}
         </Text>
         )}
     </AutoLayout>
