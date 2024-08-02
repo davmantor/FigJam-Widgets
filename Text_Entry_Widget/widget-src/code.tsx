@@ -38,6 +38,7 @@ function Widget() {
 
 
   useEffect(() => {
+    console.log("use effect called");
     const initializeWidgetId = () => {
       if (!widgetId) {
         const newWidgetId = `${figma.widgetId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
