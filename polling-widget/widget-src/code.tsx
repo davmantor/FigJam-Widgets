@@ -1,5 +1,5 @@
 const { widget } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG } = widget;
+const { useSyncedState, AutoLayout, Input, Text, SVG, Image } = widget;
 
 interface EditableTextProps {
   index: number;
@@ -14,6 +14,10 @@ interface Entry {
   text: string;
   voters: string[];
   isEditable: boolean;
+}
+
+interface UserIconDictionary {
+  [user: string]: string;
 }
 
 function EditableText({ index, value, onValueChange, isEditable, placeholder, onRemove }: EditableTextProps) {
@@ -77,6 +81,7 @@ function PollingWidget() {
   const [entries, setEntries] = useSyncedState<Entry[]>('entries', [{ text: "", voters: [], isEditable: true }]);
   const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
   const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
+  const [userIcons, setUserIcons] = useSyncedState<UserIconDictionary>('userIcons', {});
 
   const handleValueChange = (index: number, newValue: string) => {
     const updatedEntries = entries.map((item, i) => (i === index ? { ...item, text: newValue } : item));
@@ -93,22 +98,28 @@ function PollingWidget() {
 
   const handleVote = (index: number) => {
     const currentUser = figma.currentUser?.name || "User";
+    const userIconUrl = figma.currentUser?.photoUrl || "";
     const previousVote = userVotes[currentUser];
 
     if (isSubmitted) {
       const updatedEntries = [...entries];
+      const updatedUserIcons = { ...userIcons };
 
       if (previousVote !== undefined && previousVote !== index && previousVote !== null) {
         updatedEntries[previousVote].voters = updatedEntries[previousVote].voters.filter(voter => voter !== currentUser);
+      }
+
+      if (previousVote === undefined || previousVote !== index) {
         updatedEntries[index].voters.push(currentUser);
-      } else if (previousVote === undefined) {
-        updatedEntries[index].voters.push(currentUser);
+        updatedUserIcons[currentUser] = userIconUrl;
+        setUserVotes({ ...userVotes, [currentUser]: index });
+        setTotalVotes(updatedEntries.reduce((acc, entry) => acc + entry.voters.length, 0));
       }
 
       setEntries(updatedEntries);
+      setUserIcons(updatedUserIcons);
       console.log("Entries after vote:", updatedEntries);
-      setUserVotes({ ...userVotes, [currentUser]: index });
-      setTotalVotes(updatedEntries.reduce((acc, entry) => acc + entry.voters.length, 0));
+      console.log("User icons after vote:", updatedUserIcons);
     }
   };
 
@@ -188,9 +199,16 @@ function PollingWidget() {
         </>
       )}
       {isSubmitted && (
-        <Text fontSize={10} fill="#808080">
-          {'Total votes: ' + totalVotes}
-        </Text>
+        <>
+          <Text fontSize={10} fill="#808080">
+            {'Total votes: ' + totalVotes}
+          </Text>
+          <AutoLayout direction="horizontal" spacing={8}>
+            {Object.keys(userIcons).map((user, index) => (
+              <Image key={index} src={userIcons[user]} width={32} height={32} cornerRadius={16} />
+            ))}
+          </AutoLayout>
+        </>
       )}
     </AutoLayout>
   );
