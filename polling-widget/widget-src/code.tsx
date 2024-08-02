@@ -20,7 +20,7 @@ function EditableText({ index, value, onValueChange, isEditable, placeholder, on
   const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
   const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, value.text);
 
-  const handleEditEnd = (e) => {
+  const handleEditEnd = (e: { characters: string }) => {
     setInputValue(e.characters);
     setIsEditing(false);
     onValueChange(index, e.characters);
@@ -94,7 +94,7 @@ function PollingWidget() {
     if (isSubmitted) {
       const updatedEntries = [...entries];
 
-      if (previousVote !== undefined && previousVote !== index) {
+      if (previousVote !== undefined && previousVote !== index && previousVote !== null) {
         updatedEntries[previousVote].voters = updatedEntries[previousVote].voters.filter(voter => voter !== currentUser);
         updatedEntries[index].voters.push(currentUser);
       } else if (previousVote === undefined) {
@@ -110,6 +110,12 @@ function PollingWidget() {
   const handleAddTextField = () => setEntries([...entries, { text: "", voters: [], isEditable: true }]);
 
   const removeTextField = (index: number) => setEntries(entries.filter((_, i) => i !== index));
+
+  const handleVoteClick = (index: number) => {
+    if (isSubmitted) {
+      handleVote(index);
+    }
+  };
 
   return (
     <AutoLayout
@@ -132,7 +138,7 @@ function PollingWidget() {
         />
       </AutoLayout>
       {entries.map((item, index) => (
-        <AutoLayout key={index} onClick={() => isSubmitted && handleVote(index)}>
+        <AutoLayout key={index} onClick={() => handleVoteClick(index)}>
           <EditableText
             index={index}
             value={item}
