@@ -8,6 +8,7 @@ interface EditableTextProps {
   isEditable: boolean;
   placeholder?: string;
   onRemove?: (index: number) => void;
+  userIcons: UserIconDictionary;
 }
 
 interface Entry {
@@ -20,7 +21,7 @@ interface UserIconDictionary {
   [user: string]: string;
 }
 
-function EditableText({ index, value, onValueChange, isEditable, placeholder, onRemove }: EditableTextProps) {
+function EditableText({ index, value, onValueChange, isEditable, placeholder, onRemove, userIcons }: EditableTextProps) {
   const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
   const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, value.text);
 
@@ -159,8 +160,16 @@ function PollingWidget() {
           onValueChange={handleValueChange}
           isEditable={!isSubmitted}
           placeholder="Enter poll question here"
+          userIcons={userIcons}
         />
       </AutoLayout>
+      {isSubmitted && (
+        <AutoLayout direction="vertical" spacing={4} verticalAlignItems="center">
+          {value.voters.map((voter: string | number, index: string | number | undefined) => (
+            userIcons[voter] ? <Image key={index} src={userIcons[voter]} width={32} height={32} cornerRadius={16} /> : null
+          ))}
+        </AutoLayout>
+      )}
       {entries.map((item, index) => (
         <AutoLayout key={index} onClick={() => handleVoteClick(index)}>
           <EditableText
@@ -170,6 +179,7 @@ function PollingWidget() {
             isEditable={!isSubmitted}
             placeholder="Enter option"
             onRemove={removeTextField}
+            userIcons={userIcons}
           />
         </AutoLayout>
       ))}
