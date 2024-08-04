@@ -71,7 +71,11 @@ function EditableText({ index, value, onValueChange, isEditable, placeholder, on
               )}
             </>
           )}
+                          {value.voters.map((voter: string | number, index: string | number | undefined) => (
+            userIcons[voter] ? <Image key={index} src={userIcons[voter]} width={32} height={32} cornerRadius={16} /> : null
+          ))}
         </AutoLayout>
+        
       )}
     </AutoLayout>
   );
@@ -164,10 +168,8 @@ function PollingWidget() {
         />
       </AutoLayout>
       {isSubmitted && (
-        <AutoLayout direction="vertical" spacing={4} verticalAlignItems="center">
-          {value.voters.map((voter: string | number, index: string | number | undefined) => (
-            userIcons[voter] ? <Image key={index} src={userIcons[voter]} width={32} height={32} cornerRadius={16} /> : null
-          ))}
+        <AutoLayout>
+
         </AutoLayout>
       )}
       {entries.map((item, index) => (
