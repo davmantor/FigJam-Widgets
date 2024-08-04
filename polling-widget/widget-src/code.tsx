@@ -33,12 +33,13 @@ function EditableText({ index, value, onValueChange, isEditable, placeholder, on
 
   return (
     <AutoLayout
-      direction="vertical"
+      direction="horizontal"
       spacing={8}
       padding={8}
       cornerRadius={4}
       stroke={isEditing ? '#24CE16' : '#E6E6E6'}
       strokeWidth={2}
+      verticalAlignItems="center"
     >
       {isEditing && isEditable ? (
         <Input
@@ -71,11 +72,15 @@ function EditableText({ index, value, onValueChange, isEditable, placeholder, on
               )}
             </>
           )}
-                          {value.voters.map((voter: string | number, index: string | number | undefined) => (
-            userIcons[voter] ? <Image key={index} src={userIcons[voter]} width={32} height={32} cornerRadius={16} /> : null
+        </AutoLayout>
+      )}
+      {value.voters.length >= 1 && !isEditing && (
+        <AutoLayout>
+          {value.voters.map((voter, index) => (
+            <Image key={index} src={userIcons[voter]} width={24} height={24} cornerRadius={12}/>
           ))}
         </AutoLayout>
-        
+
       )}
     </AutoLayout>
   );
@@ -167,11 +172,7 @@ function PollingWidget() {
           userIcons={userIcons}
         />
       </AutoLayout>
-      {isSubmitted && (
-        <AutoLayout>
 
-        </AutoLayout>
-      )}
       {entries.map((item, index) => (
         <AutoLayout key={index} onClick={() => handleVoteClick(index)}>
           <EditableText
