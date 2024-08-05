@@ -87,6 +87,9 @@ function ChatWidget() {
     const [messageFontSize, setMessageFontSize] = useSyncedState('messageFontSize', 35);
     const [borderWidth, setBorderWidth] = useSyncedState('borderWidth', 2);
     const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState('widgetCornerRadius', 10);
+    
+    const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
+
 
     function getWidgetValue(input: number): number {
       const currentWidgetWidth = widgetWidth; // Get the current widget width
@@ -119,7 +122,7 @@ function ChatWidget() {
     const pin = `<svg width="${getWidgetValue(35)}px" height="${getWidgetValue(35)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1218 1.87023C15.7573 0.505682 13.4779 0.76575 12.4558 2.40261L9.61062 6.95916C9.61033 6.95965 9.60913 6.96167 9.6038 6.96549C9.59728 6.97016 9.58336 6.97822 9.56001 6.9848C9.50899 6.99916 9.44234 6.99805 9.38281 6.97599C8.41173 6.61599 6.74483 6.22052 5.01389 6.87251C4.08132 7.22378 3.61596 8.03222 3.56525 8.85243C3.51687 9.63502 3.83293 10.4395 4.41425 11.0208L7.94975 14.5563L1.26973 21.2363C0.879206 21.6269 0.879206 22.26 1.26973 22.6506C1.66025 23.0411 2.29342 23.0411 2.68394 22.6506L9.36397 15.9705L12.8995 19.5061C13.4808 20.0874 14.2853 20.4035 15.0679 20.3551C15.8881 20.3044 16.6966 19.839 17.0478 18.9065C17.6998 17.1755 17.3043 15.5086 16.9444 14.5375C16.9223 14.478 16.9212 14.4114 16.9355 14.3603C16.9421 14.337 16.9502 14.3231 16.9549 14.3165C16.9587 14.3112 16.9606 14.31 16.9611 14.3098L21.5177 11.4645C23.1546 10.4424 23.4147 8.16307 22.0501 6.79853L17.1218 1.87023ZM14.1523 3.46191C14.493 2.91629 15.2528 2.8296 15.7076 3.28445L20.6359 8.21274C21.0907 8.66759 21.0041 9.42737 20.4584 9.76806L15.9019 12.6133C14.9572 13.2032 14.7469 14.3637 15.0691 15.2327C15.3549 16.0037 15.5829 17.1217 15.1762 18.2015C15.1484 18.2752 15.1175 18.3018 15.0985 18.3149C15.0743 18.3316 15.0266 18.3538 14.9445 18.3589C14.767 18.3699 14.5135 18.2916 14.3137 18.0919L5.82846 9.6066C5.62872 9.40686 5.55046 9.15333 5.56144 8.97583C5.56651 8.8937 5.58877 8.84605 5.60548 8.82181C5.61855 8.80285 5.64516 8.7719 5.71886 8.74414C6.79869 8.33741 7.91661 8.56545 8.68762 8.85128C9.55668 9.17345 10.7171 8.96318 11.3071 8.01845L14.1523 3.46191Z" fill="#0F0F0F"></path> </g></svg>`
     const edit = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#000000"></path> </g></svg>`
 
-  function openMessageInputModal(): Promise<void> {
+  function openMessageInputModal(event:any): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
   
@@ -129,9 +132,11 @@ function ChatWidget() {
           await handleAddMessage({ messageText: message, anonymous: anonymous });
           resolve();
         } else if (msg.type === 'close-plugin') {
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
           resolve();
         } else if (msg.type === 'back-action') {
+          setIsCrownButtonPressed(false);
           reject('New message canceled by user.');
         }
       };
@@ -173,20 +178,24 @@ function ChatWidget() {
                       updatedMessages[index] = updatedMessage;
                       setMessages(updatedMessages);
                     }
-                    
+              setIsCrownButtonPressed(false);
               figma.closePlugin();
               resolve(); // Resolve the promise when the message is updated, no value needed
             } else if (msg.type === 'cancel-edit') {
               console.log("canceled");
+              setIsCrownButtonPressed(false);
               reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
             } else if (msg.type === 'close-plugin') {
+              setIsCrownButtonPressed(false);
               console.log("closed");
+
           figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
           resolve(); // Optionally resolve the promise here, since the action is completed
         }
           };
         } else {
           console.log('Message not found.');
+          setIsCrownButtonPressed(false);
           reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
         }
       });
@@ -412,10 +421,12 @@ function ChatWidget() {
                     processMessageQueue(); 
 
                     // setMessages(prevMessages => [...prevMessages, newMessage]);
-                        
+                    setIsCrownButtonPressed(false);
+
                     resolve();
                   } else if (msg.type === 'close-plugin') {
                     // Handle the case where the plugin UI is closed without sending a reply
+                    setIsCrownButtonPressed(false);
                     reject('Reply action was cancelled.');
                   }
                 };
@@ -423,6 +434,7 @@ function ChatWidget() {
             } else {
               // Handle the case where the message to reply to wasn't found
               console.error('Message to reply to was not found.');
+              setIsCrownButtonPressed(false);
               return Promise.reject('Message to reply to was not found.');
             }
     };
@@ -620,19 +632,23 @@ function ChatWidget() {
                               return message;
                             });
                             setMessages(updatedMessages);
+                            setIsCrownButtonPressed(false);
                             figma.closePlugin();
                             resolve(); // Resolve the promise when the message is updated, no value needed
                           } else if (msg.type === 'cancel-edit') {
                             console.log("canceled");
+                            setIsCrownButtonPressed(false);
                             reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
                           } else if (msg.type === 'close-plugin') {
                             console.log("closed");
+                            setIsCrownButtonPressed(false);
                             figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
                             resolve(); // Optionally resolve the promise here, since the action is completed
                           }
                         };
                       } else {
                         console.log('Message not found.');
+                        setIsCrownButtonPressed(false);
                         reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
                       }
 
@@ -661,19 +677,23 @@ function ChatWidget() {
                               return message;
                             });
                             setMessages(updatedMessages);
+                            setIsCrownButtonPressed(false);
                             figma.closePlugin();
                             resolve(); // Resolve the promise when the message is updated, no value needed
                           } else if (msg.type === 'cancel-edit') {
                             console.log("canceled");
+                            setIsCrownButtonPressed(false);
                             reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
                           } else if (msg.type === 'close-plugin') {
                             console.log("closed");
+                            setIsCrownButtonPressed(false);
                             figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
                             resolve(); // Optionally resolve the promise here, since the action is completed
                           }
                         };
                       } else {
                         console.log('Message not found.');
+                        setIsCrownButtonPressed(false);
                         reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
                       }
 
@@ -688,13 +708,16 @@ function ChatWidget() {
                         if (msg.type === 'update-message') {
                               const updatedText = msg.payload.message;
                               setPrompt(updatedText);
+                              setIsCrownButtonPressed(false);
                               figma.closePlugin();
                               resolve(); 
                             } else if (msg.type === 'cancel-edit') {
                               console.log("canceled");
+                              setIsCrownButtonPressed(false);
                               reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
                             } else if (msg.type === 'close-plugin') {
                               console.log("closed");
+                              setIsCrownButtonPressed(false);
                               figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
                               resolve(); // Optionally resolve the promise here, since the action is completed
                             }
@@ -703,14 +726,17 @@ function ChatWidget() {
                   } else if (msg.type === 'delete-message') {
                       // Handle delete message action
                       handleDeleteMessage(id);
+                      setIsCrownButtonPressed(false);
                       resolve();
                   } else if (msg.type === 'pin-message') {
                       // Handle pin message action
                       handlePinMessage(id);
+                      setIsCrownButtonPressed(false);
                       resolve();
                       
                   } else if (msg.type === 'close-options') {
                       // Handle closing the options iframe
+                      setIsCrownButtonPressed(false);
                       resolve();
                   }
               };
@@ -802,6 +828,8 @@ function ChatWidget() {
     };
 
 useEffect(()=>{
+  if (isCrownButtonPressed && !alreadyLoggedIn) {
+    console.log('crown', isCrownButtonPressed);
   figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
   figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
   figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
@@ -824,6 +852,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -843,6 +872,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -862,6 +892,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -881,6 +912,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -899,6 +931,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -918,6 +951,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -937,6 +971,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -955,6 +990,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -973,6 +1009,7 @@ useEffect(()=>{
           alreadyLoggedIn = true;
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
+          setIsCrownButtonPressed(false);
           figma.closePlugin();
         } else if (msg.type === 'back-action') {
           console.log("back");
@@ -981,11 +1018,47 @@ useEffect(()=>{
         }
       };
     }};
-})
+}})
 
 const handleOptionsClickChat = () => {
+  console.log('waiting');
   updateUserName();
-  return new Promise(() => {})};
+  setIsCrownButtonPressed(true);
+
+  return new Promise<void>((resolve, reject) => {
+    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+    figma.ui.postMessage({ type: 'alreadyLoggedIn', payload: alreadyLoggedIn });
+    figma.ui.postMessage({ type: 'current-widthValue', payload: widgetWidth });
+    figma.ui.postMessage({ type: 'current-borderWidthValue', payload: borderWidth });
+    figma.ui.postMessage({ type: 'current-titleFontSize', payload: titleFontSize });
+    figma.ui.postMessage({ type: 'current-borderColor', payload: borderColor });
+    figma.ui.postMessage({ type: 'current-messageFontSize', payload: messageFontSize });
+    figma.ui.postMessage({ type: 'current-promptColor', payload: promptColor });
+    figma.ui.postMessage({ type: 'current-widgetButtonColor', payload: widgetButtonColor });
+    figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+
+    figma.ui.onmessage = msg => {
+      if (msg.type === 'close-plugin') {
+        console.log("closed");
+        setIsCrownButtonPressed(false);
+        resolve();
+      } else if (msg.type === 'back-action') {
+        console.log("back");
+        alreadyLoggedIn = true;
+        handleOptionsClickChat().then(resolve).catch(reject);
+      }
+    };
+
+    figma.on('close', () => {
+      console.log("closed");
+      setIsCrownButtonPressed(false);
+      resolve();
+    });
+  });
+};
+
+
+
   return (
   <AutoLayout
     direction="vertical"
