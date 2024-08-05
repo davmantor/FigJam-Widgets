@@ -1,82 +1,70 @@
-// This widget allows users to enter a text option, edit it if necessary, and submit it. 
-// Once submitted, the text option becomes non-editable. The widget consists of two main components:
-// 1. EditableText: Handles displaying and editing of a single text entry.
-// 2. PollingWidget: Manages the overall layout and state, including submission of the text entry.
 const { widget } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG, Frame } = widget;
+const { useSyncedState, AutoLayout, Input, Text, SVG } = widget;
 
-// Define the types of properties that our EditableText component will use.
 interface EditableTextProps {
-  index: number; // The index of the text entry.
-  initialValue: string; // The initial text to show in the component.
-  onValueChange: (index: number, newValue: string) => void; // What to do when the text changes.
-  isEditable: boolean; // Can we edit this text?
-  votes: number;
-  fill?: string;
+  index: number;
+  value: { text: string; voters: string[] };
+  onValueChange: (index: number, newValue: string) => void;
+  isEditable: boolean;
   placeholder?: string;
+  onRemove?: (index: number) => void;
 }
 
-// This component can either let you edit text or just show you the text.
-function EditableText({ index, initialValue, onValueChange, isEditable, votes, fill, placeholder }: EditableTextProps) {
-  const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
-  // 'inputValue' holds the current text. 'setInputValue' updates this text.
-  const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, initialValue);
+interface Entry {
+  text: string;
+  voters: string[];
+  isEditable: boolean;
+}
 
-  // This is what the component looks like on the screen.
-  // Creates a vertically stacked container that either displays an editable text input 
-  // (when editing is allowed and active) or static text with an optional edit icon (when editing is not active). 
-  // The appearance and behavior dynamically change based on whether the text is currently being edited or not.
+function EditableText({ index, value, onValueChange, isEditable, placeholder, onRemove }: EditableTextProps) {
+  const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
+  const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, value.text);
+
+  const handleEditEnd = (e: { characters: string }) => {
+    setInputValue(e.characters);
+    setIsEditing(false);
+    onValueChange(index, e.characters);
+  };
+
   return (
     <AutoLayout
-      direction="vertical"  // Stack things on top of each other.
-      spacing={8}  // Space between items inside.
-      padding={8}  // Space around the edges inside.
-      cornerRadius={4}  // Rounded corners of the border.
-      stroke={isEditing ? '#24CE16' : '#E6E6E6'}  // Border color changes when editing.
-      strokeWidth={2}  // How thick the border is
+      direction="vertical"
+      spacing={8}
+      padding={8}
+      cornerRadius={4}
+      stroke={isEditing ? '#24CE16' : '#E6E6E6'}
+      strokeWidth={2}
     >
       {isEditing && isEditable ? (
         <Input
-          value={inputValue}  // Show the current text.
-          placeholder={placeholder || "Enter option"}  // Placeholder when nothing is typed yet.
-          onTextEditEnd={(e) => {
-            setInputValue(e.characters);
-            setIsEditing(false);
-            onValueChange(index, e.characters);
-          }}
-          width={200}  // How wide the text box is.
+          value={inputValue}
+          placeholder={placeholder || "Enter option"}
+          onTextEditEnd={handleEditEnd}
+          width={200}
         />
       ) : (
         <AutoLayout spacing={8} verticalAlignItems={'center'}>
-          <Text
-            fontSize={16}
-            fill={inputValue ? '#000000' : (index === -1 ? '#808080' : '#000000')}  
-            fontWeight={inputValue ? 'normal' : (index === -1? 'bold' : 'normal')} 
-          >
+          <Text fontSize={16} fill={inputValue ? '#000000' : '#808080'}>
             {inputValue || placeholder || "Enter option"}
           </Text>
-          {!isEditable && (
-            <Text
-            fontSize={14} >
-            {index === -1? '' : votes}
-            
-          </Text>
-          )}
+          {!isEditable && index !== -1 && <Text fontSize={14}>{value.voters.length}</Text>}
           {isEditable && (
-            <SVG
-              src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 13.5V10L10 1L14 5L5 14H1.5H1.5ZM10 1L14 5L5 14H1V10L10 1ZM3 11V12H4L12 4L11 3L3 11ZM11 3L12 4L10 6L9 5L11 3ZM9 5L4 10H3V9L9 5Z" fill="black"/>
-                    </svg>`}
-              onClick={() => setIsEditing(true)}
-            />
-          )}
-          {isEditable && index !== -1 && (
-            <SVG  src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="30" height="30" rx="15" fill="white"/>
-                    <rect x="7.5" y="14.0625" width="15" height="1.875" fill="black" fill-opacity="0.8"/>
-                    <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-                    </svg>`}
-            ></SVG>
+            <>
+              <SVG
+                src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 13.5V10L10 1L14 5L5 14H1.5H1.5ZM10 1L14 5L5 14H1V10L10 1ZM3 11V12H4L12 4L11 3L3 11ZM11 3L12 4L10 6L9 5L11 3ZM9 5L4 10H3V9L9 5Z" fill="black"/>
+                      </svg>`}
+                onClick={() => setIsEditing(true)}
+              />
+              {index !== -1 && onRemove && (
+                <SVG
+                  src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
+                  </svg>`}
+                  onClick={() => onRemove(index)}
+                />
+              )}
+            </>
           )}
         </AutoLayout>
       )}
@@ -84,148 +72,130 @@ function EditableText({ index, initialValue, onValueChange, isEditable, votes, f
   );
 }
 
-// The main part of our widget where we put everything together.
 function PollingWidget() {
-  // Keep track of the text and whether the form has been submitted.
   const [isSubmitted, setIsSubmitted] = useSyncedState('isSubmitted', false);
-  const [textArray, setTextArray] = useSyncedState('textArray', [{ initialValue: "", isEditable: true }]);
-  const [voteArray, setVoteArray] = useSyncedState('voteArray', [0]);
-  const [userName, setUserName] = useSyncedState<string>("userName", "");
+  const [entries, setEntries] = useSyncedState<Entry[]>('entries', [{ text: "", voters: [], isEditable: true }]);
   const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
   const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
 
-
-  // Handles what happens when text changes.
   const handleValueChange = (index: number, newValue: string) => {
-    const updatedTextArray = textArray.map((item, i) => {
-      if (i === index) {
-        return { ...item, initialValue: newValue };
-      }
-      return item;
-    });
-    setTextArray(updatedTextArray);
+    const updatedEntries = entries.map((item, i) => (i === index ? { ...item, text: newValue } : item));
+    setEntries(updatedEntries);
+    console.log("Entries after value change:", updatedEntries);
   };
 
-  // What to do when the submit button is pressed.
   const handleSubmit = () => {
-    setIsSubmitted(true); // Mark the form as submitted.
-    setTextArray(textArray.map(item => ({ ...item, isEditable: false })));
+    setIsSubmitted(true);
+    const updatedEntries = entries.map(item => ({ ...item, isEditable: false }));
+    setEntries(updatedEntries);
+    console.log("Entries after submission:", updatedEntries);
   };
 
   const handleVote = (index: number) => {
     const currentUser = figma.currentUser?.name || "User";
-    const previousVote = userVotes[currentUser] ?? undefined;
+    const userIcon = figma.currentUser?.photoUrl || "";
+    console.log(userIcon)
+    const previousVote = userVotes[currentUser];
 
-    //logic: check if user has already voted. if not, add their vote to the selected option. if they have, subtract their previous vote
-    //       and add the new vote. finally, update the userVotes state.
-    // previous logic was calculating and setting totalVotes before any changes to the voteArray happened, so it would always
-    // reflect the state BEFORE the current vote is counted.
     if (isSubmitted) {
-      const updatedVoteArray = [...voteArray];
-  
-      if (previousVote !== undefined && previousVote !== index) {
-        // user has previously voted and is changing their vote
-        updatedVoteArray[previousVote] -= 1;
-        updatedVoteArray[index] += 1;
+      const updatedEntries = [...entries];
+
+      if (previousVote !== undefined && previousVote !== index && previousVote !== null) {
+        updatedEntries[previousVote].voters = updatedEntries[previousVote].voters.filter(voter => voter !== currentUser);
+        updatedEntries[index].voters.push(currentUser);
       } else if (previousVote === undefined) {
-        // user is voting for the first time
-        updatedVoteArray[index] += 1;
+        updatedEntries[index].voters.push(currentUser);
       }
-  
-      setVoteArray(updatedVoteArray);
+
+      setEntries(updatedEntries);
+      console.log("Entries after vote:", updatedEntries);
       setUserVotes({ ...userVotes, [currentUser]: index });
-  
-      // update total votes
-      const sum = updatedVoteArray.reduce((accumulation, votes) => accumulation + votes, 0);
-      setTotalVotes(sum);
+      setTotalVotes(updatedEntries.reduce((acc, entry) => acc + entry.voters.length, 0));
     }
   };
 
   const handleAddTextField = () => {
-    const newTextArray = [...textArray, { initialValue: "", isEditable: true }];
-    const newVoteArray = [...voteArray, 0];
-    setTextArray(newTextArray);
-    setVoteArray(newVoteArray);
+    const newEntries = [...entries, { text: "", voters: [], isEditable: true }];
+    setEntries(newEntries);
+    console.log("Entries after adding text field:", newEntries);
   };
 
+  const removeTextField = (index: number) => {
+    const updatedEntries = entries.filter((_, i) => i !== index);
+    setEntries(updatedEntries);
+    console.log("Entries after removing text field:", updatedEntries);
+  };
 
-  // How our widget is laid out
+  const handleVoteClick = (index: number) => {
+    if (isSubmitted) {
+      handleVote(index);
+    }
+  };
+
   return (
     <AutoLayout
-      direction="vertical"  // Stack elements vertically.
-      verticalAlignItems="start"  // Align items to the start.
-      spacing={16}  // Space between elements.
-      padding={16}  // Padding around the inside.
-      cornerRadius={8}  // Rounded corners.
-      fill={'#FFFFFF'}  // Background color.
-      stroke={'#E6E6E6'}  // Border color.
+      direction="vertical"
+      verticalAlignItems="start"
+      spacing={16}
+      padding={16}
+      cornerRadius={8}
+      fill={'#FFFFFF'}
+      stroke={'#E6E6E6'}
     >
-      <AutoLayout
-        stroke={'#878584'}
-        direction="vertical"
-        padding={4}
-        cornerRadius={8}
-      >
+      <AutoLayout stroke={'#878584'} direction="vertical" padding={4} cornerRadius={8}>
         <EditableText
           key={-1}
           index={-1}
-          initialValue={''}
+          value={{ text: '', voters: [] }}
           onValueChange={handleValueChange}
           isEditable={!isSubmitted}
-          votes={0}
           placeholder="Enter poll question here"
         />
-
       </AutoLayout>
-      {textArray.map((item, index) => (
-        <AutoLayout
-          onClick={() => isSubmitted ? handleVote(index) : undefined}
-        >
+      {entries.map((item, index) => (
+        <AutoLayout key={index} onClick={() => handleVoteClick(index)}>
           <EditableText
-             key={index}
             index={index}
-            initialValue={item.initialValue}
+            value={item}
             onValueChange={handleValueChange}
             isEditable={!isSubmitted}
-            votes={voteArray[index]}
-            fill={'#FFFFFF'} 
+            placeholder="Enter option"
+            onRemove={removeTextField}
           />
         </AutoLayout>
       ))}
-
       {!isSubmitted && (
-        <SVG
-          src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="30" height="30" rx="15" fill="white"/>
-                <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
-                <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-              </svg>`}
-          onClick={handleAddTextField}
-        />
-      )}
-      {!isSubmitted && (
-        <AutoLayout
-          width={100}
-          height={32}
-          cornerRadius={6}
-          fill="#24CE16"
-          onClick={handleSubmit}
-          verticalAlignItems="center"
-          horizontalAlignItems="center"
-        >
-          <Text fontSize={14} fill="#FFFFFF">
-            Submit
-          </Text>
-        </AutoLayout>
+        <>
+          <SVG
+            src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="30" height="30" rx="15" fill="white"/>
+                  <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
+                  <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+                </svg>`}
+            onClick={handleAddTextField}
+          />
+          <AutoLayout
+            width={100}
+            height={32}
+            cornerRadius={6}
+            fill="#24CE16"
+            onClick={handleSubmit}
+            verticalAlignItems="center"
+            horizontalAlignItems="center"
+          >
+            <Text fontSize={14} fill="#FFFFFF">
+              Submit
+            </Text>
+          </AutoLayout>
+        </>
       )}
       {isSubmitted && (
-             <Text fontSize={10} fill="#808080">
+        <Text fontSize={10} fill="#808080">
           {'Total votes: ' + totalVotes}
         </Text>
-        )}
+      )}
     </AutoLayout>
   );
 }
 
-// Make sure Figma knows this is the widget we want to use.
 widget.register(PollingWidget);

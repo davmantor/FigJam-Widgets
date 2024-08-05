@@ -54,6 +54,7 @@ function generateLogId() {
 
 let alreadyLoggedIn = false;
 let thenFlag = false;
+let curr_config = "";
 
 function ChatWidget() {
     //console.log("ChatWidget rendered2");
@@ -800,281 +801,191 @@ function ChatWidget() {
       ));
     };
 
+useEffect(()=>{
+  figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+  figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
+  figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
+  figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
+  figma.ui.postMessage({ type: 'current-titleFontSize',      payload: titleFontSize });
+  figma.ui.postMessage({ type: 'current-borderColor',        payload: borderColor });
+  figma.ui.postMessage({ type: 'current-messageFontSize',    payload: messageFontSize });
+  figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
+  figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
+  figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+  figma.ui.onmessage = msg => {
+    if (msg.type === 'update-prompt') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedText = msg.payload.message;
+          setPrompt(updatedText);
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-width') {
+      console.log("calling width from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          console.log("WIDGETWIDTGSET");
+          const updatedWidth = msg.payload.message;
+          setWidgetWidth(parseInt(updatedWidth, 10));
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-borderWidth') {
+      console.log("calling width from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
+      console.log("opened");
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedBorderWidth = msg.payload.message;
+          setBorderWidth(parseInt(updatedBorderWidth, 10));
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-titleFontSize') {
+      console.log("calling width from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
+      console.log("opened");
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedTitleFontSize = msg.payload.message;
+          setTitleFontSize(parseInt(updatedTitleFontSize, 10));
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-borderColor') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedText = msg.payload.message;
+          setBorderColor(updatedText);
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-messageFontSize') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
+      console.log("opened");
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedMessageFontSize = msg.payload.message;
+          setMessageFontSize(parseInt(updatedMessageFontSize, 10));
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-promptColor') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
+      console.log("opened");
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedText = msg.payload.message;
+          setPromptColor(updatedText);
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-widgetButtonColor') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-widgetButtonColor', payload: widgetButtonColor });
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedText = msg.payload.message;
+          setWidgetButtonColor(updatedText);
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    } else if (msg.type === 'update-widgetCornerRadius') {
+      console.log("calling prompt from options");
+      figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+      figma.ui.postMessage({ type: 'edit-widgetCornerRadius', payload: widgetCornerRadius });
+      figma.ui.onmessage = msg => {
+        if (msg.type === 'update-message') {
+          const updatedText = msg.payload.message;
+          setWidgetCornerRadius(updatedText);
+          alreadyLoggedIn = true;
+        } else if (msg.type === 'close-plugin') {
+          console.log("closed");
+          figma.closePlugin();
+        } else if (msg.type === 'back-action') {
+          console.log("back");
+          alreadyLoggedIn = true;
+          handleOptionsClickChat();
+        }
+      };
+    }};
+})
+
 const handleOptionsClickChat = () => {
   updateUserName();
-  console.log("already logged in")
-  console.log("in options:", userName);
-  return new Promise((resolve, reject) => {
-
-    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
-    figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
-    figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
-    figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
-    figma.ui.postMessage({ type: 'current-titleFontSize',      payload: titleFontSize });
-    figma.ui.postMessage({ type: 'current-borderColor',        payload: borderColor });
-    figma.ui.postMessage({ type: 'current-messageFontSize',    payload: messageFontSize });
-    figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
-    figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
-    figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
-    console.log(widgetButtonColor);
-
-    figma.ui.onmessage = msg => {
-      if (msg.type === 'update-prompt') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setPrompt(updatedText);
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-width') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedWidth = msg.payload.message;
-            setWidgetWidth(parseInt(updatedWidth, 10));
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-borderWidth') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedBorderWidth = msg.payload.message;
-            setBorderWidth(parseInt(updatedBorderWidth, 10));
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-titleFontSize') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-titleFontSize', payload: titleFontSize });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedTitleFontSize = msg.payload.message;
-            setTitleFontSize(parseInt(updatedTitleFontSize, 10));
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-borderColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setBorderColor(updatedText);
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-messageFontSize') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-messageFontSize', payload: messageFontSize });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedMessageFontSize = msg.payload.message;
-            setMessageFontSize(parseInt(updatedMessageFontSize, 10));
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-promptColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setPromptColor(updatedText);
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-widgetButtonColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-widgetButtonColor', payload: widgetButtonColor });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setWidgetButtonColor(updatedText);
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-            handleOptionsClickChat();
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'update-widgetCornerRadius') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-        figma.ui.postMessage({ type: 'edit-widgetCornerRadius', payload: widgetCornerRadius });
-        console.log("opened");
-
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setWidgetCornerRadius(updatedText);
-            alreadyLoggedIn = true;
-            thenFlag = true;
-            resolve(thenFlag);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            figma.closePlugin();
-            thenFlag = false;
-            resolve(thenFlag);
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
-      } else if (msg.type === 'close-options') {
-        // Handle closing the options iframe
-        thenFlag = false;
-        resolve(thenFlag);
-      }};
-  }).then((thenFlag) => {
-    if (thenFlag) {
-      console.log("entering");
-      figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
-      figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
-      figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
-      figma.ui.postMessage({ type: 'current-titleFontSize',      payload: titleFontSize });
-      figma.ui.postMessage({ type: 'current-borderColor',        payload: borderColor });
-      figma.ui.postMessage({ type: 'current-messageFontSize',    payload: messageFontSize });
-      figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
-      figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
-      figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
-      console.log(widgetCornerRadius);
-      console.log("post_message");
-      handleOptionsClickChat();
-    }
-    console.log("thenFlag:", thenFlag)});
-  };
+  return new Promise(() => {})};
   return (
   <AutoLayout
     direction="vertical"
