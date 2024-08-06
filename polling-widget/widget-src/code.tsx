@@ -24,7 +24,7 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: 
   };
 
   return (
-    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center">
+    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent">
       <AutoLayout
         direction="horizontal"
         spacing={8}
@@ -34,6 +34,7 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: 
         strokeWidth={2}
         verticalAlignItems="center"
         fill={'#FFFFFF'}
+        width={250}
         onClick={() => setIsEditing(true)}
       >
         {isEditing ? (
@@ -41,23 +42,23 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: 
             value={value}
             onTextEditEnd={handleEditEnd}
             placeholder={isQuestion ? "Enter poll question" : "Enter option"}
-            width={200}
+            width="fill-parent"
             fontSize={isQuestion ? 18 : 16}
           />
         ) : (
-          <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'}>
+          <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" wrap="wrap">
             {value || (isQuestion ? "Enter poll question" : "Enter option")}
           </Text>
         )}
-        {!isQuestion && onRemove && (
-          <SVG
-            src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
-                </svg>`}
-            onClick={handleRemove}
-          />
-        )}
       </AutoLayout>
+      {!isQuestion && onRemove && (
+        <SVG
+          src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
+              </svg>`}
+          onClick={handleRemove}
+        />
+      )}
     </AutoLayout>
   );
 }
