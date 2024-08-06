@@ -1,5 +1,10 @@
 const { widget } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG } = widget;
+const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
+
+interface CustomUser {
+  name: string;
+  photoUrl: string;
+}
 
 interface TextBoxProps {
   index: number;
@@ -13,6 +18,7 @@ interface TextBoxProps {
   votes: number;
   onVote: () => void;
   userVote: boolean;
+  voters: CustomUser[];
 }
 
 function TextBox({
@@ -27,6 +33,7 @@ function TextBox({
   votes,
   onVote,
   userVote,
+  voters,
 }: TextBoxProps) {
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
@@ -83,12 +90,25 @@ function TextBox({
         />
       )}
       {!isQuestion && submitted && (
-        <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
-          {votes}
-        </Text>
+        <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
+          <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
+            {votes}
+          </Text>
+          {voters.map((voter, i) => (
+            <Image key={i} src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
+          ))}
+        </AutoLayout>
       )}
     </AutoLayout>
   );
+}
+
+async function getCurrentUser() {
+  const currentUser = figma.currentUser;
+  if (currentUser) {
+    const { name, photoUrl } = currentUser;
+    await figma.clientStorage.setAsync('currentUser', { name, photoUrl });
+  }
 }
 
 function PollingWidget() {
@@ -98,6 +118,19 @@ function PollingWidget() {
   const [submitted, setSubmitted] = useSyncedState<boolean>('submitted', false);
   const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
+  const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
+  const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
+
+  // Load current user from clientStorage
+  useEffect(() => {
+    async function loadUser() {
+      const storedUser = await figma.clientStorage.getAsync('currentUser');
+      if (storedUser) {
+        setCurrentUser(storedUser);
+      }
+    }
+    loadUser();
+  }, []);
 
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
@@ -118,16 +151,25 @@ function PollingWidget() {
     const updatedEntries = [...entries, ""];
     setEntries(updatedEntries);
     setVotes([...votes, 0]); // Add a vote count for the new entry
+    setVoters([...voters, []]); // Add an empty array for the new entry's voters
     setEditingIndex(updatedEntries.length - 1); // Set the new text box to be in edit mode
   };
 
   const handleVote = (index: number) => {
+    if (!currentUser) return;
+
     const newVotes = [...votes];
-    if (userVoteIndex !== null) {
+    const newVoters = [...voters];
+    
+    if (userVoteIndex !== null && userVoteIndex !== index) {
       newVotes[userVoteIndex]--;
+      newVoters[userVoteIndex] = newVoters[userVoteIndex].filter(voter => voter.name !== currentUser.name);
     }
+
     newVotes[index]++;
+    newVoters[index] = [...newVoters[index], currentUser];
     setVotes(newVotes);
+    setVoters(newVoters);
     setUserVoteIndex(index);
   };
 
@@ -163,6 +205,7 @@ function PollingWidget() {
         votes={0}
         onVote={() => {}}
         userVote={false}
+        voters={[]}
       />
       {entries.map((item, index) => (
         <TextBox
@@ -177,6 +220,7 @@ function PollingWidget() {
           votes={votes[index]}
           onVote={() => handleVote(index)}
           userVote={userVoteIndex === index}
+          voters={voters[index]}
         />
       ))}
       {!submitted && (
@@ -216,3 +260,5 @@ function PollingWidget() {
 
 widget.register(PollingWidget);
 
+// Ensure to call getCurrentUser when the plugin starts
+getCurrentUser();
