@@ -9,10 +9,25 @@ interface TextBoxProps {
   isQuestion?: boolean;
   isEditing: boolean;
   setEditingIndex: (index: number | null) => void;
-  submitted: boolean; // Add a new prop to handle submission state
+  submitted: boolean;
+  votes: number;
+  onVote: () => void;
+  userVote: boolean;
 }
 
-function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, isEditing, setEditingIndex, submitted }: TextBoxProps) {
+function TextBox({
+  index,
+  value,
+  onValueChange,
+  onRemove,
+  isQuestion = false,
+  isEditing,
+  setEditingIndex,
+  submitted,
+  votes,
+  onVote,
+  userVote,
+}: TextBoxProps) {
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
     setEditingIndex(null);
@@ -25,13 +40,15 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
   };
 
   const handleClick = () => {
-    if (!submitted) {
+    if (submitted) {
+      onVote();
+    } else {
       setEditingIndex(index);
     }
   };
 
   return (
-    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent">
+    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
       <AutoLayout
         direction="horizontal"
         spacing={8}
@@ -42,7 +59,6 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
         verticalAlignItems="center"
         fill={'#FFFFFF'}
         width={300}
-        onClick={handleClick}
       >
         {isEditing ? (
           <Input
@@ -58,13 +74,18 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
           </Text>
         )}
       </AutoLayout>
-      {!isQuestion && onRemove && !submitted && (
+      {!isQuestion && !submitted && onRemove && (
         <SVG
           src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
               </svg>`}
           onClick={handleRemove}
         />
+      )}
+      {!isQuestion && submitted && (
+        <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
+          {votes}
+        </Text>
       )}
     </AutoLayout>
   );
@@ -74,7 +95,9 @@ function PollingWidget() {
   const [title, setTitle] = useSyncedState<string>('title', "");
   const [entries, setEntries] = useSyncedState<string[]>('entries', [""]);
   const [editingIndex, setEditingIndex] = useSyncedState<number | null>('editingIndex', -1);
-  const [submitted, setSubmitted] = useSyncedState<boolean>('submitted', false); // New state to track submission
+  const [submitted, setSubmitted] = useSyncedState<boolean>('submitted', false);
+  const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
+  const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
 
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
@@ -94,7 +117,18 @@ function PollingWidget() {
   const handleAddTextBox = () => {
     const updatedEntries = [...entries, ""];
     setEntries(updatedEntries);
+    setVotes([...votes, 0]); // Add a vote count for the new entry
     setEditingIndex(updatedEntries.length - 1); // Set the new text box to be in edit mode
+  };
+
+  const handleVote = (index: number) => {
+    const newVotes = [...votes];
+    if (userVoteIndex !== null && userVoteIndex !== index) {
+      newVotes[userVoteIndex]--;
+    }
+    newVotes[index]++;
+    setVotes(newVotes);
+    setUserVoteIndex(index);
   };
 
   const handleSubmit = () => {
@@ -123,6 +157,9 @@ function PollingWidget() {
         isEditing={editingIndex === -1}
         setEditingIndex={setEditingIndex}
         submitted={submitted}
+        votes={0}
+        onVote={() => {}}
+        userVote={false}
       />
       {entries.map((item, index) => (
         <TextBox
@@ -134,6 +171,9 @@ function PollingWidget() {
           isEditing={editingIndex === index}
           setEditingIndex={setEditingIndex}
           submitted={submitted}
+          votes={votes[index]}
+          onVote={() => handleVote(index)}
+          userVote={userVoteIndex === index}
         />
       ))}
       {!submitted && (
@@ -165,4 +205,3 @@ function PollingWidget() {
 }
 
 widget.register(PollingWidget);
-
