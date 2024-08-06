@@ -222,11 +222,6 @@ function PollingWidget() {
           <Text fontSize={10} fill="#808080">
             {'Total votes: ' + totalVotes}
           </Text>
-          <AutoLayout direction="horizontal" spacing={8}>
-            {Object.keys(userIcons).map((user, index) => (
-              <Image key={index} src={userIcons[user]} width={32} height={32} cornerRadius={16} />
-            ))}
-          </AutoLayout>
         </>
       )}
     </AutoLayout>
