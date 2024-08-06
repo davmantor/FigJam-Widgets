@@ -9,9 +9,10 @@ interface TextBoxProps {
   isQuestion?: boolean;
   isEditing: boolean;
   setEditingIndex: (index: number | null) => void;
+  submitted: boolean; // Add a new prop to handle submission state
 }
 
-function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, isEditing, setEditingIndex }: TextBoxProps) {
+function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, isEditing, setEditingIndex, submitted }: TextBoxProps) {
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
     setEditingIndex(null);
@@ -20,6 +21,12 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
   const handleRemove = () => {
     if (onRemove) {
       onRemove(index);
+    }
+  };
+
+  const handleClick = () => {
+    if (!submitted) {
+      setEditingIndex(index);
     }
   };
 
@@ -35,7 +42,7 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
         verticalAlignItems="center"
         fill={'#FFFFFF'}
         width={300}
-        onClick={() => setEditingIndex(index)}
+        onClick={handleClick}
       >
         {isEditing ? (
           <Input
@@ -46,12 +53,12 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
             fontSize={isQuestion ? 18 : 16}
           />
         ) : (
-          <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" wrap="wrap">
+          <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent">
             {value || (isQuestion ? "Enter poll question" : "Enter option")}
           </Text>
         )}
       </AutoLayout>
-      {!isQuestion && onRemove && (
+      {!isQuestion && onRemove && !submitted && (
         <SVG
           src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
@@ -64,9 +71,10 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, is
 }
 
 function PollingWidget() {
-  const [title, setTitle] = useSyncedState<string>('title', "Poll Title");
+  const [title, setTitle] = useSyncedState<string>('title', "");
   const [entries, setEntries] = useSyncedState<string[]>('entries', [""]);
   const [editingIndex, setEditingIndex] = useSyncedState<number | null>('editingIndex', -1);
+  const [submitted, setSubmitted] = useSyncedState<boolean>('submitted', false); // New state to track submission
 
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
@@ -94,6 +102,7 @@ function PollingWidget() {
     setEntries(entries.map(entry => entry));
     setTitle(title); // Force a state update to ensure the title is also saved
     setEditingIndex(null);
+    setSubmitted(true); // Set submitted state to true
   };
 
   return (
@@ -113,6 +122,7 @@ function PollingWidget() {
         isQuestion={true}
         isEditing={editingIndex === -1}
         setEditingIndex={setEditingIndex}
+        submitted={submitted}
       />
       {entries.map((item, index) => (
         <TextBox
@@ -123,30 +133,36 @@ function PollingWidget() {
           onRemove={handleRemove}
           isEditing={editingIndex === index}
           setEditingIndex={setEditingIndex}
+          submitted={submitted}
         />
       ))}
-      <SVG
-        src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="30" height="30" rx="15" fill="white"/>
-              <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
-              <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
-            </svg>`}
-        onClick={handleAddTextBox}
-      />
-      <AutoLayout
-        fill="#24CE16"
-        padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
-        cornerRadius={4}
-        verticalAlignItems="center"
-        horizontalAlignItems="center"
-        onClick={handleSubmit}
-      >
-        <Text fontSize={16} fill="#FFFFFF">
-          Submit
-        </Text>
-      </AutoLayout>
+      {!submitted && (
+        <>
+          <SVG
+            src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="30" height="30" rx="15" fill="white"/>
+                  <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
+                  <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
+                </svg>`}
+            onClick={handleAddTextBox}
+          />
+          <AutoLayout
+            fill="#24CE16"
+            padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
+            cornerRadius={4}
+            verticalAlignItems="center"
+            horizontalAlignItems="center"
+            onClick={handleSubmit}
+          >
+            <Text fontSize={16} fill="#FFFFFF">
+              Submit
+            </Text>
+          </AutoLayout>
+        </>
+      )}
     </AutoLayout>
   );
 }
 
 widget.register(PollingWidget);
+
