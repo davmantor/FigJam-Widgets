@@ -14,7 +14,7 @@
   "widgetApi": "1.0.0",
   "networkAccess": {
     "allowedDomains": [
-      "none"
+      "https://s3-alpha.figma.com"
     ]
   }
 }
