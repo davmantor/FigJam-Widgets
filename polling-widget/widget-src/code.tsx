@@ -123,7 +123,7 @@ function PollingWidget() {
 
   const handleVote = (index: number) => {
     const newVotes = [...votes];
-    if (userVoteIndex !== null && userVoteIndex !== index) {
+    if (userVoteIndex !== null) {
       newVotes[userVoteIndex]--;
     }
     newVotes[index]++;
@@ -139,6 +139,8 @@ function PollingWidget() {
     setSubmitted(true); // Set submitted state to true
   };
 
+  const totalVotes = votes.reduce((acc, voteCount) => acc + voteCount, 0);
+
   return (
     <AutoLayout
       direction="vertical"
@@ -148,6 +150,7 @@ function PollingWidget() {
       cornerRadius={8}
       fill={'#FFFFFF'}
       stroke={'#E6E6E6'}
+      width={400}  // Set a fixed width for the widget
     >
       <TextBox
         index={-1}
@@ -200,8 +203,16 @@ function PollingWidget() {
           </AutoLayout>
         </>
       )}
+      {submitted && (
+        <AutoLayout width="fill-parent" padding={{ top: 10 }}>
+          <Text fontSize={12} fill="#808080" width="fill-parent">
+            Total votes: {totalVotes}
+          </Text>
+        </AutoLayout>
+      )}
     </AutoLayout>
   );
 }
 
 widget.register(PollingWidget);
+
