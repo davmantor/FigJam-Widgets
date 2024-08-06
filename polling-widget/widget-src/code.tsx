@@ -7,14 +7,14 @@ interface TextBoxProps {
   onValueChange: (index: number, newValue: string) => void;
   onRemove?: (index: number) => void;
   isQuestion?: boolean;
+  isEditing: boolean;
+  setEditingIndex: (index: number | null) => void;
 }
 
-function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: TextBoxProps) {
-  const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
-
+function TextBox({ index, value, onValueChange, onRemove, isQuestion = false, isEditing, setEditingIndex }: TextBoxProps) {
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
-    setIsEditing(false);
+    setEditingIndex(null);
   };
 
   const handleRemove = () => {
@@ -34,8 +34,8 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: 
         strokeWidth={2}
         verticalAlignItems="center"
         fill={'#FFFFFF'}
-        width={250}
-        onClick={() => setIsEditing(true)}
+        width={300}
+        onClick={() => setEditingIndex(index)}
       >
         {isEditing ? (
           <Input
@@ -66,6 +66,7 @@ function TextBox({ index, value, onValueChange, onRemove, isQuestion = false }: 
 function PollingWidget() {
   const [title, setTitle] = useSyncedState<string>('title', "Poll Title");
   const [entries, setEntries] = useSyncedState<string[]>('entries', [""]);
+  const [editingIndex, setEditingIndex] = useSyncedState<number | null>('editingIndex', -1);
 
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
@@ -79,11 +80,20 @@ function PollingWidget() {
   const handleRemove = (index: number) => {
     const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
+    setEditingIndex(null);
   };
 
   const handleAddTextBox = () => {
     const updatedEntries = [...entries, ""];
     setEntries(updatedEntries);
+    setEditingIndex(updatedEntries.length - 1); // Set the new text box to be in edit mode
+  };
+
+  const handleSubmit = () => {
+    // Force a state change to ensure all edits are saved
+    setEntries(entries.map(entry => entry));
+    setTitle(title); // Force a state update to ensure the title is also saved
+    setEditingIndex(null);
   };
 
   return (
@@ -101,6 +111,8 @@ function PollingWidget() {
         value={title}
         onValueChange={handleValueChange}
         isQuestion={true}
+        isEditing={editingIndex === -1}
+        setEditingIndex={setEditingIndex}
       />
       {entries.map((item, index) => (
         <TextBox
@@ -109,6 +121,8 @@ function PollingWidget() {
           value={item}
           onValueChange={handleValueChange}
           onRemove={handleRemove}
+          isEditing={editingIndex === index}
+          setEditingIndex={setEditingIndex}
         />
       ))}
       <SVG
@@ -119,6 +133,18 @@ function PollingWidget() {
             </svg>`}
         onClick={handleAddTextBox}
       />
+      <AutoLayout
+        fill="#24CE16"
+        padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
+        cornerRadius={4}
+        verticalAlignItems="center"
+        horizontalAlignItems="center"
+        onClick={handleSubmit}
+      >
+        <Text fontSize={16} fill="#FFFFFF">
+          Submit
+        </Text>
+      </AutoLayout>
     </AutoLayout>
   );
 }
