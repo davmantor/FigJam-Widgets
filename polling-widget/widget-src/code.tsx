@@ -1,39 +1,61 @@
 const { widget } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG, Image } = widget;
+const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
-interface EditableTextProps {
+interface CustomUser {
+  name: string;
+  photoUrl: string;
+}
+
+interface TextBoxProps {
   index: number;
-  value: { text: string; voters: string[] };
+  value: string;
   onValueChange: (index: number, newValue: string) => void;
-  isEditable: boolean;
-  placeholder?: string;
   onRemove?: (index: number) => void;
-  userIcons: UserIconDictionary;
-  isQuestion: boolean
+  isQuestion?: boolean;
+  isEditing: boolean;
+  setEditingIndex: (index: number | null) => void;
+  submitted: boolean;
+  votes: number;
+  onVote: () => void;
+  userVote: boolean;
+  voters: CustomUser[];
 }
 
-interface Entry {
-  text: string;
-  voters: string[];
-  isEditable: boolean;
-}
-
-interface UserIconDictionary {
-  [user: string]: string;
-}
-
-function EditableText({ index, value, onValueChange, isEditable, placeholder, onRemove, userIcons, isQuestion }: EditableTextProps) {
-  const [isEditing, setIsEditing] = useSyncedState(`isEditing-${index}`, false);
-  const [inputValue, setInputValue] = useSyncedState(`inputValue-${index}`, value.text);
-
+function TextBox({
+  index,
+  value,
+  onValueChange,
+  onRemove,
+  isQuestion = false,
+  isEditing,
+  setEditingIndex,
+  submitted,
+  votes,
+  onVote,
+  userVote,
+  voters,
+}: TextBoxProps) {
   const handleEditEnd = (e: { characters: string }) => {
-    setInputValue(e.characters);
-    setIsEditing(false);
     onValueChange(index, e.characters);
+    setEditingIndex(null);
+  };
+
+  const handleRemove = () => {
+    if (onRemove) {
+      onRemove(index);
+    }
+  };
+
+  const handleClick = () => {
+    if (submitted) {
+      onVote();
+    } else {
+      setEditingIndex(index);
+    }
   };
 
   return (
-    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center">
+    <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
       <AutoLayout
         direction="horizontal"
         spacing={8}
@@ -42,118 +64,124 @@ function EditableText({ index, value, onValueChange, isEditable, placeholder, on
         stroke={isEditing ? '#24CE16' : '#E6E6E6'}
         strokeWidth={2}
         verticalAlignItems="center"
+        fill={'#FFFFFF'}
+        width={300}
       >
-        {isEditing && isEditable ? (
+        {isEditing ? (
           <Input
-            value={inputValue}
-            placeholder={placeholder || "Enter option"}
+            value={value}
             onTextEditEnd={handleEditEnd}
-            width={200}
+            placeholder={isQuestion ? "Enter poll question" : "Enter option"}
+            width="fill-parent"
+            fontSize={isQuestion ? 18 : 16}
           />
         ) : (
-          <Text fontSize={16} 
-          fill={inputValue ? '#000000' : '#808080'} 
-          fontWeight={isQuestion ? 'bold' : 'normal'}>
-            {inputValue || placeholder || "Enter option"}
+          <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent">
+            {value || (isQuestion ? "Enter poll question" : "Enter option")}
           </Text>
         )}
-        {isEditable && (
-          <>
-            <SVG
-              src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 13.5V10L10 1L14 5L5 14H1.5H1.5ZM10 1L14 5L5 14H1V10L10 1ZM3 11V12H4L12 4L11 3L3 11ZM11 3L12 4L10 6L9 5L11 3ZM9 5L4 10H3V9L9 5Z" fill="black"/>
-                    </svg>`}
-              onClick={() => setIsEditing(true)}
-            />
-            {index !== -1 && onRemove && (
-              <SVG
-                src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
-                </svg>`}
-                onClick={() => onRemove(index)}
-              />
-            )}
-          </>
-        )}
       </AutoLayout>
-      <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center">
-        {!isEditable && index !== -1 && <Text fontSize={14}>{value.voters.length}</Text>}
-        {value.voters.length >= 1 && !isEditing && (
-          <AutoLayout direction="horizontal">
-            {value.voters.map((voter, i) => (
-              <Image key={i} src={userIcons[voter]} width={24} height={24} cornerRadius={12} />
-            ))}
-          </AutoLayout>
-        )}
-      </AutoLayout>
+      {!isQuestion && !submitted && onRemove && (
+        <SVG
+          src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 2L14 14M2 14L14 2" stroke="black" stroke-width="2"/>
+              </svg>`}
+          onClick={handleRemove}
+        />
+      )}
+      {!isQuestion && submitted && (
+        <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
+          <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
+            {votes}
+          </Text>
+          {voters.map((voter, i) => (
+            <Image key={i} src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
+          ))}
+        </AutoLayout>
+      )}
     </AutoLayout>
   );
 }
 
+async function getCurrentUser() {
+  const currentUser = figma.currentUser;
+  if (currentUser) {
+    const { name, photoUrl } = currentUser;
+    await figma.clientStorage.setAsync('currentUser', { name, photoUrl });
+  }
+}
+
 function PollingWidget() {
-  const [isSubmitted, setIsSubmitted] = useSyncedState('isSubmitted', false);
-  const [entries, setEntries] = useSyncedState<Entry[]>('entries', [{ text: "", voters: [], isEditable: true }]);
-  const [userVotes, setUserVotes] = useSyncedState<Record<string, number | null>>('userVotes', {});
-  const [totalVotes, setTotalVotes] = useSyncedState('totalVotes', 0);
-  const [userIcons, setUserIcons] = useSyncedState<UserIconDictionary>('userIcons', {});
+  const [title, setTitle] = useSyncedState<string>('title', "");
+  const [entries, setEntries] = useSyncedState<string[]>('entries', [""]);
+  const [editingIndex, setEditingIndex] = useSyncedState<number | null>('editingIndex', -1);
+  const [submitted, setSubmitted] = useSyncedState<boolean>('submitted', false);
+  const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
+  const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
+  const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
+  const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
+
+  // Load current user from clientStorage
+  useEffect(() => {
+    async function loadUser() {
+      const storedUser = await figma.clientStorage.getAsync('currentUser');
+      if (storedUser) {
+        setCurrentUser(storedUser);
+      }
+    }
+    loadUser();
+  }, []);
 
   const handleValueChange = (index: number, newValue: string) => {
-    const updatedEntries = entries.map((item, i) => (i === index ? { ...item, text: newValue } : item));
-    setEntries(updatedEntries);
-    console.log("Entries after value change:", updatedEntries);
+    if (index === -1) {
+      setTitle(newValue);
+    } else {
+      const updatedEntries = entries.map((item, i) => (i === index ? newValue : item));
+      setEntries(updatedEntries);
+    }
   };
 
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    const updatedEntries = entries.map(item => ({ ...item, isEditable: false }));
+  const handleRemove = (index: number) => {
+    const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
-    console.log("Entries after submission:", updatedEntries);
+    setEditingIndex(null);
+  };
+
+  const handleAddTextBox = () => {
+    const updatedEntries = [...entries, ""];
+    setEntries(updatedEntries);
+    setVotes([...votes, 0]); // Add a vote count for the new entry
+    setVoters([...voters, []]); // Add an empty array for the new entry's voters
+    setEditingIndex(updatedEntries.length - 1); // Set the new text box to be in edit mode
   };
 
   const handleVote = (index: number) => {
-    const currentUser = figma.currentUser?.name || "User";
-    const userIconUrl = figma.currentUser?.photoUrl || "";
-    const previousVote = userVotes[currentUser];
+    if (!currentUser) return;
 
-    if (isSubmitted) {
-      const updatedEntries = [...entries];
-      const updatedUserIcons = { ...userIcons };
-
-      if (previousVote !== undefined && previousVote !== index && previousVote !== null) {
-        updatedEntries[previousVote].voters = updatedEntries[previousVote].voters.filter(voter => voter !== currentUser);
-      }
-
-      if (previousVote === undefined || previousVote !== index) {
-        updatedEntries[index].voters.push(currentUser);
-        updatedUserIcons[currentUser] = userIconUrl;
-        setUserVotes({ ...userVotes, [currentUser]: index });
-        setTotalVotes(updatedEntries.reduce((acc, entry) => acc + entry.voters.length, 0));
-      }
-
-      setEntries(updatedEntries);
-      setUserIcons(updatedUserIcons);
-      console.log("Entries after vote:", updatedEntries);
-      console.log("User icons after vote:", updatedUserIcons);
+    const newVotes = [...votes];
+    const newVoters = [...voters];
+    
+    if (userVoteIndex !== null && userVoteIndex !== index) {
+      newVotes[userVoteIndex]--;
+      newVoters[userVoteIndex] = newVoters[userVoteIndex].filter(voter => voter.name !== currentUser.name);
     }
+
+    newVotes[index]++;
+    newVoters[index] = [...newVoters[index], currentUser];
+    setVotes(newVotes);
+    setVoters(newVoters);
+    setUserVoteIndex(index);
   };
 
-  const handleAddTextField = () => {
-    const newEntries = [...entries, { text: "", voters: [], isEditable: true }];
-    setEntries(newEntries);
-    console.log("Entries after adding text field:", newEntries);
+  const handleSubmit = () => {
+    // Force a state change to ensure all edits are saved
+    setEntries(entries.map(entry => entry));
+    setTitle(title); // Force a state update to ensure the title is also saved
+    setEditingIndex(null);
+    setSubmitted(true); // Set submitted state to true
   };
 
-  const removeTextField = (index: number) => {
-    const updatedEntries = entries.filter((_, i) => i !== index);
-    setEntries(updatedEntries);
-    console.log("Entries after removing text field:", updatedEntries);
-  };
-
-  const handleVoteClick = (index: number) => {
-    if (isSubmitted) {
-      handleVote(index);
-    }
-  };
+  const totalVotes = votes.reduce((acc, voteCount) => acc + voteCount, 0);
 
   return (
     <AutoLayout
@@ -164,35 +192,38 @@ function PollingWidget() {
       cornerRadius={8}
       fill={'#FFFFFF'}
       stroke={'#E6E6E6'}
+      width={400}  // Set a fixed width for the widget
     >
-      <AutoLayout direction="vertical" cornerRadius={8}>
-        <EditableText
-          key={-1}
-          index={-1}
-          value={{ text: '', voters: [] }}
-          onValueChange={handleValueChange}
-          isEditable={!isSubmitted}
-          placeholder="Enter poll question here"
-          userIcons={userIcons}
-          isQuestion={true}
-        />
-      </AutoLayout>
-
+      <TextBox
+        index={-1}
+        value={title}
+        onValueChange={handleValueChange}
+        isQuestion={true}
+        isEditing={editingIndex === -1}
+        setEditingIndex={setEditingIndex}
+        submitted={submitted}
+        votes={0}
+        onVote={() => {}}
+        userVote={false}
+        voters={[]}
+      />
       {entries.map((item, index) => (
-        <AutoLayout key={index} onClick={() => handleVoteClick(index)}>
-          <EditableText
-            index={index}
-            value={item}
-            onValueChange={handleValueChange}
-            isEditable={!isSubmitted}
-            placeholder="Enter option"
-            onRemove={removeTextField}
-            userIcons={userIcons}
-            isQuestion={false}
-          />
-        </AutoLayout>
+        <TextBox
+          key={index}
+          index={index}
+          value={item}
+          onValueChange={handleValueChange}
+          onRemove={handleRemove}
+          isEditing={editingIndex === index}
+          setEditingIndex={setEditingIndex}
+          submitted={submitted}
+          votes={votes[index]}
+          onVote={() => handleVote(index)}
+          userVote={userVoteIndex === index}
+          voters={voters[index]}
+        />
       ))}
-      {!isSubmitted && (
+      {!submitted && (
         <>
           <SVG
             src={`<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -200,32 +231,34 @@ function PollingWidget() {
                   <path d="M15.9375 7.5H14.0625V14.0625H7.5V15.9375H14.0625V22.5H15.9375V15.9375H22.5V14.0625H15.9375V7.5Z" fill="black" fill-opacity="0.8"/>
                   <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="black" stroke-opacity="0.1"/>
                 </svg>`}
-            onClick={handleAddTextField}
+            onClick={handleAddTextBox}
           />
           <AutoLayout
-            width={100}
-            height={32}
-            cornerRadius={6}
             fill="#24CE16"
-            onClick={handleSubmit}
+            padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
+            cornerRadius={4}
             verticalAlignItems="center"
             horizontalAlignItems="center"
+            onClick={handleSubmit}
           >
-            <Text fontSize={14} fill="#FFFFFF">
+            <Text fontSize={16} fill="#FFFFFF">
               Submit
             </Text>
           </AutoLayout>
         </>
       )}
-      {isSubmitted && (
-        <>
-          <Text fontSize={10} fill="#808080">
-            {'Total votes: ' + totalVotes}
+      {submitted && (
+        <AutoLayout width="fill-parent" padding={{ top: 10 }}>
+          <Text fontSize={12} fill="#808080" width="fill-parent">
+            Total votes: {totalVotes}
           </Text>
-        </>
+        </AutoLayout>
       )}
     </AutoLayout>
   );
 }
 
 widget.register(PollingWidget);
+
+// Ensure to call getCurrentUser when the plugin starts
+getCurrentUser();
