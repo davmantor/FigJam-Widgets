@@ -124,7 +124,7 @@ function ChatWidget() {
 
   function openMessageInputModal(event:any): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+      figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
   
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
@@ -154,7 +154,7 @@ function ChatWidget() {
         if (messageToEdit) {
           // Open the UI modal with the message content
           console.log("opening modal");
-          figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+          figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
           figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
           console.log("opened");
           figma.ui.onmessage = msg => {
@@ -376,7 +376,7 @@ function ChatWidget() {
             
             if (messageToReply) {
               // Open the UI for entering a reply message
-              figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+              figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
               // Send the original message text to the UI, indicating a reply action
               figma.ui.postMessage({ type: 'reply-message', payload: messageToReply });
 
@@ -615,7 +615,7 @@ function ChatWidget() {
                         // Open the UI modal with the message content
                         console.log(messageToEdit.deleted)
                         console.log("opening modal");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
                         figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
                         console.log("opened");
                         figma.ui.onmessage = msg => {
@@ -660,7 +660,7 @@ function ChatWidget() {
                         // Open the UI modal with the message content
                         console.log(messageToEdit.deleted)
                         console.log("opening modal");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 270 });
+                        figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
                         figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
                         console.log("opened");
                         figma.ui.onmessage = msg => {
@@ -828,7 +828,7 @@ function ChatWidget() {
     };
 
 useEffect(()=>{
-  if (isCrownButtonPressed && !alreadyLoggedIn) {
+  if (isCrownButtonPressed) {
     console.log('crown', isCrownButtonPressed);
   figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
   figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
@@ -850,6 +850,7 @@ useEffect(()=>{
           const updatedText = msg.payload.message;
           setPrompt(updatedText);
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -870,6 +871,7 @@ useEffect(()=>{
           const updatedWidth = msg.payload.message;
           setWidgetWidth(parseInt(updatedWidth, 10));
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -890,6 +892,7 @@ useEffect(()=>{
           const updatedBorderWidth = msg.payload.message;
           setBorderWidth(parseInt(updatedBorderWidth, 10));
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -910,6 +913,7 @@ useEffect(()=>{
           const updatedTitleFontSize = msg.payload.message;
           setTitleFontSize(parseInt(updatedTitleFontSize, 10));
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -929,6 +933,7 @@ useEffect(()=>{
           const updatedText = msg.payload.message;
           setBorderColor(updatedText);
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -949,6 +954,7 @@ useEffect(()=>{
           const updatedMessageFontSize = msg.payload.message;
           setMessageFontSize(parseInt(updatedMessageFontSize, 10));
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -969,6 +975,7 @@ useEffect(()=>{
           const updatedText = msg.payload.message;
           setPromptColor(updatedText);
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -988,6 +995,7 @@ useEffect(()=>{
           const updatedText = msg.payload.message;
           setWidgetButtonColor(updatedText);
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -1007,6 +1015,7 @@ useEffect(()=>{
           const updatedText = msg.payload.message;
           setWidgetCornerRadius(updatedText);
           alreadyLoggedIn = true;
+          setIsCrownButtonPressed(true);
         } else if (msg.type === 'close-plugin') {
           console.log("closed");
           setIsCrownButtonPressed(false);
@@ -1025,6 +1034,7 @@ const handleOptionsClickChat = () => {
   updateUserName();
   setIsCrownButtonPressed(true);
 
+  // return new Promise<void>(() => {
   return new Promise<void>((resolve, reject) => {
     figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn', payload: alreadyLoggedIn });
@@ -1056,6 +1066,7 @@ const handleOptionsClickChat = () => {
     });
   });
 };
+  // })};
 
 
 

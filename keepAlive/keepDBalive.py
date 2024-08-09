@@ -36,7 +36,7 @@ def keep_mongo_alive():
         print(f"Error pinging MongoDB server: {e}")
 
 # Schedule the keep-alive functions to run every x minutes
-schedule.every(0.1).minutes.do(keep_mongo_alive)
+schedule.every(5).minutes.do(keep_mongo_alive)
 
 # Run the keep-alive job periodically
 if __name__ == "__main__":
