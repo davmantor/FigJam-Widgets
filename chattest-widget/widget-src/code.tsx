@@ -77,7 +77,7 @@ function ChatWidget() {
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
     //const [color, setColor] = useSyncedState("theme", "#000000");
-    const [borderColor, setBorderColor] = useSyncedState("pborderColor", "#FFFFFF");
+    const [borderColor, setBorderColor] = useSyncedState("borderColor", "#3423232");
     const [widgetButtonColor, setWidgetButtonColor] = useSyncedState('widgetButtonColor', "#007aff");
 
     const [promptColor, setPromptColor] = useSyncedState("promptColor", "#000000");
@@ -1075,20 +1075,20 @@ const handleOptionsClickChat = () => {
     direction="vertical"
     spacing={getWidgetValue(8)}
     padding={borderWidth}
-    stroke="#efefef"
+    stroke={borderColor}
     strokeWidth={getWidgetValue(2)}
     cornerRadius={getWidgetValue(widgetCornerRadius)}
     onClick={updateUserName}
     minWidth={widgetWidth}
-    fill={'#efefef'}
+    fill={borderColor}
   >
   <AutoLayout
     direction="vertical"
     spacing={8}
-    padding={borderWidth}
-    stroke="#efefef"
+    padding={getWidgetValue(10)}
+    stroke={borderColor}
     strokeWidth={getWidgetValue(2)}
-    cornerRadius={getWidgetValue(widgetCornerRadius)}
+    cornerRadius={getWidgetValue(widgetCornerRadius-2)}
     onClick={updateUserName}
     minWidth={widgetWidth}
     fill={'#FFFFFF'}
@@ -1120,7 +1120,7 @@ const handleOptionsClickChat = () => {
           direction="vertical"
           spacing={getWidgetValue(1)}
           padding={getWidgetValue(8)}
-          stroke="#efefef"
+          stroke={borderColor}
           cornerRadius={getWidgetValue(10)}
           minWidth={getWidgetValue(480)}
       >
