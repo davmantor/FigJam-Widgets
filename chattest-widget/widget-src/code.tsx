@@ -1,6 +1,5 @@
 const { widget, showUI, ui } = figma;
 const { AutoLayout, Text, useSyncedState, Input, Frame, Image, SVG, useEffect, colorMapToOptions, usePropertyMenu} = widget;
-//import '@fontawesome/free-solid-svg-icons';
 
 type Message = {
     id: string;
@@ -53,8 +52,8 @@ function generateLogId() {
 }
 
 let alreadyLoggedIn = false;
-let thenFlag = false;
-let curr_config = "";
+const thenFlag = false;
+const curr_config = "";
 
 function ChatWidget() {
     //console.log("ChatWidget rendered2");
@@ -72,7 +71,7 @@ function ChatWidget() {
     const [inputPlaceholder, setInputPlaceholder] = useSyncedState('inputPlaceholder', 'Type a message...');
     const [inputActive, setInputActive] = useSyncedState('inputActive', false);
     const [isEditing, setIsEditing] = useSyncedState<boolean>('isEditing', false);
-    let messageQueue: Message[] = [];
+    const messageQueue: Message[] = [];
 
     const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
 
@@ -129,7 +128,33 @@ function ChatWidget() {
       figma.ui.onmessage = async (msg) => {
         if (msg.type === 'new-message') {
           const { message, anonymous } = msg.payload; // Destructure the payload
+
+          // Record the start time
+          const startTime = new Date().getTime();
+          console.log(startTime);
+          console.log("this is the start time");
+      
+          // Set a timeout to show the message after 5 seconds
+          const timeoutId = setTimeout(() => {
+            figma.showUI(`
+              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                  <h4 style="color: #333;">Message is being sent</h2>
+                  <p style="color: #666;">Please wait, server is booting up...</p>
+              </div>
+          `);
+          }, 5000);
+      
           await handleAddMessage({ messageText: message, anonymous: anonymous });
+      
+          // Clear the timeout if the operation completes before 5 seconds
+          clearTimeout(timeoutId);
+      
+          const endTime = new Date().getTime();
+      
+          // Calculate the duration
+          const duration = endTime - startTime;
+          console.log(`The operation took ${duration} milliseconds.`);
+      
           resolve();
         } else if (msg.type === 'close-plugin') {
           setIsCrownButtonPressed(false);
@@ -143,7 +168,7 @@ function ChatWidget() {
     });
   }
     function delay(ms: number) {
-      let rand = ms * 70 * Math.random();
+      const rand = ms * 70 * Math.random();
       return new Promise( resolve => setTimeout(resolve, ms) );
   }
     const handleEditToMessage = (id: string): Promise<void> => {
@@ -235,7 +260,7 @@ function ChatWidget() {
       console.log("anonymous:", anonymous);
       console.log("messageText:", messageText);
       console.log("messageData:", messageData);
-      let count = 10;
+      const count = 10;
 
       updateUserName();
     
@@ -307,8 +332,8 @@ function ChatWidget() {
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
-              let newUpvotedUsers = [...message.upvotedUsers];
-              let newDownvotedUsers = [...message.downvotedUsers];
+              const newUpvotedUsers = [...message.upvotedUsers];
+              const newDownvotedUsers = [...message.downvotedUsers];
   
               const upvoteIndex = newUpvotedUsers.indexOf(userName);
               const downvoteIndex = newDownvotedUsers.indexOf(userName);
@@ -333,8 +358,8 @@ function ChatWidget() {
     const onDownvote = (id: string) => {
         setMessages(prevMessages => prevMessages.map(message => {
             if (message.id === id) {
-                let newUpvotedUsers = [...message.upvotedUsers];
-                let newDownvotedUsers = [...message.downvotedUsers];
+                const newUpvotedUsers = [...message.upvotedUsers];
+                const newDownvotedUsers = [...message.downvotedUsers];
     
                 const upvoteIndex = newUpvotedUsers.indexOf(userName);
                 const downvoteIndex = newDownvotedUsers.indexOf(userName);
@@ -554,7 +579,7 @@ function ChatWidget() {
     
     
     const getMessageDepth = (messageId: string) => {
-      let currentMessage = messages.find(message => message.id === messageId);
+      const currentMessage = messages.find(message => message.id === messageId);
 
         if (!currentMessage) {
             return 0; // Return 0 if the message is not found
@@ -795,9 +820,8 @@ function ChatWidget() {
                   >
                     Send a message with the add message button below.
                   </Text>
-              </AutoLayout>;
+              </AutoLayout>
       }
-
       return sortedMessages
       .filter(message => message.parentId === parentId)
       .map((message) => (
@@ -1066,10 +1090,6 @@ const handleOptionsClickChat = () => {
     });
   });
 };
-  // })};
-
-
-
   return (
   <AutoLayout
     direction="vertical"
@@ -1173,6 +1193,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const upvotearrow = `<svg fill="#303030" height="${getWidgetValue(18)}px" width="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
   const downvotearrow = `<svg fill="#303030" height="${getWidgetValue(18)}px" width="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
   
+  
+
+
+
+
+
   const repliesup = `<svg width="${getWidgetValue(18)}px" height="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.002 492.002" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.136,328.473L264.988,109.329c-5.064-5.064-11.816-7.844-19.172-7.844c-7.208,0-13.964,2.78-19.02,7.844 L7.852,328.265C2.788,333.333,0,340.089,0,347.297c0,7.208,2.784,13.968,7.852,19.032l16.124,16.124 c5.064,5.064,11.824,7.86,19.032,7.86s13.964-2.796,19.032-7.86l183.852-183.852l184.056,184.064 c5.064,5.06,11.82,7.852,19.032,7.852c7.208,0,13.96-2.792,19.028-7.852l16.128-16.132 C494.624,356.041,494.624,338.965,484.136,328.473z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
   const repliesdown = `<svg width="${getWidgetValue(18)}px" height="${getWidgetValue(18)}px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 491.996 491.996" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M484.132,124.986l-16.116-16.228c-5.072-5.068-11.82-7.86-19.032-7.86c-7.208,0-13.964,2.792-19.036,7.86l-183.84,183.848 L62.056,108.554c-5.064-5.068-11.82-7.856-19.028-7.856s-13.968,2.788-19.036,7.856l-16.12,16.128 c-10.496,10.488-10.496,27.572,0,38.06l219.136,219.924c5.064,5.064,11.812,8.632,19.084,8.632h0.084 c7.212,0,13.96-3.572,19.024-8.632l218.932-219.328c5.072-5.064,7.856-12.016,7.864-19.224 C491.996,136.902,489.204,130.046,484.132,124.986z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>`;
 
@@ -1205,18 +1231,18 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   const score = message.upvotedUsers.length - message.downvotedUsers.length;
 
   // Adjust the right padding based on the message depth
-  var adjustedRightPadding = getWidgetValue(160);
+  let adjustedRightPadding = getWidgetValue(160);
   if (messageDepth == 0){
     adjustedRightPadding = getWidgetValue(160);
   }
 
-  var repliesAvaliable = false;
+  let repliesAvaliable = false;
   if(messageDepth >= 1){
     repliesAvaliable = true;
   }
 
-  var showNoRepliesDeleted = true;
-  if(message.text == "this message has been deleted"){
+  let showNoRepliesDeleted = true;
+  if(message.text == "this message has been deleted"   ){
     showNoRepliesDeleted = false;
   }
   
@@ -1354,45 +1380,34 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
 
                 {/* Downvote Button - Arrow Down */}
                 <AutoLayout
-                    //fill="#FFFFFF"
                     cornerRadius={getWidgetValue(200)}
                     padding={{ top: getWidgetValue(14), bottom: getWidgetValue(4), left: getWidgetValue(10), right: getWidgetValue(10) }}
                     onClick={() => onDownvote()}
                 >
                   <SVG
                     src={downvotearrow}
-                    //onClick={() => onDownvote()}
                   />
                     <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> </Text>
                 </AutoLayout>
               </AutoLayout>
           )}
-
-
-
           { message.text != "this message has been deleted" && (
-          <AutoLayout // Reply button with additional padding
+          <AutoLayout
             fill={widgetButtonColor}
             cornerRadius={getWidgetValue(200)}
             padding={{ top: getWidgetValue(8), bottom: isDeleted ? 0 : getWidgetValue(8), left: getWidgetValue(10), right: getWidgetValue(10) }} // Increased padding for the button
             onClick={onReply}
-
           >
             <Text fontSize={getWidgetValue(25)} fill={widgetButtonColor}> </Text>
             <SVG
-            
               src={replyIconSrc}
               onClick={onReply}
             />
             <Text fontSize={getWidgetValue(25)} fill="#FFFFFF"> Reply  </Text>
           </AutoLayout>
           )}
-
-
           {repliesAvaliable && (
-          <AutoLayout // show replies button with additional padding
-            //fill={message.showReplies ? '#FFFFFF' : '#000033'}
-            //stroke={'#000033'}
+          <AutoLayout
             cornerRadius={getWidgetValue(4)}
             padding={{ top: getWidgetValue(8), bottom: isDeleted ? getWidgetValue(15) : 0, left: getWidgetValue(10), right: getWidgetValue(10) }} // Increased padding for the button
             onClick={onShowReplies}
@@ -1409,7 +1424,6 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
                   />
               </AutoLayout>
             )}
-              
             { !message.showReplies && (
               <AutoLayout
               cornerRadius={4}
@@ -1436,9 +1450,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           {replyChain}
         </AutoLayout>
       )}
-    
     </AutoLayout>
-
   );
 }
 
