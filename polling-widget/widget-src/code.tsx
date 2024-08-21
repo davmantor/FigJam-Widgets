@@ -4,6 +4,7 @@ const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widge
 interface CustomUser {
   name: string;
   photoUrl: string;
+  anonymous: boolean;
 }
 
 interface TextBoxProps {
@@ -54,6 +55,10 @@ function TextBox({
     }
   };
 
+  // Limit the number of user icons to display
+  const displayedVoters = voters.slice(0, 4);
+  const additionalVotes = voters.length - displayedVoters.length;
+
   return (
     <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
       <AutoLayout
@@ -94,9 +99,18 @@ function TextBox({
           <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
             {votes}
           </Text>
-          {voters.map((voter, i) => (
-            <Image key={i} src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
+          {displayedVoters.map((voter, i) => (
+            voter.anonymous ? (
+              <AutoLayout key={i} fill="#000000" width={16} height={16} cornerRadius={8} />
+            ) : (
+              <Image key={i} src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
+            )
           ))}
+          {additionalVotes > 0 && (
+            <Text fontSize={16} fill="#000000">
+              +{additionalVotes}
+            </Text>
+          )}
         </AutoLayout>
       )}
     </AutoLayout>
@@ -120,6 +134,7 @@ function PollingWidget() {
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
   const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
+  const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false); // Global anonymous state for the current session
 
   // Load current user from clientStorage
   useEffect(() => {
@@ -160,17 +175,35 @@ function PollingWidget() {
 
     const newVotes = [...votes];
     const newVoters = [...voters];
-    
-    if (userVoteIndex !== null && userVoteIndex !== index) {
-      newVotes[userVoteIndex]--;
-      newVoters[userVoteIndex] = newVoters[userVoteIndex].filter(voter => voter.name !== currentUser.name);
+
+    // Check if the user has already voted on this option
+    const userHasVotedOnThisOption = newVoters[index].some(voter => voter.name === currentUser.name);
+
+    if (userVoteIndex !== null) {
+      if (userVoteIndex === index) {
+        newVotes[index]--;
+        newVoters[index] = newVoters[index].filter(voter => voter.name !== currentUser.name);
+        setUserVoteIndex(null);
+      } else {
+        newVotes[userVoteIndex]--;
+        newVoters[userVoteIndex] = newVoters[userVoteIndex].filter(voter => voter.name !== currentUser.name);
+
+        newVotes[index]++;
+        newVoters[index] = [...newVoters[index], { ...currentUser, anonymous: isAnonymous }];
+        setUserVoteIndex(index);
+      }
+    } else {
+      newVotes[index]++;
+      newVoters[index] = [...newVoters[index], { ...currentUser, anonymous: isAnonymous }];
+      setUserVoteIndex(index);
     }
 
-    newVotes[index]++;
-    newVoters[index] = [...newVoters[index], currentUser];
     setVotes(newVotes);
     setVoters(newVoters);
-    setUserVoteIndex(index);
+  };
+
+  const toggleAnonymousVote = () => {
+    setIsAnonymous(!isAnonymous);
   };
 
   const handleSubmit = () => {
@@ -248,11 +281,29 @@ function PollingWidget() {
         </>
       )}
       {submitted && (
-        <AutoLayout width="fill-parent" padding={{ top: 10 }}>
-          <Text fontSize={12} fill="#808080" width="fill-parent">
-            Total votes: {totalVotes}
-          </Text>
-        </AutoLayout>
+        <>
+          <AutoLayout
+            direction="horizontal"
+            spacing={8}
+            verticalAlignItems="center"
+            onClick={toggleAnonymousVote}
+          >
+            <SVG
+              src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="16" height="16" rx="2" fill="${isAnonymous ? '#24CE16' : 'white'}" stroke="black" stroke-width="1.5"/>
+                    ${isAnonymous ? `<path d="M4 8L7 11L12 4" stroke="white" stroke-width="2"/>` : ''}
+                  </svg>`}
+            />
+            <Text fontSize={14} fill="#000000">
+              Vote Anonymously
+            </Text>
+          </AutoLayout>
+          <AutoLayout width="fill-parent" padding={{ top: 10 }}>
+            <Text fontSize={12} fill="#808080" width="fill-parent">
+              Total votes: {totalVotes}
+            </Text>
+          </AutoLayout>
+        </>
       )}
     </AutoLayout>
   );
