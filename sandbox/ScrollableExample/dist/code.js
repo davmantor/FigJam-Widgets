@@ -2,7 +2,7 @@
 (() => {
   // widget-src/code.tsx
   var { widget } = figma;
-  var { Frame, AutoLayout, Text, useSyncedState, SVG, useEffect } = widget;
+  var { Frame, AutoLayout, Text, useSyncedState, SVG } = widget;
   function ScrollableFrame() {
     const [scrollY, setScrollY] = useSyncedState("scrollY", 0);
     const visibleHeight = 500;
@@ -51,7 +51,7 @@
             width: 300,
             height: contentHeight
           },
-          Array.from({ length: totalItems }).map((_, index) => /* @__PURE__ */ figma.widget.h(Text, { key: index, y: index * itemHeight }, "Item ", index + 1))
+          Array.from({ length: totalItems }).map((_, index) => /* @__PURE__ */ figma.widget.h(Text, { key: index, y: index * itemHeight }, `Item ${index + 1}`))
         )
       ),
       /* @__PURE__ */ figma.widget.h(
