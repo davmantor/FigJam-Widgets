@@ -25,23 +25,28 @@
       overflow: auto;
       
     }
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
     .button {
       background-color: #007BFF;
       color: white;
       padding: 10px 20px;
-      margin: 10px 0;
       border: none;
       border-radius: 50px;
       cursor: pointer;
       font-size: 16px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
+    
     .button:hover {
       background-color: #0056b3;
     }
+    
     .label {
       font-size: 18px;
       margin: 10px 0 5px;
@@ -118,6 +123,21 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
+    .custom-widget-id-container {
+      margin-top: 20px;
+    }
+    
+    .custom-widget-id-container label {
+      margin-right: 10px;
+    }
+    
+    .custom-widget-id-container input {
+      width: 200px;
+      margin-right: 10px;
+    }
+    
+   
+    
   </style>
 </head>
 <body>
@@ -129,16 +149,19 @@
   
   
   <div class="container" id="adminMenu">
-    <button class="button" id="refreshButton">Refresh</button>
-    <button class="button" id="revealAllButton">Reveal All</button>
-    <button class="button" id="resetResponseButton">Reset Response</button>
+    <div class="button-container">
+      <button class="button" id="refreshButton">Refresh</button>
+      <button class="button" id="revealAllButton">Reveal All</button>
+      <button class="button" id="resetResponseButton">Reset Response</button>
+    </div>
+    
     <div>
       <label class="label" for="widthInput">Width:</label>
-      <input class="input" type="number" id="widthInput" value="800">
+      <input class="input" type="number" id="widthInput" value="1020">
     </div>
     <div>
       <label class="label" for="heightInput">Height:</label>
-      <input class="input" type="number" id="heightInput" value="400">
+      <input class="input" type="number" id="heightInput" value="150">
     </div>
     <div>
       <label class="label" for="borderColorInput">Border Color:</label>
@@ -186,7 +209,14 @@
     </div>
     <div id="previousResponsesContainer" class="response-container"></div>
 
+    <div class="custom-widget-id-container">
+      <label for="customWidgetIdInput">Set Custom Widget ID:</label>
+      <input type="text" id="customWidgetIdInput" class="input" placeholder="Enter Widget ID">
+      <button class="button" id="setWidgetIdButton">Set Widget ID</button>
+    </div>
+
     <div id="widgetIdDisplay">Widget ID: </div>
+
   </div>
 
   
@@ -221,6 +251,8 @@
     const popupCancelButton = document.getElementById('popupCancelButton');
     const widgetIdDisplay = document.getElementById('widgetIdDisplay');
     const resetResponseButton = document.getElementById('resetResponseButton');
+    const setWidgetIdButton = document.getElementById('setWidgetIdButton');
+    const customWidgetIdInput = document.getElementById('customWidgetIdInput');
 
     let widgetId;
     let unsavedResponse = null;
@@ -233,6 +265,9 @@
         console.log('Received initialize message with params:', params);
         widgetId = receivedWidgetId;
         widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+        if (params.creationDate) {
+          widgetIdDisplay.innerText += ` | Created: ${params.creationDate}`;
+        }
         fetchPreviousResponses();
         updateParameters(params);
       }
@@ -263,8 +298,24 @@
         fetchPreviousResponses();
       } else {
         alert('Incorrect password, please try again.');
+        passwordInput.value = ''; 
+        passwordInput.focus(); 
       }
     };
+
+    setWidgetIdButton.onclick = () => {
+      const customWidgetId = customWidgetIdInput.value.trim();
+      if (customWidgetId) {
+        widgetId = customWidgetId;
+        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+        parent.postMessage({ pluginMessage: { type: 'setWidgetId', widgetId: customWidgetId } }, '*');
+      } else {
+        alert('Please enter a valid Widget ID.');
+      }
+    };
+    
+    
+    
 
     resetResponseButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'resetResponse' } }, '*');
@@ -348,6 +399,7 @@
         if (data.status === 'updated' || data.status === 'new') {
           widgetId = data.widget.widgetId;
           previousResponsesContainer.innerHTML = '';
+          widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
           data.widget.previous.forEach((response, index) => {
             const responseItem = document.createElement('div');
             responseItem.className = 'response-item';
@@ -506,7 +558,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === 'deleted') {
-          fetchPreviousResponses();
+          handleRefresh(widgetId); // Refresh to update the UI
         } else {
           console.error('Failed to delete response');
         }
@@ -514,7 +566,7 @@
       .catch(error => {
         console.error('Error deleting response:', error);
       });
-    }
+    }    
   </script>
 </body>
   
