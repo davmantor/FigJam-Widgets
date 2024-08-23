@@ -1,10 +1,19 @@
 const { widget } = figma;
 const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
+const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+<defs>
+</defs>
+<g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+	<path d="M 45 88 c -11.049 0 -21.18 -2.003 -29.021 -8.634 C 6.212 71.105 0 58.764 0 45 C 0 20.187 20.187 0 45 0 c 24.813 0 45 20.187 45 45 c 0 13.765 -6.212 26.105 -15.979 34.366 C 66.181 85.998 56.049 88 45 88 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,214,214); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 60.71 c -11.479 0 -20.818 -9.339 -20.818 -20.817 c 0 -11.479 9.339 -20.818 20.818 -20.818 c 11.479 0 20.817 9.339 20.817 20.818 C 65.817 51.371 56.479 60.71 45 60.71 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 90 c -10.613 0 -20.922 -3.773 -29.028 -10.625 c -0.648 -0.548 -0.88 -1.444 -0.579 -2.237 C 20.034 64.919 31.933 56.71 45 56.71 s 24.966 8.209 29.607 20.428 c 0.301 0.793 0.069 1.689 -0.579 2.237 C 65.922 86.227 55.613 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+</g>
+</svg>`;
+
 interface CustomUser {
   name: string;
   photoUrl: string;
-  anonymous: boolean;
 }
 
 interface TextBoxProps {
@@ -20,6 +29,7 @@ interface TextBoxProps {
   onVote: () => void;
   userVote: boolean;
   voters: CustomUser[];
+  isAnonymous: boolean;
 }
 
 function TextBox({
@@ -35,19 +45,23 @@ function TextBox({
   onVote,
   userVote,
   voters,
+  isAnonymous,
 }: TextBoxProps) {
-  const handleEditEnd = (e: { characters: string }) => {
+  const handleEditEnd = async (e: { characters: string }) => {
+    await getCurrentUser();
     onValueChange(index, e.characters);
     setEditingIndex(null);
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
+    await getCurrentUser();
     if (onRemove) {
       onRemove(index);
     }
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    await getCurrentUser();
     if (submitted) {
       onVote();
     } else {
@@ -55,7 +69,6 @@ function TextBox({
     }
   };
 
-  // Limit the number of user icons to display
   const displayedVoters = voters.slice(0, 4);
   const additionalVotes = voters.length - displayedVoters.length;
 
@@ -100,11 +113,15 @@ function TextBox({
             {votes}
           </Text>
           {displayedVoters.map((voter, i) => (
-            voter.anonymous ? (
-              <AutoLayout key={i} fill="#000000" width={16} height={16} cornerRadius={8} />
-            ) : (
-              <Image key={i} src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
-            )
+            <AutoLayout key={i} width={16} height={16} cornerRadius={8}>
+              {isAnonymous ? (
+              <AutoLayout width={16} height={16} cornerRadius={4}>
+                <SVG src={AnonSVG} width={16} height={16} />
+              </AutoLayout>
+              ) : (
+                <Image src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
+              )}
+            </AutoLayout>
           ))}
           {additionalVotes > 0 && (
             <Text fontSize={16} fill="#000000">
@@ -117,13 +134,11 @@ function TextBox({
   );
 }
 
-async function getCurrentUser() {
-  const currentUser = figma.currentUser;
-  if (currentUser) {
-    const { name, photoUrl } = currentUser;
-    await figma.clientStorage.setAsync('currentUser', { name, photoUrl });
-  }
-}
+const getCurrentUser = () => {
+  const currentUserName = figma.currentUser ? figma.currentUser.name : 'Unknown User';
+  setUserName(currentUserName);
+  console.log(userName);
+};
 
 function PollingWidget() {
   const [title, setTitle] = useSyncedState<string>('title', "");
@@ -134,9 +149,8 @@ function PollingWidget() {
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
   const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
-  const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false); // Global anonymous state for the current session
+  const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
 
-  // Load current user from clientStorage
   useEffect(() => {
     async function loadUser() {
       const storedUser = await figma.clientStorage.getAsync('currentUser');
@@ -147,7 +161,8 @@ function PollingWidget() {
     loadUser();
   }, []);
 
-  const handleValueChange = (index: number, newValue: string) => {
+  const handleValueChange = async (index: number, newValue: string) => {
+    await getCurrentUser();
     if (index === -1) {
       setTitle(newValue);
     } else {
@@ -156,28 +171,28 @@ function PollingWidget() {
     }
   };
 
-  const handleRemove = (index: number) => {
+  const handleRemove = async (index: number) => {
+    await getCurrentUser();
     const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
     setEditingIndex(null);
   };
 
-  const handleAddTextBox = () => {
+  const handleAddTextBox = async () => {
+    await getCurrentUser();
     const updatedEntries = [...entries, ""];
     setEntries(updatedEntries);
-    setVotes([...votes, 0]); // Add a vote count for the new entry
-    setVoters([...voters, []]); // Add an empty array for the new entry's voters
-    setEditingIndex(updatedEntries.length - 1); // Set the new text box to be in edit mode
+    setVotes([...votes, 0]);
+    setVoters([...voters, []]);
+    setEditingIndex(updatedEntries.length - 1);
   };
 
-  const handleVote = (index: number) => {
+  const handleVote = async (index: number) => {
+    await getCurrentUser();
     if (!currentUser) return;
 
     const newVotes = [...votes];
     const newVoters = [...voters];
-
-    // Check if the user has already voted on this option
-    const userHasVotedOnThisOption = newVoters[index].some(voter => voter.name === currentUser.name);
 
     if (userVoteIndex !== null) {
       if (userVoteIndex === index) {
@@ -189,12 +204,12 @@ function PollingWidget() {
         newVoters[userVoteIndex] = newVoters[userVoteIndex].filter(voter => voter.name !== currentUser.name);
 
         newVotes[index]++;
-        newVoters[index] = [...newVoters[index], { ...currentUser, anonymous: isAnonymous }];
+        newVoters[index] = [...newVoters[index], currentUser];
         setUserVoteIndex(index);
       }
     } else {
       newVotes[index]++;
-      newVoters[index] = [...newVoters[index], { ...currentUser, anonymous: isAnonymous }];
+      newVoters[index] = [...newVoters[index], currentUser];
       setUserVoteIndex(index);
     }
 
@@ -202,16 +217,17 @@ function PollingWidget() {
     setVoters(newVoters);
   };
 
-  const toggleAnonymousVote = () => {
+  const toggleAnonymousVote = async () => {
+    await getCurrentUser();
     setIsAnonymous(!isAnonymous);
   };
 
-  const handleSubmit = () => {
-    // Force a state change to ensure all edits are saved
+  const handleSubmit = async () => {
+    await getCurrentUser();
     setEntries(entries.map(entry => entry));
-    setTitle(title); // Force a state update to ensure the title is also saved
+    setTitle(title);
     setEditingIndex(null);
-    setSubmitted(true); // Set submitted state to true
+    setSubmitted(true);
   };
 
   const totalVotes = votes.reduce((acc, voteCount) => acc + voteCount, 0);
@@ -225,7 +241,7 @@ function PollingWidget() {
       cornerRadius={8}
       fill={'#FFFFFF'}
       stroke={'#E6E6E6'}
-      width={400}  // Set a fixed width for the widget
+      width={400}
     >
       <TextBox
         index={-1}
@@ -239,6 +255,7 @@ function PollingWidget() {
         onVote={() => {}}
         userVote={false}
         voters={[]}
+        isAnonymous={isAnonymous}
       />
       {entries.map((item, index) => (
         <TextBox
@@ -254,6 +271,7 @@ function PollingWidget() {
           onVote={() => handleVote(index)}
           userVote={userVoteIndex === index}
           voters={voters[index]}
+          isAnonymous={isAnonymous}
         />
       ))}
       {!submitted && (
@@ -266,6 +284,21 @@ function PollingWidget() {
                 </svg>`}
             onClick={handleAddTextBox}
           />
+          <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center">
+            <AutoLayout
+              direction="horizontal"
+              spacing={8}
+              verticalAlignItems="center"
+              onClick={toggleAnonymousVote}
+            >
+              <SVG
+                src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="${isAnonymous ? 'black' : 'none'}" stroke="black" stroke-width="2">
+                        <rect width="16" height="16" rx="2" />
+                      </svg>`}
+              />
+              <Text fontSize={16} fill="#000000">Vote Anonymously</Text>
+            </AutoLayout>
+          </AutoLayout>
           <AutoLayout
             fill="#24CE16"
             padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
@@ -281,35 +314,14 @@ function PollingWidget() {
         </>
       )}
       {submitted && (
-        <>
-          <AutoLayout
-            direction="horizontal"
-            spacing={8}
-            verticalAlignItems="center"
-            onClick={toggleAnonymousVote}
-          >
-            <SVG
-              src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="16" height="16" rx="2" fill="${isAnonymous ? '#24CE16' : 'white'}" stroke="black" stroke-width="1.5"/>
-                    ${isAnonymous ? `<path d="M4 8L7 11L12 4" stroke="white" stroke-width="2"/>` : ''}
-                  </svg>`}
-            />
-            <Text fontSize={14} fill="#000000">
-              Vote Anonymously
-            </Text>
-          </AutoLayout>
-          <AutoLayout width="fill-parent" padding={{ top: 10 }}>
-            <Text fontSize={12} fill="#808080" width="fill-parent">
-              Total votes: {totalVotes}
-            </Text>
-          </AutoLayout>
-        </>
+        <AutoLayout width="fill-parent" padding={{ top: 10 }}>
+          <Text fontSize={12} fill="#808080" width="fill-parent">
+            Total votes: {totalVotes}
+          </Text>
+        </AutoLayout>
       )}
     </AutoLayout>
   );
 }
 
 widget.register(PollingWidget);
-
-// Ensure to call getCurrentUser when the plugin starts
-getCurrentUser();
