@@ -317,10 +317,15 @@
     };
 
     function refreshTextBox() {
-      passwordInput.classList.add('shake'); // Add the shake effect
+      // Add shake class and then reset it after the animation
+      passwordInput.classList.add('shake');
+      
+      // Use a short delay to allow the animation to complete before removing the class
       setTimeout(() => {
-        passwordInput.classList.remove('shake'); // Remove the shake effect after animation ends
-      }, 500); // Adjust the timeout to match the duration of the shake animation
+        passwordInput.classList.remove('shake');
+        // Reset any inline styles set by the animation (if needed)
+        passwordInput.style.transform = '';
+      }, 500); // Match this to the duration of the animation
     }
 
     setWidgetIdButton.onclick = () => {
