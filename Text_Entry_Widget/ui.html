@@ -253,7 +253,7 @@
     const passwordScreen = document.getElementById('passwordScreen');
     const adminMenu = document.getElementById('adminMenu');
     const submitPasswordButton = document.getElementById('submitPasswordButton');
-    const passwordInput = document.getElementById('passwordInput');
+    let passwordInput = document.getElementById('passwordInput');
     const previousResponsesContainer = document.getElementById('previousResponsesContainer');
     const newResponseInput = document.getElementById('newResponseInput');
     const newUserNameInput = document.getElementById('newUserNameInput');
@@ -265,6 +265,7 @@
     const resetResponseButton = document.getElementById('resetResponseButton');
     const setWidgetIdButton = document.getElementById('setWidgetIdButton');
     const customWidgetIdInput = document.getElementById('customWidgetIdInput');
+
 
     let widgetId;
     let unsavedResponse = null;
@@ -304,6 +305,7 @@
 
     submitPasswordButton.onclick = () => {
       const password = passwordInput.value;
+      console.log("password:", password);
       if (password === '312cmpm15') {
         passwordScreen.style.display = 'none';
         adminMenu.style.display = 'flex';
@@ -311,21 +313,32 @@
       } else {
         alert('Incorrect password, please try again.');
         passwordInput.value = ''; 
-        refreshTextBox();
+        replacePasswordInput(); // Replace the input box
         passwordInput.focus(); 
       }
     };
-
-    function refreshTextBox() {
-      // Add shake class and then reset it after the animation
-      passwordInput.classList.add('shake');
+    
+    function replacePasswordInput() {
+      // Remove the old password input element
+      const oldPasswordInput = document.getElementById('passwordInput');
+      const parentElement = oldPasswordInput.parentElement;
+    
+      // Create a new password input element
+      const newPasswordInput = document.createElement('input');
+      newPasswordInput.type = 'password';
+      newPasswordInput.id = 'passwordInput';
+      newPasswordInput.className = 'input'; // Reapply any necessary classes
+      newPasswordInput.placeholder = 'Enter Password';
       
-      // Use a short delay to allow the animation to complete before removing the class
-      setTimeout(() => {
-        passwordInput.classList.remove('shake');
-        // Reset any inline styles set by the animation (if needed)
-        passwordInput.style.transform = '';
-      }, 500); // Match this to the duration of the animation
+      // Insert the new element into the DOM
+      parentElement.replaceChild(newPasswordInput, oldPasswordInput);
+    
+      // Reassign the global passwordInput variable to the new element
+      passwordInput = newPasswordInput;
+      const password = passwordInput.value;
+    
+      // Focus on the new input
+      passwordInput.focus();
     }
 
     setWidgetIdButton.onclick = () => {
