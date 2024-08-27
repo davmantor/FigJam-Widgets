@@ -313,33 +313,12 @@
       } else {
         alert('Incorrect password, please try again.');
         passwordInput.value = ''; 
-        replacePasswordInput(); // Replace the input box
-        passwordInput.focus(); 
+        location.reload(); // Refresh the entire page
+
       }
     };
     
-    function replacePasswordInput() {
-      // Remove the old password input element
-      const oldPasswordInput = document.getElementById('passwordInput');
-      const parentElement = oldPasswordInput.parentElement;
-    
-      // Create a new password input element
-      const newPasswordInput = document.createElement('input');
-      newPasswordInput.type = 'password';
-      newPasswordInput.id = 'passwordInput';
-      newPasswordInput.className = 'input'; // Reapply any necessary classes
-      newPasswordInput.placeholder = 'Enter Password';
-      
-      // Insert the new element into the DOM
-      parentElement.replaceChild(newPasswordInput, oldPasswordInput);
-    
-      // Reassign the global passwordInput variable to the new element
-      passwordInput = newPasswordInput;
-      const password = passwordInput.value;
-    
-      // Focus on the new input
-      passwordInput.focus();
-    }
+
 
     setWidgetIdButton.onclick = () => {
       const customWidgetId = customWidgetIdInput.value.trim();
