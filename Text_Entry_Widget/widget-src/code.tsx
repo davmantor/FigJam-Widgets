@@ -27,7 +27,7 @@ function Widget() {
 
 
   const [width, setWidth] = useSyncedState<number>("width", 1020);
-  const [height, setHeight] = useSyncedState<number>("height", 150);
+  const [height, setHeight] = useSyncedState<number>("height", 235);
   const [borderColor, setBorderColor] = useSyncedState<string>("borderColor", "#000000");
   const [borderWidth, setBorderWidth] = useSyncedState<number>("borderWidth", 1);
   const [fontSize, setFontSize] = useSyncedState<number>("fontSize", 16);

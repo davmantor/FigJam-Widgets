@@ -136,6 +136,18 @@
       margin-right: 10px;
     }
     
+    .shake {
+      animation: shakeAnimation 0.5s;
+    }
+    
+    @keyframes shakeAnimation {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    
    
     
   </style>
@@ -161,7 +173,7 @@
     </div>
     <div>
       <label class="label" for="heightInput">Height:</label>
-      <input class="input" type="number" id="heightInput" value="150">
+      <input class="input" type="number" id="heightInput" value="235">
     </div>
     <div>
       <label class="label" for="borderColorInput">Border Color:</label>
@@ -299,9 +311,17 @@
       } else {
         alert('Incorrect password, please try again.');
         passwordInput.value = ''; 
+        refreshTextBox();
         passwordInput.focus(); 
       }
     };
+
+    function refreshTextBox() {
+      passwordInput.classList.add('shake'); // Add the shake effect
+      setTimeout(() => {
+        passwordInput.classList.remove('shake'); // Remove the shake effect after animation ends
+      }, 500); // Adjust the timeout to match the duration of the shake animation
+    }
 
     setWidgetIdButton.onclick = () => {
       const customWidgetId = customWidgetIdInput.value.trim();
