@@ -250,7 +250,7 @@
     const borderColorInput = document.getElementById('borderColorInput');
     const borderWidthInput = document.getElementById('borderWidthInput');
     const fontSizeInput = document.getElementById('fontSizeInput');
-    const passwordScreen = document.getElementById('passwordScreen');
+    let passwordScreen = document.getElementById('passwordScreen');
     const adminMenu = document.getElementById('adminMenu');
     const submitPasswordButton = document.getElementById('submitPasswordButton');
     let passwordInput = document.getElementById('passwordInput');
@@ -313,12 +313,33 @@
       } else {
         alert('Incorrect password, please try again.');
         passwordInput.value = ''; 
-        location.reload(); // Refresh the entire page
-
+        replacePasswordInput(); // Replace the input box
+        passwordInput.focus(); 
       }
     };
     
-
+    function replacePasswordInput() {
+      // Remove the old password input element
+      const oldPasswordInput = document.getElementById('passwordInput');
+      const parentElement = oldPasswordInput.parentElement;
+    
+      // Create a new password input element
+      const newPasswordInput = document.createElement('input');
+      newPasswordInput.type = 'password';
+      newPasswordInput.id = 'passwordInput';
+      newPasswordInput.className = 'input'; // Reapply any necessary classes
+      newPasswordInput.placeholder = 'Enter Password';
+      
+      // Insert the new element into the DOM
+      parentElement.replaceChild(newPasswordInput, oldPasswordInput);
+    
+      // Reassign the global passwordInput variable to the new element
+      passwordInput = newPasswordInput;
+      const password = passwordInput.value;
+    
+      // Focus on the new input
+      passwordInput.focus();
+    }
 
     setWidgetIdButton.onclick = () => {
       const customWidgetId = customWidgetIdInput.value.trim();
