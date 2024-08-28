@@ -303,23 +303,10 @@
     }
     
 
-    submitPasswordButton.onclick = () => {
-      const password = passwordInput.value;
-      console.log("password:", password);
-      if (password === '312cmpm15') {
-        passwordScreen.style.display = 'none';
-        adminMenu.style.display = 'flex';
-        fetchPreviousResponses();
-      } else {
-        alert('Incorrect password, please try again.');
-        passwordInput.value = ''; 
-        replacePasswordInput(); // Replace the input box
-        passwordInput.focus(); 
-      }
-    };
+
     
     submitPasswordButton.onclick = () => {
-      const password = passwordInput.value;
+      let password = passwordInput.value;
       console.log("password:", password);
       if (password === '312cmpm15') {
         passwordScreen.style.display = 'none';
@@ -329,6 +316,7 @@
         alert('Incorrect password, please try again.');
         passwordInput.value = ''; 
         passwordInput.focus();
+        password = null;
         
         // Send a message to the widget to close the plugin
         parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
