@@ -320,12 +320,13 @@
         } else {
             alert("Incorrect PIN.");
             setTimeout(() => {
-                passwordInput.value = "";  // Clear the input field after a short delay
-                passwordInput.focus();     // Refocus the input field
-                console.log("delay");
-            }, 100);  // 100 milliseconds delay
+                passwordInput.value = '';  // Clear the input field
+                passwordInput.blur();      // Blur the input to remove focus
+                passwordInput.focus();     // Immediately refocus the input
+            }, 100);  // Delay allows FigJam to handle previous input properly
         }
     }
+    
     
     
     
