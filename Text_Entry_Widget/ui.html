@@ -320,7 +320,8 @@
         } else {
             passwordInput.classList.add('shake');
             passwordInput.style.borderColor = "red";
-            
+            passwordInput.style.borderWidth = "2px"; // Set border thickness to match the original
+      
             setTimeout(() => {
                 passwordInput.classList.remove('shake');
                 passwordInput.value = '';  // Clear the input field
@@ -330,6 +331,7 @@
             }, 500);  // Match the duration of the shake animation
         }
       }
+      
       
     
     
