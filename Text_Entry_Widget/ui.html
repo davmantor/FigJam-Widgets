@@ -313,17 +313,19 @@
       var deleteConfirmation = false;
 
       function checkPin() {
-        var pin = document.getElementById("passwordInput").value;
+        var pin = passwordInput.value;
         if (pin === correctPin) {
-            document.getElementById("passwordScreen").style.display = "none";
-            document.getElementById("adminMenu").style.display = "flex";
+            passwordScreen.style.display = "none";
+            adminMenu.style.display = "flex";
         } else {
             alert("Incorrect PIN.");
-            // Clear the input and refocus
-            passwordInput.value = '';
-            passwordInput.focus();
+            setTimeout(() => {
+                passwordInput.value = "";  // Clear the input field after a short delay
+                passwordInput.focus();     // Refocus the input field
+            }, 100);  // 100 milliseconds delay
         }
     }
+    
     
     
     
