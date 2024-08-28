@@ -318,28 +318,26 @@
       }
     };
     
-    function replacePasswordInput() {
-      // Remove the old password input element
-      const oldPasswordInput = document.getElementById('passwordInput');
-      const parentElement = oldPasswordInput.parentElement;
-    
-      // Create a new password input element
-      const newPasswordInput = document.createElement('input');
-      newPasswordInput.type = 'password';
-      newPasswordInput.id = 'passwordInput';
-      newPasswordInput.className = 'input'; // Reapply any necessary classes
-      newPasswordInput.placeholder = 'Enter Password';
-      
-      // Insert the new element into the DOM
-      parentElement.replaceChild(newPasswordInput, oldPasswordInput);
-    
-      // Reassign the global passwordInput variable to the new element
-      passwordInput = newPasswordInput;
+    submitPasswordButton.onclick = () => {
       const password = passwordInput.value;
+      console.log("password:", password);
+      if (password === '312cmpm15') {
+        passwordScreen.style.display = 'none';
+        adminMenu.style.display = 'flex';
+        fetchPreviousResponses();
+      } else {
+        alert('Incorrect password, please try again.');
+        passwordInput.value = ''; 
+        passwordInput.focus();
+        
+        // Send a message to the widget to close the plugin
+        parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+      }
+    };
     
-      // Focus on the new input
-      passwordInput.focus();
-    }
+    
+    
+    
 
     setWidgetIdButton.onclick = () => {
       const customWidgetId = customWidgetIdInput.value.trim();
