@@ -312,16 +312,19 @@
     var correctPin = "312cmpm15"; // Set your desired PIN here
       var deleteConfirmation = false;
 
-        function checkPin() {
-            var pin = document.getElementById("passwordInput").value;
-            if (pin === correctPin) {
-                document.getElementById("passwordScreen").style.display = "none";
-                document.getElementById("adminMenu").style.display = "flex";
-            } else {
-                alert("Incorrect PIN.");
-
-            }
+      function checkPin() {
+        var pin = document.getElementById("passwordInput").value;
+        if (pin === correctPin) {
+            document.getElementById("passwordScreen").style.display = "none";
+            document.getElementById("adminMenu").style.display = "flex";
+        } else {
+            alert("Incorrect PIN.");
+            // Clear the input and refocus
+            passwordInput.value = '';
+            passwordInput.focus();
         }
+    }
+    
     
     
     
