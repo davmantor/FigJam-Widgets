@@ -156,7 +156,7 @@
   <div id="passwordScreen">
     <label class="label" for="passwordInput">Enter Password:</label>
     <input class="input" type="password" id="passwordInput">
-    <button class="button" id="submitPasswordButton">Submit</button>
+    <button class="button" onclick="checkPin()" id="submitPasswordButton">Submit</button>
   </div>
   
   
@@ -307,21 +307,22 @@
 
 
     
-    submitPasswordButton.onclick = () => {
-      password = passwordInput.value;
-      console.log("password:", password);
-      if (password === '312cmpm15') {
-        passwordScreen.style.display = 'none';
-        adminMenu.style.display = 'flex';
-        fetchPreviousResponses();
-      } else {
-        alert('Incorrect password, please try again. 1');
-        
-        // Send a message to the widget to close the plugin
-        parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
-      }
-    };
     
+    
+    var correctPin = "312cmpm15"; // Set your desired PIN here
+      var deleteConfirmation = false;
+
+        function checkPin() {
+            var pin = document.getElementById("passwordInput").value;
+            if (pin === correctPin) {
+                document.getElementById("passwordScreen").style.display = "none";
+                document.getElementById("adminMenu").style.display = "flex";
+            } else {
+                alert("Incorrect PIN.");
+                parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+
+            }
+        }
     
     
     
