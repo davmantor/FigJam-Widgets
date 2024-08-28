@@ -158,10 +158,10 @@ function Widget() {
       }
     }
   
-    setResponse("");
-    setSubmitted(false);
+    setResponse("");  // Clear the response field
+    setSubmitted(false);  // Allow new submissions
+    setShowPrevious(false);  // Hide previous responses if necessary
   
-    // Update showPrevious to false
     try {
       const res = await fetch('https://figjam-widgets-gy8v.onrender.com/reset-widget', {
         method: 'POST',
@@ -173,7 +173,6 @@ function Widget() {
   
       const result = await res.json();
       if (res.status === 200) {
-        setShowPrevious(false); // Update the state
         console.log('Widget reset successfully');
       } else {
         console.error('Failed to reset widget.');
@@ -182,6 +181,7 @@ function Widget() {
       console.error('Error:', error);
     }
   };
+  
   
 
   const handleSubmit = async () => {
@@ -331,43 +331,40 @@ function Widget() {
   height={fontSize}/>
       </AutoLayout>
       {!submitted && (
-        <>
-          <Input
-            placeholder="Your response: "
-            value={response}
-            onTextEditEnd={(event) => setResponse(event.characters)}
-            width="fill-parent"
-            fontSize={fontSize}
-            fill="#333"
-            stroke="#ccc"
-          />
-          <AutoLayout
-            fill="#007BFF"
-            padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
-            cornerRadius={50}
-            width="fill-parent"
-            horizontalAlignItems="center"
-            verticalAlignItems="center"
-            onClick={() => {
-              if (!isSubmitting) {
-                handleSubmit();
-              }
-            }}
-            effect={{
-              type: 'drop-shadow',
-              color: '#000000',
-              offset: { x: 0, y: 2 },
-              blur: 5,
-              spread: 0,
-            }}
-            opacity={isSubmitting ? 0.5 : 1} // Change opacity when submitting
-          >
-            <Text fontSize={fontSize} fill="#FFFFFF" fontWeight="bold">
-              Submit
-            </Text>
-          </AutoLayout>
-        </>
-      )}
+  <>
+    <Input
+      placeholder="Your response: "
+      value={response}
+      onTextEditEnd={(event) => setResponse(event.characters)}
+      width="fill-parent"
+      fontSize={fontSize}
+      fill="#333"
+      stroke="#ccc"
+    />
+    <AutoLayout
+      fill="#007BFF"
+      padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
+      cornerRadius={50}
+      width="fill-parent"
+      horizontalAlignItems="center"
+      verticalAlignItems="center"
+      onClick={handleSubmit}
+      effect={{
+        type: 'drop-shadow',
+        color: '#000000',
+        offset: { x: 0, y: 2 },
+        blur: 5,
+        spread: 0,
+      }}
+      opacity={isSubmitting ? 0.5 : 1}
+    >
+      <Text fontSize={fontSize} fill="#FFFFFF" fontWeight="bold">
+        Submit
+      </Text>
+    </AutoLayout>
+  </>
+)}
+
       {submitted && (
         <AutoLayout
           padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
