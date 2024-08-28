@@ -318,13 +318,19 @@
             passwordScreen.style.display = "none";
             adminMenu.style.display = "flex";
         } else {
+            passwordInput.classList.add('shake');
+            passwordInput.style.borderColor = "red";
+            
             setTimeout(() => {
+                passwordInput.classList.remove('shake');
                 passwordInput.value = '';  // Clear the input field
                 passwordInput.blur();      // Blur the input to remove focus
                 passwordInput.focus();     // Immediately refocus the input
-            }, 100);  // Delay allows FigJam to handle previous input properly
+                passwordInput.style.borderColor = ""; // Reset border color
+            }, 500);  // Match the duration of the shake animation
         }
-    }
+      }
+      
     
     
     
