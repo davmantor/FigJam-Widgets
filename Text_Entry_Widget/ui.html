@@ -265,6 +265,7 @@
     const resetResponseButton = document.getElementById('resetResponseButton');
     const setWidgetIdButton = document.getElementById('setWidgetIdButton');
     const customWidgetIdInput = document.getElementById('customWidgetIdInput');
+    let password;
 
 
     let widgetId;
@@ -276,6 +277,7 @@
       const { type, widgetId: receivedWidgetId, params } = event.data.pluginMessage;
       if (type === 'initialize') {
         console.log('Received initialize message with params:', params);
+        console.log("password:", password);
         widgetId = receivedWidgetId;
         widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
         if (params.creationDate) {
@@ -306,7 +308,7 @@
 
     
     submitPasswordButton.onclick = () => {
-      let password = passwordInput.value;
+      password = passwordInput.value;
       console.log("password:", password);
       if (password === '312cmpm15') {
         passwordScreen.style.display = 'none';
