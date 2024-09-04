@@ -61,8 +61,6 @@ function ChatWidget() {
    
     
     const [logId, setLogId] = useSyncedState('newMessage', Date.now());
-    const [widgetId, setWidgetId] = useSyncedState('widgetId', ''); // Store the current widget ID
-
     
 
    
@@ -90,36 +88,6 @@ function ChatWidget() {
     const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState('widgetCornerRadius', 10);
     
     const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
-
-    const loadChats = async (id: string) => {
-      try {
-          const response = await fetch(`https://figjam-widgets.onrender.com/logs/${id}/messages`);
-          if (response.ok) {
-              const chats = await response.json();
-              setMessages(chats);
-              setWidgetId(id); // Update the current widget ID
-          } else {
-              console.error('Failed to load chats:', response.statusText);
-          }
-      } catch (error) {
-          console.error('Error loading chats:', error);
-      }
-  };
-
-      // Listen for messages from the admin menu
-      figma.ui.onmessage = (msg) => {
-        if (msg.type === 'load-chats' && msg.widgetId) {
-            loadChats(msg.widgetId);
-        }
-    };
-
-    useEffect(() => {
-        // Initial load for current widget ID, if any
-        if (widgetId) {
-            loadChats(widgetId);
-        }
-    });
-
 
     function getWidgetValue(input: number): number {
       const currentWidgetWidth = widgetWidth; // Get the current widget width
