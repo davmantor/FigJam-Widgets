@@ -853,6 +853,7 @@ function ChatWidget() {
 
 useEffect(()=>{
   if (isCrownButtonPressed) {
+    setIsCrownButtonPressed(false);
     console.log('crown', isCrownButtonPressed);
   figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
   figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
