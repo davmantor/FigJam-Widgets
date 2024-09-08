@@ -56,7 +56,7 @@ const MessageSchema = new mongoose.Schema({
     },
     logId: {
       type: Number,
-      required: true,  // Ensure logId is provided
+      default: 0
     },
     anonymous: {
       type: Boolean,
