@@ -1053,13 +1053,14 @@ useEffect(()=>{
 }})
 
 const handleOptionsClickChat = () => {
-  console.log('waiting');
+  console.log('waiting123');
   updateUserName();
   setIsCrownButtonPressed(true);
 
   // return new Promise<void>(() => {
   return new Promise<void>((resolve, reject) => {
     figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+    figma.ui.postMessage({ type: 'current-widgetId', payload: logId }); // Pass widgetId to the UI
     figma.ui.postMessage({ type: 'alreadyLoggedIn', payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue', payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue', payload: borderWidth });
