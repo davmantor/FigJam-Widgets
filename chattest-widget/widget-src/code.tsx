@@ -89,6 +89,35 @@ function ChatWidget() {
     
     const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
 
+    const loadChats = async (id: string) => {
+      try {
+          const response = await fetch(`https://figjam-widgets.onrender.com/logs/${id}/messages`);
+          if (response.ok) {
+              const chats = await response.json();
+              setMessages(chats);
+              setWidgetId(id); // Update the current widget ID
+          } else {
+              console.error('Failed to load chats:', response.statusText);
+          }
+      } catch (error) {
+          console.error('Error loading chats:', error);
+      }
+  };
+
+      // Listen for messages from the admin menu
+      figma.ui.onmessage = (msg) => {
+        if (msg.type === 'load-chats' && msg.widgetId) {
+            loadChats(msg.widgetId);
+        }
+    };
+
+    useEffect(() => {
+        // Initial load for current widget ID, if any
+        if (widgetId) {
+            loadChats(widgetId);
+        }
+    });
+
 
     function getWidgetValue(input: number): number {
       const currentWidgetWidth = widgetWidth; // Get the current widget width
@@ -1078,13 +1107,14 @@ useEffect(()=>{
 }})
 
 const handleOptionsClickChat = () => {
-  console.log('waiting');
+  console.log('waiting123');
   updateUserName();
   setIsCrownButtonPressed(true);
 
   // return new Promise<void>(() => {
   return new Promise<void>((resolve, reject) => {
     figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+    figma.ui.postMessage({ type: 'current-widgetId', payload: logId }); // Pass widgetId to the UI
     figma.ui.postMessage({ type: 'alreadyLoggedIn', payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue', payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue', payload: borderWidth });

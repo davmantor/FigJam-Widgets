@@ -181,10 +181,10 @@
             }
           }
         window.onmessage = function(event) {
-            console.log("called!");
+            console.log("called123!");
             var messageType = event.data.pluginMessage.type;
             var payload = event.data.pluginMessage.payload;
-            console.log(payload);
+            console.log("payload", payload);
             switch (messageType) {
                 case 'set-widget-log-id':
                     document.getElementById('widgetIdDisplay').textContent = event.data.pluginMessage.payload;
