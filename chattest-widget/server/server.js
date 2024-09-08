@@ -94,26 +94,36 @@ app.post('/messages', async (req, res) => {
 
 // Define a GET route to fetch messages
 app.post('/messages', async (req, res) => {
-  console.log("Starting", req.body);
   try {
     console.log(req.body.logId);
-    const message = new MessageModel(req.body);
     
-    const log = await LogModel.findOneAndUpdate(
-      { logId: req.body.logId }, 
-      { $push: { messages: message } }, 
-      { upsert: true, new: true } // Upserts a new log if it doesn't exist
-    );
+    const message = new MessageModel({
+      ...req.body,
+      logId: req.body.logId // Ensure logId is included in the message
+    });
     
-    await message.save(); // Save the message separately if required
+    let log = await LogModel.findOne({ logId: req.body.logId });
     
-    console.log("Log found or created", log);
+    if (!log) {
+      console.log("Creating new log");
+      log = new LogModel({
+        logId: req.body.logId,
+        messages: [message] // Initialize the log with the first message
+      });
+    } else {
+      log.messages.push(message); // Push the new message into the existing log
+    }
+    
+    await message.save(); // Save the message separately
+    await log.save(); // Save the log
+    
     res.status(201).send(message);
   } catch (error) {
     console.error("Error in /messages route:", error);
     res.status(500).send(error.message);
   }
 });
+
 
 
 app.delete('/delete-widget/:logId', async (req, res) => {

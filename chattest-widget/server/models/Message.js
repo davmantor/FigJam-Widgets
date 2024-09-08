@@ -5,7 +5,6 @@ const MessageSchema = new mongoose.Schema({
       type: String,
       unique: true,
       default: () => new mongoose.Types.ObjectId().toString(),  // Assigns a unique ID
-      default: () => new mongoose.Types.ObjectId().toString(),  // Assigns a unique ID
     },
     parentId: {
       type: String,
@@ -14,11 +13,9 @@ const MessageSchema = new mongoose.Schema({
     text: {
       type: String,
       default: '',  // Default empty string for text
-      default: '',  // Default empty string for text
     },
     sender: {
       type: String,
-      default: 'anonymous',  // Default sender name if not provided
       default: 'anonymous',  // Default sender name if not provided
     },
     timestamp: {
@@ -48,26 +45,21 @@ const MessageSchema = new mongoose.Schema({
     upvotedUsers: {
       type: [String],
       default: [],  // Default to an empty array
-      default: [],  // Default to an empty array
     },
     downvotedUsers: {
       type: [String],
-      default: [],  // Default to an empty array
       default: [],  // Default to an empty array
     },
     directReply: {
       type: Number,
       default: 0,  // Default to zero for no replies
-      default: 0,  // Default to zero for no replies
     },
     logId: {
       type: Number,
       required: true,  // Ensure logId is provided
-      required: true,  // Ensure logId is provided
     },
     anonymous: {
       type: Boolean,
-      default: false,  // Default to not being anonymous
       default: false,  // Default to not being anonymous
     }
 });

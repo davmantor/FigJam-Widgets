@@ -89,13 +89,13 @@ function ChatWidget() {
     
     const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
 
-    const loadChats = async (id: string) => {
+    const loadChats = async (id: number) => {
       try {
           const response = await fetch(`https://figjam-widgets.onrender.com/logs/${id}/messages`);
           if (response.ok) {
               const chats = await response.json();
               setMessages(chats);
-              setWidgetId(id); // Update the current widget ID
+              setLogId(id); // Update the current widget ID
           } else {
               console.error('Failed to load chats:', response.statusText);
           }
@@ -113,8 +113,8 @@ function ChatWidget() {
 
     useEffect(() => {
         // Initial load for current widget ID, if any
-        if (widgetId) {
-            loadChats(widgetId);
+        if (logId) {
+            loadChats(logId);
         }
     });
 
