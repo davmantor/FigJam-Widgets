@@ -61,8 +61,6 @@ function ChatWidget() {
    
     
     const [logId, setLogId] = useSyncedState('newMessage', Date.now());
-    const [widgetId, setWidgetId] = useSyncedState('widgetId', ''); // Store the current widget ID
-
     
 
    
@@ -90,35 +88,6 @@ function ChatWidget() {
     const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState('widgetCornerRadius', 10);
     
     const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
-
-    const loadChats = async (id: string) => {
-      try {
-          const response = await fetch(`https://figjam-widgets.onrender.com/logs/${id}/messages`);
-          if (response.ok) {
-              const chats = await response.json();
-              setMessages(chats);
-              setWidgetId(id); // Update the current widget ID
-          } else {
-              console.error('Failed to load chats:', response.statusText);
-          }
-      } catch (error) {
-          console.error('Error loading chats:', error);
-      }
-  };
-
-      // Listen for messages from the admin menu
-      figma.ui.onmessage = (msg) => {
-        if (msg.type === 'load-chats' && msg.widgetId) {
-            loadChats(msg.widgetId);
-        }
-    };
-
-    useEffect(() => {
-        // Initial load for current widget ID, if any
-        if (widgetId) {
-            loadChats(widgetId);
-        }
-    });
 
 
     function getWidgetValue(input: number): number {
@@ -312,19 +281,19 @@ function ChatWidget() {
         
         const newMessageObject = {
           id: newId,
-          parentId: null, // Assuming direct messages have no parent; adjust if implementing replies
+          parentId: null, 
           text: messageText.trim(),
           sender: currentUserName,
           timestamp: timestampString,
-          edited: false, // New messages are not edited at creation
-          deleteConfirm: false, // Initial state for deletion confirmation
-          showReplies: false, // Initial state for showing replies
-          pinned: false, // Initial pinned state
-          deleted: false, // Initial deletion state
-          upvotedUsers: [], // Initial upvote state
-          downvotedUsers: [], // Initial downvote state
+          edited: false, 
+          deleteConfirm: false, 
+          showReplies: false, 
+          pinned: false, 
+          deleted: false, 
+          upvotedUsers: [], 
+          downvotedUsers: [], 
           directreply: 0,
-          logId: logId, // Include the logId in each message
+          logId: logId, 
           userIcon: userIcon,
           anonymous: anonymous
         };
@@ -884,8 +853,11 @@ function ChatWidget() {
 
 useEffect(()=>{
   if (isCrownButtonPressed) {
-    console.log('crown', isCrownButtonPressed);
+    setIsCrownButtonPressed(false);
+    console.log('crown123', isCrownButtonPressed);
   figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+  console.log('logid', logId);
+  figma.ui.postMessage({ type: 'set-widget-log-id', payload: logId });
   figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
   figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
   figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -896,7 +868,28 @@ useEffect(()=>{
   figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
   figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
   figma.ui.onmessage = msg => {
-    if (msg.type === 'update-prompt') {
+    if (msg.type === 'load-chats') {
+      console.log("Loading new chats...", msg.messages);
+
+      const newMessages = msg.messages;
+        
+        // Validate message structure
+        const validMessages = newMessages.map((message: Message) => {
+          if (!message.timestamp || isNaN(Date.parse(message.timestamp))) {
+            message.timestamp = new Date().toISOString(); // Set to current time if invalid
+          }
+          return message;
+        });
+
+        setMessages(validMessages); // Replace the current messages with valid ones
+
+        if (validMessages.length !== newMessages.length) {
+          console.error("Some messages had invalid structures.");
+        }
+
+
+      console.log("New messages loaded:", newMessages);
+    } else if (msg.type === 'update-prompt') {
       console.log("calling prompt from options");
       figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
       figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
