@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 const MessageSchema = require('./Message').schema; // Import the Message schema
 
 const LogSchema = new mongoose.Schema({
-    logId:{
+    logId: {
         type: Number,
-      }, 
+        required: true, // Ensuring logId is required
+        unique: true // Ensure uniqueness across logs
+    },
     messages: {
         type: [MessageSchema],
-        default: [{
-            id:  Math.random(),
+        default: () => [{
             text: 'This is a temporary message',
             sender: 'System'
         }]
