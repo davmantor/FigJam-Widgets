@@ -11,7 +11,8 @@ const LogSchema = new mongoose.Schema({
         type: [MessageSchema],
         default: () => [{
             text: 'This is a temporary message',
-            sender: 'System'
+            sender: 'System',
+            logId: logId 
         }]
     }
 }, { autoIndex: false }); // Disable automatic indexing
