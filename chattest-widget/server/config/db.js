@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const MessageModel = require('../models/Message');
 const db = process.env.MONGODB_URI;
 
-
 const connectDB = async () => {
   try {
-    await mongoose.connect(db, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Log the MongoDB URI (remove this in production)
+    console.log('MongoDB URI:', db);
+
+    // Connect to MongoDB without deprecated options
+    await mongoose.connect(db);
+
     console.log('-----MongoDB Connected');
   } catch (err) {
-    console.error(err.message);
+    console.error('MongoDB connection error:', err.message);
     process.exit(1);
   }
 };

@@ -153,17 +153,42 @@
         function loadWidgetData() {
             var widgetId = document.getElementById("widgetIdInput").value;
             if (widgetId) {
-                parent.postMessage({ pluginMessage: { type: 'load-chats', widgetId: widgetId } }, '*');
+              // Fetch messages from the server for the given widgetId
+              fetch(`https://figjam-widgets.onrender.com/logs/${widgetId}/messages`)
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  // Send the messages array to the widget/plugin
+                  console.log(data)
+                  parent.postMessage({ 
+                    pluginMessage: { 
+                      type: 'load-chats', 
+                      widgetId: widgetId, 
+                      messages: data 
+                    } 
+                  }, '*');
+                })
+                .catch(error => {
+                  console.error('There was a problem with the fetch operation:', error);
+                  alert("Error loading chats: " + error.message);
+                });
             } else {
-                alert("Please enter a Widget ID.");
+              alert("Please enter a Widget ID.");
             }
-        }
+          }
         window.onmessage = function(event) {
-            console.log("called!");
+            console.log("called123!");
             var messageType = event.data.pluginMessage.type;
             var payload = event.data.pluginMessage.payload;
-            console.log(payload);
+            console.log("payload", payload);
             switch (messageType) {
+                case 'set-widget-log-id':
+                    document.getElementById('widgetIdDisplay').textContent = event.data.pluginMessage.payload;
+                    break;
                 case 'current-borderColor':
                     document.getElementById('borderColorButton').insertAdjacentHTML("beforeend", payload);
                     break;
