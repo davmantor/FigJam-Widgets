@@ -61,19 +61,17 @@ const MessageSchema = new mongoose.Schema({
       default: 0,  // Default to zero for no replies
     },
     logId: {
-    logId: {
       type: Number,
       required: true,  // Ensure logId is provided
       required: true,  // Ensure logId is provided
     },
-    anonymous: {
     anonymous: {
       type: Boolean,
       default: false,  // Default to not being anonymous
       default: false,  // Default to not being anonymous
     }
 });
-});
+
 
 const MessageModel = mongoose.model('Message', MessageSchema);
 
