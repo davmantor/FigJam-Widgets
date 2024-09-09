@@ -1,71 +1,72 @@
 const mongoose = require('mongoose');
 
 const MessageSchema = new mongoose.Schema({
-    id: {
-      type: String,
-      unique: true,
-      default: () => new mongoose.Types.ObjectId().toString(),  // Assigns a unique ID
-    },
-    parentId: {
-      type: String,
-      default: null,
-    },
-    text: {
-      type: String,
-      default: '',  // Default empty string for text
-    },
-    sender: {
-      type: String,
-      default: 'anonymous',  // Default sender name if not provided
-    },
-    timestamp: {
-      type: Date, // Store as Date object instead of a string
-      default: Date.now,  // Default to current timestamp
-    },
-    edited: {
-      type: Boolean,
-      default: false,
-    },
-    deleteConfirm: {
-      type: Boolean,
-      default: false,
-    },
-    showReplies: {
-      type: Boolean,
-      default: false,
-    },
-    pinned: {
-      type: Boolean,
-      default: false,
-    },
-    deleted: {
-      type: Boolean,
-      default: false,
-    },
-    upvotedUsers: {
-      type: [String],
-      default: [],  // Default to an empty array
-    },
-    downvotedUsers: {
-      type: [String],
-      default: [],  // Default to an empty array
-    },
-    directReply: {
-      type: Number,
-      default: 0,  // Default to zero for no replies
-    },
-    logId: {
-      type: Number,
-      default: 0
-    },
-    anonymous: {
-      type: Boolean,
-      default: false,  // Default to not being anonymous
-    }
+  id: {
+    type: String,
+    unique: true,
+    default: () => new mongoose.Types.ObjectId().toString(),
+  },
+  parentId: {
+    type: String,
+    default: null,
+  },
+  text: {
+    type: String,
+    default: '',
+  },
+  sender: {
+    type: String,
+    default: 'anonymous',
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
+  edited: {
+    type: Boolean,
+    default: false,
+  },
+  deleteConfirm: {
+    type: Boolean,
+    default: false,
+  },
+  showReplies: {
+    type: Boolean,
+    default: false,
+  },
+  pinned: {
+    type: Boolean,
+    default: false,
+  },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
+  upvotedUsers: {
+    type: [String],
+    default: [],
+  },
+  downvotedUsers: {
+    type: [String],
+    default: [],
+  },
+  directReply: {
+    type: Number,
+    default: 0,
+  },
+  logId: {
+    type: Number,
+    default: 0,
+  },
+  anonymous: {
+    type: Boolean,
+    default: false,
+  },
+  userIcon: {
+    type: String,
+    default: '',
+  }
 });
 
-
-const MessageModel = mongoose.model('Message', MessageSchema);
-
-module.exports = MessageModel;
-
+// Export only the schema so that the model can be associated with the correct database context
+module.exports = MessageSchema;

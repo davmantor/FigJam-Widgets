@@ -152,9 +152,10 @@
 
         function loadWidgetData() {
             var widgetId = document.getElementById("widgetIdInput").value;
+            document.getElementById('widgetIdDisplay').textContent = widgetId;
             if (widgetId) {
               // Fetch messages from the server for the given widgetId
-              fetch(`https://figjam-widgets.onrender.com/logs/${widgetId}/messages`)
+              fetch(`https://figjam-widgets.onrender.com/chatwidget/logs/${widgetId}/messages`)
                 .then(response => {
                   if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -167,8 +168,8 @@
                   parent.postMessage({ 
                     pluginMessage: { 
                       type: 'load-chats', 
-                      widgetId: widgetId, 
-                      messages: data 
+                      logId: widgetId, 
+                      messages: data.messages 
                     } 
                   }, '*');
                 })
