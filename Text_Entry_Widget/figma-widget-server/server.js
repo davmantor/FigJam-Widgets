@@ -18,9 +18,6 @@ mongoose.connect(db, {
   socketTimeoutMS: 45000 // 45 seconds
 });
 
-const dbConnection = mongoose.connection;
-dbConnection.on('error', (err) => console.error(`Connection error: ${err}`));
-dbConnection.once('open', () => console.log('Connected to MongoDB'));
 
 const widgetSchema = new mongoose.Schema({
   widgetId: { type: String, unique: true },
@@ -40,7 +37,12 @@ const widgetSchema = new mongoose.Schema({
 });
 
 
-const Widget = mongoose.model('Widget', widgetSchema);
+const dbConnection = mongoose.connection.useDb('TextEntryWidget')
+dbConnection.on('error', (err) => console.error(`Connection error: ${err}`));
+dbConnection.once('open', () => console.log('Connected to MongoDB'));
+
+
+const Widget = mongoose.model('log', widgetSchema);
 
 app.post('/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
