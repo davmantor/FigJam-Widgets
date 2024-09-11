@@ -1,12 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors'); // Import the cors package
+const axios = require('axios'); 
+const momenttz = require('moment-timezone');
 
 const app = express();
 require('dotenv').config(); // at the top of your server.js
 const connectDB = require('./config/db'); // Import your connectDB function
 const MessageSchema = require('./models/Message');
 const LogSchema = require('./models/Logs');
+
 const moment = require('moment');
 const bodyParser = require('body-parser');
 
@@ -52,6 +55,20 @@ app.use(bodyParser.json());
 
 app.use(express.json()); // For parsing application/json
 
+async function getUserTimezone(ip) {
+  try {
+    const response = await axios.get(`http://ip-api.com/json/${ip}`);
+    if (response.data && response.data.timezone) {
+      return response.data.timezone;
+    } else {
+      throw new Error('Timezone not found for the given IP.');
+    }
+  } catch (error) {
+    console.error('Error fetching timezone:', error.message);
+    return null; // Return null if there's an error
+  }
+}
+
 app.post('/chatwidget/create-widget', async (req, res) => {
     console.log("creating widget");
     try {
@@ -96,17 +113,56 @@ app.post('/chatwidget/create-widget', async (req, res) => {
     }
   });
 
-  app.get('/chatwidget/logs/:logId/messages', async (req, res) => {
-    try {
-      const logId = req.params.logId;
-      const log = await LogModel.findOne({ logId: req.params.logId }).populate('messages');
-      res.status(200).send({logId, messages: log.messages});
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
+// Helper function to get user's timezone based on IP address
+async function getUserTimezone(ip) {
+  try {
+    const response = await axios.get(`http://ip-api.com/json/${ip}`);
+    if (response.data && response.data.timezone) {
+      return response.data.timezone;
+    } else {
+      throw new Error('Timezone not found for the given IP.');
     }
-  });
-    
+  } catch (error) {
+    console.error('Error fetching timezone:', error.message);
+    return null; // Return null if there's an error
+  }
+}
+
+app.get('/chatwidget/logs/:logId/messages', async (req, res) => {
+  try {
+    const logId = req.params.logId;
+
+    // Get the user's IP address from the request headers (or use a fallback IP)
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    // Get user's timezone using the IP
+    const userTimezone = await getUserTimezone(ip);
+
+    // Find the log by logId and populate the messages
+    const log = await LogModel.findOne({ logId }).populate('messages');
+
+    // If no log is found, return an error
+    if (!log) {
+      return res.status(404).send({ message: 'Log not found' });
+    }
+
+    // Convert the timestamps of each message to the user's local timezone
+    const messagesWithLocalTime = log.messages.map((message) => {
+      let localTimestamp = momenttz.utc(message.timestamp); // Assume the timestamp is in UTC
+      if (userTimezone) {
+        localTimestamp = localTimestamp.tz(userTimezone); // Convert to user's timezone
+      }
+      return { ...message.toObject(), timestamp: localTimestamp.format() }; // Return the message with formatted timestamp
+    });
+
+    // Send the response with the logId and messages with adjusted timestamps
+    res.status(200).send({ logId, messages: messagesWithLocalTime });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
   
 
 // Define a GET route to fetch messages
@@ -114,14 +170,22 @@ app.post('/chatwidget/create-widget', async (req, res) => {
 app.post('/chatwidget/messages', async (req, res) => {
   try {
     console.log('inside messages');
-    let { timestamp, logId } = req.body;
+    const { timestamp, logId } = req.body;
 
-    // Convert timestamp to a valid ISO 8601 date string
-    const currentDate = new Date();
-    const formattedTimestamp = moment(`${currentDate.toDateString()} ${timestamp}`, 'ddd MMM DD YYYY h:mm A').toISOString();
+    // Get the user's IP address from the request headers (or use a fallback IP)
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    // Get user's timezone using the IP
+    const userTimezone = await getUserTimezone(ip);
+
+    // Convert the timestamp to the user's local time (or fallback to UTC if timezone not found)
+    let localTimestamp = momenttz.utc(timestamp); // Assume the timestamp is in UTC
+    if (userTimezone) {
+      localTimestamp = localTimestamp.tz(userTimezone); // Convert to user's timezone
+    }
 
     // Update the request body with the formatted timestamp
-    const messageData = { ...req.body, timestamp: formattedTimestamp };
+    const messageData = { ...req.body, timestamp: localTimestamp.toISOString() };
 
     // Create a new message
     const message = new MessageModel(messageData);
@@ -145,7 +209,7 @@ app.post('/chatwidget/messages', async (req, res) => {
 
     // Push the new message into the log's messages array
     log.messages.push(message);
-    console.log('done');
+
     // Save the log and the message separately
     await log.save();
     await message.save();
@@ -157,7 +221,6 @@ app.post('/chatwidget/messages', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
 
 
 
@@ -351,6 +414,6 @@ app.post('/textentrywidget/delete-response', async (req, res) => {
   
   
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

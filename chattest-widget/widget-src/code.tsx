@@ -309,7 +309,7 @@ function ChatWidget() {
       }
     };
     
-
+    
     
     
     const handleAddMessage = async (
@@ -344,7 +344,7 @@ function ChatWidget() {
             parentId: message.parentId || null,
             text: message.text || '',
             sender: message.sender || 'Anonymous',
-            timestamp: message.timestamp ? convertISOToDateTime(message.timestamp) : timestampString,
+            timestamp: message.timestamp ? message.timestamp : 'Lost TimeStamp',
             edited: message.edited || false,
             deleteConfirm: message.deleteConfirm || false,
             showReplies: message.showReplies || false,
@@ -377,7 +377,7 @@ function ChatWidget() {
           const timestamp = Date.now();
           const randomString = generateRandomString();
           const newId = `${timestamp}${randomString}${userName}`;
-          console.log(newId);
+          console.log('time', timestamp);
     
           const timestampDate = new Date(timestamp);
           const hours = timestampDate.getHours();
@@ -385,9 +385,10 @@ function ChatWidget() {
           const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
           const ampm = hours >= 12 ? 'PM' : 'AM';
           const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-          const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+          const timestampString = timestampDate.toISOString();
           const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
           const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
+
     
           const newMessageObject: Message = {
             id: newId,
@@ -1369,6 +1370,40 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
   if(message.text == "this message has been deleted"   ){
     showNoRepliesDeleted = false;
   }
+
+  function convertISOToDateTime(isoString: string): string {
+      // Create a new Date object from the ISO string
+      const date = new Date(isoString);
+  
+      // Convert the date to local time components
+      const year = date.getFullYear();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()]; // Get the abbreviated month name
+      const day = date.getDate();
+  
+      // Get local hours and minutes
+      const localHours = date.getHours();
+      const localMinutes = padWithZero(date.getMinutes());
+  
+      // Convert the time to 12-hour format
+      const ampm = localHours >= 12 ? 'PM' : 'AM';
+      const formattedHours = localHours % 12 || 12; // Convert to 12-hour format
+  
+      // Return the formatted date and time string (e.g., "Sep 09, 2024 12:52 PM")
+      return `${month} ${day}, ${year} ${formattedHours}:${localMinutes} ${ampm}`;
+  }
+  
+  // Helper function to pad single digit numbers with a leading zero
+  function padWithZero(number: number): string {
+      return number < 10 ? '0' + number : number.toString();
+  }
+  
+  
+  
+
+  
+  
+      
   
   return (
     
@@ -1395,7 +1430,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="start"
-            width={getWidgetValue(490)}
+            width={getWidgetValue(450)}
             spacing={getWidgetValue(20)}
           >
             {message.userIcon ? ( // Add this block to display the user icon
@@ -1419,10 +1454,10 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             direction="horizontal"
             horizontalAlignItems="end"
             padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(1), right: getWidgetValue(8) }}
-            width={getWidgetValue(260)}
+            width={getWidgetValue(300)}
           >
             <Text fontSize={getWidgetValue(25)} fill={messageStyle.color} horizontalAlignText={"right"}>
-              {message.timestamp}
+              {convertISOToDateTime(message.timestamp)}
             </Text>
           </AutoLayout>
 
