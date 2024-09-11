@@ -7,6 +7,7 @@ require('dotenv').config(); // at the top of your server.js
 const connectDB = require('./config/db'); // Import your connectDB function
 const MessageSchema = require('./models/Message');
 const LogSchema = require('./models/Logs');
+
 const moment = require('moment');
 const bodyParser = require('body-parser');
 
