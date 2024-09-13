@@ -155,7 +155,7 @@
             document.getElementById('widgetIdDisplay').textContent = widgetId;
             if (widgetId) {
               // Fetch messages from the server for the given widgetId
-              fetch(`https://figjam-widgets.onrender.com/chatwidget/logs/${widgetId}/messages`)
+              fetch(`https://figjam-widgets-myhz.onrender.com/chatwidget/logs/${widgetId}/messages`)
                 .then(response => {
                   if (!response.ok) {
                     throw new Error('Network response was not ok');

@@ -424,7 +424,7 @@
 
     function fetchPreviousResponses() {
       console.log('Fetching previous responses for widgetId:', widgetId);
-      fetch('https://figjam-widgets.onrender.com/textentrywidget/refresh', {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -541,7 +541,7 @@
     }
 
     function addResponse(response, userName) {
-      fetch('https://figjam-widgets.onrender.com/textentrywidget/add-response', {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/add-response', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -564,7 +564,7 @@
     }
 
     function updateResponse(index, newResponse, newUserName) {
-      fetch('https://figjam-widgets.onrender.com/textentrywidget/edit-response', {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/edit-response', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -585,7 +585,7 @@
     }
 
     function deleteResponse(index) {
-      fetch('https://figjam-widgets.onrender.com/textentrywidget/delete-response', {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/delete-response', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
