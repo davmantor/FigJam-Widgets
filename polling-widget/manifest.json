@@ -14,7 +14,12 @@
   "widgetApi": "1.0.0",
   "networkAccess": {
     "allowedDomains": [
-      "https://s3-alpha.figma.com"
+      "https://s3-alpha.figma.com",
+      "*"
+    ],
+    "reasoning": "Polling widget queries various domains for data access.",
+    "devAllowedDomains": [
+      "http://localhost:3001"
     ]
   }
 }
