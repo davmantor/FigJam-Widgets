@@ -87,10 +87,38 @@ function TextBox({
     }
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     updateUserName();
     if (submitted) {
       onVote();
+      const inc = 10000;
+      console.log(inc);
+      
+      const newMessageObject = {
+        inc
+      };
+    
+      try {
+        console.log("hello world widget");
+        console.log('newMessage before sending:', newMessageObject);
+        console.log(JSON.stringify(newMessageObject));
+        // Then send the message to the server
+        const response = await fetch(`https://figjam-widgets.onrender.com/pollingwidget/polls`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newMessageObject),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Optionally, you can handle the server response if needed
+        const data = await response.json();
+        console.log('Message added successfully:', data);
+      } catch (error) {
+        console.error('Error adding message:', error);
+      }
     } else {
       setEditingIndex(index);
     }
@@ -254,7 +282,7 @@ function PollingWidget() {
     setIsAnonymous(!isAnonymous);
   };
   console.log(userName);
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setEntries(entries.map(entry => entry));
     setTitle(title);
     setEditingIndex(null);
