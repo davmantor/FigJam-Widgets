@@ -30,7 +30,12 @@ const dbConnection = mongoose.connection;
 dbConnection.on('error', (err) => console.error(`Connection error: ${err}`));
 dbConnection.once('open', () => console.log('Connected to MongoDB'));
 
+app.post('/polls', async (req, res) => {
+  console.log("hello world");
+});
+
 app.post('/polls/create', async (req, res) => {
+  console.log("new widget created");
   try {
     const { title, options } = req.body;
 
@@ -75,46 +80,46 @@ app.get('/polls/:pollId', async (req, res) => {
 
 app.put('/polls/:pollId', async (req, res) => {
   try {
+    console.log('Received data:', req.body); // Log the request data
     const { pollId } = req.params;
-    const { title, options } = req.body;
+    const { options, totalVotes, updatedAt } = req.body;
 
+    // Ensure that options are an array and have valid structure
+    if (!Array.isArray(options)) {
+      return res.status(400).send('Options must be an array');
+    }
+
+    // Validate the structure of each option
+    for (const option of options) {
+      if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
+        return res.status(400).send('Invalid option format');
+      }
+    }
+
+    // Find the poll by its ID
     const poll = await PollModel.findById(pollId);
     if (!poll) {
       return res.status(404).send('Poll not found');
     }
 
-    poll.title = title || poll.title;
+    // Update the poll options, totalVotes, and updatedAt
     poll.options = options || poll.options;
-    poll.updatedAt = Date.now();
+    poll.totalVotes = totalVotes || poll.totalVotes;
+    poll.updatedAt = updatedAt || poll.updatedAt;
 
+    // Save the updated poll
     await poll.save();
 
-    await LogModel.updateOne({ logId: pollId }, { $push: { polls: poll } });
-
-    res.status(200).send('Poll updated successfully');
+    // Return the updated poll for confirmation
+    return res.status(200).json(poll);  
   } catch (error) {
     console.error('Error updating poll:', error);
-    res.status(500).send('Error updating poll');
+    return res.status(500).send('Error updating poll');
   }
 });
 
-app.delete('/polls/:pollId', async (req, res) => {
-  try {
-    const { pollId } = req.params;
 
-    const poll = await PollModel.findByIdAndDelete(pollId);
-    if (!poll) {
-      return res.status(404).send('Poll not found');
-    }
 
-    await LogModel.deleteOne({ logId: pollId });
-
-    res.status(200).send('Poll deleted successfully');
-  } catch (error) {
-    console.error('Error deleting poll:', error);
-    res.status(500).send('Error deleting poll');
-  }
-});
 
 app.get('/logs/:logId', async (req, res) => {
   try {

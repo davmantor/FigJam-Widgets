@@ -3,7 +3,7 @@ const PollSchema = require('./Poll');
 
 const LogSchema = new mongoose.Schema({
   logId: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },

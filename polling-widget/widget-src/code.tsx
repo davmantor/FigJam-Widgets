@@ -25,13 +25,17 @@ interface TextBoxProps {
   isEditing: boolean;
   setEditingIndex: (index: number | null) => void;
   submitted: boolean;
-  votes: number;
+  votes: number[];
   onVote: () => void;
   updateUserName: () => void;
   userVote: boolean;
   voters: CustomUser[];
   isAnonymous: boolean;
+  totalVoters: number;
+  entries: string[];    // Add entries prop
+  pollId: string; // Add pollId prop
 }
+
 
 function ProgressBar({ votes, totalVotes }: { votes: number; totalVotes: number }) {
   const parentWidth = 250;
@@ -73,8 +77,10 @@ function TextBox({
   voters,
   isAnonymous,
   totalVoters,
-  updateUserName  // Accept totalVoters as a prop
-}: TextBoxProps & { totalVoters: number }) {
+  updateUserName,  // Accept totalVoters and updateUserName
+  pollId,          // Add pollId for context if needed
+  entries          // Add entries for additional context
+}: TextBoxProps & { totalVoters: number; pollId?: string; entries?: string[] }) {
 
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
@@ -88,41 +94,56 @@ function TextBox({
   };
 
   const handleClick = async () => {
-    updateUserName();
+    updateUserName();  // Ensure the user name is up-to-date
     if (submitted) {
-      onVote();
-      const inc = 10000;
-      console.log(inc);
-      
+      console.log("previous voters:" + voters);
+      onVote();  // This will update local states like votes and voters
+      console.log("after voters:" + voters);
+      const newVotes = [...votes];
+      const newVoters = [...voters];
+      const totalVotes = newVotes.reduce((acc, vote) => acc + vote, 0);
+  
       const newMessageObject = {
-        inc
+        title: "pollTitle",
+        options: entries.map((entry, index) => ({
+          text: entry,           // Option text
+          votes: newVotes[index], // Number of votes for this option
+          // Ensure voters[index] is an array before calling .map()
+          voters: (Array.isArray(voters[index]) ? voters[index] : []).map((voter: CustomUser) => ({
+            name: voter.name || 'Unknown User',  // Ensure 'name' exists in each voter
+          })),
+        })),
+        totalVotes,  // Sum of all votes
+        isAnonymous: isAnonymous,  // This should come from your state or logic
+        updatedAt: new Date(),  // Current date/time for the last update
       };
-    
+      
+      
+  
+      console.log('Sending message object to server:', newMessageObject);  // Log the request data
+  
       try {
-        console.log("hello world widget");
-        console.log('newMessage before sending:', newMessageObject);
-        console.log(JSON.stringify(newMessageObject));
-        // Then send the message to the server
-        const response = await fetch(`https://figjam-widgets.onrender.com/pollingwidget/polls`, {
-          method: 'POST',
+        const response = await fetch(`http://localhost:3001/polls/${pollId}`, {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(newMessageObject),
         });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        // Optionally, you can handle the server response if needed
-        const data = await response.json();
-        console.log('Message added successfully:', data);
+  
+        console.log('Server response status:', response.status);  // Log the response status
+        const responseData = await response.json();
+        console.log('Server response data:', responseData);  // Log the response data
       } catch (error) {
-        console.error('Error adding message:', error);
+        console.error('Error updating poll:', error);  // Log any error
       }
     } else {
-      setEditingIndex(index);
+      setEditingIndex(index);  // If not submitted, continue with editing
     }
   };
+  
+  
+  
 // Now the voters array contains both the original and fake voters
 
   const displayedVoters = voters.slice(0, 4);
@@ -221,6 +242,8 @@ function PollingWidget() {
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
   const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
+  const [pollId, setPollId] = useSyncedState<string>('pollId', "");
+
 
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
@@ -248,6 +271,9 @@ function PollingWidget() {
   const handleVote = (index: number) => {
     // Update the user's name before proceeding
     updateUserName();
+    console.log(entries);
+    console.log(votes);
+    console.log(voters);
   
     // Assuming userName is the state variable holding the updated user name
     const userName = figma.currentUser ? figma.currentUser.name : 'Unknown User';
@@ -279,16 +305,62 @@ function PollingWidget() {
   };
 
   const toggleAnonymousVote = () => {
-    setIsAnonymous(!isAnonymous);
+    setIsAnonymous(prevState => !prevState);  // Toggle the value
   };
+  
   console.log(userName);
   const handleSubmit = async () => {
+    console.log(`isAnonymous before submit: ${isAnonymous}`);
+    // Prepare the data to be sent to the server
+    const pollData = {
+      title,
+      options: entries.map(entry => ({
+        text: entry,        
+        votes: 0, 
+        voters: []
+      })),
+      totalVotes: 0,
+      isAnonymous: isAnonymous,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  
+    try {
+      console.log(JSON.stringify(pollData));
+      // Send the data to the server to create a new poll
+      const response = await fetch('http://localhost:3001/polls/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pollData),  // Convert poll data to JSON string
+      });
+      console.log("POLL DATA");
+      console.log(JSON.stringify(pollData));
+  
+      // Check if the request was successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      // Optionally, handle the server response if needed
+      const data = await response.json();
+      setPollId(data.pollId);
+
+      console.log('Poll created successfully:', data);
+    } catch (error) {
+      console.error('Error creating poll:', error);
+    }
+
+    // Set UI states
     setEntries(entries.map(entry => entry));
     setTitle(title);
     setEditingIndex(null);
     setSubmitted(true);
   };
-
+  
+  
+  
   // Create a combined voters array using a Set to ensure uniqueness
   const combinedVoters = new Set<CustomUser>();
   voters.forEach(voterArray => {
@@ -316,22 +388,24 @@ function PollingWidget() {
       stroke={'#E6E6E6'}
       width={400}
     >
-      <TextBox
-        index={-1}
-        value={title}
-        onValueChange={handleValueChange}
-        isQuestion={true}
-        isEditing={editingIndex === -1}
-        setEditingIndex={setEditingIndex}
-        submitted={submitted}
-        votes={0}
-        onVote={() => {}}
-        userVote={false}
-        voters={[]}
-        isAnonymous={isAnonymous}
-        totalVoters={combinedVoters.size}  // Pass combinedVoters.size here
-        updateUserName={updateUserName}  // Pass updateUserName here
-      />
+    <TextBox
+      index={-1}
+      value={title}
+      onValueChange={handleValueChange}
+      isQuestion={true}
+      isEditing={editingIndex === -1}
+      setEditingIndex={setEditingIndex}
+      submitted={submitted}
+      votes={[]}
+      onVote={() => {}}
+      userVote={false}
+      voters={[]}
+      isAnonymous={isAnonymous}
+      totalVoters={combinedVoters.size}
+      updateUserName={updateUserName}
+      entries={entries}
+      pollId={pollId}
+    />
       {entries.map((item, index) => (
         <TextBox
           key={index}
@@ -342,13 +416,15 @@ function PollingWidget() {
           isEditing={editingIndex === index}
           setEditingIndex={setEditingIndex}
           submitted={submitted}
-          votes={votes[index]}
+          votes={votes}            // Pass votes
           onVote={() => handleVote(index)}
           userVote={userVoteIndex === index}
-          voters={voters[index]}
+          voters={voters[index]}          // Pass voters
           isAnonymous={isAnonymous}
-          totalVoters={combinedVoters.size}  // Pass combinedVoters.size here
-          updateUserName={updateUserName}  // Pass updateUserName here
+          totalVoters={combinedVoters.size}  
+          updateUserName={updateUserName}  
+          entries={entries}               // Pass entries
+          pollId={pollId}                 // Pass pollId
         />
       ))}
       {!submitted && (
