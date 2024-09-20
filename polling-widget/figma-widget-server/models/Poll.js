@@ -27,7 +27,6 @@ const PollSchema = new mongoose.Schema({
   },
   isAnonymous: {
     type: Boolean,
-    default: false,
   },
   createdAt: {
     type: Date,
