@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config(); // Use environment variables for DB connection
 
-const LogSchema = require('./models/Logs');
+const LogSchema = require('./models/PollLogs');
 const PollSchema = require('./models/Poll');
 
 const db = process.env.MONGODB_URI;

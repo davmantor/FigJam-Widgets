@@ -7,6 +7,9 @@ require('dotenv').config(); // at the top of your server.js
 const connectDB = require('./config/db'); // Import your connectDB function
 const MessageSchema = require('./models/Message');
 const LogSchema = require('./models/Logs');
+const PollLogSchema = require('./models/PollLogs');
+const PollSchema = require('./models/Poll');
+
 const moment = require('moment');
 const bodyParser = require('body-parser');
 
@@ -37,10 +40,13 @@ const widgetSchema = new mongoose.Schema({
 
 const textEntryDB = mongoose.connection.useDb('TextEntryWidget');
 const chatWidgetDB = mongoose.connection.useDb('ChatWidget');
+const pollingDB = mongoose.connection.useDb('PollingWidget');
 
 const MessageModel = chatWidgetDB.model('Message', MessageSchema); // Using MessageSchema
 const LogModel = chatWidgetDB.model('Log', LogSchema); // Using LogSchema
 const Widget = textEntryDB.model('log', widgetSchema);
+const PollModel = pollingDB.model('Poll', PollSchema); // Poll model
+const PollLogModel = pollingDB.model('Log', PollLogSchema);    // Log model
 
 
 
@@ -345,6 +351,94 @@ app.post('/textentrywidget/delete-response', async (req, res) => {
   } catch (error) {
     console.error('Error deleting response:', error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+app.post('/polls', async (req, res) => {
+  console.log("hello world");
+});
+
+app.post('/polls/create', async (req, res) => {
+  console.log("new widget created");
+  try {
+    const { title, options } = req.body;
+
+    const newPoll = new PollModel({
+      title,
+      options,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    await newPoll.save();
+
+    const newLog = new PollLogModel({
+      logId: newPoll.id,
+      polls: [newPoll], 
+    });
+
+    await newLog.save();
+
+    res.status(201).send({ pollId: newPoll._id, logId: newLog._id });
+  } catch (error) {
+    console.error('Error creating poll:', error);
+    res.status(500).send('Error creating poll');
+  }
+});
+
+app.get('/polls/:pollId', async (req, res) => {
+  try {
+    const { pollId } = req.params;
+    const poll = await PollModel.findById(pollId);
+
+    if (!poll) {
+      return res.status(404).send('Poll not found');
+    }
+
+    res.status(200).json(poll);
+  } catch (error) {
+    console.error('Error fetching poll:', error);
+    res.status(500).send('Error fetching poll');
+  }
+});
+
+app.put('/polls/:pollId', async (req, res) => {
+  try {
+    console.log('Received data:', req.body); // Log the request data
+    const { pollId } = req.params;
+    const { options, totalVotes, updatedAt } = req.body;
+
+    // Ensure that options are an array and have valid structure
+    if (!Array.isArray(options)) {
+      return res.status(400).send('Options must be an array');
+    }
+
+    // Validate the structure of each option
+    for (const option of options) {
+      if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
+        return res.status(400).send('Invalid option format');
+      }
+    }
+
+    // Find the poll by its ID
+    const poll = await PollModel.findById(pollId);
+    if (!poll) {
+      return res.status(404).send('Poll not found');
+    }
+
+    // Update the poll options, totalVotes, and updatedAt
+    poll.options = options || poll.options;
+    poll.totalVotes = totalVotes || poll.totalVotes;
+    poll.updatedAt = updatedAt || poll.updatedAt;
+
+    // Save the updated poll
+    await poll.save();
+
+    // Return the updated poll for confirmation
+    return res.status(200).json(poll);  
+  } catch (error) {
+    console.error('Error updating poll:', error);
+    return res.status(500).send('Error updating poll');
   }
 });
 
