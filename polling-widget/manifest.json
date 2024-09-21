@@ -12,9 +12,7 @@
   "permissions": ["currentuser"],
   "containsWidget": true,
   "widgetApi": "1.0.0",
-  "networkAccess": {
-    "allowedDomains": [
-      "https://s3-alpha.figma.com"
-    ]
-  }
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:4000"]}
 }

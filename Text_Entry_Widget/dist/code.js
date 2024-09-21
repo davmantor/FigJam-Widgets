@@ -161,7 +161,7 @@
       setSubmitted(false);
       setShowPrevious(false);
       try {
-        const res = yield fetch("https://figjam-widgets.onrender.com/textentrywidget/reset-widget", {
+        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -194,7 +194,7 @@
       setPreviousResponses((prev) => [{ response, userName: name, photoUrl, timestamp }, ...prev]);
       const data = { widgetId: widgetId != null ? widgetId : "", response, userName: name, photoUrl, timestamp };
       try {
-        const res = yield fetch("http://localhost:4000/textentrywidget/submit", {
+        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/submit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -217,7 +217,7 @@
       if (!currentWidgetId) return;
       const data = { widgetId: currentWidgetId };
       try {
-        const res = yield fetch("https://figjam-widgets.onrender.com/textentrywidget/refresh", {
+        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -239,7 +239,7 @@
     const handleRevealAll = () => __async(this, null, function* () {
       const data = { widgetId: widgetId != null ? widgetId : "" };
       try {
-        const res = yield fetch("https://figjam-widgets.onrender.com/textentrywidget/reveal-all", {
+        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
