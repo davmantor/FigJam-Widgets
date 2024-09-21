@@ -123,7 +123,7 @@ function TextBox({
       console.log('Sending message object to server:', newMessageObject);  // Log the request data
   
       try {
-        const response = await fetch(`http://localhost:3001/polls/${pollId}`, {
+        const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ function PollingWidget() {
     try {
       console.log(JSON.stringify(pollData));
       // Send the data to the server to create a new poll
-      const response = await fetch('http://localhost:3001/polls/create', {
+      const response = await fetch('https://figjam-widgets-myhz.onrender.com/polls/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
