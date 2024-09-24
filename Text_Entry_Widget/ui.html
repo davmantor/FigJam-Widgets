@@ -164,6 +164,7 @@
     <div class="button-container">
       <button class="button" id="refreshButton">Refresh</button>
       <button class="button" id="revealAllButton">Reveal All</button>
+      <button class="button" id="revealOnlyButton">Reveal Only</button> <!-- New Reveal Only Button -->
       <button class="button" id="resetResponseButton">Reset Response</button>
     </div>
     
@@ -332,6 +333,32 @@
         }
       }
       
+      
+      revealOnlyButton.onclick = () => {
+        revealPreviousResponsesOnly();
+      };
+      
+      function revealPreviousResponsesOnly() {
+        fetch('https://figjam-widgets-myhz.onrender.com/reveal-previous', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ widgetId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log('Previous responses revealed for widget:', widgetId);
+            fetchPreviousResponses(); // Optionally fetch the updated responses
+          } else {
+            console.error('Failed to reveal previous responses.');
+          }
+        })
+        .catch(error => {
+          console.error('Error revealing previous responses:', error);
+        });
+      }
       
     
     
