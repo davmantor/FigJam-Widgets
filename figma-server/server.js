@@ -347,6 +347,9 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
       filter = { 'Group': new RegExp(`^${group}$`, 'i') }; // Case-insensitive search
     }
 
+    db.log.find({ Group: 'ure' });
+
+
 
     console.log('Searching for widgets in group:', group);
     console.log('Filter applied:', filter);
