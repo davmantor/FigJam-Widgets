@@ -352,7 +352,7 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
     }
 
     db.log.find({ Group: 'ure' });
-    db.log.find({ Group: { $exists: false } });
+    //db.log.find({ Group: { $exists: false } });
 
 
 
