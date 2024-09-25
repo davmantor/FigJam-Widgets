@@ -343,7 +343,7 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
 
     // If a group is provided, add it to the filter criteria
     if (group) {
-      filter = { 'group': group };
+      filter = { 'Group': group };
     }
 
     // Update the showPrevious field for all matching widgets
