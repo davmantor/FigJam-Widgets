@@ -336,11 +336,26 @@ app.post('/textentrywidget/submit', async (req, res) => {
 
 
 app.post('/textentrywidget/reveal-all', async (req, res) => {
+  const { group } = req.body;
+
   try {
-    await Widget.updateMany({}, { $set: { showPrevious: true } });
-    res.json({ status: 'success' });
+    let filter = {};
+
+    // If a group is provided, add it to the filter criteria
+    if (group) {
+      filter = { 'group': group };
+    }
+
+    // Update the showPrevious field for all matching widgets
+    const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
+    
+    if (result.nModified > 0) {
+      res.json({ status: 'success', message: `${result.nModified} widget(s) updated.` });
+    } else {
+      res.status(404).send('No widgets found for the specified criteria.');
+    }
   } catch (error) {
-    console.error('Error revealing all data:', error);
+    console.error('Error revealing data:', error);
     res.status(500).send('Internal Server Error');
   }
 });

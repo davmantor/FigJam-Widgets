@@ -183,6 +183,7 @@
       <button class="button" id="refreshButton">Refresh</button>
       <button class="button" id="revealAllButton">Reveal All</button>
       <button class="button" id="revealOnlyButton">Reveal Only</button> <!-- New Reveal Only Button -->
+      <button class="button" id="revealGroupButton">Reveal Group</button>
       <button class="button" id="resetResponseButton">Reset Response</button>
     </div>
     
@@ -295,6 +296,7 @@
     const setWidgetGroupButton = document.getElementById('setWidgetGroupButton');
     const customWidgetGroupInput = document.getElementById('customWidgetGroupInput');
     const widgetGroupDisplay = document.getElementById('widgetGroupDisplay');
+    const revealGroupButton = document.getElementById('revealGroupButton');
     let widgetGroup = "None";  // Default group
     let password;
 
@@ -307,33 +309,117 @@
 
     setWidgetGroupButton.onclick = () => {
       const customWidgetGroup = customWidgetGroupInput.value.trim();
+      
       if (customWidgetGroup) {
         widgetGroup = customWidgetGroup;
         widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+        
+        // Send the new group to the server
+        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ widgetId, group: widgetGroup })
+        })
+        .then(() => {
+          console.log("Group updated on the server after button click.");
+        })
+        .catch(error => {
+          console.error('Error updating group after button click:', error);
+        });
+        
         parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
         alert('Please enter a valid Widget Group.');
       }
     };
-
     
     window.onmessage = (event) => {
       const { type, widgetId: receivedWidgetId, widgetGroup: receivedWidgetGroup, params } = event.data.pluginMessage;
+      
       if (type === 'initialize') {
         console.log('Received initialize message with params:', receivedWidgetId, receivedWidgetGroup, params);
-        console.log("password:", password);
         widgetId = receivedWidgetId;
-        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
         widgetGroup = receivedWidgetGroup;
-        console.log(receivedWidgetGroup);
+        
+        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
         widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+    
         if (params.creationDate) {
           widgetIdDisplay.innerText += ` | Created: ${params.creationDate}`;
         }
+    
         fetchPreviousResponses();
         updateParameters(params);
+    
+        // Check if the local group is different from the group in the database
+        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ widgetId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          const dbGroup = data.widget.Group || "None";
+          
+          // If the group from the database is different from the local one, update it
+          if (widgetGroup !== dbGroup) {
+            widgetGroup = dbGroup;
+            widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+            
+            // Send an update to the server
+            fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ widgetId, group: widgetGroup })
+            }).then(() => {
+              console.log("Group updated on the server during initialization.");
+            }).catch(error => {
+              console.error('Error updating group during initialization:', error);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing widget data during initialization:', error);
+        });
       }
     };
+
+
+    
+    setWidgetGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+      
+      if (customWidgetGroup) {
+        widgetGroup = customWidgetGroup;
+        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+        
+        // Send the new group to the server
+        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ widgetId, group: widgetGroup })
+        })
+        .then(() => {
+          console.log("Group updated on the server after button click.");
+        })
+        .catch(error => {
+          console.error('Error updating group after button click:', error);
+        });
+        
+        parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group.');
+      }
+    };
+    
 
     function updateParameters(params) {
       if (params) {
@@ -378,6 +464,38 @@
       revealOnlyButton.onclick = () => {
         revealPreviousResponsesOnly();
       };
+
+      revealGroupButton.onclick = () => {
+        const customWidgetGroup = customWidgetGroupInput.value.trim();
+      
+        if (customWidgetGroup) {
+          revealGroup(customWidgetGroup);
+        } else {
+          alert('Please enter a valid Widget Group to reveal.');
+        }
+      };
+      
+      function revealGroup(group) {
+        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ group })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log(`Group ${group} revealed successfully.`);
+            fetchPreviousResponses(); // Optionally fetch updated responses
+          } else {
+            console.error(`Failed to reveal group ${group}.`);
+          }
+        })
+        .catch(error => {
+          console.error(`Error revealing group ${group}:`, error);
+        });
+      }
       
       function revealPreviousResponsesOnly() {
         fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-previous', {
@@ -428,53 +546,8 @@
 
     refreshButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'refresh' } }, '*');
-      
-      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ widgetId })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'updated' || data.status === 'new') {
-          widgetId = data.widget.widgetId;
-          let dbGroup = data.widget.Group || "None";
-          previousResponsesContainer.innerHTML = '';
-          widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
-          widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
-    
-          // Check if local group is different from the group's value in the database
-          if (widgetGroup !== dbGroup) {
-            // Update the local group to match the one in the database
-            widgetGroup = dbGroup;
-            widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
-            
-            // Send an update request to the server to store the updated group
-            fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ widgetId, group: widgetGroup })
-            }).then(() => {
-              console.log("Group updated on the server.");
-            }).catch(error => {
-              console.error('Error updating group:', error);
-            });
-          }
-    
-          data.widget.previous.forEach((response, index) => {
-            // Render responses logic
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching previous responses:', error);
-      });
+      fetchPreviousResponses();
     };
-    
 
     revealAllButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
@@ -657,6 +730,7 @@
     }
 
     function addResponse(response, userName) {
+      console.log('add response called', response, userName);
       fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/add-response', {
         method: 'POST',
         headers: {
