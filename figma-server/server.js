@@ -339,8 +339,6 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
   console.log(req.body); 
   const { group } = req.body;
 
-  const widgets = await Widget.find({});
-  console.log('All widgets:', widgets);
 
 
   try {
@@ -352,7 +350,7 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
     }
 
     db.log.find({ Group: 'ure' });
-    //db.log.find({ Group: { $exists: false } });
+    db.log.find({ Group: { $exists: false } });
 
 
 
