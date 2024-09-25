@@ -349,8 +349,8 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
       filter = { 'Group': new RegExp(`^${group}$`, 'i') }; // Case-insensitive search
     }
 
-    db.log.find({ Group: 'ure' });
-    db.log.find({ Group: { $exists: false } });
+    Widget.find({ Group: 'ure' });
+    Widget.find({ Group: { $exists: false } });
 
 
 
