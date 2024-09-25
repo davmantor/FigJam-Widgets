@@ -65,7 +65,32 @@ app.post('/reset-widget', async (req, res) => {
 });
 
 
+// Endpoint to reveal previous responses by setting showPrevious to true for a specific widget
+app.post('/reveal-previous', async (req, res) => {
+  const { widgetId } = req.body;
+
+  try {
+    // Find the widget by its ID and update its showPrevious field to true
+    const widget = await Widget.findOneAndUpdate(
+      { widgetId }, 
+      { showPrevious: true }, 
+      { new: true } // Return the updated widget document
+    );
+
+    if (widget) {
+      return res.json({ status: 'success', widget });
+    } else {
+      return res.status(404).send('Widget not found');
+    }
+  } catch (error) {
+    console.error('Error updating widget:', error);
+    return res.status(500).send('Internal Server Error');
+  }
+});
+
+
 app.post('/refresh', async (req, res) => {
+  
   const { widgetId } = req.body;
 
   try {

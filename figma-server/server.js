@@ -249,6 +249,7 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
 
 
 app.post('/textentrywidget/refresh', async (req, res) => {
+  console.log("refresh", req);
   const { widgetId } = req.body;
 
   try {
