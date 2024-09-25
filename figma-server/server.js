@@ -339,8 +339,6 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
   console.log(req.body); 
   const { group } = req.body;
 
-
-
   try {
     let filter = {};
 
@@ -349,24 +347,23 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
       filter = { 'Group': new RegExp(`^${group}$`, 'i') }; // Case-insensitive search
     }
 
-    Widget.find({ Group: 'ure' });
-    Widget.find({ Group: { $exists: false } });
-
-
-
-
     console.log('Searching for widgets in group:', group);
     console.log('Filter applied:', filter);
+    const matchedWidgets = await Widget.find(filter);
+    console.log('Matched Widgets:', matchedWidgets);
 
-    
 
     // Update the showPrevious field for all matching widgets
     const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
     console.log('Query result:', result);
 
-    
-    if (result.nModified > 0) {
-      res.json({ status: 'success', message: `${result.nModified} widget(s) updated.` });
+    const matchedWidgets = await Widget.find(filter);
+    console.log('Matched Widgets:', matchedWidgets);
+
+
+    // Use modifiedCount to check how many widgets were modified
+    if (result.modifiedCount > 0) {
+      res.json({ status: 'success', message: `${result.modifiedCount} widget(s) updated.` });
     } else {
       res.status(404).send('No widgets found for the specified criteria.');
     }
@@ -375,6 +372,7 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 app.post('/textentrywidget/add-response', async (req, res) => {
   const { widgetId, response, userName, photoUrl } = req.body;
