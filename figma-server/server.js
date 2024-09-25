@@ -23,6 +23,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 const widgetSchema = new mongoose.Schema({
   widgetId: { type: String, unique: true },
+  Group:{type: String,  default: "None"},
   previous: [{
     response: String,
     userName: String,
@@ -253,10 +254,16 @@ app.post('/textentrywidget/refresh', async (req, res) => {
   try {
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
-      { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false } },
+      { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false, Group: "None" } },
       { upsert: true, new: true }
     );
-    return res.json({ status: 'updated', widget });
+    return res.json({ status: 'updated', 
+      widgetId: widget.widgetId,
+      Group: widget.Group || "None",  // Ensure "None" as default group if not set
+      previous: widget.previous,
+      current: widget.current,
+      showPrevious: widget.showPrevious,
+    });
   } catch (error) {
     console.error('Error refreshing data:', error);
     res.status(500).send('Internal Server Error');

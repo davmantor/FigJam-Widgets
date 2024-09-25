@@ -44,6 +44,7 @@
     const [widgetId, setWidgetId] = useSyncedState("widgetId", null);
     const [creationDate, setCreationDate] = useSyncedState("creationDate", null);
     const [isSubmitting, setIsSubmitting] = useSyncedState("isSubmitting", false);
+    const [widgetGroup, setWidgetGroup] = useSyncedState("widgetGroup", "None");
     const [width, setWidth] = useSyncedState("width", 1020);
     const [height, setHeight] = useSyncedState("height", 235);
     const [borderColor, setBorderColor] = useSyncedState("borderColor", "#000000");
@@ -86,11 +87,16 @@
       }
       figma.ui.onmessage = (msg) => {
         console.log("Received message:", msg);
+        if (msg.type === "setWidgetGroup") {
+          setWidgetGroup(msg.widgetGroup);
+          console.log(widgetGroup);
+        }
         if (msg.type === "close") {
           figma.closePlugin();
         }
         if (msg.type === "refresh") {
           handleRefresh(widgetId != null ? widgetId : "");
+          setWidgetGroup(msg.params.Group || "None");
         }
         if (msg.type === "revealAll") {
           handleRevealAll();
@@ -269,11 +275,12 @@
         shadowOffsetY,
         shadowBlur,
         shadowSpread,
-        creationDate
+        creationDate,
+        widgetGroup
       };
       console.log("Opening admin menu with params:", params);
       figma.showUI(__html__, { width: 1e3, height: 400 });
-      figma.ui.postMessage({ type: "initialize", widgetId: widgetId != null ? widgetId : "", params });
+      figma.ui.postMessage({ type: "initialize", widgetId: widgetId != null ? widgetId : "", widgetGroup: widgetGroup != null ? widgetGroup : "", params });
       return new Promise(() => {
       });
     };

@@ -123,6 +123,11 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
+    #widgetGroupDisplay {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
     .custom-widget-id-container {
       margin-top: 20px;
     }
@@ -132,6 +137,19 @@
     }
     
     .custom-widget-id-container input {
+      width: 200px;
+      margin-right: 10px;
+    }
+
+    .custom-widget-group-container {
+      margin-top: 20px;
+    }
+    
+    .custom-widget-group-container label {
+      margin-right: 10px;
+    }
+    
+    .custom-widget-group-container input {
       width: 200px;
       margin-right: 10px;
     }
@@ -222,11 +240,19 @@
     </div>
     <div id="previousResponsesContainer" class="response-container"></div>
 
+    <div class="custom-widget-group-container">
+      <label for="customWidgetGroupInput">Set Custom Widget Group:</label>
+      <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
+      <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
+    </div>
+      
     <div class="custom-widget-id-container">
       <label for="customWidgetIdInput">Set Custom Widget ID:</label>
       <input type="text" id="customWidgetIdInput" class="input" placeholder="Enter Widget ID">
       <button class="button" id="setWidgetIdButton">Set Widget ID</button>
     </div>
+
+    <div id="widgetGroupDisplay">Widget Group: </div>
 
     <div id="widgetIdDisplay">Widget ID: </div>
 
@@ -266,6 +292,10 @@
     const resetResponseButton = document.getElementById('resetResponseButton');
     const setWidgetIdButton = document.getElementById('setWidgetIdButton');
     const customWidgetIdInput = document.getElementById('customWidgetIdInput');
+    const setWidgetGroupButton = document.getElementById('setWidgetGroupButton');
+    const customWidgetGroupInput = document.getElementById('customWidgetGroupInput');
+    const widgetGroupDisplay = document.getElementById('widgetGroupDisplay');
+    let widgetGroup = "None";  // Default group
     let password;
 
 
@@ -273,14 +303,30 @@
     let unsavedResponse = null;
     let unsavedUserName = null;
     let currentEditingIndex = null;
+
+
+    setWidgetGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+      if (customWidgetGroup) {
+        widgetGroup = customWidgetGroup;
+        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+        parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group.');
+      }
+    };
+
     
     window.onmessage = (event) => {
-      const { type, widgetId: receivedWidgetId, params } = event.data.pluginMessage;
+      const { type, widgetId: receivedWidgetId, widgetGroup: receivedWidgetGroup, params } = event.data.pluginMessage;
       if (type === 'initialize') {
-        console.log('Received initialize message with params:', params);
+        console.log('Received initialize message with params:', receivedWidgetId, receivedWidgetGroup, params);
         console.log("password:", password);
         widgetId = receivedWidgetId;
         widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+        widgetGroup = receivedWidgetGroup;
+        console.log(receivedWidgetGroup);
+        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
         if (params.creationDate) {
           widgetIdDisplay.innerText += ` | Created: ${params.creationDate}`;
         }
@@ -304,11 +350,6 @@
         shadowSpreadInput.value = params.shadowSpread;
       }
     }
-    
-
-
-    
-    
     
     var correctPin = "312cmpm15"; // Set your desired PIN here
       var deleteConfirmation = false;
@@ -462,8 +503,10 @@
       .then(data => {
         if (data.status === 'updated' || data.status === 'new') {
           widgetId = data.widget.widgetId;
+          widgetGroup = data.widget.Group || "None";
           previousResponsesContainer.innerHTML = '';
           widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+          widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
           data.widget.previous.forEach((response, index) => {
             const responseItem = document.createElement('div');
             responseItem.className = 'response-item';
