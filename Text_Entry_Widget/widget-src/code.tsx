@@ -236,6 +236,7 @@ function Widget() {
 
   const handleRefresh = async (currentWidgetId: string) => {
     if (!currentWidgetId) return;
+    console.log("refresh inside", currentWidgetId);
   
     const data = { widgetId: currentWidgetId };
   

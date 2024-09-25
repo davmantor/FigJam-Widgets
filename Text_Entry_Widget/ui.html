@@ -428,8 +428,53 @@
 
     refreshButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'refresh' } }, '*');
-      fetchPreviousResponses();
+      
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'updated' || data.status === 'new') {
+          widgetId = data.widget.widgetId;
+          let dbGroup = data.widget.Group || "None";
+          previousResponsesContainer.innerHTML = '';
+          widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+          widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+    
+          // Check if local group is different from the group's value in the database
+          if (widgetGroup !== dbGroup) {
+            // Update the local group to match the one in the database
+            widgetGroup = dbGroup;
+            widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+            
+            // Send an update request to the server to store the updated group
+            fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ widgetId, group: widgetGroup })
+            }).then(() => {
+              console.log("Group updated on the server.");
+            }).catch(error => {
+              console.error('Error updating group:', error);
+            });
+          }
+    
+          data.widget.previous.forEach((response, index) => {
+            // Render responses logic
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching previous responses:', error);
+      });
     };
+    
 
     revealAllButton.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
@@ -492,6 +537,7 @@
 
     function fetchPreviousResponses() {
       console.log('Fetching previous responses for widgetId:', widgetId);
+      console.log('refresh');
       fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
         method: 'POST',
         headers: {

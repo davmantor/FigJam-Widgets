@@ -221,6 +221,7 @@
     });
     const handleRefresh = (currentWidgetId) => __async(this, null, function* () {
       if (!currentWidgetId) return;
+      console.log("refresh inside", currentWidgetId);
       const data = { widgetId: currentWidgetId };
       try {
         const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh", {

@@ -249,7 +249,6 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
 
 
 app.post('/textentrywidget/refresh', async (req, res) => {
-  console.log("refresh", req);
   const { widgetId } = req.body;
 
   try {
@@ -258,18 +257,34 @@ app.post('/textentrywidget/refresh', async (req, res) => {
       { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false, Group: "None" } },
       { upsert: true, new: true }
     );
-    return res.json({ status: 'updated', 
-      widgetId: widget.widgetId,
-      Group: widget.Group || "None",  // Ensure "None" as default group if not set
-      previous: widget.previous,
-      current: widget.current,
-      showPrevious: widget.showPrevious,
-    });
+    return res.json({ status: 'updated', widget });
   } catch (error) {
     console.error('Error refreshing data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
+app.post('/textentrywidget/update-group', async (req, res) => {
+  const { widgetId, group } = req.body;
+
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { widgetId },
+      { $set: { Group: group } },
+      { new: true }
+    );
+    
+    if (widget) {
+      return res.json({ status: 'success', widget });
+    } else {
+      return res.status(404).send('Widget not found');
+    }
+  } catch (error) {
+    console.error('Error updating group:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 app.post('/textentrywidget/reveal-previous', async (req, res) => {
   const { widgetId } = req.body;
