@@ -336,7 +336,7 @@ app.post('/textentrywidget/submit', async (req, res) => {
 
 
 app.post('/textentrywidget/reveal-all', async (req, res) => {
-  console.log(req.body);
+  console.log(req.body); 
   const { group } = req.body;
 
   try {
@@ -344,8 +344,14 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
 
     // If a group is provided, add it to the filter criteria
     if (group) {
-      filter = { 'Group': group };
+      filter = { 'Group': new RegExp(`^${group}$`, 'i') }; // Case-insensitive search
     }
+
+
+    console.log('Searching for widgets in group:', group);
+    console.log('Filter applied:', filter);
+
+    
 
     // Update the showPrevious field for all matching widgets
     const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
