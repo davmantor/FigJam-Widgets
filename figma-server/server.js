@@ -336,6 +336,7 @@ app.post('/textentrywidget/submit', async (req, res) => {
 
 
 app.post('/textentrywidget/reveal-all', async (req, res) => {
+  console.log(req.body);
   const { group } = req.body;
 
   try {

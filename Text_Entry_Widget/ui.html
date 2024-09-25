@@ -466,7 +466,8 @@
       };
 
       revealGroupButton.onclick = () => {
-        const customWidgetGroup = customWidgetGroupInput.value.trim();
+        const customWidgetGroup = widgetGroupDisplay.textContent.replace('Widget Group: ', '').trim();
+        console.log(customWidgetGroup);
       
         if (customWidgetGroup) {
           revealGroup(customWidgetGroup);
@@ -476,25 +477,7 @@
       };
       
       function revealGroup(group) {
-        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ group })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            console.log(`Group ${group} revealed successfully.`);
-            fetchPreviousResponses(); // Optionally fetch updated responses
-          } else {
-            console.error(`Failed to reveal group ${group}.`);
-          }
-        })
-        .catch(error => {
-          console.error(`Error revealing group ${group}:`, error);
-        });
+        parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: group } }, '*');
       }
       
       function revealPreviousResponsesOnly() {

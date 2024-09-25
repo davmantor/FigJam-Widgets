@@ -136,8 +136,30 @@
           setWidgetId(msg.widgetId);
           handleRefresh(msg.widgetId);
         }
+        if (msg.type === "revealGroup") {
+          revealGroup(msg.widgetGroup);
+        }
       };
     });
+    function revealGroup(group) {
+      const data = { widgetId, group };
+      fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+        // Pass the group in the request body
+      }).then((res) => res.json()).then((data2) => {
+        if (data2.status === "success") {
+          console.log(`Group ${group} responses revealed successfully.`);
+        } else {
+          console.error("Failed to reveal group responses.");
+        }
+      }).catch((error) => {
+        console.error("Error revealing group:", error);
+      });
+    }
     const resetResponse = () => __async(this, null, function* () {
       var _a, _b;
       if (response.trim() !== "") {
