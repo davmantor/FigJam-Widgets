@@ -339,6 +339,10 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
   console.log(req.body); 
   const { group } = req.body;
 
+  const widgets = await Widget.find({});
+  console.log('All widgets:', widgets);
+
+
   try {
     let filter = {};
 
@@ -348,6 +352,8 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
     }
 
     db.log.find({ Group: 'ure' });
+    db.log.find({ Group: { $exists: false } });
+
 
 
 
@@ -358,6 +364,8 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
 
     // Update the showPrevious field for all matching widgets
     const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
+    console.log('Query result:', result);
+
     
     if (result.nModified > 0) {
       res.json({ status: 'success', message: `${result.nModified} widget(s) updated.` });
