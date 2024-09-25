@@ -349,16 +349,16 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
 
     console.log('Searching for widgets in group:', group);
     console.log('Filter applied:', filter);
-    const matchedWidgets = await Widget.find(filter);
-    console.log('Matched Widgets:', matchedWidgets);
+    const matchedWidgets1 = await Widget.find(filter);
+    console.log('Matched Widgets1:', matchedWidgets1);
 
 
     // Update the showPrevious field for all matching widgets
     const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
     console.log('Query result:', result);
 
-    const matchedWidgets = await Widget.find(filter);
-    console.log('Matched Widgets:', matchedWidgets);
+    const matchedWidgets2 = await Widget.find(filter);
+    console.log('Matched Widgets2:', matchedWidgets2);
 
 
     // Use modifiedCount to check how many widgets were modified
