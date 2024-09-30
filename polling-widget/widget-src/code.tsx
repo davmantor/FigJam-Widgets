@@ -265,10 +265,12 @@ function PollingWidget() {
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
   const [pollId, setPollId] = useSyncedState<string>('pollId', "");
+  const [logId, setLogId] = useSyncedState<string>('logId', "");
 
   const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
-  const [logId, setLogId] = useSyncedState<string | null>('logId', null);
+
+
   const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 400);
   const [borderWidth, setBorderWidth] = useSyncedState<number>('borderWidth', 2);
   const [borderColor, setBorderColor] = useSyncedState<string>('borderColor', '#E6E6E6');
@@ -307,7 +309,7 @@ function PollingWidget() {
     setEditingIndex(updatedEntries.length - 1);
   };
 
-  const handleVote = (index: number) => {
+  const handleVote = async (index: number) => {
     // Update the user's name before proceeding
     updateUserName();
     console.log(entries);
@@ -341,6 +343,43 @@ function PollingWidget() {
     // Update the state with the new votes and voters arrays
     setVotes(newVotes);
     setVoters(newVoters);
+  
+    // Calculate total votes after voting and unvoting is handled
+    const totalVotes = newVotes.reduce((acc, voteCount) => acc + voteCount, 0);
+  
+    // Prepare the updated poll data to send to the database
+    const updatedPoll = {
+      options: entries.map((entry, i) => ({
+        text: entry,
+        votes: newVotes[i],
+        voters: newVoters[i],
+      })),
+      totalVotes: totalVotes,
+      updatedAt: new Date(),
+    };
+  
+    console.log("UPDATED POLL");
+    console.log(updatedPoll);
+    console.log(pollId);
+  
+    // Wait for the database to update before proceeding
+    try {
+      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedPoll),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      console.log('Database updated successfully');
+    } catch (error) {
+      console.error('Error updating poll:', error);
+    }
   };
 
   const toggleAnonymousVote = () => {
@@ -384,6 +423,7 @@ function PollingWidget() {
   
       // Optionally, handle the server response if needed
       const data = await response.json();
+      console.log("THIS IS THE DATA" + JSON.stringify(data))
       setPollId(data.pollId);
 
       console.log('Poll created successfully:', data);
@@ -429,8 +469,6 @@ function PollingWidget() {
       setIsCrownButtonPressed(false);
       console.log('crown123', isCrownButtonPressed);
     figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
-    console.log('logid', logId);
-    figma.ui.postMessage({ type: 'set-widget-log-id', payload: logId });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -438,7 +476,7 @@ function PollingWidget() {
     figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
     figma.ui.postMessage({ type: 'current-barColor',           payload: barColor });
     figma.ui.postMessage({ type: 'current-accentColor',        payload: accentColor });
-    figma.ui.postMessage({ type: 'current-widgetId',           payload: pollId });
+    figma.ui.postMessage({ type: 'current-widgetId',           payload: logId });
     figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
     figma.ui.onmessage = async (msg) => {
       if (msg.type === 'update-prompt') {
@@ -566,27 +604,27 @@ function PollingWidget() {
             handleOptionsClickChat();
           }
         };
-      // } else if (msg.type === 'update-widgetId') {
-      //   console.log("calling prompt from options");
-      //   figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-      //   figma.ui.postMessage({ type: 'edit-widgetId', payload: pollId });
-      //   console.log("opened");
-      //   figma.ui.onmessage = msg => {
-      //     if (msg.type === 'update-message') {
-      //       const updatedText = msg.payload.message;
-      //       setWidgetId(updatedText);
-      //       alreadyLoggedIn = true;
-      //       setIsCrownButtonPressed(true);
-      //     } else if (msg.type === 'close-plugin') {
-      //       console.log("closed");
-      //       setIsCrownButtonPressed(false);
-      //       figma.closePlugin();
-      //     } else if (msg.type === 'back-action') {
-      //       console.log("back");
-      //       alreadyLoggedIn = true;
-      //       handleOptionsClickChat();
-      //     }
-      //   };
+      } else if (msg.type === 'update-widgetId') {
+        console.log("calling prompt from options");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+        figma.ui.postMessage({ type: 'edit-widgetId', payload: logId });
+        console.log("opened");
+        figma.ui.onmessage = msg => {
+          if (msg.type === 'update-message') {
+            const updatedText = msg.payload.message;
+            setWidgetId(updatedText);
+            alreadyLoggedIn = true;
+            setIsCrownButtonPressed(true);
+          } else if (msg.type === 'close-plugin') {
+            console.log("closed");
+            setIsCrownButtonPressed(false);
+            figma.closePlugin();
+          } else if (msg.type === 'back-action') {
+            console.log("back");
+            alreadyLoggedIn = true;
+            handleOptionsClickChat();
+          }
+        };
       } else if (msg.type === 'update-accentColor') {
         console.log("calling prompt from options");
         figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
@@ -631,30 +669,32 @@ function PollingWidget() {
       }};
   }})
 
-  // const setWidgetId = async (widgetId: string) => {
-  //   const newMessageObject = {
-  //     newPollId: widgetId
-  //   };
-  //   try {
-  //     const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}/update-id`, {
-  //       method: 'PUT',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(newMessageObject),
-  //     });
+  const setWidgetId = async (widgetId: string) => {
+    console.log("SET WIDGET ID WAS JUST CALLED");
+    const newMessageObject = {
+      newPollId: widgetId
+    };
+    console.log("newMessageObject", newMessageObject);
+    try {
+      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMessageObject),
+      });
   
-  //     console.log('Server response status:', response.status);  // Log the response status
-  //     const responseData = await response.json();
-  //     console.log('Server response data:', responseData);  // Log the response data
+      console.log('Server response status:', response.status);  // Log the response status
+      const responseData = await response.json();
+      console.log('Server response data:', responseData);  // Log the response data
   
-  //     if (response.status === 200) {
-  //       setPollId(widgetId);  // Update the pollId state only if the server response is successful
-  //     }
-  //   } catch (error) {
-  //     console.error('Error updating poll ID:', error);  // Log any error
-  //   }
-  // };
+      if (response.status === 200) {
+        setLogId(widgetId);  // Update the pollId state only if the server response is successful
+      }
+    } catch (error) {
+      console.error('Error updating poll ID:', error);  // Log any error
+    }
+  };
 
   const handleOptionsClickChat = () => {
     updateUserName();

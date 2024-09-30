@@ -78,30 +78,22 @@ app.get('/polls/:pollId', async (req, res) => {
   }
 });
 
-app.put('/polls/:pollId/update-id', async (req, res) => {
+
+app.put('/polls/update-id/:pollId', async (req, res) => {
   try {
+    console.log(req.params);
     const { pollId } = req.params;
     const { newPollId } = req.body;
 
-    // Validate the new poll ID
-    if (!newPollId) {
-      return res.status(400).send('New poll ID is required');
-    }
-
-    // Ensure the new poll ID does not conflict with existing poll IDs
-    const existingPoll = await PollModel.findById(newPollId);
-    if (existingPoll) {
-      return res.status(400).send('New poll ID already exists');
-    }
-
-    // Find the poll by its current ID
     const poll = await PollModel.findById(pollId);
     if (!poll) {
       return res.status(404).send('Poll not found');
     }
 
     // Update the poll ID
-    poll._id = newPollId;
+    poll.id = newPollId
+    console.log(poll.id);
+    console.log(poll);
 
     // Save the updated poll
     await poll.save();
@@ -109,6 +101,7 @@ app.put('/polls/:pollId/update-id', async (req, res) => {
     // Return the updated poll for confirmation
     return res.status(200).json(poll);
   } catch (error) {
+    console.log(error);
     console.error('Error updating poll ID:', error);
     return res.status(500).send('Error updating poll ID');
   }
@@ -124,7 +117,7 @@ app.put('/polls/:pollId', async (req, res) => {
     if (!Array.isArray(options)) {
       return res.status(400).send('Options must be an array');
     }
-
+    console.log(totalVotes);
     // Validate the structure of each option
     for (const option of options) {
       if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
@@ -146,15 +139,11 @@ app.put('/polls/:pollId', async (req, res) => {
     // Save the updated poll
     await poll.save();
 
-    // Return the updated poll for confirmation
-    return res.status(200).json(poll);  
   } catch (error) {
     console.error('Error updating poll:', error);
     return res.status(500).send('Error updating poll');
   }
 });
-
-
 
 
 app.get('/logs/:logId', async (req, res) => {
