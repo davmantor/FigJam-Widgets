@@ -3,6 +3,10 @@
   "id": "1400160483063412580",
   "api": "1.0.0",
   "main": "dist/code.js",
+  "ui": {
+    "main": "dist/ui.html", 
+    "optionsChat": "dist/optionsChat.html"
+  },
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",

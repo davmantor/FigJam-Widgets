@@ -1256,13 +1256,12 @@ return (
           left: getWidgetValue(590), // Adjust this value to position correctly
           right: getWidgetValue(10),
         }}
-        onClick={handleOptionsClickChat}
         verticalAlignItems="center"
         horizontalAlignItems="end"
       >
         {/* Adding Sort By Votes Button first */}
         <AutoLayout
-          cornerRadius={getWidgetValue(4)}
+          cornerRadius={getWidgetValue(100)}
           padding={{
             top: getWidgetValue(5),
             bottom: getWidgetValue(5),
