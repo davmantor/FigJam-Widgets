@@ -117,28 +117,29 @@ app.put('/polls/:pollId', async (req, res) => {
     if (!Array.isArray(options)) {
       return res.status(400).send('Options must be an array');
     }
-    console.log(totalVotes);
+    console.log("totalVotes" + totalVotes);
     // Validate the structure of each option
     for (const option of options) {
       if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
         return res.status(400).send('Invalid option format');
       }
     }
-
+    console.log("options" + options);
     // Find the poll by its ID
     const poll = await PollModel.findById(pollId);
     if (!poll) {
       return res.status(404).send('Poll not found');
     }
+    console.log("Poll" + poll);
 
     // Update the poll options, totalVotes, and updatedAt
     poll.options = options || poll.options;
     poll.totalVotes = totalVotes || poll.totalVotes;
     poll.updatedAt = updatedAt || poll.updatedAt;
-
+    console.log("ATTEMPTING TO SAVE");
     // Save the updated poll
     await poll.save();
-
+    console.log("SAVE");
   } catch (error) {
     console.error('Error updating poll:', error);
     return res.status(500).send('Error updating poll');
