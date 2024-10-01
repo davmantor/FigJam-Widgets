@@ -81,29 +81,34 @@ app.get('/polls/:pollId', async (req, res) => {
 
 app.put('/polls/update-id/:pollId', async (req, res) => {
   try {
-    console.log(req.params);
     const { pollId } = req.params;
     const { newPollId } = req.body;
 
-    const poll = await PollModel.findById(pollId);
+    // Check if the poll with the provided newPollId already exists
+    let poll = await PollModel.findOne({ id: newPollId });
+
+    if (poll) {
+      // If the poll exists, return the data for the poll
+      return res.status(200).json({ status: 'exists', poll });
+    }
+
+    // If the poll doesn't exist, find the poll by its current ID (pollId)
+    poll = await PollModel.findById(pollId);
     if (!poll) {
       return res.status(404).send('Poll not found');
     }
 
-    // Update the poll ID
-    poll.id = newPollId
-    console.log(poll.id);
-    console.log(poll);
+    // Update the poll ID to the newPollId
+    poll.id = newPollId;
 
     // Save the updated poll
     await poll.save();
 
     // Return the updated poll for confirmation
-    return res.status(200).json(poll);
+    return res.status(200).json({ status: 'updated', poll });
   } catch (error) {
-    console.log(error);
-    console.error('Error updating poll ID:', error);
-    return res.status(500).send('Error updating poll ID');
+    console.error('Error updating or retrieving poll ID:', error);
+    return res.status(500).send('Error updating or retrieving poll ID');
   }
 });
 

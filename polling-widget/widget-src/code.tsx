@@ -686,7 +686,9 @@ function PollingWidget() {
     const newMessageObject = {
       newPollId: widgetId
     };
+    
     console.log("newMessageObject", newMessageObject);
+    
     try {
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
         method: 'PUT',
@@ -696,17 +698,34 @@ function PollingWidget() {
         body: JSON.stringify(newMessageObject),
       });
   
-      console.log('Server response status:', response.status);  // Log the response status
       const responseData = await response.json();
-      console.log('Server response data:', responseData);  // Log the response data
+      console.log('Server response data:', responseData);
   
       if (response.status === 200) {
-        setLogId(widgetId);  // Update the pollId state only if the server response is successful
+        if (responseData.status === 'exists') {
+          // If the poll exists, populate the widget with existing data
+          console.log('Poll already exists:', responseData.poll);
+          populateWidgetData(responseData.poll); // Implement this function to fill the widget
+        } else if (responseData.status === 'updated') {
+          // If the poll was successfully updated with the new ID
+          console.log('Poll ID updated successfully:', responseData.poll);
+          setLogId(widgetId); // Update the logId state with the new widgetId
+        }
       }
     } catch (error) {
-      console.error('Error updating poll ID:', error);  // Log any error
+      console.error('Error updating or retrieving poll ID:', error);  // Log any error
     }
   };
+  
+  // Helper function to populate widget with data (you'll need to implement this logic)
+  const populateWidgetData = (pollData) => {
+    setTitle(pollData.title);
+    setEntries(pollData.options.map(option => option.text));
+    setVotes(pollData.options.map(option => option.votes));
+    setVoters(pollData.options.map(option => option.voters));
+    setUserVoteIndex(null); // Reset user vote index or handle according to your logic
+  };
+  
 
   const handleOptionsClickChat = () => {
     updateUserName();
