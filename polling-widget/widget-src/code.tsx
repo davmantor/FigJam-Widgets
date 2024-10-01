@@ -695,7 +695,7 @@ function PollingWidget() {
   
     try {
       // Make the PUT request to the server to check if the poll exists or update the ID
-      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id`, {
+      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -713,9 +713,9 @@ function PollingWidget() {
           console.log('Poll already exists:', responseData.poll);
           populateWidgetData(responseData.poll); // Call the function to update widget with poll data
           setLogId(widgetId); // Update the logId state with the new widgetId
-        } else if (responseData.status === 'updated') {
+        } else {
           // If the poll was successfully updated with the new ID
-          console.log('Poll ID updated successfully:', responseData.poll);
+          console.log('Poll ID updated successfully');
           setLogId(widgetId); // Update the logId state with the new widgetId
         }
       }
