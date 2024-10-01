@@ -352,11 +352,10 @@ function PollingWidget() {
   
 
     // Calculate total votes after voting and unvoting is handled
-    let totalVotes = 0;
+    let totalVotes = 100;
     for (let i = 0; i < newVotes.length; i++) {
       totalVotes += newVotes[i];
     }
-  
     // Prepare the updated poll data to send to the database
     const updatedPoll = {
       options: entries.map((entry, i) => ({
