@@ -134,8 +134,9 @@ app.put('/polls/:pollId', async (req, res) => {
 
     // Update the poll options, totalVotes, and updatedAt
     poll.options = options || poll.options;
-    poll.totalVotes = totalVotes || poll.totalVotes;
-    poll.updatedAt = updatedAt || poll.updatedAt;
+    poll.totalVotes = totalVotes !== undefined ? totalVotes : poll.totalVotes;
+    poll.updatedAt = updatedAt !== undefined ? updatedAt : poll.updatedAt;
+    
     console.log("ATTEMPTING TO SAVE");
     // Save the updated poll
     await poll.save();
@@ -145,6 +146,24 @@ app.put('/polls/:pollId', async (req, res) => {
     return res.status(500).send('Error updating poll');
   }
 });
+
+
+
+app.post('/polls/refresh', async (req, res) => {
+  const { id } = req.body;
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { id },
+      { $setOnInsert: { id, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false } },
+      { upsert: true, new: true }
+    );
+    return res.json({ status: 'updated', widget });
+  } catch (error) {
+    console.error('Error refreshing data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 app.get('/logs/:logId', async (req, res) => {

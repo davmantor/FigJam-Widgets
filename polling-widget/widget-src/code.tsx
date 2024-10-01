@@ -30,6 +30,7 @@ interface TextBoxProps {
   submitted: boolean;
   votes: number[];
   onVote: () => void;
+  handleVote: () => void;
   updateUserName: () => void;
   userVote: boolean;
   voters: CustomUser[];
@@ -85,6 +86,7 @@ function TextBox({
   submitted,
   votes,
   onVote,
+  handleVote,
   userVote,
   voters,
   isAnonymous,
@@ -114,51 +116,52 @@ function TextBox({
       onRemove(index);
     }
   };
+  
 
   const handleClick = async () => {
     updateUserName();  // Ensure the user name is up-to-date
     if (submitted) {
       console.log("previous voters:" + voters);
-      onVote();  // This will update local states like votes and voters
+      await onVote();  // This will update local states like votes and voters
       console.log("after voters:" + voters);
-      const newVotes = [...votes];
-      const newVoters = [...voters];
-      const totalVotes = newVotes.reduce((acc, vote) => acc + vote, 0);
+      // const newVotes = [...votes];
+      // const newVoters = [...voters];
+      // const totalVotes = newVotes.reduce((acc, vote) => acc + vote, 0);
   
-      const newMessageObject = {
-        title: "pollTitle",
-        options: entries.map((entry, index) => ({
-          text: entry,           // Option text
-          votes: newVotes[index], // Number of votes for this option
-          // Ensure voters[index] is an array before calling .map()
-          voters: (Array.isArray(voters[index]) ? voters[index] : []).map((voter: CustomUser) => ({
-            name: voter.name || 'Unknown User',  // Ensure 'name' exists in each voter
-          })),
-        })),
-        totalVotes,  // Sum of all votes
-        isAnonymous: isAnonymous,  // This should come from your state or logic
-        updatedAt: new Date(),  // Current date/time for the last update
-      };
+      // const newMessageObject = {
+      //   title: "pollTitle",
+      //   options: entries.map((entry, index) => ({
+      //     text: entry,           // Option text
+      //     votes: newVotes[index], // Number of votes for this option
+      //     // Ensure voters[index] is an array before calling .map()
+      //     voters: (Array.isArray(voters[index]) ? voters[index] : []).map((voter: CustomUser) => ({
+      //       name: voter.name || 'Unknown User',  // Ensure 'name' exists in each voter
+      //     })),
+      //   })),
+      //   totalVotes,  // Sum of all votes
+      //   isAnonymous: isAnonymous,  // This should come from your state or logic
+      //   updatedAt: new Date(),  // Current date/time for the last update
+      // };
       
       
   
-      console.log('Sending message object to server:', newMessageObject);  // Log the request data
+      // console.log('Sending message object to server:', newMessageObject);  // Log the request data
   
-      try {
-        const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newMessageObject),
-        });
+      // try {
+      //   const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
+      //     method: 'PUT',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(newMessageObject),
+      //   });
   
-        console.log('Server response status:', response.status);  // Log the response status
-        const responseData = await response.json();
-        console.log('Server response data:', responseData);  // Log the response data
-      } catch (error) {
-        console.error('Error updating poll:', error);  // Log any error
-      }
+      //   console.log('Server response status:', response.status);  // Log the response status
+      //   const responseData = await response.json();
+      //   console.log('Server response data:', responseData);  // Log the response data
+      // } catch (error) {
+      //   console.error('Error updating poll:', error);  // Log any error
+      // }
     } else {
       setEditingIndex(index);  // If not submitted, continue with editing
     }
@@ -309,6 +312,8 @@ function PollingWidget() {
     setEditingIndex(updatedEntries.length - 1);
   };
 
+  
+
   const handleVote = async (index: number) => {
     // Update the user's name before proceeding
     updateUserName();
@@ -341,11 +346,16 @@ function PollingWidget() {
     }
   
     // Update the state with the new votes and voters arrays
-    setVotes(newVotes);
-    setVoters(newVoters);
+    await setVotes(newVotes);
+    await setVoters(newVoters);
+    
   
+
     // Calculate total votes after voting and unvoting is handled
-    const totalVotes = newVotes.reduce((acc, voteCount) => acc + voteCount, 0);
+    let totalVotes = 0;
+    for (let i = 0; i < newVotes.length; i++) {
+      totalVotes += newVotes[i];
+    }
   
     // Prepare the updated poll data to send to the database
     const updatedPoll = {
@@ -357,6 +367,8 @@ function PollingWidget() {
       totalVotes: totalVotes,
       updatedAt: new Date(),
     };
+
+    console.log(totalVotes);
   
     console.log("UPDATED POLL");
     console.log(updatedPoll);
@@ -364,6 +376,7 @@ function PollingWidget() {
   
     // Wait for the database to update before proceeding
     try {
+      console.log("I AM ENTERING THE TRY CATCH")
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
         method: 'PUT',
         headers: {
@@ -775,7 +788,7 @@ function PollingWidget() {
       setEditingIndex={setEditingIndex}
       submitted={submitted}
       votes={[]}
-      onVote={() => {}}
+      onVote={() => handleVote(index)}
       userVote={false}
       voters={[]}
       isAnonymous={isAnonymous}
