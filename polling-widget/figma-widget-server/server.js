@@ -92,7 +92,7 @@ app.put('/polls/update-id/:pollId', async (req, res) => {
       return res.status(200).json({ status: 'exists', poll });
     }
 
-    const poll_2 = await PollModel.findOne(pollId);
+    const poll_2 = await PollModel.findOne({_id: ObjectId(pollId)});
 
     // Update the poll ID to the newPollId
     poll_2.id = newPollId;
