@@ -23,7 +23,7 @@ const PollSchema = new mongoose.Schema({
   ],
   totalVotes: {
     type: Number,
-    default: 0,
+    default: -1,
     min: -1
   },
   isAnonymous: {
