@@ -437,6 +437,7 @@ function PollingWidget() {
       const data = await response.json();
       console.log("THIS IS THE DATA" + JSON.stringify(data))
       setPollId(data.pollId);
+      setLogId(data.logId);
 
       console.log('Poll created successfully:', data);
     } catch (error) {
@@ -698,11 +699,8 @@ function PollingWidget() {
         body: JSON.stringify(newMessageObject),
       });
   
-      const responseData = await response.json();
-      console.log('Server response data:', responseData);
-  
       if (response.status === 200) {
-        if (responseData.status === 'exists') {
+        if (response.status === 'exists') {
           // If the poll exists, populate the widget with existing data
           console.log('Poll already exists:', responseData.poll);
           populateWidgetData(responseData.poll); // Implement this function to fill the widget
@@ -712,6 +710,7 @@ function PollingWidget() {
           setLogId(widgetId); // Update the logId state with the new widgetId
         }
       }
+      console.log(logId);
     } catch (error) {
       console.error('Error updating or retrieving poll ID:', error);  // Log any error
     }

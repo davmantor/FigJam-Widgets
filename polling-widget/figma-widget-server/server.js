@@ -82,7 +82,7 @@ app.get('/polls/:pollId', async (req, res) => {
 app.put('/polls/update-id', async (req, res) => {
   try {
     const { newPollId } = req.body;
-
+    console.log(newPollId);
     // Check if the poll with the provided newPollId already exists
     let poll = await PollModel.findOne({ id: newPollId });
 
