@@ -139,7 +139,7 @@ app.put('/polls/:pollId', async (req, res) => {
 
     // Update the poll options, totalVotes, and updatedAt
     poll.options = options;
-    poll.totalVotes = 0;
+    poll.totalVotes = totalVotes;
     poll.updatedAt = updatedAt;
     
     console.log("ATTEMPTING TO SAVE");
