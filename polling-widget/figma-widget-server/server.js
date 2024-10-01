@@ -112,7 +112,9 @@ app.put('/polls/:pollId', async (req, res) => {
     console.log('Received data:', req.body); // Log the request data
     const { pollId } = req.params;
     const { options, totalVotes, updatedAt } = req.body;
-
+    console.log("Options:" + options);
+    console.error("Total votes:" + totalVotes);
+    console.log("Updated at" + updatedAt);
     // Ensure that options are an array and have valid structure
     if (!Array.isArray(options)) {
       return res.status(400).send('Options must be an array');
@@ -120,10 +122,13 @@ app.put('/polls/:pollId', async (req, res) => {
     console.log("totalVotes" + totalVotes);
     // Validate the structure of each option
     for (const option of options) {
+      console.log("Validating option:", option);
       if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
+        console.log("Invalid option format detected");
         return res.status(400).send('Invalid option format');
       }
     }
+    
     console.log("options" + options);
     // Find the poll by its ID
     const poll = await PollModel.findById(pollId);
@@ -133,9 +138,9 @@ app.put('/polls/:pollId', async (req, res) => {
     console.log("Poll" + poll);
 
     // Update the poll options, totalVotes, and updatedAt
-    poll.options = options || poll.options;
-    poll.totalVotes = totalVotes !== undefined ? totalVotes : poll.totalVotes;
-    poll.updatedAt = updatedAt !== undefined ? updatedAt : poll.updatedAt;
+    poll.options = options
+    poll.totalVotes = totalVotes
+    poll.updatedAt = updatedAt
     
     console.log("ATTEMPTING TO SAVE");
     // Save the updated poll
