@@ -720,9 +720,7 @@ function PollingWidget() {
         }
       }
     } catch (error) {
-      console.error(error);
-      // Handle and log any errors that occur during the request
-      console.error('Error updating or retrieving poll ID:');
+      console.error('Error updating or retrieving poll ID');
     }
   };
   

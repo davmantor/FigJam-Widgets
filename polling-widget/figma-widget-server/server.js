@@ -100,8 +100,7 @@ app.put('/polls/update-id', async (req, res) => {
     // Return the updated poll for confirmation
     return res.status(200).json({ status: 'updated', poll });
   } catch (error) {
-    console.error(error);
-    console.error('Error updating or retrieving poll ID:');
+    console.error('Error updating or retrieving poll ID');
     return res.status(500).send('Error updating or retrieving poll ID');
   }
 });
