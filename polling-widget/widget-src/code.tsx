@@ -690,7 +690,7 @@ function PollingWidget() {
     console.log("newMessageObject", newMessageObject);
     
     try {
-      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
+      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

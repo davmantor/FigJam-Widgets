@@ -79,9 +79,8 @@ app.get('/polls/:pollId', async (req, res) => {
 });
 
 
-app.put('/polls/update-id/:pollId', async (req, res) => {
+app.put('/polls/update-id', async (req, res) => {
   try {
-    const { pollId } = req.params;
     const { newPollId } = req.body;
 
     // Check if the poll with the provided newPollId already exists
@@ -90,12 +89,6 @@ app.put('/polls/update-id/:pollId', async (req, res) => {
     if (poll) {
       // If the poll exists, return the data for the poll
       return res.status(200).json({ status: 'exists', poll });
-    }
-
-    // If the poll doesn't exist, find the poll by its current ID (pollId)
-    poll = await PollModel.findOne({pollId});
-    if (!poll) {
-      return res.status(404).send('Poll not found');
     }
 
     // Update the poll ID to the newPollId
