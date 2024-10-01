@@ -93,7 +93,7 @@ app.put('/polls/update-id/:pollId', async (req, res) => {
     }
 
     // If the poll doesn't exist, find the poll by its current ID (pollId)
-    poll = await PollModel.findById(pollId);
+    poll = await PollModel.findOne({pollId});
     if (!poll) {
       return res.status(404).send('Poll not found');
     }

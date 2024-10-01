@@ -352,7 +352,7 @@ function PollingWidget() {
   
 
     // Calculate total votes after voting and unvoting is handled
-    let totalVotes = 100;
+    let totalVotes = 0;
     for (let i = 0; i < newVotes.length; i++) {
       totalVotes += newVotes[i];
     }
