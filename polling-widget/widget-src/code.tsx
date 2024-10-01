@@ -683,14 +683,18 @@ function PollingWidget() {
   }})
 
   const setWidgetId = async (widgetId: string) => {
+    if (!widgetId) return
     console.log("SET WIDGET ID WAS JUST CALLED");
+  
+    // Prepare the request payload
     const newMessageObject = {
       newPollId: widgetId
     };
     
     console.log("newMessageObject", newMessageObject);
-    
+  
     try {
+      // Make the PUT request to the server to check if the poll exists or update the ID
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id`, {
         method: 'PUT',
         headers: {
@@ -699,31 +703,38 @@ function PollingWidget() {
         body: JSON.stringify(newMessageObject),
       });
   
+      // Parse the response from the server
+      const responseData = await response.json();
+      console.log(responseData);
+      // Check if the response is successful
       if (response.status === 200) {
-        if (response.status === 'exists') {
-          // If the poll exists, populate the widget with existing data
+        if (responseData.status === 'exists') {
+          // If the poll already exists, populate the widget with existing poll data
           console.log('Poll already exists:', responseData.poll);
-          populateWidgetData(responseData.poll); // Implement this function to fill the widget
+          populateWidgetData(responseData.poll); // Call the function to update widget with poll data
+          setLogId(widgetId); // Update the logId state with the new widgetId
         } else if (responseData.status === 'updated') {
           // If the poll was successfully updated with the new ID
           console.log('Poll ID updated successfully:', responseData.poll);
           setLogId(widgetId); // Update the logId state with the new widgetId
         }
       }
-      console.log(logId);
     } catch (error) {
-      console.error('Error updating or retrieving poll ID:', error);  // Log any error
+      console.error(error);
+      // Handle and log any errors that occur during the request
+      console.error('Error updating or retrieving poll ID:');
     }
   };
   
-  // Helper function to populate widget with data (you'll need to implement this logic)
+  // Helper function to populate widget with poll data
   const populateWidgetData = (pollData) => {
-    setTitle(pollData.title);
-    setEntries(pollData.options.map(option => option.text));
-    setVotes(pollData.options.map(option => option.votes));
-    setVoters(pollData.options.map(option => option.voters));
-    setUserVoteIndex(null); // Reset user vote index or handle according to your logic
+    setTitle(pollData.title); // Set the poll title
+    setEntries(pollData.options.map(option => option.text)); // Set the options text
+    setVotes(pollData.options.map(option => option.votes)); // Set the votes for each option
+    setVoters(pollData.options.map(option => option.voters)); // Set the voters for each option
+    setUserVoteIndex(null); // Reset the user vote index or adjust based on your logic
   };
+  
   
 
   const handleOptionsClickChat = () => {
