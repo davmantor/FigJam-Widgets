@@ -9,6 +9,8 @@ const PollSchema = require('./models/Poll');
 
 const db = process.env.MONGODB_URI;
 
+const ObjectId = mongoose.Types.ObjectId;
+
 mongoose.connect(db, { 
   useNewUrlParser: true, 
   useUnifiedTopology: true,
@@ -91,8 +93,12 @@ app.put('/polls/update-id/:pollId', async (req, res) => {
       // If the poll exists, return the data for the poll
       return res.status(200).json({ status: 'exists', poll });
     }
-
+    
     const poll_2 = await PollModel.findById(ObjectId(pollId));
+    if (!poll_2) {
+      return res.status(404).send('Poll not found with the object id');
+    }
+  
 
     // Update the poll ID to the newPollId
     poll_2.id = newPollId;

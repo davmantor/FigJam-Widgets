@@ -692,7 +692,7 @@ function PollingWidget() {
     };
     
     console.log("newMessageObject", newMessageObject);
-  
+    console.log(pollId)
     try {
       // Make the PUT request to the server to check if the poll exists or update the ID
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
@@ -702,6 +702,7 @@ function PollingWidget() {
         },
         body: JSON.stringify(newMessageObject),
       });
+      console.log("pollId being used for update:", pollId);  // Log the pollId being used for findById
   
       // Parse the response from the server
       const responseData = await response.json();
