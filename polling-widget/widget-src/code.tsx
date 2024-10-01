@@ -283,6 +283,11 @@ function PollingWidget() {
 
   const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 10);
 
+  // Track logId changes
+  useEffect(() => {
+    console.log("LogId updated:", logId);
+  }, [logId]);
+
   function getWidgetValue(input: number): number {
     const currentWidgetWidth = widgetWidth; // Get the current widget width
     const scalingRatio = currentWidgetWidth / 400; // Calculate the scaling ratio
@@ -624,6 +629,7 @@ function PollingWidget() {
         console.log("opened");
         figma.ui.onmessage = msg => {
           if (msg.type === 'update-message') {
+            console.log(logId);
             const updatedText = msg.payload.message;
             setWidgetId(updatedText);
             alreadyLoggedIn = true;
@@ -684,7 +690,6 @@ function PollingWidget() {
 
   const setWidgetId = async (widgetId: string) => {
     if (!widgetId) return
-    console.log("SET WIDGET ID WAS JUST CALLED");
   
     // Prepare the request payload
     const newMessageObject = {
@@ -693,6 +698,8 @@ function PollingWidget() {
     
     console.log("newMessageObject", newMessageObject);
     console.log(pollId)
+    setLogId(widgetId); // Update the logId state with the new widgetId
+    console.log("THIS IS THE WIDGET ID" + logId);
     try {
       // Make the PUT request to the server to check if the poll exists or update the ID
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
@@ -713,11 +720,12 @@ function PollingWidget() {
           // If the poll already exists, populate the widget with existing poll data
           console.log('Poll already exists:', responseData.poll);
           populateWidgetData(responseData.poll); // Call the function to update widget with poll data
-          setLogId(widgetId); // Update the logId state with the new widgetId
+          console.log('LogId after update:', logId);
+
         } else {
           // If the poll was successfully updated with the new ID
           console.log('Poll ID updated successfully');
-          setLogId(widgetId); // Update the logId state with the new widgetId
+          console.log('LogId after update:', logId);
         }
       }
     } catch (error) {
@@ -732,6 +740,7 @@ function PollingWidget() {
     setVotes(pollData.options.map(option => option.votes)); // Set the votes for each option
     setVoters(pollData.options.map(option => option.voters)); // Set the voters for each option
     setUserVoteIndex(null); // Reset the user vote index or adjust based on your logic
+    console.log(pollData);
   };
   
   
