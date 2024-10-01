@@ -138,9 +138,9 @@ app.put('/polls/:pollId', async (req, res) => {
     console.log("Poll" + poll);
 
     // Update the poll options, totalVotes, and updatedAt
-    poll.options = options
-    poll.totalVotes = totalVotes
-    poll.updatedAt = updatedAt
+    poll.options = options;
+    poll.totalVotes = totalVotes;
+    poll.updatedAt = updatedAt;
     
     console.log("ATTEMPTING TO SAVE");
     // Save the updated poll
@@ -151,8 +151,6 @@ app.put('/polls/:pollId', async (req, res) => {
     return res.status(500).send('Error updating poll');
   }
 });
-
-
 
 app.post('/polls/refresh', async (req, res) => {
   const { id } = req.body;
