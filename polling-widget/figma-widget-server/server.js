@@ -9,6 +9,8 @@ const PollSchema = require('./models/Poll');
 
 const db = process.env.MONGODB_URI;
 
+const ObjectId = mongoose.Types.ObjectId;
+
 mongoose.connect(db, { 
   useNewUrlParser: true, 
   useUnifiedTopology: true,
@@ -78,32 +80,36 @@ app.get('/polls/:pollId', async (req, res) => {
   }
 });
 
-
 app.put('/polls/update-id/:pollId', async (req, res) => {
   try {
-    console.log(req.params);
     const { pollId } = req.params;
     const { newPollId } = req.body;
+    console.log(pollId);
+    console.log(newPollId);
+    console.log("hello world!!!!")
+    // Check if the poll with the provided newPollId already exists
+    let poll = await PollModel.findOne({ id: newPollId });
 
-    const poll = await PollModel.findById(pollId);
-    if (!poll) {
-      return res.status(404).send('Poll not found');
+    if (poll) {
+      // If the poll exists, return the data for the poll
+      return res.status(200).json({ status: 'exists', poll });
     }
+    
+    const poll_2 = await PollModel.findById(ObjectId(pollId));
+    if (!poll_2) {
+      return res.status(404).send('Poll not found with the object id');
+    }
+  
 
-    // Update the poll ID
-    poll.id = newPollId
-    console.log(poll.id);
-    console.log(poll);
+    // Update the poll ID to the newPollId
+    poll_2.id = newPollId;
 
     // Save the updated poll
-    await poll.save();
-
-    // Return the updated poll for confirmation
-    return res.status(200).json(poll);
+    await poll_2.save();
+    return res.sendStatus(200); // This sends a 200 OK with no body
   } catch (error) {
-    console.log(error);
-    console.error('Error updating poll ID:', error);
-    return res.status(500).send('Error updating poll ID');
+    console.error('Error updating or retrieving poll ID');
+    return res.status(500).send('Error updating or retrieving poll ID');
   }
 });
 
@@ -112,38 +118,63 @@ app.put('/polls/:pollId', async (req, res) => {
     console.log('Received data:', req.body); // Log the request data
     const { pollId } = req.params;
     const { options, totalVotes, updatedAt } = req.body;
-
+    console.log("Options:" + options);
+    console.error("Total votes:" + totalVotes);
+    console.log("Updated at" + updatedAt);
     // Ensure that options are an array and have valid structure
     if (!Array.isArray(options)) {
       return res.status(400).send('Options must be an array');
     }
-    console.log(totalVotes);
+    console.log("totalVotes" + totalVotes);
     // Validate the structure of each option
     for (const option of options) {
+      console.log("Validating option:", option);
       if (!option.text || typeof option.votes !== 'number' || !Array.isArray(option.voters)) {
+        console.log("Invalid option format detected");
         return res.status(400).send('Invalid option format');
       }
     }
-
+    
+    console.log("options" + options);
     // Find the poll by its ID
     const poll = await PollModel.findById(pollId);
     if (!poll) {
       return res.status(404).send('Poll not found');
     }
+    console.log("Poll" + poll);
 
     // Update the poll options, totalVotes, and updatedAt
-    poll.options = options || poll.options;
-    poll.totalVotes = totalVotes || poll.totalVotes;
-    poll.updatedAt = updatedAt || poll.updatedAt;
-
+    poll.options = options;
+    poll.totalVotes = totalVotes;
+    poll.updatedAt = updatedAt;
+    
+    console.log("ATTEMPTING TO SAVE");
     // Save the updated poll
     await poll.save();
-
+    console.log("SAVE");
   } catch (error) {
     console.error('Error updating poll:', error);
     return res.status(500).send('Error updating poll');
   }
 });
+
+
+
+app.post('/polls/refresh', async (req, res) => {
+  const { id } = req.body;
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { id },
+      { $setOnInsert: { id, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false } },
+      { upsert: true, new: true }
+    );
+    return res.json({ status: 'updated', widget });
+  } catch (error) {
+    console.error('Error refreshing data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 
 app.get('/logs/:logId', async (req, res) => {

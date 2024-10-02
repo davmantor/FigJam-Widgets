@@ -30,6 +30,7 @@ interface TextBoxProps {
   submitted: boolean;
   votes: number[];
   onVote: () => void;
+  handleVote: () => void;
   updateUserName: () => void;
   userVote: boolean;
   voters: CustomUser[];
@@ -85,6 +86,7 @@ function TextBox({
   submitted,
   votes,
   onVote,
+  handleVote,
   userVote,
   voters,
   isAnonymous,
@@ -114,51 +116,52 @@ function TextBox({
       onRemove(index);
     }
   };
+  
 
   const handleClick = async () => {
     updateUserName();  // Ensure the user name is up-to-date
     if (submitted) {
       console.log("previous voters:" + voters);
-      onVote();  // This will update local states like votes and voters
+      await onVote();  // This will update local states like votes and voters
       console.log("after voters:" + voters);
-      const newVotes = [...votes];
-      const newVoters = [...voters];
-      const totalVotes = newVotes.reduce((acc, vote) => acc + vote, 0);
+      // const newVotes = [...votes];
+      // const newVoters = [...voters];
+      // const totalVotes = newVotes.reduce((acc, vote) => acc + vote, 0);
   
-      const newMessageObject = {
-        title: "pollTitle",
-        options: entries.map((entry, index) => ({
-          text: entry,           // Option text
-          votes: newVotes[index], // Number of votes for this option
-          // Ensure voters[index] is an array before calling .map()
-          voters: (Array.isArray(voters[index]) ? voters[index] : []).map((voter: CustomUser) => ({
-            name: voter.name || 'Unknown User',  // Ensure 'name' exists in each voter
-          })),
-        })),
-        totalVotes,  // Sum of all votes
-        isAnonymous: isAnonymous,  // This should come from your state or logic
-        updatedAt: new Date(),  // Current date/time for the last update
-      };
+      // const newMessageObject = {
+      //   title: "pollTitle",
+      //   options: entries.map((entry, index) => ({
+      //     text: entry,           // Option text
+      //     votes: newVotes[index], // Number of votes for this option
+      //     // Ensure voters[index] is an array before calling .map()
+      //     voters: (Array.isArray(voters[index]) ? voters[index] : []).map((voter: CustomUser) => ({
+      //       name: voter.name || 'Unknown User',  // Ensure 'name' exists in each voter
+      //     })),
+      //   })),
+      //   totalVotes,  // Sum of all votes
+      //   isAnonymous: isAnonymous,  // This should come from your state or logic
+      //   updatedAt: new Date(),  // Current date/time for the last update
+      // };
       
       
   
-      console.log('Sending message object to server:', newMessageObject);  // Log the request data
+      // console.log('Sending message object to server:', newMessageObject);  // Log the request data
   
-      try {
-        const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newMessageObject),
-        });
+      // try {
+      //   const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
+      //     method: 'PUT',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify(newMessageObject),
+      //   });
   
-        console.log('Server response status:', response.status);  // Log the response status
-        const responseData = await response.json();
-        console.log('Server response data:', responseData);  // Log the response data
-      } catch (error) {
-        console.error('Error updating poll:', error);  // Log any error
-      }
+      //   console.log('Server response status:', response.status);  // Log the response status
+      //   const responseData = await response.json();
+      //   console.log('Server response data:', responseData);  // Log the response data
+      // } catch (error) {
+      //   console.error('Error updating poll:', error);  // Log any error
+      // }
     } else {
       setEditingIndex(index);  // If not submitted, continue with editing
     }
@@ -280,6 +283,11 @@ function PollingWidget() {
 
   const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 10);
 
+  // Track logId changes
+  useEffect(() => {
+    console.log("LogId updated:", logId);
+  }, [logId]);
+
   function getWidgetValue(input: number): number {
     const currentWidgetWidth = widgetWidth; // Get the current widget width
     const scalingRatio = currentWidgetWidth / 400; // Calculate the scaling ratio
@@ -308,6 +316,8 @@ function PollingWidget() {
     setVoters([...voters, []]);
     setEditingIndex(updatedEntries.length - 1);
   };
+
+  
 
   const handleVote = async (index: number) => {
     // Update the user's name before proceeding
@@ -341,12 +351,16 @@ function PollingWidget() {
     }
   
     // Update the state with the new votes and voters arrays
-    setVotes(newVotes);
-    setVoters(newVoters);
+    await setVotes(newVotes);
+    await setVoters(newVoters);
+    
   
+
     // Calculate total votes after voting and unvoting is handled
-    const totalVotes = newVotes.reduce((acc, voteCount) => acc + voteCount, 0);
-  
+    let totalVotes = 0;
+    for (let i = 0; i < newVotes.length; i++) {
+      totalVotes += newVotes[i];
+    }
     // Prepare the updated poll data to send to the database
     const updatedPoll = {
       options: entries.map((entry, i) => ({
@@ -357,6 +371,8 @@ function PollingWidget() {
       totalVotes: totalVotes,
       updatedAt: new Date(),
     };
+
+    console.log(totalVotes);
   
     console.log("UPDATED POLL");
     console.log(updatedPoll);
@@ -364,6 +380,7 @@ function PollingWidget() {
   
     // Wait for the database to update before proceeding
     try {
+      console.log("I AM ENTERING THE TRY CATCH")
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
         method: 'PUT',
         headers: {
@@ -425,6 +442,7 @@ function PollingWidget() {
       const data = await response.json();
       console.log("THIS IS THE DATA" + JSON.stringify(data))
       setPollId(data.pollId);
+      setLogId(data.logId);
 
       console.log('Poll created successfully:', data);
     } catch (error) {
@@ -611,6 +629,7 @@ function PollingWidget() {
         console.log("opened");
         figma.ui.onmessage = msg => {
           if (msg.type === 'update-message') {
+            console.log(logId);
             const updatedText = msg.payload.message;
             setWidgetId(updatedText);
             alreadyLoggedIn = true;
@@ -670,12 +689,19 @@ function PollingWidget() {
   }})
 
   const setWidgetId = async (widgetId: string) => {
-    console.log("SET WIDGET ID WAS JUST CALLED");
+    if (!widgetId) return
+  
+    // Prepare the request payload
     const newMessageObject = {
       newPollId: widgetId
     };
+    
     console.log("newMessageObject", newMessageObject);
+    console.log(pollId)
+    setLogId(widgetId); // Update the logId state with the new widgetId
+    console.log("THIS IS THE WIDGET ID" + logId);
     try {
+      // Make the PUT request to the server to check if the poll exists or update the ID
       const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
         method: 'PUT',
         headers: {
@@ -683,18 +709,41 @@ function PollingWidget() {
         },
         body: JSON.stringify(newMessageObject),
       });
+      console.log("pollId being used for update:", pollId);  // Log the pollId being used for findById
   
-      console.log('Server response status:', response.status);  // Log the response status
+      // Parse the response from the server
       const responseData = await response.json();
-      console.log('Server response data:', responseData);  // Log the response data
-  
+      console.log(responseData);
+      // Check if the response is successful
       if (response.status === 200) {
-        setLogId(widgetId);  // Update the pollId state only if the server response is successful
+        if (responseData.status === 'exists') {
+          // If the poll already exists, populate the widget with existing poll data
+          console.log('Poll already exists:', responseData.poll);
+          populateWidgetData(responseData.poll); // Call the function to update widget with poll data
+          console.log('LogId after update:', logId);
+
+        } else {
+          // If the poll was successfully updated with the new ID
+          console.log('Poll ID updated successfully');
+          console.log('LogId after update:', logId);
+        }
       }
     } catch (error) {
-      console.error('Error updating poll ID:', error);  // Log any error
+      console.error('Error updating or retrieving poll ID');
     }
   };
+  
+  // Helper function to populate widget with poll data
+  const populateWidgetData = (pollData) => {
+    setTitle(pollData.title); // Set the poll title
+    setEntries(pollData.options.map(option => option.text)); // Set the options text
+    setVotes(pollData.options.map(option => option.votes)); // Set the votes for each option
+    setVoters(pollData.options.map(option => option.voters)); // Set the voters for each option
+    setUserVoteIndex(null); // Reset the user vote index or adjust based on your logic
+    console.log(pollData);
+  };
+  
+  
 
   const handleOptionsClickChat = () => {
     updateUserName();
@@ -775,7 +824,7 @@ function PollingWidget() {
       setEditingIndex={setEditingIndex}
       submitted={submitted}
       votes={[]}
-      onVote={() => {}}
+      onVote={() => handleVote(index)}
       userVote={false}
       voters={[]}
       isAnonymous={isAnonymous}
