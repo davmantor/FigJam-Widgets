@@ -806,37 +806,31 @@ function PollingWidget() {
     >
       <SVG src={adminI} onClick={handleOptionsClickChat} />
     </AutoLayout>
-              {/* Add the title at the top */}
-              <Text
-      fontSize={getWidgetValue(30)}  // Adjust the size as needed
-      fontWeight="bold"              // Make it bold for emphasis
-      width="fill-parent"            // Make it span across the widget
-      horizontalAlignText="left"   // Center-align the text
-    >
-      Poll
-    </Text>
-    <TextBox
-      index={-1}
-      value={title}
-      onValueChange={handleValueChange}
-      isQuestion={true}
-      isEditing={editingIndex === -1}
-      setEditingIndex={setEditingIndex}
-      submitted={submitted}
-      votes={[]}
-      onVote={() => handleVote(index)}
-      userVote={false}
-      voters={[]}
-      isAnonymous={isAnonymous}
-      totalVoters={combinedVoters.size}
-      updateUserName={updateUserName}
-      entries={entries}
-      pollId={pollId}
-      widgetWidth={widgetWidth}
-      barColor={barColor}
-      accentColor={accentColor}
-      promptColor={promptColor}
-    />
+    <AutoLayout
+    width="fill-parent"
+    verticalAlignItems="center"
+    onClick={() => setEditingIndex(-1)}  // Set the index to -1 to trigger title editing
+  >
+    {editingIndex === -1 ? (
+      <Input
+        value={title}
+        onTextEditEnd={(e) => handleValueChange(-1, e.characters)}  // Update the title on edit end
+        placeholder="Enter poll title"
+        width="fill-parent"
+        fontSize={getWidgetValue(30)}   // Scale title size
+        fontWeight="bold"
+      />
+    ) : (
+      <Text
+        fontSize={getWidgetValue(30)}
+        fontWeight="bold"
+        width="fill-parent"
+        horizontalAlignText="left"
+      >
+        {title || "Enter poll title"}
+      </Text>
+    )}
+  </AutoLayout>
       {entries.map((item, index) => (
         <TextBox
           key={index}
