@@ -231,13 +231,13 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
-    widget.previous.push(widget.current);
+   
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
       { $set: { showPrevious: false } },
       { new: true }
     );
-
+    widget.previous.push(widget.current);
     widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
 
     if (widget) {
