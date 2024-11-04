@@ -44,6 +44,7 @@
     const [widgetId, setWidgetId] = useSyncedState("widgetId", null);
     const [creationDate, setCreationDate] = useSyncedState("creationDate", null);
     const [isSubmitting, setIsSubmitting] = useSyncedState("isSubmitting", false);
+    const [widgetGroup, setWidgetGroup] = useSyncedState("widgetGroup", "None");
     const [width, setWidth] = useSyncedState("width", 1020);
     const [height, setHeight] = useSyncedState("height", 235);
     const [borderColor, setBorderColor] = useSyncedState("borderColor", "#000000");
@@ -86,11 +87,16 @@
       }
       figma.ui.onmessage = (msg) => {
         console.log("Received message:", msg);
+        if (msg.type === "setWidgetGroup") {
+          setWidgetGroup(msg.widgetGroup);
+          console.log(widgetGroup);
+        }
         if (msg.type === "close") {
           figma.closePlugin();
         }
         if (msg.type === "refresh") {
           handleRefresh(widgetId != null ? widgetId : "");
+          setWidgetGroup(msg.params.Group || "None");
         }
         if (msg.type === "revealAll") {
           handleRevealAll();
@@ -130,8 +136,30 @@
           setWidgetId(msg.widgetId);
           handleRefresh(msg.widgetId);
         }
+        if (msg.type === "revealGroup") {
+          revealGroup(msg.widgetGroup);
+        }
       };
     });
+    function revealGroup(group) {
+      const data = { widgetId, group };
+      fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+        // Pass the group in the request body
+      }).then((res) => res.json()).then((data2) => {
+        if (data2.status === "success") {
+          console.log(`Group ${group} responses revealed successfully.`);
+        } else {
+          console.error("Failed to reveal group responses.");
+        }
+      }).catch((error) => {
+        console.error("Error revealing group:", error);
+      });
+    }
     const resetResponse = () => __async(this, null, function* () {
       var _a, _b;
       if (response.trim() !== "") {
@@ -215,6 +243,7 @@
     });
     const handleRefresh = (currentWidgetId) => __async(this, null, function* () {
       if (!currentWidgetId) return;
+      console.log("refresh inside", currentWidgetId);
       const data = { widgetId: currentWidgetId };
       try {
         const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh", {
@@ -269,11 +298,12 @@
         shadowOffsetY,
         shadowBlur,
         shadowSpread,
-        creationDate
+        creationDate,
+        widgetGroup
       };
       console.log("Opening admin menu with params:", params);
       figma.showUI(__html__, { width: 1e3, height: 400 });
-      figma.ui.postMessage({ type: "initialize", widgetId: widgetId != null ? widgetId : "", params });
+      figma.ui.postMessage({ type: "initialize", widgetId: widgetId != null ? widgetId : "", widgetGroup: widgetGroup != null ? widgetGroup : "", params });
       return new Promise(() => {
       });
     };

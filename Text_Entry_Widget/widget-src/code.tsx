@@ -23,6 +23,8 @@ function Widget() {
   const [widgetId, setWidgetId] = useSyncedState<string | null>("widgetId", null);
   const [creationDate, setCreationDate] = useSyncedState<string | null>("creationDate", null);
   const [isSubmitting, setIsSubmitting] = useSyncedState<boolean>("isSubmitting", false);
+  const [widgetGroup, setWidgetGroup] = useSyncedState<string | null>('widgetGroup', 'None');
+
 
 
 
@@ -81,11 +83,16 @@ function Widget() {
   
     figma.ui.onmessage = (msg) => {
       console.log("Received message:", msg);
+      if (msg.type === 'setWidgetGroup') {
+        setWidgetGroup(msg.widgetGroup);
+        console.log(widgetGroup);
+      }
       if (msg.type === 'close') {
         figma.closePlugin();
       }
       if (msg.type === 'refresh') {
         handleRefresh(widgetId ?? "");
+        setWidgetGroup(msg.params.Group || "None");
       }
       if (msg.type === 'revealAll') {
         handleRevealAll();
@@ -125,10 +132,36 @@ function Widget() {
         setWidgetId(msg.widgetId);
         handleRefresh(msg.widgetId);
       }
+      if(msg.type === 'revealGroup'){
+        revealGroup(msg.widgetGroup);
+      }
     };
   });
   
-
+  function revealGroup(group: string) {
+    // Create the data payload with widgetId and group
+    const data = { widgetId, group };
+  
+    // Send the group to the server
+    fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), // Pass the group in the request body
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status === 'success') {
+        console.log(`Group ${group} responses revealed successfully.`);
+      } else {
+        console.error('Failed to reveal group responses.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error revealing group:', error);
+    });
+  }
   const resetResponse = async () => {
     if (response.trim() !== "") {
       const name = figma.currentUser?.name || "User";
@@ -229,6 +262,7 @@ function Widget() {
 
   const handleRefresh = async (currentWidgetId: string) => {
     if (!currentWidgetId) return;
+    console.log("refresh inside", currentWidgetId);
   
     const data = { widgetId: currentWidgetId };
   
@@ -292,12 +326,13 @@ function Widget() {
       shadowBlur,
       shadowSpread,
       creationDate,
+      widgetGroup
     };
   
     console.log('Opening admin menu with params:', params);
   
     figma.showUI(__html__, { width: 1000, height: 400 });
-    figma.ui.postMessage({ type: 'initialize', widgetId: widgetId ?? "", params });
+    figma.ui.postMessage({ type: 'initialize', widgetId: widgetId ?? "",  widgetGroup: widgetGroup ?? "", params });
     return new Promise(() => {});
   };
   

@@ -23,6 +23,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 const widgetSchema = new mongoose.Schema({
   widgetId: { type: String, unique: true },
+  Group:{type: String,  default: "None"},
   previous: [{
     response: String,
     userName: String,
@@ -230,16 +231,21 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
+    widget.previous.push(widget.current);
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
       { $set: { showPrevious: false } },
       { new: true }
     );
+
+    widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
+
     if (widget) {
       res.json({ status: 'success', widget });
     } else {
       res.status(404).send('Widget not found');
     }
+    await widget.save();
   } catch (error) {
     console.error('Error resetting widget:', error);
     res.status(500).send('Internal Server Error');
@@ -251,9 +257,10 @@ app.post('/textentrywidget/refresh', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
+
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
-      { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false } },
+      { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false, Group: "None" } },
       { upsert: true, new: true }
     );
     return res.json({ status: 'updated', widget });
@@ -262,6 +269,28 @@ app.post('/textentrywidget/refresh', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+app.post('/textentrywidget/update-group', async (req, res) => {
+  const { widgetId, group } = req.body;
+
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { widgetId },
+      { $set: { Group: group } },
+      { new: true }
+    );
+    
+    if (widget) {
+      return res.json({ status: 'success', widget });
+    } else {
+      return res.status(404).send('Widget not found');
+    }
+  } catch (error) {
+    console.error('Error updating group:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 app.post('/textentrywidget/reveal-previous', async (req, res) => {
   const { widgetId } = req.body;
@@ -313,14 +342,43 @@ app.post('/textentrywidget/submit', async (req, res) => {
 
 
 app.post('/textentrywidget/reveal-all', async (req, res) => {
+  console.log(req.body); 
+  const { group } = req.body;
+
   try {
-    await Widget.updateMany({}, { $set: { showPrevious: true } });
-    res.json({ status: 'success' });
+    let filter = {};
+
+    // If a group is provided, add it to the filter criteria
+    if (group) {
+      filter = { 'Group': new RegExp(`^${group}$`, 'i') }; // Case-insensitive search
+    }
+
+    console.log('Searching for widgets in group:', group);
+    console.log('Filter applied:', filter);
+    const matchedWidgets1 = await Widget.find(filter);
+    console.log('Matched Widgets1:', matchedWidgets1);
+
+
+    // Update the showPrevious field for all matching widgets
+    const result = await Widget.updateMany(filter, { $set: { showPrevious: true } });
+    console.log('Query result:', result);
+
+    const matchedWidgets2 = await Widget.find(filter);
+    console.log('Matched Widgets2:', matchedWidgets2);
+
+
+    // Use modifiedCount to check how many widgets were modified
+    if (result.modifiedCount > 0) {
+      res.json({ status: 'success', message: `${result.modifiedCount} widget(s) updated.` });
+    } else {
+      res.status(404).send('No widgets found for the specified criteria.');
+    }
   } catch (error) {
-    console.error('Error revealing all data:', error);
+    console.error('Error revealing data:', error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 app.post('/textentrywidget/add-response', async (req, res) => {
   const { widgetId, response, userName, photoUrl } = req.body;
@@ -424,6 +482,39 @@ app.get('/polls/:pollId', async (req, res) => {
   }
 });
 
+
+app.put('/polls/update-id/:pollId', async (req, res) => {
+  try {
+    const { pollId } = req.params;
+    const { newPollId } = req.body;
+    console.log(pollId);
+    console.log(newPollId);
+
+    // Check if the poll with the provided newPollId already exists
+    let poll = await PollModel.findOne({ id: newPollId });
+
+    if (poll) {
+      // If the poll exists, return the data for the poll
+      return res.status(200).json({ status: 'exists', poll });
+    }
+    
+    const poll_2 = await PollModel.findById(pollId);
+    if (!poll_2) {
+      return res.status(404).send('Poll not found with the object id');
+    }
+  
+    // Update the poll ID to the newPollId
+    poll_2.id = newPollId;
+
+    // Save the updated poll
+    await poll_2.save();
+    return res.sendStatus(200); // This sends a 200 OK with no body
+  } catch (error) {
+    console.error('Error updating or retrieving poll ID');
+    return res.status(500).send('Error updating or retrieving poll ID');
+  }
+});
+
 app.put('/polls/:pollId', async (req, res) => {
   try {
     console.log('Received data:', req.body); // Log the request data
@@ -450,7 +541,7 @@ app.put('/polls/:pollId', async (req, res) => {
 
     // Update the poll options, totalVotes, and updatedAt
     poll.options = options || poll.options;
-    poll.totalVotes = totalVotes || poll.totalVotes;
+    poll.totalVotes = totalVotes
     poll.updatedAt = updatedAt || poll.updatedAt;
 
     // Save the updated poll
