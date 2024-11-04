@@ -231,16 +231,21 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
+    widget.previous.push(widget.current);
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
       { $set: { showPrevious: false } },
       { new: true }
     );
+
+    widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
+
     if (widget) {
       res.json({ status: 'success', widget });
     } else {
       res.status(404).send('Widget not found');
     }
+    await widget.save();
   } catch (error) {
     console.error('Error resetting widget:', error);
     res.status(500).send('Internal Server Error');
@@ -252,6 +257,7 @@ app.post('/textentrywidget/refresh', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
+
     const widget = await Widget.findOneAndUpdate(
       { widgetId },
       { $setOnInsert: { widgetId, previous: [], current: { response: "", userName: "", photoUrl: "" }, showPrevious: false, Group: "None" } },
