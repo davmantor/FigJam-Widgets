@@ -1,0 +1,19 @@
+{
+  "name": "likert",
+  "id": "1438340856064853388",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "permissions": ["currentuser"],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "ui": "ui.html",
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:3000"]}
+}
