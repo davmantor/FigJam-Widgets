@@ -5,9 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Likert Scale Widget</title>
 </head>
+<style>
+  h3 {
+    overflow-wrap: break-word;
+  }
+  body {
+    font-family: sans-serif;
+  }
+  textarea {
+    width: 100%;
+    border-radius: 5px;
+    font-family: sans-serif;
+    resize: vertical;
+  }
+  select, button, textarea {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .btnrow {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-end;
+    padding-top: 5px;
+  }
+  button {
+    padding: 5px 10px;
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #aaa;
+  }
+  .editQuestion {
+    display: none;
+  }
+</style>
 <body>
   <h3 id="question">What did you like/dislike about the class?</h3>
-  <label for="rating">Select your rating:</label>
+  <label for="rating">My rating:</label>
   <select id="rating">
     <option value="1">Strongly Disagree</option>
     <option value="2">Disagree</option>
@@ -15,21 +51,24 @@
     <option value="4">Agree</option>
     <option value="5">Strongly Agree</option>
   </select>
+  <br><br>
+  <label for="comment">Comment:</label>
+  <textarea placeholder="Type a comment..." id="comment" rows="4"></textarea>
   <br>
-  <label for="comment">Your comment:</label>
-  <textarea id="comment" rows="4"></textarea>
-  <br>
-  <button id="submitButton">Submit</button>
-  <button id="closeButton">Close</button>
+  <div class="btnrow">
+    <button id="closeButton">Close</button>
+    <button id="submitButton">Submit</button>
+  </div>
 
   <script>
     let currentUser = { photoUrl: "https://via.placeholder.com/20", name: "Anonymous" };
 
     window.onmessage = (event) => {
-      const { type, user } = event.data.pluginMessage;
-      console.log("here", user.photoUrl);
-      if (type === "setUser" && user) {
+      if (event.data.pluginMessage.type === "init" && event.data.pluginMessage.user) {
+        const { type, user, rating, question } = event.data.pluginMessage;
         currentUser = { photoUrl: user.photoUrl || "https://via.placeholder.com/20", name: user.name || "Anonymous" };
+        document.getElementById("rating").value = rating;
+        document.getElementById("question").innerText = question;
       }
     };
 
@@ -39,6 +78,7 @@
       const user = { icon: currentUser.photoUrl };
 
       parent.postMessage({ pluginMessage: { type: "submitResponse", user, rating, comment } }, "*");
+      parent.postMessage({ pluginMessage: { type: "close" } }, "*");
     };
 
     document.getElementById("closeButton").onclick = () => {
