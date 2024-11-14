@@ -78,7 +78,7 @@
     document.getElementById("submitButton").onclick = () => {
       const rating = parseInt(document.getElementById("rating").value);
       const comment = document.getElementById("comment").value;
-      const user = { icon: currentUser.photoUrl };
+      const user = { icon: currentUser.photoUrl, name: currentUser.name };
 
       parent.postMessage({ pluginMessage: { type: "submitResponse", user, rating, comment } }, "*");
       parent.postMessage({ pluginMessage: { type: "close" } }, "*");
