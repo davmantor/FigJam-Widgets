@@ -6,10 +6,6 @@
   <title>Likert Scale Widget</title>
 </head>
 <style>
-  h3 {
-    overflow-wrap: break-word;
-    display: none;
-  }
   body {
     font-family: sans-serif;
   }
@@ -40,21 +36,26 @@
   button:hover {
     background-color: #aaa;
   }
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
   .editQuestion {
     display: none;
   }
 </style>
 <body>
-  <h3 id="question">What did you like/dislike about the class?</h3>
-  <label for="rating">My rating:</label>
-  <select id="rating">
-    <option value="1">Strongly Disagree</option>
-    <option value="2">Disagree</option>
-    <option value="3">Neutral</option>
-    <option value="4">Agree</option>
-    <option value="5">Strongly Agree</option>
-  </select>
-  <br><br>
+  <div id="ratingWrapper">
+    <label for="rating">My rating:</label>
+    <select id="rating">
+      <option value="1">Strongly Disagree</option>
+      <option value="2">Disagree</option>
+      <option value="3">Neutral</option>
+      <option value="4">Agree</option>
+      <option value="5">Strongly Agree</option>
+    </select>
+    <br>
+  </div>
   <label for="comment">Comment:</label>
   <textarea placeholder="Type a comment..." id="comment" rows="4"></textarea>
   <br>
@@ -65,19 +66,34 @@
 
   <script>
     let currentUser = { photoUrl: "https://via.placeholder.com/20", name: "Anonymous" };
+    let isFreeResponse = false;
+
+    function disableSubmitIfFreeResponse(e) {
+      if (isFreeResponse) {
+        document.getElementById("submitButton").disabled = !e.target.value;
+      }
+    }
 
     window.onmessage = (event) => {
       if (event.data.pluginMessage.type === "init" && event.data.pluginMessage.user) {
+        isFreeResponse = event.data.pluginMessage.isFreeResponse;
         const { type, user, rating, question } = event.data.pluginMessage;
         currentUser = { photoUrl: user.photoUrl || "https://via.placeholder.com/20", name: user.name || "Anonymous" };
+        if (isFreeResponse) {
+          document.getElementById("ratingWrapper").style.display = "none";
+          document.getElementById("comment").style.height = "calc(100% - 50px)";
+          document.getElementById("comment").addEventListener("input", disableSubmitIfFreeResponse);
+          document.getElementById("submitButton").disabled = true;
+        }
         document.getElementById("rating").value = rating;
         document.getElementById("question").innerText = question;
       }
     };
 
     document.getElementById("submitButton").onclick = () => {
-      const rating = parseInt(document.getElementById("rating").value);
       const comment = document.getElementById("comment").value;
+      if (!comment && isFreeResponse) return;
+      const rating = parseInt(document.getElementById("rating").value);
       const user = { icon: currentUser.photoUrl, name: currentUser.name };
 
       parent.postMessage({ pluginMessage: { type: "submitResponse", user, rating, comment } }, "*");
