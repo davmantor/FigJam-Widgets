@@ -55,10 +55,23 @@ function Widget() {
     sticky.text.characters = res.comment;
   }
 
+  async function generateLikertPoll(comment) {
+    const response = await fetch("http://localhost:3000/generatePoll", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ comment }),
+    });
+    const data = await response.json();
+    console.log(data);
+    return { question: data.question, labels: data.labels };
+  }
+  
+
   const createCopy = async (res: Response) => {
     const node = await figma.getNodeByIdAsync(widgetId) as WidgetNode;
 
     // some LLM magic here...
+    /*
 
     const clone = node.cloneWidget({
       question: "LLM question generated from \"" + res.comment + "\"",
@@ -67,7 +80,17 @@ function Widget() {
       labels: ["Custom", "Scale", "From", "LLM", "Response", "And", "More"],
       responses: [],
     });
-    clone.y = node.y + node.height + 16;
+    */
+
+      const { question, labels } = await generateLikertPoll(res.comment);
+      const clone = node.cloneWidget({
+        question,
+        questionAuthor: res.user,
+        isFreeResponse: false,
+        labels,
+        responses: [],
+      });
+      clone.y = node.y + node.height + 16;
   }
 
   const responsesWithoutComments = responses.filter(res => res.comment.length === 0);
