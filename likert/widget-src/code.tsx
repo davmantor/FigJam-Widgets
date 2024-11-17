@@ -13,7 +13,7 @@ const colors = ["#FFAFA3", "#FFC470", "#FFD966", "#85E0A3", "#80CAFF", "#FFADE7"
 function Widget() {
   const [isFreeResponse, setIsFreeResponse] = useSyncedState("isFreeResponse", true);
   const [question, setQuestion] = useSyncedState("question", "");
-  const [questionAuthor, setQuestionAuthor] = useSyncedState<null|Response['user']>("questionAuthor", null);
+  const [questionAuthor, setQuestionAuthor] = useSyncedState<null | Response["user"]>("questionAuthor", null);
   const [labels, setLabels] = useSyncedState<string[]>("labels", ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]);
   const [responses, setResponses] = useSyncedState<Response[]>("responses", []);
   const widgetId = useWidgetNodeId();
@@ -53,7 +53,7 @@ function Widget() {
     // Load the font before setting characters
     await figma.loadFontAsync(sticky.text.fontName as FontName);
     sticky.text.characters = res.comment;
-  }
+  };
 
   async function generateLikertPoll(comment) {
     const response = await fetch("http://localhost:3000/generatePoll", {
@@ -65,113 +65,182 @@ function Widget() {
     console.log(data);
     return { question: data.question, labels: data.labels };
   }
-  
+
+  const rerollLabels = () => {
+    const baseLabels = ["Very Bad", "Bad", "Neutral", "Good", "Very Good"];
+    const shuffledLabels = baseLabels
+      .map((label) => ({ label, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ label }) => label);
+
+    setLabels(shuffledLabels);
+  };
 
   const createCopy = async (res: Response) => {
     const node = await figma.getNodeByIdAsync(widgetId) as WidgetNode;
 
-    // some LLM magic here...
-    /*
-
+    const { question, labels } = await generateLikertPoll(res.comment);
     const clone = node.cloneWidget({
-      question: "LLM question generated from \"" + res.comment + "\"",
+      question,
       questionAuthor: res.user,
       isFreeResponse: false,
-      labels: ["Custom", "Scale", "From", "LLM", "Response", "And", "More"],
+      labels,
       responses: [],
     });
-    */
+    clone.y = node.y + node.height + 16;
+  };
 
-      const { question, labels } = await generateLikertPoll(res.comment);
-      const clone = node.cloneWidget({
-        question,
-        questionAuthor: res.user,
-        isFreeResponse: false,
-        labels,
-        responses: [],
-      });
-      clone.y = node.y + node.height + 16;
-  }
-
-  const responsesWithoutComments = responses.filter(res => res.comment.length === 0);
-  
-  const optionsWithResponses = new Set(responses.map(res => res.rating));
+  const responsesWithoutComments = responses.filter((res) => res.comment.length === 0);
+  const optionsWithResponses = new Set(responses.map((res) => res.rating));
 
   return (
-    <AutoLayout width={1032} direction="vertical" padding={16} spacing={4} fill={'#ffffff'} cornerRadius={10}>
-      <AutoLayout width={'fill-parent'} cornerRadius={{topLeft: 5, topRight: 5}} verticalAlignItems="center" spacing={4} padding={8} fill={'#eeeeee'}>
-        <Input placeholder="Set a title..." fontSize={18} width={'fill-parent'} value={question} onTextEditEnd={(e) => setQuestion(e.characters)} />
-        {questionAuthor && <>
-          <Text fontSize={12} fill="#777777">{questionAuthor.name}</Text>
-          <Image src={questionAuthor.icon} width={20} height={20} cornerRadius={10} />
-        </>}
+    <AutoLayout width={1032} direction="vertical" padding={16} spacing={4} fill={"#ffffff"} cornerRadius={10}>
+      <AutoLayout width={"fill-parent"} cornerRadius={{ topLeft: 5, topRight: 5 }} verticalAlignItems="center" spacing={4} padding={8} fill={"#eeeeee"}>
+        <Input placeholder="Set a title..." fontSize={18} width={"fill-parent"} value={question} onTextEditEnd={(e) => setQuestion(e.characters)} />
+        {questionAuthor && (
+          <>
+            <Text fontSize={12} fill="#777777">
+              {questionAuthor.name}
+            </Text>
+            <Image src={questionAuthor.icon} width={20} height={20} cornerRadius={10} />
+          </>
+        )}
       </AutoLayout>
-      {!isFreeResponse && (<>
-        <AutoLayout width={1000} spacing={4}>
-          {labels.map((label, index) => (
-            <AutoLayout onClick={openPluginWindow.bind(null, index + 1)} width={'fill-parent'} height={'fill-parent'} minHeight={150} key={index} direction="vertical" spacing={4} padding={8} fill={colors[index % colors.length]} strokeWidth={2} hoverStyle={{stroke: "#111111", opacity: 0.8}}>
-              <Text>{label}</Text>
-              <AutoLayout spacing={4} wrap={true} width={'fill-parent'}>
-                {responses
-                  .filter((res) => res.rating === index + 1)
-                  .map((res, i) => (
-                    <Image key={i} src={res.user.icon} width={20} height={20} cornerRadius={10} />
-                  ))}
+      {!isFreeResponse && (
+        <>
+          <AutoLayout width={1000} spacing={4}>
+            {labels.map((label, index) => (
+              <AutoLayout onClick={openPluginWindow.bind(null, index + 1)} width={"fill-parent"} height={"fill-parent"} minHeight={150} key={index} direction="vertical" spacing={4} padding={8} fill={colors[index % colors.length]} strokeWidth={2} hoverStyle={{ stroke: "#111111", opacity: 0.8 }}>
+                <Text>{label}</Text>
+                <AutoLayout spacing={4} wrap={true} width={"fill-parent"}>
+                  {responses
+                    .filter((res) => res.rating === index + 1)
+                    .map((res, i) => (
+                      <Image key={i} src={res.user.icon} width={20} height={20} cornerRadius={10} />
+                    ))}
+                </AutoLayout>
               </AutoLayout>
-            </AutoLayout>
-          ))}
-        </AutoLayout>
-        {responses.length > 0 && (<>
-          <Rectangle width={'fill-parent'} height={6} fill={'#ffffff'} />
-          <AutoLayout spacing={4} cornerRadius={10}>
-            {labels.map((label, index) =>
-              {return optionsWithResponses.has(index + 1) && <AutoLayout key={index} verticalAlignItems="center" horizontalAlignItems="center" padding={{left: 4}} width={(1000 - (optionsWithResponses.size - 1) * 4) / responses.length * responses.filter(x => x.rating - 1 === index).length} height={16} fill={colors[index % colors.length]}>
-                <Text fontSize={10} fill={'#333333'}>{Math.round(responses.filter(x => x.rating - 1 === index).length / responses.length * 100)}%</Text>
-              </AutoLayout>}
-            )}
+            ))}
           </AutoLayout>
-        </>)}
+          {responses.length > 0 && (
+            <>
+              <Rectangle width={"fill-parent"} height={6} fill={"#ffffff"} />
+              <AutoLayout spacing={4} cornerRadius={10}>
+                {labels.map((label, index) =>
+                  optionsWithResponses.has(index + 1) && (
+                    <AutoLayout
+                      key={index}
+                      verticalAlignItems="center"
+                      horizontalAlignItems="center"
+                      padding={{ left: 4 }}
+                      width={(1000 - (optionsWithResponses.size - 1) * 4) / responses.length * responses.filter((x) => x.rating - 1 === index).length}
+                      height={16}
+                      fill={colors[index % colors.length]}
+                    >
+                      <Text fontSize={10} fill={"#333333"}>
+                        {Math.round((responses.filter((x) => x.rating - 1 === index).length / responses.length) * 100)}%
+                      </Text>
+                    </AutoLayout>
+                  )
+                )}
+              </AutoLayout>
+            </>
+          )}
+<AutoLayout
+  width={150}
+  height={40}
+  fill="#4A4A4A" // Darker background color for better visibility
+  cornerRadius={10} // Rounded edges
+  padding={{ left: 16, right: 16, top: 8, bottom: 8 }} // Padding for better text spacing
+  hoverStyle={{ fill: "#333333" }} // Hover effect
+  horizontalAlignItems="center" // Center the content horizontally
+  verticalAlignItems="center" // Center the content vertically
+  spacing={8} // Optional: Add spacing between elements if needed
+  onClick={rerollLabels} // Function to trigger when clicked
+>
+  <Text fontSize={16} fill="#FFFFFF" horizontalAlignText="center" verticalAlignText="center">
+    Reroll Labels
+  </Text>
+</AutoLayout>
+
+
+
         </>
       )}
       {isFreeResponse && (
-        <AutoLayout onClick={openPluginWindow.bind(null, -1)} width={'fill-parent'} height={50} direction="vertical" spacing={4} padding={8} fill={defaultColor} strokeWidth={2} cornerRadius={{bottomLeft: 5, bottomRight: 5}} hoverStyle={{stroke: "#111111", opacity: 0.8}}>
+        <AutoLayout
+          onClick={openPluginWindow.bind(null, -1)}
+          width={"fill-parent"}
+          height={50}
+          direction="vertical"
+          spacing={4}
+          padding={8}
+          fill={defaultColor}
+          strokeWidth={2}
+          cornerRadius={{ bottomLeft: 5, bottomRight: 5 }}
+          hoverStyle={{ stroke: "#111111", opacity: 0.8 }}
+        >
           <Text>Click here to enter a response</Text>
         </AutoLayout>
       )}
-      {responses.length > 0 && <>
-        <Rectangle width={'fill-parent'} height={6} fill={'#ffffff'} />
-        <Text>{responses.length} {responses.length === 1 ? "response" : "responses"}</Text>
-        {responsesWithoutComments.length !== responses.length &&
-          <AutoLayout direction="horizontal" wrap={true} spacing={4} width={1000}>
-            {
-              responses.filter(res => res.comment.length > 0).map((res, i) => (
-                <AutoLayout onClick={createCopy.bind(null, res)} width={(1000 - 16) / 5} minHeight={100} fill={isFreeResponse ? colors[i % colors.length] : colors[(res.rating - 1) % colors.length]} strokeAlign={"inside"} key={i} direction="vertical" spacing={4} padding={8}>
-                  <Text width={'fill-parent'} height={'fill-parent'}>{res.comment}</Text>
-                  <AutoLayout spacing={4} verticalAlignItems="end" width={'fill-parent'}>
-                    <Text fill={'#000000'} opacity={0.5} fontSize={10}>{isFreeResponse ? res.user.name : labels[res.rating - 1]}</Text>
-                    <Rectangle height={'fill-parent'} width={'fill-parent'} />
-                    <Image src={res.user.icon} width={16} height={16} cornerRadius={10} />
+      {responses.length > 0 && (
+        <>
+          <Rectangle width={"fill-parent"} height={6} fill={"#ffffff"} />
+          <Text>
+            {responses.length} {responses.length === 1 ? "response" : "responses"}
+          </Text>
+          {responsesWithoutComments.length !== responses.length && (
+            <AutoLayout direction="horizontal" wrap={true} spacing={4} width={1000}>
+              {responses
+                .filter((res) => res.comment.length > 0)
+                .map((res, i) => (
+                  <AutoLayout
+                    onClick={createCopy.bind(null, res)}
+                    width={(1000 - 16) / 5}
+                    minHeight={100}
+                    fill={isFreeResponse ? colors[i % colors.length] : colors[(res.rating - 1) % colors.length]}
+                    strokeAlign={"inside"}
+                    key={i}
+                    direction="vertical"
+                    spacing={4}
+                    padding={8}
+                  >
+                    <Text width={"fill-parent"} height={"fill-parent"}>
+                      {res.comment}
+                    </Text>
+                    <AutoLayout spacing={4} verticalAlignItems="end" width={"fill-parent"}>
+                      <Text fill={"#000000"} opacity={0.5} fontSize={10}>
+                        {isFreeResponse ? res.user.name : labels[res.rating - 1]}
+                      </Text>
+                      <Rectangle height={"fill-parent"} width={"fill-parent"} />
+                      <Image src={res.user.icon} width={16} height={16} cornerRadius={10} />
+                    </AutoLayout>
                   </AutoLayout>
-                </AutoLayout>
-              ))
-            }
-          </AutoLayout>
-        }
-      </>}
-      {
-        responsesWithoutComments.length > 0 && <>
-          {responsesWithoutComments.length !== responses.length && <Rectangle width={'fill-parent'} height={12} fill={'#ffffff'} />}
-          <AutoLayout width={'fill-parent'} verticalAlignItems="center" spacing={8}>
-            <Frame width={Math.min(20 + (responsesWithoutComments.length - 1) * 10, 110)} height={20} cornerRadius={10} fill={'#ffffff'}>
+                ))}
+            </AutoLayout>
+          )}
+        </>
+      )}
+      {responsesWithoutComments.length > 0 && (
+        <>
+          {responsesWithoutComments.length !== responses.length && <Rectangle width={"fill-parent"} height={12} fill={"#ffffff"} />}
+          <AutoLayout width={"fill-parent"} verticalAlignItems="center" spacing={8}>
+            <Frame width={Math.min(20 + (responsesWithoutComments.length - 1) * 10, 110)} height={20} cornerRadius={10} fill={"#ffffff"}>
               {responsesWithoutComments.slice(0, 10).map((res, i) => (
                 <Image key={i} src={res.user.icon} stroke="#ffffff" strokeWidth={1} width={20} height={20} cornerRadius={10} x={i * 10} />
               ))}
-              {responsesWithoutComments.length > 10 && <AutoLayout horizontalAlignItems="center" fill="#cccccc" stroke="#ffffff" strokeWidth={1} width={20} height={20} cornerRadius={10} x={90}><Text>+</Text></AutoLayout>}
+              {responsesWithoutComments.length > 10 && (
+                <AutoLayout horizontalAlignItems="center" fill="#cccccc" stroke="#ffffff" strokeWidth={1} width={20} height={20} cornerRadius={10} x={90}>
+                  <Text>+</Text>
+                </AutoLayout>
+              )}
             </Frame>
-            <Text fill="#aaaaaa">+{responsesWithoutComments.length} {responsesWithoutComments.length === 1 ? "response" : "responses"} without comments</Text>
+            <Text fill="#aaaaaa">
+              +{responsesWithoutComments.length} {responsesWithoutComments.length === 1 ? "response" : "responses"} without comments
+            </Text>
           </AutoLayout>
         </>
-      }
+      )}
     </AutoLayout>
   );
 }
