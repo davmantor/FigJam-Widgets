@@ -19,10 +19,13 @@ const openai = new OpenAI({
 // Route to Generate Poll
 app.post("/generatePoll", async (req, res) => {
     try {
-        const { comment } = req.body;
+        const { question, response } = req.body;
 
-        if (!comment) {
-            return res.status(400).json({ error: "Comment is required." });
+        if (!response) {
+            return res.status(400).json({ error: "Response is required." });
+        }
+        if (typeof question !== "string") {
+            return res.status(400).json({ error: "Question is required." });
         }
 
         const prompt = `
@@ -37,9 +40,10 @@ app.post("/generatePoll", async (req, res) => {
         - Option 4
         - Option 5
 
-        Comment: "${comment}"`;
+        Context: ${question}
+        Comment: "${response.comment}"`;
 
-        const response = await openai.chat.completions.create({
+        const aiResponse = await openai.chat.completions.create({
             model: "gpt-4o",
             max_tokens: 300,
             messages: [
@@ -54,8 +58,8 @@ app.post("/generatePoll", async (req, res) => {
             ],
         });
 
-        if (response && response.choices && response.choices.length > 0) {
-            const generatedText = response.choices[0].message.content.trim();
+        if (aiResponse && aiResponse.choices && aiResponse.choices.length > 0) {
+            const generatedText = aiResponse.choices[0].message.content.trim();
             const lines = generatedText.split("\n").map((line) => line.trim());
             const question = lines[0].replace("Question:", "").trim();
             const labels = lines

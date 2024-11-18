@@ -10,13 +10,31 @@ interface Response {
 const defaultColor = "#FFD966";
 const colors = ["#FFAFA3", "#FFC470", "#FFD966", "#85E0A3", "#80CAFF", "#FFADE7", "#D9B8FF", "#E6E6E6", "AFBCCF"];
 
+enum Loading { NOT_SENT, SENT, RECEIVED };
+
 function Widget() {
   const [isFreeResponse, setIsFreeResponse] = useSyncedState("isFreeResponse", true);
   const [question, setQuestion] = useSyncedState("question", "");
-  const [questionAuthor, setQuestionAuthor] = useSyncedState<null | Response["user"]>("questionAuthor", null);
+  const [questionSource, setQuestionSource] = useSyncedState<null|{question: string, response: Response}>("questionSource", null);
+  const [loading, setLoading] = useSyncedState<Loading>("loading", Loading.RECEIVED);
   const [labels, setLabels] = useSyncedState<string[]>("labels", ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]);
   const [responses, setResponses] = useSyncedState<Response[]>("responses", []);
   const widgetId = useWidgetNodeId();
+
+  const regenerateResponse = async () => {
+    if (loading === Loading.SENT) return;
+    if (questionSource === null) {
+      setLoading(Loading.RECEIVED);
+      return;
+    }
+    setResponses([]);
+    setLoading(Loading.SENT);
+    const data = await generateLikertPoll(questionSource.question, questionSource.response);
+
+    setQuestion(data.question);
+    setLabels(data.labels);
+    setLoading(Loading.RECEIVED);
+  }
 
   useEffect(() => {
     figma.ui.onmessage = (msg) => {
@@ -55,36 +73,31 @@ function Widget() {
     sticky.text.characters = res.comment;
   };
 
-  async function generateLikertPoll(comment) {
-    const response = await fetch("http://localhost:3000/generatePoll", {
+  async function generateLikertPoll(question: string, response: Response) {
+    const resp = await fetch("http://localhost:3000/generatePoll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ comment }),
+      body: JSON.stringify({ question, response }),
     });
-    const data = await response.json();
-    console.log(data);
-    return { question: data.question, labels: data.labels };
+
+    const data = await resp.json();
+    if (resp.ok) {
+      return { question: data.question, labels: data.labels };
+    } else {
+      console.error("Failed to generate poll", data);
+      return { question: `Unable to generate poll (${data.error})`, labels: ["Click 'Regenerate' to get a new poll"] };
+    }
   }
-
-  const rerollLabels = () => {
-    const baseLabels = ["Very Bad", "Bad", "Neutral", "Good", "Very Good"];
-    const shuffledLabels = baseLabels
-      .map((label) => ({ label, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ label }) => label);
-
-    setLabels(shuffledLabels);
-  };
 
   const createCopy = async (res: Response) => {
     const node = await figma.getNodeByIdAsync(widgetId) as WidgetNode;
-
-    const { question, labels } = await generateLikertPoll(res.comment);
+    const data = await generateLikertPoll(question, res);
     const clone = node.cloneWidget({
-      question,
-      questionAuthor: res.user,
+      question: data.question,
+      questionSource: {question, response: res},
       isFreeResponse: false,
-      labels,
+      labels: data.labels,
+      loading: Loading.RECEIVED,
       responses: [],
     });
     clone.y = node.y + node.height + 16;
@@ -96,17 +109,29 @@ function Widget() {
   return (
     <AutoLayout width={1032} direction="vertical" padding={16} spacing={4} fill={"#ffffff"} cornerRadius={10}>
       <AutoLayout width={"fill-parent"} cornerRadius={{ topLeft: 5, topRight: 5 }} verticalAlignItems="center" spacing={4} padding={8} fill={"#eeeeee"}>
-        <Input placeholder="Set a title..." fontSize={18} width={"fill-parent"} value={question} onTextEditEnd={(e) => setQuestion(e.characters)} />
-        {questionAuthor && (
+        {loading === Loading.RECEIVED && <Input placeholder="Set a title..." fontSize={18} width={"fill-parent"} value={question} onTextEditEnd={(e) => setQuestion(e.characters)} />}
+        {loading !== Loading.RECEIVED && <Text fill="#999999" width="fill-parent">Synthesizing a poll...</Text>}
+        {questionSource && (
           <>
             <Text fontSize={12} fill="#777777">
-              {questionAuthor.name}
+              {questionSource.response.user.name}
             </Text>
-            <Image src={questionAuthor.icon} width={20} height={20} cornerRadius={10} />
+            <Image src={questionSource.response.user.icon} width={20} height={20} cornerRadius={10} />
+            <Rectangle height={1} width={4} />
+            <AutoLayout
+              onClick={loading === Loading.RECEIVED ? regenerateResponse : () => {}}
+              fill="#dddddd"
+              opacity={loading === Loading.RECEIVED ? 1 : 0.5}
+              padding={4}
+              cornerRadius={4}
+              hoverStyle={loading === Loading.RECEIVED ? {fill: "#cccccc"} : {}}
+            >
+              <Text fontSize={12}>🔄️ Regenerate</Text>
+            </AutoLayout>
           </>
         )}
       </AutoLayout>
-      {!isFreeResponse && (
+      {(!isFreeResponse && loading === Loading.RECEIVED) && (
         <>
           <AutoLayout width={1000} spacing={4}>
             {labels.map((label, index) => (
@@ -146,31 +171,12 @@ function Widget() {
               </AutoLayout>
             </>
           )}
-<AutoLayout
-  width={150}
-  height={40}
-  fill="#4A4A4A" // Darker background color for better visibility
-  cornerRadius={10} // Rounded edges
-  padding={{ left: 16, right: 16, top: 8, bottom: 8 }} // Padding for better text spacing
-  hoverStyle={{ fill: "#333333" }} // Hover effect
-  horizontalAlignItems="center" // Center the content horizontally
-  verticalAlignItems="center" // Center the content vertically
-  spacing={8} // Optional: Add spacing between elements if needed
-  onClick={rerollLabels} // Function to trigger when clicked
->
-  <Text fontSize={16} fill="#FFFFFF" horizontalAlignText="center" verticalAlignText="center">
-    Reroll Labels
-  </Text>
-</AutoLayout>
-
-
-
         </>
       )}
-      {isFreeResponse && (
+      {(isFreeResponse && loading === Loading.RECEIVED) && (
         <AutoLayout
           onClick={openPluginWindow.bind(null, -1)}
-          width={"fill-parent"}
+          width="fill-parent"
           height={50}
           direction="vertical"
           spacing={4}
