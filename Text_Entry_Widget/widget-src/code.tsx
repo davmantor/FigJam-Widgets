@@ -163,7 +163,10 @@ function Widget() {
     });
   }
   const resetResponse = async () => {
+    console.log("---response---", response.trim(), response.trim() !== "");
+
     if (response.trim() !== "") {
+      console.log("push response");
       const name = figma.currentUser?.name || "User";
       const photoUrl = figma.currentUser?.photoUrl || null;
       const timestamp = new Date().toISOString(); // Get the current timestamp

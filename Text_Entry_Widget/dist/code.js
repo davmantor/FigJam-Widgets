@@ -162,7 +162,9 @@
     }
     const resetResponse = () => __async(this, null, function* () {
       var _a, _b;
+      console.log("---response---", response.trim(), response.trim() !== "");
       if (response.trim() !== "") {
+        console.log("push response");
         const name = ((_a = figma.currentUser) == null ? void 0 : _a.name) || "User";
         const photoUrl = ((_b = figma.currentUser) == null ? void 0 : _b.photoUrl) || null;
         const timestamp = (/* @__PURE__ */ new Date()).toISOString();

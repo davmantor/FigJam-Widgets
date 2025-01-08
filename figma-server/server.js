@@ -237,7 +237,9 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
       { $set: { showPrevious: false } },
       { new: true }
     );
-    widget.previous.push(widget.current);
+    if(widget.current.response){
+      widget.previous.push(widget.current);
+    }
     widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
 
     if (widget) {
