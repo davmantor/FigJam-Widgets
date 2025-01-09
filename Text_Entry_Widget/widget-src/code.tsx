@@ -1,5 +1,5 @@
 const { widget } = figma;
-const { useEffect, useSyncedState, Text, Input, AutoLayout, SVG, Image } = widget;
+const { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
 
 const AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
     <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -114,75 +114,34 @@ function Widget() {
       if (msg.type === 'resetResponse') { // New message type
         resetResponse();
       }
+      if (msg.type === 'resetAll') {
+        waitForTask(handleResetAll());
+      }
       if (msg.type === 'setWidgetId') {
         setWidgetId(msg.widgetId);
         handleRefresh(msg.widgetId);
       }
-      if(msg.type === 'revealGroup'){
-        revealGroup(msg.widgetGroup);
+      if (msg.type === 'revealGroup') {
+        waitForTask(handleRevealAll(msg.widgetGroup));
+      }
+      if (msg.type === 'resetGroup') {
+        waitForTask(handleResetAll(msg.widgetGroup));
       }
     }
     });
-  
-  function revealGroup(group: string) {
-    // Create the data payload with widgetId and group
-    const data = { widgetId, group };
-  
-    // Send the group to the server
-    fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data), // Pass the group in the request body
-    })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.status === 'success') {
-        console.log(`Group ${group} responses revealed successfully.`);
-      } else {
-        console.error('Failed to reveal group responses.');
-      }
-    })
-    .catch((error) => {
-      console.error('Error revealing group:', error);
-    });
-  }
-  const resetResponse = async () => {
-    console.log("---response---", response.trim(), response.trim() !== "");
 
-    if (response.trim() !== "") {
-      console.log("push response");
-      const name = figma.currentUser?.name || "User";
-      const photoUrl = figma.currentUser?.photoUrl || null;
-      const timestamp = new Date().toISOString(); // Get the current timestamp
-  
-      const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
-  
-      try {
-        const res = await fetch('https://figjam-widgets.onrender.com/textentrywidget/add-response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-  
-        const result = await res.json();
-  
-        if (res.status === 200) {
-          console.log('Response saved successfully');
-        } else {
-          console.error('Failed to submit data.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+  const resetResponse = async (currentWidgetId: string|null=null) => {
+    let self = false;
+    if (!currentWidgetId) {
+      currentWidgetId = widgetId;
+      self = true;
     }
   
-    setResponse("");  // Clear the response field
-    setSubmitted(false);  // Allow new submissions
-    setShowPrevious(false);  // Hide previous responses if necessary
+    if (self) {
+      setResponse("");  // Clear the response field
+      setSubmitted(false);  // Allow new submissions
+      setShowPrevious(false);  // Hide previous responses if necessary
+    }
   
     try {
       const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget', {
@@ -190,19 +149,41 @@ function Widget() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ widgetId: widgetId ?? "" })
+        body: JSON.stringify({ widgetId: currentWidgetId ?? "" })
       });
   
-      const result = await res.json();
       if (res.status === 200) {
         console.log('Widget reset successfully');
+        return true;
       } else {
         console.error('Failed to reset widget.');
+        return false;
       }
     } catch (error) {
       console.error('Error:', error);
     }
+    return false;
   };
+
+  const handleResetAll = async (group=undefined) => {
+    const widgets: any[] = figma.currentPage.findAll((node: any) => node.type === "WIDGET" && node.name === 'Text Entry Widget');
+    for (const widget of widgets) {
+      if (group && widget.widgetSyncedState.widgetGroup !== group) {
+        continue;
+      }
+      console.log("resetting widget", widget.widgetSyncedState.widgetId);
+      const result = await resetResponse(widget.widgetSyncedState.widgetId);
+      if (result) {
+        widget.setWidgetSyncedState({
+          ...widget.widgetSyncedState, // previous values are overwritten
+          response: "",
+          submitted: false,
+          showPrevious: false
+        });
+      }
+    }
+    figma.ui.postMessage({ type: 'resetAll', group: !!group, status: 'success' });
+  }
   
   
 
@@ -236,7 +217,8 @@ function Widget() {
       const result = await res.json();
   
       if (res.status === 200) {
-        handleRefresh(widgetId ?? "");
+        setPreviousResponses(result.widget.previous);
+        setShowPrevious(result.widget.showPrevious);
       } else {
         console.error('Failed to submit data.');
       }
@@ -290,8 +272,8 @@ function Widget() {
   };
   
 
-  const handleRevealAll = async () => {
-    const data = { widgetId: widgetId ?? "" };
+  const handleRevealAll = async (group=undefined) => {
+    const data = { widgetId: widgetId ?? "", group };
     try {
       const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-all', {
         method: 'POST',
@@ -301,29 +283,31 @@ function Widget() {
         body: JSON.stringify(data)
       });
       if (res.ok) {
-        // reveal all other widgets on board
-        const widgets = figma.currentPage.children.filter(node => node.type === 'WIDGET' && node.name === 'Text Entry Widget') as WidgetNode[];
-        for (const widget of widgets) {
-          console.log("revealing widget", widget.widgetSyncedState.widgetId);
-          const responses = await getRefreshedResponses(widget.widgetSyncedState.widgetId);
-          if (responses !== null) {
-            widget.x = widget.x + 1; // force a re-render
-            widget.setWidgetSyncedState({
-              ...widget.widgetSyncedState, // previous values are overwritten
-              previousResponses: responses.previous,
-              showPrevious: responses.showPrevious
-            });
-          }
-        }
-        figma.ui.postMessage({ type: 'revealAll', status: 'success' });
-        return;
+        console.log('All data revealed successfully.');
       } else {
         console.error('Failed to reveal all data.');
       }
     } catch (error) {
       console.error('Error:', error);
     }
-    figma.ui.postMessage({ type: 'revealAll', status: 'failed' });
+
+    // reveal all other widgets on board
+    const widgets: any[] = figma.currentPage.findAll((node: any) => node.type === "WIDGET" && node.name === 'Text Entry Widget');
+    for (const widget of widgets) {
+      if (group && widget.widgetSyncedState.widgetGroup !== group) {
+        continue;
+      }
+      console.log("revealing widget", widget.widgetSyncedState.widgetId);
+      const responses = await getRefreshedResponses(widget.widgetSyncedState.widgetId);
+      if (responses !== null) {
+        widget.setWidgetSyncedState({
+          ...widget.widgetSyncedState, // previous values are overwritten
+          previousResponses: responses.previous,
+          showPrevious: responses.showPrevious
+        });
+      }
+    }
+    figma.ui.postMessage({ type: 'revealAll', group: !!group, status: 'success' });
   };
 
   const openAdminMenu = () => {
@@ -396,7 +380,7 @@ function Widget() {
       width="fill-parent"
       horizontalAlignItems="center"
       verticalAlignItems="center"
-      onClick={handleSubmit}
+      onClick={() => waitForTask(handleSubmit())}
       effect={{
         type: 'drop-shadow',
         color: '#000000',

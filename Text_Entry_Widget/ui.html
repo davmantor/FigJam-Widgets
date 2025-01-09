@@ -109,54 +109,56 @@
       flex-direction: column;
       margin-bottom: 15px;
       background-color: #f1f1f1;
-      padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #d1d1d1;
       border-radius: 5px;
       margin-bottom: 5px;
     }
+    .response-item > * {
+      padding: 10px;
+    }
     .response-header {
       cursor: pointer;
-      
+      background-color: #e1e1e1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    .response-header .header-text-content {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #888;
+    }
+    .response-header img {
+      width: 24px;
+      height: 24px;
+      background-color: #222;
+      border-radius: 100%;
+      flex-shrink: 0;
     }
     .response-content {
       display: none;
       flex-direction: column;
       margin-bottom: 15px;
     }
-    #widgetIdDisplay {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    #widgetGroupDisplay {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .custom-widget-id-container {
+    .widget-details-container {
       margin-top: 20px;
-    }
-    
-    .custom-widget-id-container label {
-      margin-right: 10px;
-    }
-    
-    .custom-widget-id-container input {
-      width: 200px;
-      margin-right: 10px;
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-start;
+      white-space: nowrap;
     }
 
-    .custom-widget-group-container {
-      margin-top: 20px;
-    }
-    
-    .custom-widget-group-container label {
+    .widget-details-container label {
       margin-right: 10px;
     }
     
-    .custom-widget-group-container input {
-      width: 200px;
+    .widget-details-container input {
       margin-right: 10px;
+      flex-grow: 1;
     }
     
     .shake {
@@ -178,20 +180,45 @@
 <body>
   <div id="passwordScreen">
     <label class="label" for="passwordInput">Enter Password:</label>
-    <input class="input" type="password" id="passwordInput">
+    <input class="input" onkeyup="if (event.key === 'Enter') checkPin()" type="password" id="passwordInput">
     <button class="button" onclick="checkPin()" id="submitPasswordButton">Submit</button>
   </div>
   
   
   <div class="container" id="adminMenu">
     <div class="button-container">
-      <button class="button" id="refreshButton">Refresh</button>
-      <button class="button" id="revealAllButton">Reveal All</button>
-      <button class="button" id="revealOnlyButton">Reveal Only</button> <!-- New Reveal Only Button -->
+      <button class="button" id="refreshButton" onclick="refresh()">Refresh</button>
+      <button class="button" id="revealOnlyButton">Reveal</button> <!-- New Reveal Only Button -->
       <button class="button" id="revealGroupButton">Reveal Group</button>
-      <button class="button danger" id="resetResponseButton">Reset Response</button>
+      <button class="button" id="revealAllButton">Reveal All</button>
+      <button class="button danger" id="resetResponseButton">Reset</button>
+      <button class="button danger" id="resetGroupButton">Reset Group</button>
+      <button class="button danger" id="resetAllButton">Reset All</button>
     </div>
+
+    <div class="widget-details-container">
+      <label for="customWidgetGroupInput">Widget Group:</label>
+      <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
+      <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
+    </div>
+      
+    <div class="widget-details-container">
+      <label for="customWidgetIdInput">Widget ID:</label>
+      <input type="text" id="customWidgetIdInput" width="45ch" class="input" placeholder="Enter Widget ID">
+      <button class="button" id="setWidgetIdButton">Set Widget ID</button>
+    </div>
+
+    <div class="new-response">
+      <h3 style="margin-top: 0">New response</h3>
+      <input class="input input-small" type="text" placeholder="User Name" id="newUserNameInput">
+      <textarea class="input input-large" placeholder="Response" id="newResponseInput"></textarea>
+      <button class="button" id="addResponseButton">Add Response</button>
+      
+    </div>
+    <div id="previousResponsesContainer" class="response-container"></div>
     
+    <h2>Widget appearance</h2>
+
     <div>
       <label class="label" for="widthInput">Dimensions:</label>
       <div class="button-container">
@@ -235,33 +262,6 @@
       <label class="label" for="shadowSpreadInput">Shadow Spread:</label>
       <input class="input" type="number" id="shadowSpreadInput" value="0">
     </div>
-    
-    <div class="new-response">
-      <label class="label" for="newResponseInput">New Response:</label>
-      <textarea class="input input-large" id="newResponseInput"></textarea>
-      <label class="label" for="newUserNameInput">User Name:</label>
-      <input class="input input-small" type="text" id="newUserNameInput">
-      <button class="button" id="addResponseButton">Add Response</button>
-      
-    </div>
-    <div id="previousResponsesContainer" class="response-container"></div>
-
-    <div class="custom-widget-group-container">
-      <label for="customWidgetGroupInput">Set Custom Widget Group:</label>
-      <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
-      <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
-    </div>
-      
-    <div class="custom-widget-id-container">
-      <label for="customWidgetIdInput">Set Custom Widget ID:</label>
-      <input type="text" id="customWidgetIdInput" class="input" placeholder="Enter Widget ID">
-      <button class="button" id="setWidgetIdButton">Set Widget ID</button>
-    </div>
-
-    <div id="widgetGroupDisplay">Widget Group: </div>
-
-    <div id="widgetIdDisplay">Widget ID: </div>
-
   </div>
 
   
@@ -276,7 +276,6 @@
   
   
   <script>
-    const refreshButton = document.getElementById('refreshButton');
     const revealAllButton = document.getElementById('revealAllButton');
     const widthInput = document.getElementById('widthInput');
     const heightInput = document.getElementById('heightInput');
@@ -294,14 +293,25 @@
     const popup = document.getElementById('popup');
     const popupSaveButton = document.getElementById('popupSaveButton');
     const popupCancelButton = document.getElementById('popupCancelButton');
-    const widgetIdDisplay = document.getElementById('widgetIdDisplay');
     const resetResponseButton = document.getElementById('resetResponseButton');
+    const resetAllButton = document.getElementById('resetAllButton');
     const setWidgetIdButton = document.getElementById('setWidgetIdButton');
     const customWidgetIdInput = document.getElementById('customWidgetIdInput');
     const setWidgetGroupButton = document.getElementById('setWidgetGroupButton');
     const customWidgetGroupInput = document.getElementById('customWidgetGroupInput');
-    const widgetGroupDisplay = document.getElementById('widgetGroupDisplay');
     const revealGroupButton = document.getElementById('revealGroupButton');
+    const resetGroupButton = document.getElementById('resetGroupButton');
+
+    const AnonSVG = `<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 256 256" xml:space="preserve">
+<defs>
+</defs>
+<g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+	<path d="M 45 88 c -11.049 0 -21.18 -2.003 -29.021 -8.634 C 6.212 71.105 0 58.764 0 45 C 0 20.187 20.187 0 45 0 c 24.813 0 45 20.187 45 45 c 0 13.765 -6.212 26.105 -15.979 34.366 C 66.181 85.998 56.049 88 45 88 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,214,214); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 60.71 c -11.479 0 -20.818 -9.339 -20.818 -20.817 c 0 -11.479 9.339 -20.818 20.818 -20.818 c 11.479 0 20.817 9.339 20.817 20.818 C 65.817 51.371 56.479 60.71 45 60.71 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 90 c -10.613 0 -20.922 -3.773 -29.028 -10.625 c -0.648 -0.548 -0.88 -1.444 -0.579 -2.237 C 20.034 64.919 31.933 56.71 45 56.71 s 24.966 8.209 29.607 20.428 c 0.301 0.793 0.069 1.689 -0.579 2.237 C 65.922 86.227 55.613 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+</g>
+</svg>`;
+
     let widgetGroup = "None";  // Default group
     let password;
 
@@ -316,7 +326,7 @@
       
       if (customWidgetGroup) {
         widgetGroup = customWidgetGroup;
-        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+        customWidgetGroupInput.value = widgetGroup;
         
         // Send the new group to the server
         fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
@@ -348,12 +358,8 @@
         widgetId = receivedWidgetId;
         widgetGroup = receivedWidgetGroup;
         
-        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
-        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
-    
-        if (params.creationDate) {
-          widgetIdDisplay.innerText += ` | Created: ${params.creationDate}`;
-        }
+        customWidgetIdInput.value = widgetId;
+        customWidgetGroupInput.value = widgetGroup;
     
         fetchPreviousResponses();
         updateParameters(params);
@@ -373,7 +379,7 @@
           // If the group from the database is different from the local one, update it
           if (widgetGroup !== dbGroup) {
             widgetGroup = dbGroup;
-            widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+            customWidgetGroupInput.value = widgetGroup;
             
             // Send an update to the server
             fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
@@ -392,9 +398,28 @@
         .catch(error => {
           console.error('Error refreshing widget data during initialization:', error);
         });
-      } else if (type === 'revealAll') {
-        delete revealAllButton.style.opacity;
-        delete revealAllButton.style.pointerEvents;
+
+      }
+      if (type === 'revealAll') {
+        if (event.data.pluginMessage.group) {
+          revealGroupButton.innerText = 'Reveal Group';
+          revealGroupButton.style.opacity = '';
+          revealGroupButton.style.pointerEvents = '';
+        } else {
+          revealAllButton.innerText = 'Reveal All';
+          revealAllButton.style.opacity = '';
+          revealAllButton.style.pointerEvents = '';
+        }
+      } else if (type === 'resetAll') {
+        if (event.data.pluginMessage.group) {
+          resetGroupButton.innerText = 'Reset Group';
+          resetGroupButton.style.opacity = '';
+          resetGroupButton.style.pointerEvents = '';
+        } else {
+          resetAllButton.innerText = 'Reset All';
+          resetAllButton.style.opacity = '';
+          resetAllButton.style.pointerEvents = '';
+        }
       }
     };
 
@@ -405,7 +430,7 @@
       
       if (customWidgetGroup) {
         widgetGroup = customWidgetGroup;
-        widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+        customWidgetGroupInput.value = widgetGroup;
         
         // Send the new group to the server
         fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/update-group', {
@@ -474,19 +499,32 @@
       };
 
       revealGroupButton.onclick = () => {
-        const customWidgetGroup = widgetGroupDisplay.textContent.replace('Widget Group: ', '').trim();
-        console.log(customWidgetGroup);
+        const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+        revealGroupButton.style.opacity = '0.5';
+        revealGroupButton.style.pointerEvents = 'none';
+        revealGroupButton.innerText = 'Revealing...';
       
         if (customWidgetGroup) {
-          revealGroup(customWidgetGroup);
+          parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: customWidgetGroup } }, '*');
         } else {
           alert('Please enter a valid Widget Group to reveal.');
         }
       };
+
+      resetGroupButton.onclick = () => {
+        const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+        resetGroupButton.style.opacity = '0.5';
+        resetGroupButton.style.pointerEvents = 'none';
+        resetGroupButton.innerText = 'Resetting...';
       
-      function revealGroup(group) {
-        parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: group } }, '*');
-      }
+        if (customWidgetGroup) {
+          parent.postMessage({ pluginMessage: { type: 'resetGroup', widgetGroup: customWidgetGroup } }, '*');
+        } else {
+          alert('Please enter a valid Widget Group to reset.');
+        }
+      };
       
       function revealPreviousResponsesOnly() {
         fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-previous', {
@@ -500,7 +538,7 @@
         .then(data => {
           if (data.status === 'success') {
             console.log('Previous responses revealed for widget:', widgetId);
-            fetchPreviousResponses(); // Optionally fetch the updated responses
+            refresh();
           } else {
             console.error('Failed to reveal previous responses.');
           }
@@ -521,12 +559,17 @@
       const customWidgetId = customWidgetIdInput.value.trim();
       if (customWidgetId) {
         widgetId = customWidgetId;
-        widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
+        customWidgetIdInput.value = widgetId;
         parent.postMessage({ pluginMessage: { type: 'setWidgetId', widgetId: customWidgetId } }, '*');
       } else {
         alert('Please enter a valid Widget ID.');
       }
     };
+
+    function refresh() {
+      parent.postMessage({ pluginMessage: { type: 'refresh', params: { Group: widgetGroup } } }, '*');
+      fetchPreviousResponses();
+    }
     
     
     
@@ -535,14 +578,17 @@
       parent.postMessage({ pluginMessage: { type: 'resetResponse' } }, '*');
     };
 
-    refreshButton.onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'refresh', params: { Group: widgetGroup } } }, '*');
-      fetchPreviousResponses();
+    resetAllButton.onclick = () => {
+      resetAllButton.style.opacity = '0.5';
+      resetAllButton.style.pointerEvents = 'none';
+      resetAllButton.innerText = 'Resetting...'
+      parent.postMessage({ pluginMessage: { type: 'resetAll' } }, '*');
     };
 
     revealAllButton.onclick = () => {
       revealAllButton.style.opacity = '0.5';
       revealAllButton.style.pointerEvents = 'none';
+      revealAllButton.innerText = 'Revealing...';
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
     };
 
@@ -617,43 +663,58 @@
           widgetId = data.widget.widgetId;
           widgetGroup = data.widget.Group || "None";
           previousResponsesContainer.innerHTML = '';
-          widgetIdDisplay.innerText = `Widget ID: ${widgetId}`;
-          widgetGroupDisplay.innerText = `Widget Group: ${widgetGroup}`;
+          customWidgetIdInput.value = widgetId;
+          customWidgetGroupInput.value = widgetGroup;
           data.widget.previous.forEach((response, index) => {
             const responseItem = document.createElement('div');
             responseItem.className = 'response-item';
         
+            // --- HEADER ---
             const responseHeader = document.createElement('div');
             responseHeader.className = 'response-header';
-            responseHeader.innerText = `Response from ${response.userName}`;
             responseHeader.onclick = () => {
               handleUnsavedChanges(index, responseHeader);
             };
-        
+
+            if (response.photoUrl) {
+              const photo = document.createElement('img');
+              photo.src = response.photoUrl;
+              responseHeader.appendChild(photo);
+            } else {
+              const photo = document.createElement('div');
+              photo.innerHTML = AnonSVG;
+              responseHeader.appendChild(photo);
+            }
+
+            const headerText = document.createElement('span');
+            headerText.className = 'header-text';
+            headerText.appendChild(document.createTextNode(response.userName));
+            responseHeader.appendChild(headerText);
+
+            const headerTextContent = document.createElement('span');
+            headerTextContent.className = 'header-text-content';
+            headerTextContent.textContent = response.response;
+            responseHeader.appendChild(headerTextContent);
+
+            // --- CONTENT ---
             const responseContent = document.createElement('div');
             responseContent.className = 'response-content';
-        
-            const userNameLabel = document.createElement('label');
-            userNameLabel.className = 'input-label';
-            userNameLabel.innerText = 'User Name:';
         
             const userNameInput = document.createElement('input');
             userNameInput.className = 'input input-small';
             userNameInput.type = 'text';
             userNameInput.value = response.userName;
+            userNameInput.placeholder = 'User Name';
             userNameInput.oninput = (event) => {
               unsavedUserName = event.target.value;
               unsavedResponse = responseInput.value;
               currentEditingIndex = index;
             };
         
-            const responseLabel = document.createElement('label');
-            responseLabel.className = 'input-label';
-            responseLabel.innerText = 'Response:';
-        
             const responseInput = document.createElement('textarea');
             responseInput.className = 'input input-large';
             responseInput.value = response.response;
+            responseInput.placeholder = 'Response';
             responseInput.oninput = (event) => {
               unsavedResponse = event.target.value;
               unsavedUserName = userNameInput.value;
@@ -688,9 +749,7 @@
               deleteResponse(index);
             }
 
-            responseContent.appendChild(userNameLabel);
             responseContent.appendChild(userNameInput);
-            responseContent.appendChild(responseLabel);
             responseContent.appendChild(responseInput);
             buttonContainer.appendChild(saveButton);
             buttonContainer.appendChild(deleteButton);
@@ -733,7 +792,8 @@
 
     function showResponseContent(responseHeader) {
       const responseContent = responseHeader.nextElementSibling;
-      responseContent.style.display = responseContent.style.display === 'none' ? 'flex' : 'none';
+      console.log("showing")
+      responseContent.style.display = responseContent.style.display === 'flex' ? 'none' : 'flex';
     }
 
     function addResponse(response, userName) {
@@ -771,7 +831,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === 'updated') {
-          fetchPreviousResponses();
+          refresh();
         } else {
           console.error('Failed to update response');
         }
@@ -792,8 +852,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === 'deleted') {
-          parent.postMessage({ pluginMessage: { type: 'refresh', params: { Group: widgetGroup } } }, '*');
-          fetchPreviousResponses();
+          refresh();
         } else {
           console.error('Failed to delete response');
         }
