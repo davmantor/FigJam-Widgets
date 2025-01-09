@@ -471,89 +471,84 @@
     }
     
     var correctPin = "312cmpm15"; // Set your desired PIN here
-      var deleteConfirmation = false;
+    var deleteConfirmation = false;
+    passwordInput.focus();
+    
 
-      function checkPin() {
-        var pin = passwordInput.value;
-        if (pin === correctPin) {
-            passwordScreen.style.display = "none";
-            adminMenu.style.display = "flex";
-        } else {
-            passwordInput.classList.add('shake');
-            passwordInput.style.borderColor = "red";
-            passwordInput.style.borderWidth = "2px"; // Set border thickness to match the original
-      
-            setTimeout(() => {
-                passwordInput.classList.remove('shake');
-                passwordInput.value = '';  // Clear the input field
-                passwordInput.blur();      // Blur the input to remove focus
-                passwordInput.focus();     // Immediately refocus the input
-                passwordInput.style.borderColor = ""; // Reset border color
-            }, 500);  // Match the duration of the shake animation
-        }
+    function checkPin() {
+      var pin = passwordInput.value;
+      if (pin === correctPin) {
+          passwordScreen.style.display = "none";
+          adminMenu.style.display = "flex";
+      } else {
+          passwordInput.classList.add('shake');
+          passwordInput.style.borderColor = "red";
+          passwordInput.style.borderWidth = "2px"; // Set border thickness to match the original
+    
+          setTimeout(() => {
+              passwordInput.classList.remove('shake');
+              passwordInput.value = '';  // Clear the input field
+              passwordInput.blur();      // Blur the input to remove focus
+              passwordInput.focus();     // Immediately refocus the input
+              passwordInput.style.borderColor = ""; // Reset border color
+          }, 500);  // Match the duration of the shake animation
       }
-      
-      
-      revealOnlyButton.onclick = () => {
-        revealPreviousResponsesOnly();
-      };
+    }
+    
+    
+    revealOnlyButton.onclick = () => {
+      revealPreviousResponsesOnly();
+    };
 
-      revealGroupButton.onclick = () => {
-        const customWidgetGroup = customWidgetGroupInput.value.trim();
+    revealGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
 
-        revealGroupButton.style.opacity = '0.5';
-        revealGroupButton.style.pointerEvents = 'none';
-        revealGroupButton.innerText = 'Revealing...';
-      
-        if (customWidgetGroup) {
-          parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: customWidgetGroup } }, '*');
-        } else {
-          alert('Please enter a valid Widget Group to reveal.');
-        }
-      };
-
-      resetGroupButton.onclick = () => {
-        const customWidgetGroup = customWidgetGroupInput.value.trim();
-
-        resetGroupButton.style.opacity = '0.5';
-        resetGroupButton.style.pointerEvents = 'none';
-        resetGroupButton.innerText = 'Resetting...';
-      
-        if (customWidgetGroup) {
-          parent.postMessage({ pluginMessage: { type: 'resetGroup', widgetGroup: customWidgetGroup } }, '*');
-        } else {
-          alert('Please enter a valid Widget Group to reset.');
-        }
-      };
-      
-      function revealPreviousResponsesOnly() {
-        fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-previous', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ widgetId })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            console.log('Previous responses revealed for widget:', widgetId);
-            refresh();
-          } else {
-            console.error('Failed to reveal previous responses.');
-          }
-        })
-        .catch(error => {
-          console.error('Error revealing previous responses:', error);
-        });
+      revealGroupButton.style.opacity = '0.5';
+      revealGroupButton.style.pointerEvents = 'none';
+      revealGroupButton.innerText = 'Revealing...';
+    
+      if (customWidgetGroup) {
+        parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group to reveal.');
       }
-      
+    };
+
+    resetGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+      resetGroupButton.style.opacity = '0.5';
+      resetGroupButton.style.pointerEvents = 'none';
+      resetGroupButton.innerText = 'Resetting...';
     
+      if (customWidgetGroup) {
+        parent.postMessage({ pluginMessage: { type: 'resetGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group to reset.');
+      }
+    };
     
-    
-    
-    
-    
+    function revealPreviousResponsesOnly() {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-previous', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          console.log('Previous responses revealed for widget:', widgetId);
+          refresh();
+        } else {
+          console.error('Failed to reveal previous responses.');
+        }
+      })
+      .catch(error => {
+        console.error('Error revealing previous responses:', error);
+      });
+    }
 
     setWidgetIdButton.onclick = () => {
       const customWidgetId = customWidgetIdInput.value.trim();
@@ -808,7 +803,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === 'added') {
-          fetchPreviousResponses();
+          refresh();
           newResponseInput.value = '';
           newUserNameInput.value = '';
         } else {
