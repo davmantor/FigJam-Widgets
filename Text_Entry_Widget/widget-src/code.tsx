@@ -1,11 +1,11 @@
 const { widget } = figma;
 const { useEffect, useSyncedState, Text, Input, AutoLayout, SVG, Image } = widget;
 
-const AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+const AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
     <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>`;
 
-const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+const AnonSVG = `<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
 <defs>
 </defs>
 <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
@@ -21,7 +21,7 @@ function Widget() {
   const [showPrevious, setShowPrevious] = useSyncedState<boolean>("showPrevious", false);
   const [previousResponses, setPreviousResponses] = useSyncedState<any[]>("previousResponses", []);
   const [widgetId, setWidgetId] = useSyncedState<string | null>("widgetId", null);
-  const [creationDate, setCreationDate] = useSyncedState<string | null>("creationDate", null);
+  const [creationDate, setCreationDate] = useSyncedState<string | null>("creationDate", new Date().toISOString().split('T')[0]); // Format: YYYY-MM-DD
   const [isSubmitting, setIsSubmitting] = useSyncedState<boolean>("isSubmitting", false);
   const [widgetGroup, setWidgetGroup] = useSyncedState<string | null>('widgetGroup', 'None');
 
@@ -55,32 +55,18 @@ function Widget() {
     setScrollIndex((prev) => Math.min(previousResponses.length - 1, prev + 1));
   };
 
-
+  const initializeWidgetId = () => {
+    if (!widgetId) {
+      const newWidgetId = `${figma.widgetId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      setWidgetId(newWidgetId);
+      handleRefresh(newWidgetId);
+    }
+  };
 
   useEffect(() => {
-    console.log("use effect called");
-    const initializeWidgetId = () => {
-      if (!widgetId) {
-        const newWidgetId = `${figma.widgetId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        setWidgetId(newWidgetId);
-        handleRefresh(newWidgetId);
-      }
-    };
-  
     if (widgetId === null) {
       initializeWidgetId();
     }
-
-    if (widgetId != null) {
-      handleRefresh(widgetId);
-    }
-
-    if (!creationDate) {
-      const currentDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-      setCreationDate(currentDate);
-    }
-
-  
     figma.ui.onmessage = (msg) => {
       console.log("Received message:", msg);
       if (msg.type === 'setWidgetGroup') {
@@ -135,8 +121,8 @@ function Widget() {
       if(msg.type === 'revealGroup'){
         revealGroup(msg.widgetGroup);
       }
-    };
-  });
+    }
+    });
   
   function revealGroup(group: string) {
     // Create the data payload with widgetId and group
@@ -174,7 +160,7 @@ function Widget() {
       const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
       try {
-        const res = await fetch('http://figjam-widgets.onrender.com/textentrywidget/add-response', {
+        const res = await fetch('https://figjam-widgets.onrender.com/textentrywidget/add-response', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -260,14 +246,12 @@ function Widget() {
       setIsSubmitting(false); 
     }
   };
-  
-  
 
-  const handleRefresh = async (currentWidgetId: string) => {
-    if (!currentWidgetId) return;
-    console.log("refresh inside", currentWidgetId);
+  const getRefreshedResponses = async (widgetId: string) => {
+    if (!widgetId) return null;
+    console.log("refresh inside", widgetId);
   
-    const data = { widgetId: currentWidgetId };
+    const data = { widgetId };
   
     try {
       const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
@@ -280,16 +264,28 @@ function Widget() {
   
       const result = await res.json();
   
-      if (res.status === 200 && result.widget.previous.length > 0) {
-        setPreviousResponses(result.widget.previous);
-        setShowPrevious(result.widget.showPrevious);
+      if (res.status === 200) {
+        console.log(result)
+        return {previous: result.widget.previous, showPrevious: result.widget.showPrevious};
       } else {
-        // Clear the responses if there are none
-        setPreviousResponses([]);
-        setShowPrevious(false);
+        return null;
       }
     } catch (error) {
       console.error('Error:', error);
+      return null;
+    }
+  }
+  
+  
+
+  const handleRefresh = async (currentWidgetId: string) => {
+    if (!currentWidgetId) return;
+    console.log("refresh inside", currentWidgetId);
+  
+    const responses = await getRefreshedResponses(currentWidgetId);
+    if (responses !== null) {
+      setPreviousResponses(responses.previous);
+      setShowPrevious(responses.showPrevious);
     }
   };
   
@@ -305,15 +301,29 @@ function Widget() {
         body: JSON.stringify(data)
       });
       if (res.ok) {
-        const result = await res.json();
-        setShowPrevious(true);
-        setPreviousResponses(result.widget.previous);
+        // reveal all other widgets on board
+        const widgets = figma.currentPage.children.filter(node => node.type === 'WIDGET' && node.name === 'Text Entry Widget') as WidgetNode[];
+        for (const widget of widgets) {
+          console.log("revealing widget", widget.widgetSyncedState.widgetId);
+          const responses = await getRefreshedResponses(widget.widgetSyncedState.widgetId);
+          if (responses !== null) {
+            widget.x = widget.x + 1; // force a re-render
+            widget.setWidgetSyncedState({
+              ...widget.widgetSyncedState, // previous values are overwritten
+              previousResponses: responses.previous,
+              showPrevious: responses.showPrevious
+            });
+          }
+        }
+        figma.ui.postMessage({ type: 'revealAll', status: 'success' });
+        return;
       } else {
         console.error('Failed to reveal all data.');
       }
     } catch (error) {
       console.error('Error:', error);
     }
+    figma.ui.postMessage({ type: 'revealAll', status: 'failed' });
   };
 
   const openAdminMenu = () => {

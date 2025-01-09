@@ -6,28 +6,24 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
       background-color: #f9f9f9;
       color: #333;
-      padding-bottom: 100px;
-      overflow: hidden; 
-
-
-
+      width: 100%;
+      height: 100%;
     }
     .container {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      width: 950px;
-      height: 400px;
-      padding-bottom: 100px;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
+      padding: 20px;
       overflow: auto;
-      
     }
     .button-container {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: flex-start;
       gap: 10px;
       margin-bottom: 20px;
     }
@@ -45,6 +41,13 @@
     
     .button:hover {
       background-color: #0056b3;
+    }
+
+    .button.danger {
+      background-color: #dc3545;
+    }
+    .button.danger:hover {
+      background-color: #bd2130;
     }
     
     .label {
@@ -90,6 +93,7 @@
       display: none;
     }
     #passwordScreen {
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -104,14 +108,15 @@
       display: flex;
       flex-direction: column;
       margin-bottom: 15px;
-    }
-    .response-header {
-      cursor: pointer;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
       margin-bottom: 5px;
+    }
+    .response-header {
+      cursor: pointer;
+      
     }
     .response-content {
       display: none;
@@ -184,16 +189,16 @@
       <button class="button" id="revealAllButton">Reveal All</button>
       <button class="button" id="revealOnlyButton">Reveal Only</button> <!-- New Reveal Only Button -->
       <button class="button" id="revealGroupButton">Reveal Group</button>
-      <button class="button" id="resetResponseButton">Reset Response</button>
+      <button class="button danger" id="resetResponseButton">Reset Response</button>
     </div>
     
     <div>
-      <label class="label" for="widthInput">Width:</label>
-      <input class="input" type="number" id="widthInput" value="1020">
-    </div>
-    <div>
-      <label class="label" for="heightInput">Height:</label>
-      <input class="input" type="number" id="heightInput" value="235">
+      <label class="label" for="widthInput">Dimensions:</label>
+      <div class="button-container">
+        <input class="input" type="number" id="widthInput" value="1020">
+        <span>x</span>
+        <input class="input" type="number" id="heightInput" value="235">
+      </div>
     </div>
     <div>
       <label class="label" for="borderColorInput">Border Color:</label>
@@ -306,7 +311,6 @@
     let unsavedUserName = null;
     let currentEditingIndex = null;
 
-
     setWidgetGroupButton.onclick = () => {
       const customWidgetGroup = customWidgetGroupInput.value.trim();
       
@@ -336,9 +340,10 @@
     };
     
     window.onmessage = (event) => {
-      const { type, widgetId: receivedWidgetId, widgetGroup: receivedWidgetGroup, params } = event.data.pluginMessage;
+      const type = event.data.pluginMessage.type;
       
       if (type === 'initialize') {
+        const { type, widgetId: receivedWidgetId, widgetGroup: receivedWidgetGroup, params } = event.data.pluginMessage;
         console.log('Received initialize message with params:', receivedWidgetId, receivedWidgetGroup, params);
         widgetId = receivedWidgetId;
         widgetGroup = receivedWidgetGroup;
@@ -387,6 +392,9 @@
         .catch(error => {
           console.error('Error refreshing widget data during initialization:', error);
         });
+      } else if (type === 'revealAll') {
+        delete revealAllButton.style.opacity;
+        delete revealAllButton.style.pointerEvents;
       }
     };
 
@@ -528,11 +536,13 @@
     };
 
     refreshButton.onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'refresh' } }, '*');
+      parent.postMessage({ pluginMessage: { type: 'refresh', params: { Group: widgetGroup } } }, '*');
       fetchPreviousResponses();
     };
 
     revealAllButton.onclick = () => {
+      revealAllButton.style.opacity = '0.5';
+      revealAllButton.style.pointerEvents = 'none';
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
     };
 
@@ -650,10 +660,18 @@
               currentEditingIndex = index;
             };
 
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            buttonContainer.style.marginBottom = '0px';
+
             const saveButton = document.createElement('button');
             saveButton.className = 'button';
+            saveButton.style.flexGrow = '1';
             saveButton.innerText = 'Save';
             saveButton.onclick = () => {
+              // loading state
+              saveButton.parentElement.style.opacity = '0.5';
+              saveButton.parentElement.style.pointerEvents = 'none';
               updateResponse(index, responseInput.value, userNameInput.value);
               unsavedResponse = null;
               unsavedUserName = null;
@@ -661,16 +679,22 @@
             };
 
             const deleteButton = document.createElement('button');
-            deleteButton.className = 'button';
+            deleteButton.className = 'button danger';
             deleteButton.innerText = 'Delete';
-            deleteButton.onclick = () => deleteResponse(index);
+            deleteButton.style.flexGrow = '1';
+            deleteButton.onclick = () => {
+              deleteButton.parentElement.style.opacity = '0.5';
+              deleteButton.parentElement.style.pointerEvents = 'none';
+              deleteResponse(index);
+            }
 
             responseContent.appendChild(userNameLabel);
             responseContent.appendChild(userNameInput);
             responseContent.appendChild(responseLabel);
             responseContent.appendChild(responseInput);
-            responseContent.appendChild(saveButton);
-            responseContent.appendChild(deleteButton);
+            buttonContainer.appendChild(saveButton);
+            buttonContainer.appendChild(deleteButton);
+            responseContent.appendChild(buttonContainer);
 
             responseItem.appendChild(responseHeader);
             responseItem.appendChild(responseContent);
@@ -768,7 +792,8 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === 'deleted') {
-          handleRefresh(widgetId); // Refresh to update the UI
+          parent.postMessage({ pluginMessage: { type: 'refresh', params: { Group: widgetGroup } } }, '*');
+          fetchPreviousResponses();
         } else {
           console.error('Failed to delete response');
         }
