@@ -174,7 +174,7 @@ function Widget() {
       const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
       try {
-        const res = await fetch('http://figjam-widgets.onrender.com/textentrywidget/add-response', {
+        const res = await fetch('http://localhost:4000/textentrywidget/add-response', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -199,7 +199,7 @@ function Widget() {
     setShowPrevious(false);  // Hide previous responses if necessary
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget', {
+      const res = await fetch('http://localhost:4000/textentrywidget/reset-widget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -239,7 +239,7 @@ function Widget() {
     const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/submit', {
+      const res = await fetch('http://localhost:4000/textentrywidget/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -270,7 +270,7 @@ function Widget() {
     const data = { widgetId: currentWidgetId };
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
+      const res = await fetch('http://localhost:4000/textentrywidget/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

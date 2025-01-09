@@ -170,7 +170,7 @@
         const timestamp = (/* @__PURE__ */ new Date()).toISOString();
         const data = { widgetId: widgetId != null ? widgetId : "", response, userName: name, photoUrl, timestamp };
         try {
-          const res = yield fetch("http://figjam-widgets.onrender.com/textentrywidget/add-response", {
+          const res = yield fetch("http://localhost:4000/textentrywidget/add-response", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -191,7 +191,7 @@
       setSubmitted(false);
       setShowPrevious(false);
       try {
-        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget", {
+        const res = yield fetch("http://localhost:4000/textentrywidget/reset-widget", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -224,7 +224,7 @@
       setPreviousResponses((prev) => [{ response, userName: name, photoUrl, timestamp }, ...prev]);
       const data = { widgetId: widgetId != null ? widgetId : "", response, userName: name, photoUrl, timestamp };
       try {
-        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/submit", {
+        const res = yield fetch("http://localhost:4000/textentrywidget/submit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -248,7 +248,7 @@
       console.log("refresh inside", currentWidgetId);
       const data = { widgetId: currentWidgetId };
       try {
-        const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh", {
+        const res = yield fetch("http://localhost:4000/textentrywidget/refresh", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
