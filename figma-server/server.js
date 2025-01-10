@@ -237,9 +237,6 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
       { $set: { showPrevious: false } },
       { new: true }
     );
-    if(widget.current.response){
-      widget.previous.push(widget.current);
-    }
     widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
 
     if (widget) {
@@ -321,16 +318,20 @@ app.post('/textentrywidget/submit', async (req, res) => {
   const { widgetId, response, userName, photoUrl, timestamp } = req.body;
 
   console.log('Received data:', { widgetId, response, userName, photoUrl, timestamp }); // Debugging line
-
   try {
     let widget = await Widget.findOne({ widgetId });
+    console.log(widget);
     if (widget) {
-      widget.previous.push(widget.current);
+      console.log("inside widget");
+      if(widget.current.response){
+        widget.previous.push(widget.current);
+      }
       widget.current = { response, userName, photoUrl, timestamp };
       await widget.save();
       console.log('Updated widget:', widget); // Debugging line
       return res.json({ status: 'updated', widget });
     } else {
+      console.log("new widget");
       widget = new Widget({ widgetId, previous: [], current: { response, userName, photoUrl, timestamp }, showPrevious: false });
       await widget.save();
       console.log('New widget created:', widget); // Debugging line
@@ -384,10 +385,11 @@ app.post('/textentrywidget/reveal-all', async (req, res) => {
 
 app.post('/textentrywidget/add-response', async (req, res) => {
   const { widgetId, response, userName, photoUrl } = req.body;
+  console.log("response", response);
 
   try {
     let widget = await Widget.findOne({ widgetId });
-    if (widget) {
+    if (widget && widget.current.response) {
       widget.previous.push({ response, userName, photoUrl });
       await widget.save();
       return res.json({ status: 'added' });

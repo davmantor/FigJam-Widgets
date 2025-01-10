@@ -144,7 +144,7 @@ function Widget() {
     }
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget', {
+      const res = await fetch('http://localhost:4000/textentrywidget/reset-widget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -206,7 +206,7 @@ function Widget() {
     const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/submit', {
+      const res = await fetch('http://localhost:4000/textentrywidget/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -236,7 +236,7 @@ function Widget() {
     const data = { widgetId };
   
     try {
-      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
+      const res = await fetch('http://localhost:4000/textentrywidget/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
