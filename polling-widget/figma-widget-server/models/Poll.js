@@ -6,6 +6,7 @@ const PollSchema = new mongoose.Schema({
     unique: true,
     default: () => new mongoose.Types.ObjectId().toString(),
   },
+  Group:{type: String,  default: "None"},
   title: {
     type: String,
     required: true,

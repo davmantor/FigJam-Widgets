@@ -192,7 +192,26 @@ app.get('/logs/:logId', async (req, res) => {
     res.status(500).send('Error fetching logs');
   }
 });
+app.post('/polls/update-group', async (req, res) => {
+  const { widgetId, group } = req.body;
 
+  try {
+    const widget = await Widget.findOneAndUpdate(
+      { widgetId },
+      { $set: { Group: group } },
+      { new: true }
+    );
+    
+    if (widget) {
+      return res.json({ status: 'success', widget });
+    } else {
+      return res.status(404).send('Widget not found');
+    }
+  } catch (error) {
+    console.error('Error updating group:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
