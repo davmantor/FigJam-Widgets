@@ -558,8 +558,27 @@ app.put('/polls/:pollId', async (req, res) => {
     return res.status(500).send('Error updating poll');
   }
 });
+app.post('/polls/update-group', async (req, res) => {
+  const { pollId, group } = req.body;
 
+  try {
+    // Find the poll and update its group
+    const poll = await PollModel.findOneAndUpdate(
+      { _id: pollId },
+      { $set: { group } },
+      { new: true } // Return the updated poll
+    );
 
+    if (poll) {
+      return res.json({ status: 'success', poll });
+    } else {
+      return res.status(404).send('Poll not found');
+    }
+  } catch (error) {
+    console.error('Error updating group for poll:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
   
   
 
