@@ -1,23 +1,19 @@
 {
-  "name": "react",
-  "id": "1463258273200914454",
+  "name": "radar",
+  "id": "1464043679168710469",
   "api": "1.0.0",
   "main": "dist/code.js",
-  "ui": {
-    "main": "dist/ui.html"
-  },
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
   "editorType": [
+    "figma",
     "figjam"
   ],
   "permissions": ["currentuser"],
   "containsWidget": true,
   "widgetApi": "1.0.0",
-  "networkAccess": {
-    "allowedDomains": [
-      "none"
-    ]
-  }
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:4000"]}
 }

@@ -496,6 +496,8 @@ function PollingWidget() {
     figma.ui.postMessage({ type: 'current-accentColor',        payload: accentColor });
     figma.ui.postMessage({ type: 'current-widgetId',           payload: logId });
     figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+    figma.ui.postMessage({ type: 'current-pollId',           payload: pollId });
+
     figma.ui.onmessage = async (msg) => {
       if (msg.type === 'update-prompt') {
         console.log("calling prompt from options");

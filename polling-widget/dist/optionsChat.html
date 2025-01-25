@@ -44,6 +44,7 @@
             font-size: 14px;
             
         }
+        
         .icon {
             margin-top: 1px;
             margin-bottom: 1px;
@@ -133,11 +134,51 @@
                 </svg>
                 Accent Color:
             </div> 
+            <div class="widget-details-container">
+                <label for="customWidgetGroupInput">Widget Group:</label>
+                <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
+                <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
+              </div>
 
         </div>
     </div>
 
     <script>
+        let widgetId = null;
+
+
+
+        const setWidgetGroupButton = document.getElementById('setWidgetGroupButton');
+        const customWidgetGroupInput = document.getElementById('customWidgetGroupInput');
+        setWidgetGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+      
+      if (customWidgetGroup) {
+        widgetGroup = customWidgetGroup;
+        customWidgetGroupInput.value = widgetGroup;
+        console.log(widgetId);
+        
+        // Send the new group to the server
+        fetch('http://localhost:4000/polls/update-group', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ widgetId, group: widgetGroup })
+        })
+        .then(() => {
+          console.log("Group updated on the server after button click.");
+        })
+        .catch(error => {
+          console.error('Error updating group after button click:', error);
+        });
+        
+        parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group.');
+      }
+    };
+        let widgetGroup = "None"; 
         window.onmessage = function(event) {
             console.log("called123!");
             var messageType = event.data.pluginMessage.type;
@@ -178,6 +219,10 @@
                         document.getElementById("pinForm").style.display = "none";
                         document.getElementById("adminControls").style.display = "block";
                     }
+                    break;
+                case 'current-pollId':
+                    widgetId = event.data.pluginMessage.payload;
+                    console.log("widgetID", widgetId);
                     break;
             }
         };

@@ -13,6 +13,8 @@ const PollSchema = require('./models/Poll');
 const moment = require('moment');
 const bodyParser = require('body-parser');
 
+const ObjectId = mongoose.Types.ObjectId;
+
 
 mongoose.connect(process.env.MONGODB_URI, { 
   useNewUrlParser: true, 
@@ -452,7 +454,8 @@ app.post('/polls/create', async (req, res) => {
       options,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    });
+      group: group || 'None' 
+    });    
 
     await newPoll.save();
 
@@ -462,6 +465,7 @@ app.post('/polls/create', async (req, res) => {
     });
 
     await newLog.save();
+    console.log(newPoll._id); 
 
     res.status(201).send({ pollId: newPoll._id, logId: newLog._id });
   } catch (error) {
@@ -556,6 +560,55 @@ app.put('/polls/:pollId', async (req, res) => {
   } catch (error) {
     console.error('Error updating poll:', error);
     return res.status(500).send('Error updating poll');
+  }
+});
+app.post('/polls/update-group', async (req, res) => {
+  console.log('body', req.body);
+  const { widgetId, group } = req.body;
+
+  try {
+    // Convert pollId to ObjectId
+    console.log(widgetId);
+    const objectId = new ObjectId(widgetId.toString(16).padStart(24, '0'));
+    console.log(objectId);
+
+
+    const poll = await PollModel.findOneAndUpdate(
+      { _id: objectId }, // Ensure the ID matches
+      { $set: { group } }, // Update the group field
+      { new: true } // Return the updated document
+    );
+
+    if (poll) {
+      console.log('succeeded');
+      return res.json({ status: 'success', poll });
+    } else {
+      console.log('failed');
+      return res.status(404).send('Poll not found');
+    }
+  } catch (error) {
+    console.error('Error updating group for poll:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/polls/group/:group', async (req, res) => {
+  console.log(req.params);
+  const { group } = req.params;
+  console.log(group);
+
+  try {
+    // Fetch polls that match the given group
+    const polls = await PollModel.find({ group: new RegExp(`^${group}$`, 'i') }); // Case-insensitive matching
+
+    if (polls.length === 0) {
+      return res.status(404).send('No polls found for the specified group.');
+    }
+
+    res.status(200).json(polls);
+  } catch (error) {
+    console.error('Error fetching polls by group:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
