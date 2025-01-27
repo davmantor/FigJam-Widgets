@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wordcloud</title>
+  </head>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      text-align: center;
+      padding-right: 20px;
+      overflow: hidden;
+      margin: 0;
+      height: 100%;
+      width: calc(100% - 20px);
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #ccc;
+      font-size: unset;
+      color: black;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #emoji {
+        font-size: 64px;
+    }
+    #emoji-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #emoji-input {
+        width: 100%;
+        flex-grow: 1;
+        padding: 10px;
+        font-size: unset;
+    }
+  </style>
+  <body>
+    <div id="emoji-row">
+        <span id="emoji"></span>
+        <input onchange="updateEmoji()" type="text" placeholder="My reaction..." id="emoji-input" />
+    </div>
+    <script>
+        window.onmessage = (event) => {
+            document.getElementById("emoji").innerText = event.data.pluginMessage.stamp;
+            document.getElementById("emoji-input").value = event.data.pluginMessage.message;
+            document.getElementById("emoji-input").focus();
+        };
+
+        function updateEmoji() {
+            parent.postMessage({ pluginMessage: { type: "textSubmit", value: document.getElementById("emoji-input").value } }, "*");
+        }
+
+    </script>
+</body>
+</html>

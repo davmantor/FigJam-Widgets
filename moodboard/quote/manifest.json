@@ -9,6 +9,7 @@
   "editorType": [
     "figjam"
   ],
+  "ui": "ui.html",
   "containsWidget": true,
   "widgetApi": "1.0.0",
   "networkAccess": {

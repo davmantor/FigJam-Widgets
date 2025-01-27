@@ -47,8 +47,8 @@ function Widget() {
     const frame = figma.createGif(image.hash);
     frame.resize(gif.dims[0], gif.dims[1]);
     figma.currentPage.appendChild(frame);
-    frame.x = node.x + node.width / 2 - frame.width / 2;
-    frame.y = node.y - frame.height - 16;
+    frame.x = node.absoluteTransform[0][2] + node.width / 2 - frame.width / 2;
+    frame.y = node.absoluteTransform[1][2] - frame.height - 16;
   }
 
   const fetchGifUrls = async () => {
