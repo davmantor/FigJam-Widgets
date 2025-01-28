@@ -1,0 +1,21 @@
+{
+  "name": "wordcloud",
+  "id": "1460800419684738181",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "ui": "ui.html",
+  "permissions": ["currentuser"],
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}
