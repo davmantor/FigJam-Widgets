@@ -4,6 +4,7 @@ const {
   useSyncedMap,
   waitForTask,
   useEffect,
+  usePropertyMenu,
   useWidgetNodeId,
   AutoLayout,
   Text,
@@ -32,22 +33,21 @@ function Widget() {
   const [wordcloudImg, setWordcloudImg] = useSyncedState<
     null | WordcloudWord[]
   >("wordcloudImg", null);
-  const [thresholdMet, setThresholdMet] = useSyncedState<boolean>(
-    "thresholdMet",
-    false
-  );
+  const [responsesNeeded, setResponsesNeeded] = useSyncedState<number>("responsesNeeded", MIN_RESPONSES);
+  const [wordsNeeded, setWordsNeeded] = useSyncedState<number>("wordsNeeded", MIN_WORDS);
+  const [timerSeconds, setTimerSeconds] = useSyncedState<number>("timerSeconds", TIMER_SECONDS);
   const [responses, setResponses] = useSyncedState<number>("responses", 0);
   const votes = useSyncedMap<number>("votes");
   const widgetId = useWidgetNodeId();
 
   const openInputMenu = () => {
     const params = {
-      seconds: TIMER_SECONDS,
+      seconds: timerSeconds,
       maxWordsInWordcloud: MAX_WORDS_IN_WORDCLOUD,
       currentUser: figma.currentUser,
     };
 
-    figma.showUI(__html__, { width: 400, height: 400 });
+    figma.showUI(__html__, { width: 400, height: 300 });
     figma.ui.postMessage({ type: "initialize", params });
     return new Promise(() => {});
   };
@@ -87,7 +87,7 @@ function Widget() {
           color: { r: word.color[0] / 255, g: word.color[1] / 255, b: word.color[2] / 255 },
         },
       ];
-      text.lineHeight = { value: text.fontSize, unit: "PIXELS" };
+      text.lineHeight = { value: text.fontSize * 0.9, unit: "PIXELS" };
       text.x = word.x + PADDING;
       text.y = word.y + PADDING;
       text.rotation = word.rotation;
@@ -109,10 +109,10 @@ function Widget() {
   };
 
   const responsesLeft = () => {
-    return Math.max(0, MIN_RESPONSES - responses);
+    return Math.max(0, responsesNeeded - responses);
   };
   const wordsLeft = () => {
-    return Math.max(0, MIN_WORDS - votes.size);
+    return Math.max(0, wordsNeeded - votes.size);
   };
 
   useEffect(() => {
@@ -127,7 +127,6 @@ function Widget() {
       }
       if (msg.type === "words") {
         console.log(votes.entries());
-        setThresholdMet(responsesToGo <= 0 && wordsToGo <= 0);
         figma.ui.postMessage({ type: "words", words: votes.entries() });
       }
       if (msg.type === "wordcloudImage") {
@@ -136,11 +135,72 @@ function Widget() {
         setWordcloudImg(msg.result);
         //figma.closePlugin();
       }
+      if (msg.type === "closeWindow") {
+        figma.closePlugin();
+      }
     };
+  });
+
+  usePropertyMenu([
+    {
+      itemType: 'dropdown',
+      tooltip: 'Responses needed',
+      propertyName: 'responsesNeeded',
+      options: [
+        { option: '1', label: '1 responses' },
+        { option: '2', label: '2 responses' },
+        { option: '3', label: '3 responses' },
+        { option: '4', label: '4 responses' },
+        { option: '5', label: '5 responses' },
+        { option: '10', label: '10 responses' },
+      ],
+      selectedOption: responsesNeeded.toString(),
+    },
+    {
+      itemType: 'dropdown',
+      tooltip: 'Words needed',
+      propertyName: 'wordsNeeded',
+      options: [
+        { option: '5', label: '5 words' },
+        { option: '10', label: '10 words' },
+        { option: '15', label: '15 words' },
+        { option: '20', label: '20 words' },
+        { option: '30', label: '30 words' },
+        { option: '50', label: '50 words' },
+      ],
+      selectedOption: wordsNeeded.toString(),
+    },
+    {
+      itemType: 'dropdown',
+      tooltip: 'Timer',
+      propertyName: 'timer',
+      options: [
+        { option: '10', label: '10 seconds' },
+        { option: '20', label: '20 seconds' },
+        { option: '30', label: '30 seconds' },
+        { option: '45', label: '45 seconds' },
+        { option: '60', label: '60 seconds' },
+        { option: '90', label: '90 seconds' },
+        { option: '120', label: '120 seconds' },
+      ],
+      selectedOption: timerSeconds.toString(),
+    }
+  ], async ({ propertyName, propertyValue }) => {
+    if (!propertyValue) return;
+    if (propertyName === 'responsesNeeded') {
+      setResponsesNeeded(parseInt(propertyValue));
+    }
+    if (propertyName === 'wordsNeeded') {
+      setWordsNeeded(parseInt(propertyValue));
+    }
+    if (propertyName === 'timer') {
+      setTimerSeconds(parseInt(propertyValue));
+    }
   });
 
   const responsesToGo = responsesLeft();
   const wordsToGo = wordsLeft();
+  const thresholdMet = responsesToGo <= 0 && wordsToGo <= 0;
 
   return (
     <AutoLayout
@@ -180,13 +240,13 @@ function Widget() {
           onClick={thresholdMet ? createWordcloud : undefined}
         >
           <Text>{thresholdMet ? "" : "🔒 "}Generate</Text>
-          {!thresholdMet && responsesToGo > 0 && (
+          {(!thresholdMet && responsesToGo > 0) && (
             <Text fontSize={8}>
               Need {responsesToGo} more{" "}
               {responsesToGo === 1 ? "response" : "responses"}
             </Text>
           )}
-          {!thresholdMet && responsesToGo <= 0 && wordsToGo > 0 && (
+          {(!thresholdMet && responsesToGo <= 0 && wordsToGo > 0) && (
             <Text fontSize={8}>
               Need {wordsLeft()} more {wordsToGo === 1 ? "word" : "words"}
             </Text>

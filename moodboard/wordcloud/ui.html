@@ -47,6 +47,10 @@
     h2 {
       max-width: calc(100% - 64px);
     }
+    #wordcloud-entry h2 {
+      margin-top: 0;
+      text-align: left;
+    }
 
     #timer {
       position: absolute;
@@ -68,7 +72,11 @@
       flex-wrap: wrap;
       gap: 10px;
       align-content: flex-start;
-      justify-content: center;
+      justify-content: flex-start;
+      padding: 5px 0;
+    }
+    #word-list span {
+      line-height: 1em;
     }
 
     #give-up {
@@ -131,7 +139,7 @@
       <p>
         Once we have enough responses, we'll generate a word cloud at the end!
       </p>
-      <button onclick="startWordcloud()">Let's go!</button>
+      <button id="start-wordcloud" onclick="startWordcloud()">Let's go!</button>
     </div>
     <div id="wordcloud-entry" style="display: none">
       <h2>Enter words that fit the topic</h2>
@@ -158,7 +166,10 @@
     <div id="wordcloud-end" style="display: none; overflow: hidden">
       <h1 id="result-header">Wordcloud complete!</h1>
       <p id="result-body">You can now close this window.</p>
-      <div id="wordcloud-result" style="opacity: 0"></div>
+      <button id="close-window" onclick="closeWindow()" style="display: none">Close</button>
+      <div style="width: 1px; height: 1px; overflow: hidden">
+        <div id="wordcloud-result" style="opacity: 0"></div>
+      </div>
     </div>
     <script>
       let seconds = 0;
@@ -180,6 +191,7 @@
           seconds = event.data.pluginMessage.params.seconds;
           maxWordsInWordcloud = event.data.pluginMessage.params.maxWordsInWordcloud;
           document.getElementById("seconds").innerText = seconds;
+          document.getElementById("start-wordcloud").focus();
         }
         if (type === "words") {
           console.log(event.data.pluginMessage.words);
@@ -232,6 +244,7 @@
           const wordElement = document.createElement("span");
           wordElement.innerText = word;
           wordList.appendChild(wordElement);
+          wordElement.scrollIntoView();
         }
       }
 
@@ -245,8 +258,13 @@
         parent.postMessage({ pluginMessage: { type: "words" } }, "*");
       }
 
+      function closeWindow() {
+        parent.postMessage({ pluginMessage: { type: "closeWindow" } }, "*");
+      }
+
       async function generateWordcloud(words) {
         console.log("Generating word cloud with words", words);
+        console.log(words)
         const wordCloudElem = document.getElementById("wordcloud-result");
 
         words = words
@@ -288,6 +306,7 @@
             "Wordcloud complete!";
           document.getElementById("result-body").innerText =
             "You can now close this window.";
+          document.getElementById("close-window").style.display = "inline-block";
           parent.postMessage(
             {
               pluginMessage: {
@@ -307,6 +326,7 @@
           fontFamily: "Inter, sans-serif",
           rotateRatio: 0,
           rotationSteps: 2,
+          shrinkToFit: true
         });
       }
     </script>
