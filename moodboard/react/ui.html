@@ -42,7 +42,7 @@
   <body>
     <div id="emoji-row">
         <span id="emoji"></span>
-        <input onchange="updateEmoji()" type="text" placeholder="My reaction..." id="emoji-input" />
+        <input onkeydown="detectEnter()" onchange="updateEmoji()" type="text" placeholder="Add an optional explanation..." id="emoji-input" />
     </div>
     <script>
         window.onmessage = (event) => {
@@ -50,6 +50,12 @@
             document.getElementById("emoji-input").value = event.data.pluginMessage.message;
             document.getElementById("emoji-input").focus();
         };
+
+        function detectEnter() {
+            if (event.key === "Enter") {
+                updateEmoji();
+            }
+        }
 
         function updateEmoji() {
             parent.postMessage({ pluginMessage: { type: "textSubmit", value: document.getElementById("emoji-input").value } }, "*");

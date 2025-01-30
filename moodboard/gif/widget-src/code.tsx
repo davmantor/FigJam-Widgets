@@ -4,6 +4,7 @@ const { AutoLayout, Text, Input, Image, useEffect, useStickable, useWidgetNodeId
 const TENOR_API_KEY = "AIzaSyABOoQRf8M5Al8q_lMfoo3tEgYsUUiY-ik";
 const GIF_PROMPTS = ["yes!!", "hmm", "laugh out loud", "woohoo", "aww", "say what", "dang it", "oh no", "cat dance"];
 const WIDGET_WIDTH = 500;
+const PLACEMENT_OFFSET = 32;
 
 interface TenorGIF {
   url: string;
@@ -47,8 +48,10 @@ function Widget() {
     const frame = figma.createGif(image.hash);
     frame.resize(gif.dims[0], gif.dims[1]);
     figma.currentPage.appendChild(frame);
-    frame.x = node.absoluteTransform[0][2] + node.width / 2 - frame.width / 2;
-    frame.y = node.absoluteTransform[1][2] - frame.height - 16;
+    const xOffset = Math.random() * PLACEMENT_OFFSET - (PLACEMENT_OFFSET / 2);
+    const yOffset = Math.random() * PLACEMENT_OFFSET * -1;
+    frame.x = node.absoluteTransform[0][2] + node.width / 2 - frame.width / 2 + xOffset;
+    frame.y = node.absoluteTransform[1][2] - frame.height - 16 + yOffset;
   }
 
   const fetchGifUrls = async () => {
@@ -95,7 +98,7 @@ function Widget() {
         <Text width={300} fontSize={24} verticalAlignText="center" fill="#ccc">Search Tenor</Text>
       </AutoLayout>
     </AutoLayout>
-    {gifs && (
+    {!!gifs && (
       <AutoLayout spacing={8} direction="horizontal" width="fill-parent" wrap={true} verticalAlignItems="center">
         {gifs.map((gif, i) => (
           <AutoLayout key={i} effect={[{type: "drop-shadow", color: {r: 0, g: 0, b: 0, a: 0.1}, offset: {x: 0, y: 3}, blur: 5}]} hoverStyle={{opacity: 0.6}} onClick={() => waitForTask(createGIF(gif))} width="hug-contents" verticalAlignItems="center">
@@ -104,6 +107,9 @@ function Widget() {
         ))}
       </AutoLayout>)}
     {gifs === null && <Text>Loading GIFs...</Text>}
+    {!!gifs && <AutoLayout padding={8}>
+      <AutoLayout><Text>🔄️ Refresh</Text></AutoLayout>
+    </AutoLayout>}
   </AutoLayout>
   );
 }
