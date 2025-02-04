@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIF Picker</title>
+</head>
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 0;
+    }
+    select, button, textarea, input {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    header {
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
+        padding: 10px;
+        background-color: #eee;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    button {
+        padding: 5px 10px;
+        transition: background-color 0.2s ease-in-out;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #aaa;
+    }
+    button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    #results {
+        margin: 10px;
+        overflow: auto;
+    }
+    #results img {
+        display: block;
+        width: 49%;
+        margin: 0 0 2%;
+        background: #999;
+        float: left;
+        clear: left;
+        height: auto;
+        cursor: pointer;
+        border-radius: 2px;
+        margin-bottom: 5px;
+    }
+    #results img.right {
+        float: right;
+        clear: right;
+    }
+    #results img:hover {
+        transform: scale(1.1);
+        outline: 2px solid #000;
+    }
+</style>
+<body>
+    <header>
+        <input id="search" type="text" style="flex-grow: 1;" placeholder="Search Tenor...">
+        <button id="searchBtn">Search</button>
+    </header>
+    <div id="results"></div>
+
+    <script>
+        function loadMore() {
+            if (!value || loading) return
+            parent.postMessage({ pluginMessage: { type: "search", query: value, next } }, "*");
+        }
+        let value = "";
+        let next = "";
+        // Simple masonry support
+        let leftColumnHeight = 0;
+        let rightColumnHeight = 0;
+        let loading = false;
+        function search() {
+            if (loading) return;
+            value = document.getElementById("search").value;
+            if (!value) return
+            parent.postMessage({ pluginMessage: { type: "search", query: value } }, "*");
+            loading = true;
+        }
+
+        window.onmessage = (event) => {
+            if (event.data.pluginMessage.type === "results") {
+                if (loading) {
+                    // loading only set when loading new query - clear previous results
+                    document.getElementById("results").innerHTML = "";
+                    document.getElementById("results").style.display = "none";
+                    leftColumnHeight = 0;
+                    rightColumnHeight = 0;
+                }
+
+                next = event.data.pluginMessage.next;
+
+                for (let i = 0; i < event.data.pluginMessage.results.length; i++) {
+                    const img = document.createElement("img");
+                    const gif = event.data.pluginMessage.results[i];
+                    img.src = gif.url;
+                    img.style.cursor = "pointer";
+                    img.onclick = () => {
+                        parent.postMessage({ pluginMessage: { type: "select", gif: event.data.pluginMessage.results[i] } }, "*");
+                    };
+                    if (leftColumnHeight > rightColumnHeight) {
+                        img.classList.add('right');
+                        rightColumnHeight += gif.dims[1] / gif.dims[0] * 200;
+                    } else {
+                        leftColumnHeight += gif.dims[1] / gif.dims[0] * 200;
+                    }
+                    document.getElementById("results").appendChild(img);
+                }
+
+                document.getElementById("results").style.display = "block";
+                loading = false;
+            }
+        };
+
+        document.getElementById("searchBtn").onclick = search;
+        document.getElementById("search").onkeydown = (e) => {
+            if (e.key === "Enter") {
+                search();
+            }
+        };
+        document.getElementById("search").focus();
+
+        document.addEventListener("scroll", (e) => {
+            if (document.body.scrollHeight - document.body.scrollTop === document.body.clientHeight) {
+                if (!value || loading) return
+                parent.postMessage({ pluginMessage: { type: "search", query: value, next } }, "*");
+            }
+        })
+    </script>
+</body>
+</html>

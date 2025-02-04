@@ -5,10 +5,15 @@ const {
   useWidgetNodeId,
   useSyncedState,
   useStickable,
+<<<<<<< HEAD
+=======
+  useEffect,
+>>>>>>> main
   usePropertyMenu,
 } = widget;
 
 const REACTIONS = ["😄", "😂", "☹️", "😭", "😡", "🤔", "😱", "💀", "👀", "❗"];
+<<<<<<< HEAD
 
 const adminIcon = `
   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -19,11 +24,17 @@ const adminIcon = `
     </g>
   </svg>
 `;
+=======
+const RANDOM_OFFSET = 32;
+
+const PENCIL_ICON = `<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="var(--figma-color-icon-onbrand-secondary, rgba(255, 255, 255, .8))"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-pencil"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>`;
+>>>>>>> main
 
 function Widget() {
   const widgetId = useWidgetNodeId();
   const [stamp, setStamp] = useSyncedState("stamp", null);
   const [rotation, setRotation] = useSyncedState("rotation", 0);
+<<<<<<< HEAD
   const [author, setAuthor] = useSyncedState("author", null);
   const [message, setMessage] = useSyncedState("message", null);
   const [revealName, setRevealName] = useSyncedState("revealName", false);
@@ -132,6 +143,126 @@ const cloneStamp = async (reaction) => {
     return (
       <AutoLayout
         rotation={rotation}
+=======
+  const [author, setAuthor] = useSyncedState<string | null>("author", null);
+  const [showAuthor, setShowAuthor] = useSyncedState("showAuthor", false);
+  const [message, setMessage] = useSyncedState<string | null>("message", null);
+
+  const cloneStamp = async (reaction: string) => {
+    try {
+      const currentUser = figma.currentUser?.name || "Unknown User";
+
+      // Fetch the widget node asynchronously
+      const node = await figma.getNodeByIdAsync(widgetId);
+      if (node && node.type === "WIDGET") {
+        const clone = node.cloneWidget({
+          stamp: reaction,
+          rotation: Math.random() * 16 - 8,
+          author: currentUser,
+          showAuthor: false,
+          message: message || "",
+        });
+
+        if (clone && node.width) {
+          const index = REACTIONS.indexOf(reaction);
+          // transform absolutely (x and y will use relative transforms to parent, which produces incorrect results)
+          clone.x =
+            node.absoluteTransform[0][2] +
+            (node.width / REACTIONS.length) * index -
+            2 +
+            (Math.random() * RANDOM_OFFSET - RANDOM_OFFSET / 2);
+          clone.y =
+            node.absoluteTransform[1][2] -
+            node.height +
+            (Math.random() * RANDOM_OFFSET - RANDOM_OFFSET / 2);
+        }
+      }
+    } catch (error) {
+      console.error("Error cloning stamp:", error);
+    }
+  };
+
+  if (stamp) {
+    let propertyMenuItems = [
+      {
+        itemType: "toggle",
+        tooltip: "Show Author",
+        propertyName: "showAuthor",
+        isToggled: showAuthor,
+      },
+      {
+        itemType: "separator",
+      },
+      {
+        itemType: "action",
+        tooltip: "Edit Stamp Text",
+        propertyName: "editText",
+        icon: PENCIL_ICON,
+      },
+    ];
+
+    useEffect(() => {
+      console.log("Stamp mounted");
+      try {
+        figma.showUI(__html__, { width: 400, height: 100 });
+        console.log("Stamp mounted 2");
+
+        figma.ui.postMessage({
+          currentUser: figma.currentUser?.name || "Unknown User",
+          author: author || "Unknown Author",
+          stamp: stamp,
+          message: message || "",
+        });
+
+        figma.ui.onmessage = (data) => {
+          if (data.type === "textSubmit") {
+            setMessage(data.value.trim());
+          }
+          figma.closePlugin();
+        };
+      } catch (e) {
+        console.error("Error mounting stamp:", e);
+      }
+    });
+
+    usePropertyMenu(propertyMenuItems, async ({ propertyName }) => {
+      if (author && figma.currentUser?.name !== author) {
+        figma.notify("You can't edit someone else's reaction.");
+        return;
+      }
+      if (propertyName === "editText") {
+        return new Promise((resolve) => {
+          figma.showUI(__html__, { width: 400, height: 100 });
+
+          figma.ui.postMessage({
+            currentUser: figma.currentUser?.name || "Unknown User",
+            author: author || "Unknown Author",
+            stamp: stamp,
+            message: message || "",
+          });
+
+          figma.ui.onmessage = (data) => {
+            if (data.type === "textSubmit") {
+              setMessage(data.value.trim());
+            }
+            figma.closePlugin();
+            resolve();
+          };
+        });
+      } else if (propertyName === "showAuthor") {
+        setShowAuthor(!showAuthor);
+      }
+    });
+
+    useStickable();
+    return (
+      <AutoLayout
+        rotation={
+          message
+            ? rotation / ((Math.min(message.length, 50) + 20) / 25)
+            : rotation
+        }
+>>>>>>> main
         effect={[
           {
             type: "drop-shadow",
@@ -140,6 +271,7 @@ const cloneStamp = async (reaction) => {
             blur: 5,
           },
         ]}
+<<<<<<< HEAD
         spacing={8}
         verticalAlignItems="center"
         padding={{ left: 12, right: 12, top: 8, bottom: 8 }}
@@ -164,6 +296,40 @@ const cloneStamp = async (reaction) => {
             ) : null}
           </AutoLayout>
         ) : null}
+=======
+        verticalAlignItems="center"
+        fill={!!message ? "#f0f0f0" : ""}
+        cornerRadius={{
+          topLeft: 48,
+          topRight: 32,
+          bottomLeft: 48,
+          bottomRight: 32,
+        }}
+      >
+        <Text
+          tooltip={showAuthor ? author || "No author" : undefined}
+          fontSize={48}
+        >
+          {stamp}
+        </Text>
+        {!!message && (
+          <AutoLayout
+            direction="vertical"
+            maxWidth={300}
+            width="hug-contents"
+            padding={{ top: 4, bottom: 4, left: 4, right: 12 }}
+          >
+            <Text fill="#444" width="fill-parent">
+              {message}
+            </Text>
+            {!!author && showAuthor && (
+              <Text fill="#999" fontSize={8} width="fill-parent">
+                {author}
+              </Text>
+            )}
+          </AutoLayout>
+        )}
+>>>>>>> main
       </AutoLayout>
     );
   }
@@ -173,15 +339,24 @@ const cloneStamp = async (reaction) => {
       stroke={{ type: "solid", color: "#85E0A3" }}
       strokeWidth={2}
       cornerRadius={10}
+<<<<<<< HEAD
       minHeight={100}
+=======
+      minHeight={80}
+>>>>>>> main
       fill="#ffffff"
       padding={{ left: 16, right: 16, top: 8, bottom: 8 }}
       spacing={8}
       verticalAlignItems="center"
+<<<<<<< HEAD
       direction="vertical"
     >
       <AutoLayout spacing={8}>
       {REACTIONS.map((reaction, index) => (
+=======
+    >
+      {REACTIONS.map((reaction) => (
+>>>>>>> main
         <AutoLayout
           key={reaction}
           effect={[
@@ -192,6 +367,7 @@ const cloneStamp = async (reaction) => {
               blur: 5,
             },
           ]}
+<<<<<<< HEAD
           onClick={() => {
             if (index === REACTIONS.length - 1) {
               return openSettingsPopup(); // Return promise for settings ⚙️
@@ -199,10 +375,14 @@ const cloneStamp = async (reaction) => {
               cloneStamp(reaction);
             }
           }}
+=======
+          onClick={() => cloneStamp(reaction)}
+>>>>>>> main
           cornerRadius={1000}
           width="hug-contents"
           verticalAlignItems="center"
         >
+<<<<<<< HEAD
           <Text fontSize={emojiSize}>{reaction}</Text>
         </AutoLayout>
       ))}
@@ -212,6 +392,12 @@ const cloneStamp = async (reaction) => {
 
       
     </AutoLayout>
+=======
+          <Text fontSize={36}>{reaction}</Text>
+        </AutoLayout>
+      ))}
+    </AutoLayout>
+>>>>>>> main
   );
 }
 

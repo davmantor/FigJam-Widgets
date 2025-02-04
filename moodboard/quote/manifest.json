@@ -1,0 +1,20 @@
+{
+  "name": "quote",
+  "id": "1445572123776858346",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "ui": "ui.html",
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}

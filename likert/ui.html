@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Likert Scale Widget</title>
+</head>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+  textarea {
+    width: 100%;
+    border-radius: 5px;
+    font-size: 1.5em;
+    height: calc(100% - 100px);
+    font-family: sans-serif;
+    resize: vertical;
+  }
+  select, button, textarea {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .btnrow {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-end;
+    padding-top: 5px;
+  }
+  button {
+    padding: 5px 10px;
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #aaa;
+  }
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  .editQuestion {
+    display: none;
+  }
+</style>
+<body>
+  <div id="ratingWrapper">
+    <label for="rating">My rating:</label>
+    <select id="rating">
+      <option value="1">Strongly Disagree</option>
+      <option value="2">Disagree</option>
+      <option value="3">Neutral</option>
+      <option value="4">Agree</option>
+      <option value="5">Strongly Agree</option>
+    </select>
+    <br>
+  </div>
+  <label for="comment">Comment:</label>
+  <textarea placeholder="Type a comment..." id="comment" rows="4"></textarea>
+  <br>
+  <div class="btnrow">
+    <button id="closeButton">Close</button>
+    <button id="submitButton">Submit</button>
+  </div>
+
+  <script>
+    let currentUser = { photoUrl: "https://via.placeholder.com/20", name: "Anonymous" };
+    let isFreeResponse = false;
+
+    function disableSubmitIfFreeResponse(e) {
+      if (isFreeResponse) {
+        document.getElementById("submitButton").disabled = !e.target.value;
+      }
+    }
+
+    window.onmessage = (event) => {
+      if (event.data.pluginMessage.type === "init" && event.data.pluginMessage.user) {
+        isFreeResponse = event.data.pluginMessage.isFreeResponse;
+        const { type, user, rating, question } = event.data.pluginMessage;
+        currentUser = { photoUrl: user.photoUrl || "https://via.placeholder.com/20", name: user.name || "Anonymous" };
+        if (isFreeResponse) {
+          document.getElementById("ratingWrapper").style.display = "none";
+          document.getElementById("comment").style.height = "calc(100% - 50px)";
+          document.getElementById("comment").addEventListener("input", disableSubmitIfFreeResponse);
+          document.getElementById("submitButton").disabled = true;
+        }
+        document.getElementById("rating").value = rating;
+      }
+    };
+
+    document.getElementById("submitButton").onclick = () => {
+      const comment = document.getElementById("comment").value;
+      if (!comment && isFreeResponse) return;
+      const rating = parseInt(document.getElementById("rating").value);
+      const user = { icon: currentUser.photoUrl, name: currentUser.name };
+
+      parent.postMessage({ pluginMessage: { type: "submitResponse", user, rating, comment } }, "*");
+      parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+    };
+
+    document.getElementById("closeButton").onclick = () => {
+      parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+    };
+  </script>
+</body>
+</html>

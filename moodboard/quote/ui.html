@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wordcloud</title>
+  </head>
+  <style>
+    body {
+      font-family: "Lora", "Inter", sans-serif;
+      text-align: center;
+      padding: 10px;
+      overflow: hidden;
+      margin: 0;
+      height: calc(100% - 20px);
+      width: calc(100% - 20px);
+      background-color: #ffd966;
+
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #fff;
+      border: 1px solid #999;
+      font-size: unset;
+      color: black;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #quote-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    #quote-inner {
+      flex-grow: 1;
+      display: flex;
+      gap: 5px;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .quote {
+      font-family: "Lora", serif;
+      font-size: 64px;
+      line-height: 0;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 10px;
+    }
+    .quote.end {
+      align-items: flex-start;
+      padding-top: 1.25em;
+    }
+    .quote.start {
+      padding-bottom: 2em;
+      align-items: flex-end;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: unset;
+      font-family: unset;
+    }
+    textarea {
+      width: 100%;
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 1em;
+      font-family: unset;
+      resize: none;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <div id="quote-row">
+      <div class="quote start">
+        <span>“</span>
+      </div>
+      <div id="quote-inner">
+        <textarea id="quote" placeholder="My quote..." rows="4"></textarea>
+        <input
+          type="text"
+          id="citation"
+          onkeyup="(e) => detectEnter(e)"
+          placeholder="Author (optional)..."
+        />
+        <div class="btn-row">
+          <button onclick="updateQuote()">Update</button>
+        </div>
+      </div>
+      <div class="quote end">
+        <span>”</span>
+      </div>
+    </div>
+
+    <script>
+      const citation = document.getElementById("citation");
+      const quote = document.getElementById("quote");
+      window.onmessage = (event) => {
+        quote.innerText = event.data.pluginMessage.quote;
+        citation.value = event.data.pluginMessage.citation;
+        citation.onkeydown = (e) => {
+          if (e.key === "Enter") {
+            updateQuote();
+          }
+        };
+        quote.onkeydown = (e) => {
+          if (e.key === "Enter" && e.shiftKey) {
+            e.preventDefault();
+            updateQuote();
+          }
+        }
+        quote.focus();
+      };
+
+      function detectEnter(e) {
+        if (e.key === "Enter") {
+          updateQuote();
+        }
+      }
+
+      function updateQuote() {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "textSubmit",
+              quote: document.getElementById("quote").value,
+              citation: document.getElementById("citation").value,
+            },
+          },
+          "*"
+        );
+      }
+    </script>
+  </body>
+</html>

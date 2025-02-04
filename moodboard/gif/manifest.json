@@ -1,0 +1,21 @@
+{
+  "name": "gif",
+  "id": "1445572433117139179",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://tenor.googleapis.com",
+      "https://media.tenor.com"
+    ]
+  }
+}

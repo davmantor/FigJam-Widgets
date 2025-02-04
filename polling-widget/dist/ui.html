@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Input</title>
+  <style>
+    body {
+     /*font-family: Arial, sans-serif;*/
+      font-family: 'Inter', sans-serif;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    textarea {
+      font-family: 'Inter', sans-serif;
+      width: 350px; /*calc(100% - 20px);  Adjust width to account for padding */
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      resize: none; /* Prevents resizing */
+      height: 150px; /* Increased height for better message visibility */
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007AFF; /* A nice blue */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: 350px;
+    }
+    .back-button {
+      padding: 10px 20px;
+      background-color: #a2a2a2;; /* A nice blue */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: 350px;
+    }
+    button:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+    .back-button:hover {
+      background-color: #8c8c8c; /* Darker blue on hover */
+    }
+
+    button:disabled {
+      background-color: #a2a2a2; /* Gray color */
+    }
+    /* Define the animation */
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Apply the animation to the button text */
+    button.waiting:after {
+      content: " ..."; /* Add ellipsis to indicate waiting */
+      animation: pulse 1s infinite; /* Apply the pulse animation */
+    }
+    
+  </style>
+</head>
+<body>
+  <textarea id="messageInput" placeholder="Type your message here..."></textarea>
+  <button id="sendMessage">Send</button>
+  <button class="back-button" id="backButton">Back</button>
+  <label>
+  
+<div id="anonymousContainer">
+  <label>
+    <input type="checkbox" id="anonymousCheckbox"> Send anonymously
+  </label>
+</div>
+</label>
+  <script>
+    // Handle incoming messages for editing or replying
+    window.onmessage = event => {
+      console.log("INSIDE MODAL MAIN")
+      const { type, payload } = event.data.pluginMessage;
+      if (type === 'edit-message') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'block'; // Show checkbox when editing a message
+      } else if (type === 'edit-prompt') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Prompt'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-borderColor') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Border Color'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-promptColor') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Prompt Color'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-width') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Box Width'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-borderWidth') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Border Width'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-widgetCornerRadius') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Corner Radius'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-barColor') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Bar Color'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-accentColor') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Accent Color'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'edit-widgetId') {
+        console.log("MODAL UPDATE");
+        document.getElementById('messageInput').value = payload; // Pre-fill the textarea with the existing message
+        document.getElementById('sendMessage').innerText = 'Update Widget ID'; // Change button text to indicate update action
+        anonymousContainer.style.display = 'none'; // Hide checkbox when editing a prompt
+      } else if (type === 'reply-message') {
+        console.log("MODAL REPLY");
+        document.getElementById('messageInput').value = ''; // Ensure textarea is clear for reply
+        document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...` // Show reply-to message snippet
+        document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
+        anonymousContainer.style.display = 'block'; // Show checkbox when replying to a message
+      }
+    };
+
+    // Send button click handler
+    document.getElementById('sendMessage').onclick = () => {
+      document.getElementById('sendMessage').disabled = "false";
+      const message = document.getElementById('messageInput').value.trim();
+      const anonymous = document.getElementById('anonymousCheckbox').checked; // Get the checkbox value
+      const actionType = document.getElementById('sendMessage').innerText.includes('Reply') ? 'send-reply' : document.getElementById('sendMessage').innerText === 'Send' ? 'new-message' : 'update-message';
+      parent.postMessage({ pluginMessage: { type: actionType, payload: { message, anonymous } } }, '*'); // Include the anonymous value
+      document.getElementById('sendMessage').disabled = "true";
+      document.getElementById('sendMessage').innerText = 'Please Wait'; // Update button to indicate reply action
+      document.getElementById('sendMessage').classList.add('waiting');
+    };
+
+    document.getElementById('backButton').onclick = () => {
+      console.log("Back button clicked");
+      parent.postMessage({ pluginMessage: { type: 'back-action' } }, '*');
+    };
+    
+    // Cancel button click handler
+    document.getElementById('cancelButton').onclick = () => {
+      console.log("MODAL CANCEL");
+      parent.postMessage({ pluginMessage: { type: 'close-plugin' } }, '*');
+    };
+
+  </script>
+</body>
+</html>
