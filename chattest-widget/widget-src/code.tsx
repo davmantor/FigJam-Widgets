@@ -61,6 +61,8 @@ function ChatWidget() {
    
     
     const [logId, setLogId] = useSyncedState('newMessage', Date.now());
+    const [alwaysAnonymous, setAlwaysAnonymous] = useSyncedState('alwaysAnonymous', false);
+
     
 
    
@@ -214,6 +216,7 @@ function ChatWidget() {
               setIsCrownButtonPressed(false);
               console.log("closed");
 
+
           figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
           resolve(); // Optionally resolve the promise here, since the action is completed
         }
@@ -279,6 +282,7 @@ function ChatWidget() {
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
         const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
         
+<<<<<<< Updated upstream
         const newMessageObject = {
           id: newId,
           parentId: null, // Assuming direct messages have no parent; adjust if implementing replies
@@ -312,6 +316,107 @@ function ChatWidget() {
       
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+=======
+    
+        // Loop through each message and process them similarly to how you'd handle a single message
+        messages.forEach(async (message) => {
+          const enforcedAnonymous = alwaysAnonymous || message.anonymous;
+          // Use defaults or provided values
+          const validatedMessage: Message = {
+            id: message.id || newId,
+            parentId: message.parentId || null,
+            text: message.text || '',
+            sender: message.sender || 'Anonymous',
+            timestamp: message.timestamp ? convertISOToDateTime(message.timestamp) : timestampString,
+            edited: message.edited || false,
+            deleteConfirm: message.deleteConfirm || false,
+            showReplies: message.showReplies || false,
+            pinned: message.pinned || false,
+            deleted: message.deleted || false,
+            upvotedUsers: message.upvotedUsers || [],
+            downvotedUsers: message.downvotedUsers || [],
+            directreply: message.directreply || 0,
+            logId: message.logId || 0,
+            anonymous: enforcedAnonymous,
+            userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
+            };
+    
+          // Add the message to the queue and process it
+          messageQueue.push(validatedMessage);
+          processMessageQueue();
+        });
+    
+        console.log("Bulk messages processed.");
+      } else {
+        // Handle a single message (normal case)
+        const { messageText, anonymous } = messageData as { messageText: string; anonymous: boolean };
+        console.log("anonymous:", anonymous);
+        console.log("messageText:", messageText);
+        console.log("messageData:", messageData);
+    
+        updateUserName();
+    
+        if (messageText.trim() !== '') {
+          const timestamp = Date.now();
+          const randomString = generateRandomString();
+          const newId = `${timestamp}${randomString}${userName}`;
+          console.log(newId);
+    
+          const timestampDate = new Date(timestamp);
+          const hours = timestampDate.getHours();
+          const minutes = timestampDate.getMinutes();
+          const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+          const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+          const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
+          const userIcon = anonymous ? "None" : figma.currentUser ? figma.currentUser.photoUrl : null;
+          const enforcedAnonymous = alwaysAnonymous || anonymous; // Force anonymous if the toggle is on
+
+
+    
+          const newMessageObject: Message = {
+            id: newId,
+            parentId: null,
+            text: messageText.trim(),
+            sender: currentUserName,
+            timestamp: timestampString,
+            edited: false,
+            deleteConfirm: false,
+            showReplies: false,
+            pinned: false,
+            deleted: false,
+            upvotedUsers: [],
+            downvotedUsers: [],
+            directreply: 0,
+            logId: logId,
+            anonymous: enforcedAnonymous,
+            userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
+    };
+          
+    
+          try {
+            console.log('newMessage before sending:', newMessageObject);
+    
+            // Then send the message to the server
+            const response = await fetch(`https://figjam-widgets-myhz.onrender.com/chatwidget/messages`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(newMessageObject),
+            });
+    
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            // Optionally, you can handle the server response if needed
+            const data = await response.json();
+            console.log('Message added successfully:', data);
+          } catch (error) {
+            console.error('Error adding message:', error);
+>>>>>>> Stashed changes
           }
       
           // Optionally, you can handle the server response if needed
@@ -329,6 +434,11 @@ function ChatWidget() {
         processMessageQueue();      
       }
     };
+<<<<<<< Updated upstream
+=======
+    
+    
+>>>>>>> Stashed changes
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
@@ -765,7 +875,116 @@ function ChatWidget() {
                       resolve();
                   }
               };
+<<<<<<< Updated upstream
           });
+=======
+            } else if (msg.type === "delete-message") {
+              handleDeleteMessage(id);
+              setIsCrownButtonPressed(false);
+              resolve();
+            } else if (msg.type === "pin-message") {
+              handlePinMessage(id);
+              setIsCrownButtonPressed(false);
+              resolve();
+            } else if (msg.type === "close-options") {
+              setIsCrownButtonPressed(false);
+              resolve();
+            }
+
+              else if (msg.type === 'toggle-anonymous-mode') {
+                setAlwaysAnonymous(msg.payload);
+              }
+          
+          };
+        });
+      };
+    
+      const getTotalDirectReplies = (messageId: string): number => {
+        const message = messages.filter((msg) => msg.parentId === messageId);
+        return 0; // Customize this logic if needed
+      };
+    
+      // Function to calculate the score (upvotes - downvotes) for a message
+      const calculateScore = (message: Message) => {
+        return message.upvotedUsers.length - message.downvotedUsers.length;
+      };
+    
+      // Sort messages based on pinned status and the sortByVotes toggle
+      let sortedMessages = [...messages].sort((a, b) => {
+        if (a.pinned && !b.pinned) {
+          return -1; // a comes before b because it's pinned
+        }
+        if (!a.pinned && b.pinned) {
+          return 1; // a comes after b because b is pinned
+        }
+        if (sortByVotes) {
+          return calculateScore(b) - calculateScore(a); // Sort by score in descending order if sorting by votes
+        }
+        return 0; // No sorting if sortByVotes is disabled
+      });
+    
+      const filteredMessages = sortedMessages.filter(
+        (message) => message.parentId === parentId
+      );
+    
+      if (filteredMessages.length === 0) {
+        return (
+          <AutoLayout
+            padding={getWidgetValue(30)}
+            direction="vertical"
+            spacing={getWidgetValue(20)}
+            width={getWidgetValue(800)}
+            height={getWidgetValue(250)}
+            horizontalAlignItems={"center"}
+            verticalAlignItems={"center"}
+          >
+            <Text
+              fill="#60666D"
+              fontSize={getWidgetValue(36)}
+              fontWeight={500}
+              lineHeight={getWidgetValue(20.4)}
+            >
+              No messages yet
+            </Text>
+            <Text
+              fill="#8E939A"
+              fontSize={getWidgetValue(24)}
+              lineHeight={getWidgetValue(20.4)}
+            >
+              Send a message with the add message button below.
+            </Text>
+          </AutoLayout>
+        );
+      }
+    
+      return sortedMessages
+        .filter((message) => message.parentId === parentId)
+        .map((message) => (
+          <MessageBubble
+            key={message.id}
+            message={message}
+            onReply={() => handleReplyToMessage(message.id)}
+            onEdit={() => handleEditToMessage(message.id)}
+            onDelete={() => handleDeleteMessage(message.id)}
+            onDeleteConfirm={() => handleDeleteConfirm(message.id)}
+            onShowReplies={() => handleShowReplies(message.id)}
+            replyChain={renderMessages(message.id)}
+            replyToId={replyToId}
+            user={userName}
+            getMessageDepth={getMessageDepth}
+            onPin={handlePinMessage}
+            totalReplies={getTotalReplies(message.id)}
+            onUpvote={() => onUpvote(message.id)}
+            onDownvote={() => onDownvote(message.id)}
+            onOptionsClick={() => handleOptionsClick(message.id)}
+            updateUserName={() => updateUserName()}
+            getTotalDirectReplies={(messageID) => getTotalDirectReplies(message.id)}
+            messageFontSize={messageFontSize}
+            widgetWidth={widgetWidth}
+            widgetButtonColor={widgetButtonColor}
+          />
+        ));
+>>>>>>> Stashed changes
     };
 
 
@@ -865,8 +1084,24 @@ useEffect(()=>{
   figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
   figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
   figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+<<<<<<< Updated upstream
   figma.ui.onmessage = msg => {
     if (msg.type === 'update-prompt') {
+=======
+  figma.ui.postMessage({ type: 'current-anonymous', payload: alwaysAnonymous });
+  figma.ui.onmessage = async (msg) => {
+    console.log('message',msg);
+    if (msg.type === 'load-chats') {
+      console.log("Loading new chats...", msg.messages);
+      const newMessages = msg.messages;
+      console.log("messages", newMessages);
+      await handleAddMessage({ messages: newMessages }, true);
+      const logIdAsNumber = parseInt(msg.logId, 10);
+      setLogId(logIdAsNumber);
+
+      
+    } else if (msg.type === 'update-prompt') {
+>>>>>>> Stashed changes
       console.log("calling prompt from options");
       figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
       figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
@@ -1051,7 +1286,12 @@ useEffect(()=>{
           handleOptionsClickChat();
         }
       };
-    }};
+    } else if (msg.type === 'toggle-anonymous-mode') {
+      console.log("HERE", alwaysAnonymous, msg.payload);
+      setAlwaysAnonymous(msg.payload);
+      console.log("HERE2", alwaysAnonymous,  msg.payload);
+  }
+  };
 }})
 
 const handleOptionsClickChat = () => {
@@ -1275,11 +1515,17 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={getWidgetValue(520)}
             spacing={getWidgetValue(20)}
           >
+<<<<<<< Updated upstream
             {message.userIcon ? ( // Add this block to display the user icon
                             <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
                         ) : (
                             <SVG src="<svg>...<svg>" width={getWidgetValue(30)} height={getWidgetValue(30)} /> // SVG code for question mark icon
                         )}
+=======
+            {!message.anonymous && message.userIcon && message.userIcon !== "None" ? (
+              <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
+            ) : null}
+>>>>>>> Stashed changes
               <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>

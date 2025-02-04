@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar Chart</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      height: 100vh;
+      background-color: #e0f7fa; /* Light blue background */
+    }
+    canvas {
+      max-width: 400px;
+      max-height: 400px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="radarChart"></canvas>
+
+  <script>
+    let radarChart; // Variable to hold the radar chart instance
+
+    // Listen for messages from the Figma widget
+    window.onmessage = (event) => {
+      const { type, payload } = event.data.pluginMessage;
+
+      if (type === 'render-polar-plot') {
+        const polls = payload;
+
+        // Extract labels and data from polls
+        const labels = polls.map((poll) => poll.title);
+        const data = polls.map((poll) => 
+          poll.options.reduce((acc, option, index) => acc + (5 - index) * option.votes, 0)
+        );
+
+        // Render the radar chart
+        renderRadarChart(labels, data);
+      }
+    };
+
+    function renderRadarChart(labels, data) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+
+      if (radarChart) {
+        radarChart.destroy(); // Destroy the previous chart if it exists
+      }
+
+      radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Poll Results',
+            data: data,
+            backgroundColor: 'rgba(0, 255, 0, 0.3)', // Semi-transparent green
+            borderColor: '#32CD32', // Lime green border
+            borderWidth: 2,
+            pointBackgroundColor: '#32CD32', // Lime green points
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#32CD32',
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false, // Hide the legend
+            },
+          },
+          scales: {
+            r: {
+              grid: {
+                color: '#ccc', // Light grey grid lines
+              },
+              angleLines: {
+                color: '#ccc', // Light grey axis lines
+              },
+              pointLabels: {
+                color: '#000', // Black font for labels
+                font: {
+                  size: 14, // Label font size
+                },
+              },
+              ticks: {
+                display: false, // Hide scale numbers
+              },
+            },
+          },
+          animation: {
+            onComplete: () => {
+              // Send the chart to the widget after the animation completes
+              console.log('Animation completed, sending chart to widget');
+              sendChartToWidget();
+            },
+          },
+        },
+      });
+    }
+
+    function sendChartToWidget() {
+        const canvas = document.getElementById('radarChart');
+        const imageUrl = canvas.toDataURL('image/png'); // Convert chart to image URL
+      
+        // Log before sending the chart image
+        console.log('Preparing to send chart image to widget:', imageUrl);
+      
+        // Send the image back to the widget
+        parent.postMessage(
+          { pluginMessage: { type: 'chart-image', payload: imageUrl } },
+          '*'
+        );
+        console.log('Chart image sent to widget.');
+      
+        // Introduce a delay before sending the close UI message
+        setTimeout(() => {
+          console.log('Preparing to send close-ui message to widget.');
+          // Notify widget that UI can be closed
+          parent.postMessage(
+            { pluginMessage: { type: 'close-ui' } },
+            '*'
+          );
+          console.log('Close-ui message sent to widget.');
+        }, 10000); // Delay of 10 seconds
+      }
+      
+      
+      
+      
+      
+  </script>
+</body>
+</html>
