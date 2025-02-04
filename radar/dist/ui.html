@@ -13,143 +13,137 @@
       justify-content: center;
       margin: 0;
       height: 100vh;
-      background-color: #e0f7fa;
+      background-color: #e0f7fa; /* Light blue background */
     }
     canvas {
       max-width: 400px;
       max-height: 400px;
     }
-    .admin-panel {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      font-size: 12px;
-      margin-top: 6px;
-    }
-    input {
-      width: 100%;
-      padding: 4px;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  
-  <!-- Admin Menu -->
-  <div class="admin-panel">
-    <label>Chart Title</label>
-    <input type="text" id="chartTitle" placeholder="Enter chart title" />
-
-    <label>Point Labels</label>
-    <input type="text" id="pointLabels" placeholder="Comma-separated labels" />
-
-    <label>Width</label>
-    <input type="number" id="chartWidth" value="400" />
-
-    <label>Height</label>
-    <input type="number" id="chartHeight" value="400" />
-
-    <label>Title Font Size</label>
-    <input type="number" id="titleFontSize" value="16" />
-
-    <label>Body Font Size</label>
-    <input type="number" id="bodyFontSize" value="12" />
-
-    <label>Chart Color</label>
-    <input type="color" id="chartColor" value="#32CD32" />
-
-    <button onclick="applySettings()">Apply Settings</button>
-  </div>
-
   <canvas id="radarChart"></canvas>
 
   <script>
-    let radarChart;
-    
+    let radarChart; // Variable to hold the radar chart instance
+    let chartTitle = "Poll Results"; // Default title
+    let chartColor = "#32CD32"; // Default color (Lime Green)
+    let titleFontSize = 16; // Default title font size
+
+    // Listen for messages from the Figma widget
     window.onmessage = (event) => {
       const { type, payload } = event.data.pluginMessage;
 
       if (type === 'render-polar-plot') {
-        const polls = payload;
+        const polls = payload.sanitizedPolls;
+        console.log('polls', payload);
 
+        // Extract labels and data from polls
         const labels = polls.map((poll) => poll.title);
-        const data = polls.map((poll) =>
+        const data = polls.map((poll) => 
           poll.options.reduce((acc, option, index) => acc + (5 - index) * option.votes, 0)
         );
 
-        renderRadarChart(labels, data);
+        // Get settings from Figma plugin
+        chartTitle = payload.chartTitle || chartTitle;
+        chartColor = payload.chartColor || chartColor;
+        titleFontSize = payload.titleFontSize || titleFontSize;
+
+        // Render the radar chart with new settings
+        renderRadarChart(labels, data, chartTitle, chartColor, titleFontSize);
       }
     };
 
-    function renderRadarChart(labels, data) {
+    function renderRadarChart(labels, data, title, color, fontSize) {
       const ctx = document.getElementById('radarChart').getContext('2d');
-
+    
       if (radarChart) {
-        radarChart.destroy();
+        radarChart.destroy(); // Destroy the previous chart if it exists
       }
-
-      const chartTitle = document.getElementById("chartTitle").value || "Poll Results";
-      const chartColor = document.getElementById("chartColor").value || "#32CD32";
-      const width = document.getElementById("chartWidth").value || 400;
-      const height = document.getElementById("chartHeight").value || 400;
-      const titleFontSize = document.getElementById("titleFontSize").value || 16;
-      const bodyFontSize = document.getElementById("bodyFontSize").value || 12;
-      const pointLabels = document.getElementById("pointLabels").value.split(",").map(x => x.trim());
-
-      document.getElementById("radarChart").width = width;
-      document.getElementById("radarChart").height = height;
-
+    
       radarChart = new Chart(ctx, {
         type: 'radar',
         data: {
-          labels: labels.length === pointLabels.length ? pointLabels : labels,
+          labels: labels,
           datasets: [{
-            label: chartTitle,
+            label: '', // Set an empty label to avoid duplication in the legend
             data: data,
-            backgroundColor: `${chartColor}40`, 
-            borderColor: chartColor,
+            backgroundColor: color + "55", // Semi-transparent background color
+            borderColor: color, // Line color
             borderWidth: 2,
-            pointBackgroundColor: chartColor,
+            pointBackgroundColor: color,
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: chartColor,
+            pointHoverBorderColor: color,
           }]
         },
         options: {
           responsive: true,
           plugins: {
             legend: {
-              display: false,
+              display: false, // Hide the legend to avoid duplication
             },
             title: {
               display: true,
-              text: chartTitle,
-              font: { size: parseInt(titleFontSize) },
-            }
+              text: title,
+              color: "#000", // Title text color
+              font: {
+                size: fontSize, // Set the title font size
+                weight: "bold",
+              },
+            },
           },
           scales: {
             r: {
+              grid: {
+                color: '#ccc', // Light grey grid lines
+              },
+              angleLines: {
+                color: '#ccc', // Light grey axis lines
+              },
               pointLabels: {
-                font: { size: parseInt(bodyFontSize) }
-              }
-            }
-          }
-        }
+                color: '#000', // Black font for labels
+                font: {
+                  size: fontSize - 2, // Slightly smaller font size for point labels
+                },
+              },
+              ticks: {
+                display: false, // Hide scale numbers
+              },
+            },
+          },
+          animation: {
+            onComplete: () => {
+              console.log('Animation completed, sending chart to widget');
+              sendChartToWidget();
+            },
+          },
+        },
       });
     }
-
-    function applySettings() {
-      renderRadarChart(radarChart.data.labels, radarChart.data.datasets[0].data);
+    
+    function sendChartToWidget() {
+        const canvas = document.getElementById('radarChart');
+        const imageUrl = canvas.toDataURL('image/png'); // Convert chart to image URL
+      
+        console.log('Preparing to send chart image to widget:', imageUrl);
+      
+        // Send the image back to the widget
+        parent.postMessage(
+          { pluginMessage: { type: 'chart-image', payload: imageUrl } },
+          '*'
+        );
+      
+        // Introduce a delay before sending the close UI message
+        setTimeout(() => {
+          console.log('Sending close-ui message to widget.');
+          parent.postMessage(
+            { pluginMessage: { type: 'close-ui' } },
+            '*'
+          );
+        }, 10000); // Delay of 10 seconds
     }
   </script>
-
 </body>
 </html>

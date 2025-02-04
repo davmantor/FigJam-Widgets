@@ -354,17 +354,11 @@ function ChatWidget() {
         const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
         const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
-<<<<<<< HEAD
         
     
         // Loop through each message and process them similarly to how you'd handle a single message
         messages.forEach(async (message) => {
           const enforcedAnonymous = alwaysAnonymous || message.anonymous;
-=======
-    
-        // Loop through each message and process them similarly to how you'd handle a single message
-        messages.forEach(async (message) => {
->>>>>>> main
           // Use defaults or provided values
           const validatedMessage: Message = {
             id: message.id || newId,
@@ -381,15 +375,9 @@ function ChatWidget() {
             downvotedUsers: message.downvotedUsers || [],
             directreply: message.directreply || 0,
             logId: message.logId || 0,
-<<<<<<< HEAD
             anonymous: enforcedAnonymous,
             userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
             };
-=======
-            anonymous: message.anonymous || false,
-            userIcon: message.userIcon || "",
-          };
->>>>>>> main
     
           // Add the message to the queue and process it
           messageQueue.push(validatedMessage);
@@ -421,13 +409,9 @@ function ChatWidget() {
           const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
           const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
           const userIcon = anonymous ? "None" : figma.currentUser ? figma.currentUser.photoUrl : null;
-<<<<<<< HEAD
           const enforcedAnonymous = alwaysAnonymous || anonymous; // Force anonymous if the toggle is on
 
 
-=======
-
->>>>>>> main
     
           const newMessageObject: Message = {
             id: newId,
@@ -444,16 +428,10 @@ function ChatWidget() {
             downvotedUsers: [],
             directreply: 0,
             logId: logId,
-<<<<<<< HEAD
             anonymous: enforcedAnonymous,
             userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
     };
           
-=======
-            userIcon: userIcon,
-            anonymous: anonymous,
-          };
->>>>>>> main
     
           try {
             console.log('newMessage before sending:', newMessageObject);
@@ -487,10 +465,7 @@ function ChatWidget() {
       }
     };
     
-<<<<<<< HEAD
     
-=======
->>>>>>> main
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
@@ -909,14 +884,11 @@ function ChatWidget() {
               setIsCrownButtonPressed(false);
               resolve();
             }
-<<<<<<< HEAD
 
               else if (msg.type === 'toggle-anonymous-mode') {
                 setAlwaysAnonymous(msg.payload);
               }
           
-=======
->>>>>>> main
           };
         });
       };
@@ -1043,13 +1015,9 @@ useEffect(()=>{
   figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
   figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
   figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
-<<<<<<< HEAD
   figma.ui.postMessage({ type: 'current-anonymous', payload: alwaysAnonymous });
   figma.ui.onmessage = async (msg) => {
     console.log('message',msg);
-=======
-  figma.ui.onmessage = async (msg) => {
->>>>>>> main
     if (msg.type === 'load-chats') {
       console.log("Loading new chats...", msg.messages);
       const newMessages = msg.messages;
@@ -1507,17 +1475,9 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={getWidgetValue(490)}
             spacing={getWidgetValue(20)}
           >
-<<<<<<< HEAD
             {!message.anonymous && message.userIcon && message.userIcon !== "None" ? (
               <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
             ) : null}
-=======
-            {message.userIcon && message.userIcon !== "None" ? (
-                  <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
-                ) : (
-                  <SVG src={AnonSVG} width={getWidgetValue(40)} height={getWidgetValue(40)} />
-                )}
->>>>>>> main
               <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
