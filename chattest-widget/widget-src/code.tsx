@@ -21,6 +21,26 @@ type Message = {
 
 };
 
+const defaultMessage: Message = {
+  id: '', // Default to an empty string
+  parentId: null, // Default to null
+  text: '', // Default to an empty string
+  sender: 'Anonymous', // Default to 'Anonymous'
+  timestamp: new Date().toISOString(), // Default to the current time in ISO format
+  edited: false, // Default to false
+  deleteConfirm: false, // Default to false
+  showReplies: false, // Default to false
+  pinned: false, // Default to false
+  deleted: false, // Default to false
+  upvotedUsers: [], // Default to an empty array
+  downvotedUsers: [], // Default to an empty array
+  directreply: 0, // Default to 0
+  logId: 0, // Default to 0
+  anonymous: false, // Default to false
+  userIcon: null // Default to null
+};
+
+
 
 type MessageBubbleProps = {
     message: Message;
@@ -54,6 +74,16 @@ function generateLogId() {
 let alreadyLoggedIn = false;
 const thenFlag = false;
 const curr_config = "";
+
+const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+<defs>
+</defs>
+<g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+	<path d="M 45 88 c -11.049 0 -21.18 -2.003 -29.021 -8.634 C 6.212 71.105 0 58.764 0 45 C 0 20.187 20.187 0 45 0 c 24.813 0 45 20.187 45 45 c 0 13.765 -6.212 26.105 -15.979 34.366 C 66.181 85.998 56.049 88 45 88 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,214,214); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 60.71 c -11.479 0 -20.818 -9.339 -20.818 -20.817 c 0 -11.479 9.339 -20.818 20.818 -20.818 c 11.479 0 20.817 9.339 20.817 20.818 C 65.817 51.371 56.479 60.71 45 60.71 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 90 c -10.613 0 -20.922 -3.773 -29.028 -10.625 c -0.648 -0.548 -0.88 -1.444 -0.579 -2.237 C 20.034 64.919 31.933 56.71 45 56.71 s 24.966 8.209 29.607 20.428 c 0.301 0.793 0.069 1.689 -0.579 2.237 C 65.922 86.227 55.613 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+</g>
+</svg>`;
 
 function ChatWidget() {
     //console.log("ChatWidget rendered2");
@@ -90,6 +120,13 @@ function ChatWidget() {
     const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState('widgetCornerRadius', 10);
     
     const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
+    const [sortByVotes, setSortByVotes] = useSyncedState<boolean>('sortByVotes', false);
+
+    // Toggle sorting by votes
+    const handleSortByVotesToggle = () => {
+      setSortByVotes(!sortByVotes);
+    };
+
 
 
     function getWidgetValue(input: number): number {
@@ -97,6 +134,32 @@ function ChatWidget() {
       const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
       return Math.floor(input * scalingRatio); // Scale the input value by the ratio
     }
+
+    function convertISOToDateTime(isoString: string): string {
+      // Create a new Date object from the ISO string
+      const date = new Date(isoString);
+    
+      // Extract the components of the date and time
+      const year = date.getFullYear();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()]; // Get the abbreviated month name
+      const day = date.getDate();
+      const hours = date.getHours();
+      const minutes = padWithZero(date.getMinutes());
+    
+      // Convert the time to 12-hour format
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+    
+      // Return the formatted date and time string (e.g., "Sep 09, 2024 12:52 PM")
+      return `${month} ${day}, ${year} ${formattedHours}:${minutes} ${ampm}`;
+    }
+    
+    // Helper function to pad single digit numbers with a leading zero
+    function padWithZero(number: number): string {
+      return number < 10 ? '0' + number : number.toString();
+    }
+    
 
     //const scale = 1.5; // Example scale factor
     const plus = `<svg width="${getWidgetValue(28)}px" height="${getWidgetValue(28)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
@@ -115,6 +178,7 @@ function ChatWidget() {
     </g>
     </svg>`;
 
+
     const delete1 = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
 
     const deleteNO = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 12L14 16M14 12L10 16M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
@@ -123,52 +187,61 @@ function ChatWidget() {
     const pin = `<svg width="${getWidgetValue(35)}px" height="${getWidgetValue(35)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.1218 1.87023C15.7573 0.505682 13.4779 0.76575 12.4558 2.40261L9.61062 6.95916C9.61033 6.95965 9.60913 6.96167 9.6038 6.96549C9.59728 6.97016 9.58336 6.97822 9.56001 6.9848C9.50899 6.99916 9.44234 6.99805 9.38281 6.97599C8.41173 6.61599 6.74483 6.22052 5.01389 6.87251C4.08132 7.22378 3.61596 8.03222 3.56525 8.85243C3.51687 9.63502 3.83293 10.4395 4.41425 11.0208L7.94975 14.5563L1.26973 21.2363C0.879206 21.6269 0.879206 22.26 1.26973 22.6506C1.66025 23.0411 2.29342 23.0411 2.68394 22.6506L9.36397 15.9705L12.8995 19.5061C13.4808 20.0874 14.2853 20.4035 15.0679 20.3551C15.8881 20.3044 16.6966 19.839 17.0478 18.9065C17.6998 17.1755 17.3043 15.5086 16.9444 14.5375C16.9223 14.478 16.9212 14.4114 16.9355 14.3603C16.9421 14.337 16.9502 14.3231 16.9549 14.3165C16.9587 14.3112 16.9606 14.31 16.9611 14.3098L21.5177 11.4645C23.1546 10.4424 23.4147 8.16307 22.0501 6.79853L17.1218 1.87023ZM14.1523 3.46191C14.493 2.91629 15.2528 2.8296 15.7076 3.28445L20.6359 8.21274C21.0907 8.66759 21.0041 9.42737 20.4584 9.76806L15.9019 12.6133C14.9572 13.2032 14.7469 14.3637 15.0691 15.2327C15.3549 16.0037 15.5829 17.1217 15.1762 18.2015C15.1484 18.2752 15.1175 18.3018 15.0985 18.3149C15.0743 18.3316 15.0266 18.3538 14.9445 18.3589C14.767 18.3699 14.5135 18.2916 14.3137 18.0919L5.82846 9.6066C5.62872 9.40686 5.55046 9.15333 5.56144 8.97583C5.56651 8.8937 5.58877 8.84605 5.60548 8.82181C5.61855 8.80285 5.64516 8.7719 5.71886 8.74414C6.79869 8.33741 7.91661 8.56545 8.68762 8.85128C9.55668 9.17345 10.7171 8.96318 11.3071 8.01845L14.1523 3.46191Z" fill="#0F0F0F"></path> </g></svg>`
     const edit = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#000000"></path> </g></svg>`
 
-  function openMessageInputModal(event:any): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
-  
-      figma.ui.onmessage = async (msg) => {
-        if (msg.type === 'new-message') {
-          const { message, anonymous } = msg.payload; // Destructure the payload
-
-          // Record the start time
-          const startTime = new Date().getTime();
-          console.log(startTime);
-          console.log("this is the start time");
-      
-          // Set a timeout to show the message after 5 seconds
-          const timeoutId = setTimeout(() => {
-            figma.showUI(`
-              <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
-                  <h4 style="color: #333;">Message is being sent</h2>
-                  <p style="color: #666;">Please wait, server is booting up...</p>
-              </div>
-          `);
-          }, 5000);
-      
-          await handleAddMessage({ messageText: message, anonymous: anonymous });
-      
-          // Clear the timeout if the operation completes before 5 seconds
-          clearTimeout(timeoutId);
-      
-          const endTime = new Date().getTime();
-      
-          // Calculate the duration
-          const duration = endTime - startTime;
-          console.log(`The operation took ${duration} milliseconds.`);
-      
-          resolve();
-        } else if (msg.type === 'close-plugin') {
-          setIsCrownButtonPressed(false);
-          figma.closePlugin();
-          resolve();
-        } else if (msg.type === 'back-action') {
-          setIsCrownButtonPressed(false);
-          reject('New message canceled by user.');
-        }
-      };
-    });
-  }
+    function openMessageInputModal(event: any): Promise<void> {
+      return new Promise<void>(async (resolve, reject) => {
+        figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
+    
+        figma.ui.onmessage = async (msg) => {
+          if (msg.type === 'new-message') {
+            const { message, anonymous } = msg.payload; // Destructure the payload
+    
+            // Record the start time
+            const startTime = new Date().getTime();
+            console.log(startTime);
+            console.log("this is the start time");
+    
+            // Set a timeout to show the message after 5 seconds
+            const timeoutId = setTimeout(() => {
+              figma.showUI(`
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                    <h4 style="color: #333;">Message is being sent</h2>
+                    <p style="color: #666;">Please wait, server is booting up...</p>
+                </div>
+            `);
+            }, 5000);
+    
+            // Handle single message
+            await handleAddMessage({ messageText: message, anonymous: anonymous });
+    
+            // Clear the timeout if the operation completes before 5 seconds
+            clearTimeout(timeoutId);
+    
+            const endTime = new Date().getTime();
+    
+            // Calculate the duration
+            const duration = endTime - startTime;
+            console.log(`The operation took ${duration} milliseconds.`);
+    
+            resolve();
+          } else if (msg.type === 'bulk-load-messages') {
+            const { messages } = msg.payload;
+    
+            // Handle bulk loading of messages
+            await handleAddMessage({ messages }, true); // Set isBulkLoad to true
+    
+            resolve();
+          } else if (msg.type === 'close-plugin') {
+            setIsCrownButtonPressed(false);
+            figma.closePlugin();
+            resolve();
+          } else if (msg.type === 'back-action') {
+            setIsCrownButtonPressed(false);
+            reject('New message canceled by user.');
+          }
+        };
+      });
+    }
+    
     function delay(ms: number) {
       const rand = ms * 70 * Math.random();
       return new Promise( resolve => setTimeout(resolve, ms) );
@@ -258,20 +331,20 @@ function ChatWidget() {
 
     
     
-    const handleAddMessage = async (messageData: { messageText: string, anonymous: boolean }) => {
-      const { messageText, anonymous } = messageData;
-      console.log("anonymous:", anonymous);
-      console.log("messageText:", messageText);
-      console.log("messageData:", messageData);
-      const count = 10;
-
-      updateUserName();
-    
-      if (messageText.trim() !== '') {
+    const handleAddMessage = async (
+      messageData: { messageText: string; anonymous: boolean } | { messages: Partial<Message>[] }, // Handle either single message or array of messages
+      isBulkLoad: boolean = false // Flag to differentiate between single and bulk load
+    ) => {
+      // If it's a bulk load, handle multiple messages
+      console.log("outside");
+      if (isBulkLoad && "messages" in messageData) {
+        console.log("inside bulk load");
+        const { messages } = messageData;
         const timestamp = Date.now();
         const randomString = generateRandomString();
         const newId = `${timestamp}${randomString}${userName}`;
         console.log(newId);
+    
         const timestampDate = new Date(timestamp);
         const hours = timestampDate.getHours();
         const minutes = timestampDate.getMinutes();
@@ -282,41 +355,6 @@ function ChatWidget() {
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
         const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
         
-<<<<<<< Updated upstream
-        const newMessageObject = {
-          id: newId,
-          parentId: null, // Assuming direct messages have no parent; adjust if implementing replies
-          text: messageText.trim(),
-          sender: currentUserName,
-          timestamp: timestampString,
-          edited: false, // New messages are not edited at creation
-          deleteConfirm: false, // Initial state for deletion confirmation
-          showReplies: false, // Initial state for showing replies
-          pinned: false, // Initial pinned state
-          deleted: false, // Initial deletion state
-          upvotedUsers: [], // Initial upvote state
-          downvotedUsers: [], // Initial downvote state
-          directreply: 0,
-          logId: logId, // Include the logId in each message
-          userIcon: userIcon,
-          anonymous: anonymous
-        };
-        try {
-          // Add the message to the state first
-          console.log('newMessage before sending:', newMessageObject);
-
-          // Then send the message to the server
-          const response = await fetch(`https://figjam-widgets.onrender.com/messages`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newMessageObject),
-          });
-      
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-=======
     
         // Loop through each message and process them similarly to how you'd handle a single message
         messages.forEach(async (message) => {
@@ -416,29 +454,18 @@ function ChatWidget() {
             console.log('Message added successfully:', data);
           } catch (error) {
             console.error('Error adding message:', error);
->>>>>>> Stashed changes
           }
-      
-          // Optionally, you can handle the server response if needed
-          const data = await response.json();
-          console.log('Message added successfully:', data);
-        } catch (error) {
-          console.error('Error adding message:', error);
-          // Optionally, handle the error (e.g., show a notification to the user)
+    
+          messageQueue.push(newMessageObject);
+          delay(10000);
+    
+          // Call the function to process the queue
+          processMessageQueue();
         }
-        
-        messageQueue.push(newMessageObject);
-        delay(10000);
-
-        // Call the function to process the queue
-        processMessageQueue();      
       }
     };
-<<<<<<< Updated upstream
-=======
     
     
->>>>>>> Stashed changes
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
           if (message.id === id) {
@@ -721,163 +748,130 @@ function ChatWidget() {
       }));
     };
 
-
-
     const renderMessages = (parentId: string | null = null) => {
-
-      //console.log('render')
+      // State to keep track of whether sorting by votes is enabled
+      // const [sortByVotes, setSortByVotes] = useSyncedState<boolean>('sortByVotes', false);
+    
+      // // Toggle sorting by votes
+      // const handleSortByVotesToggle = () => {
+      //   setSortByVotes(!sortByVotes); // Toggle the state
+      // };
+    
       // Function to calculate the total number of replies for a message
       const getTotalReplies = (messageId: string): number => {
         return messages.filter((message) => message.parentId === messageId).length;
       };
-
-
+    
       const handleOptionsClick = (id: string) => {
-        // Here you can add logic to check if the user is authorized
-        // For example, let's assume you have a function `isUserAuthorized` that checks this
+        // Logic for handling options when clicked
         updateUserName();
-        console.log("in options:" , userName);
-            return new Promise<void>((resolve, reject) => {
-              figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
-  
-              // Listen for messages from the options.html iframe
-              figma.ui.onmessage = msg => {
-                  if (msg.type === 'edit-message') {
-                    console.log("calling edit from options");
-                      // Handle edit message action
-                      const messageToEdit = messages.find(message => message.id === id);
-                      if (messageToEdit && !messageToEdit.deleted) {
-                        // Open the UI modal with the message content
-                        console.log(messageToEdit.deleted)
-                        console.log("opening modal");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
-                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.text });
-                        console.log("opened");
-                        figma.ui.onmessage = msg => {
-                          if (msg.type === 'update-message') {
-                            console.log("updated");
-                            // Process the updated message text
-                            const updatedText = msg.payload.message;
-                            const anonymous = msg.payload.anonymous;
-                            console.log(msg.payload);
-                            const updatedMessages = messages.map(message => {
-                              if (message.id === id) {
-                                return { ...message, text: updatedText, anonymous: anonymous, edited: true };
-                              }
-                              return message;
-                            });
-                            setMessages(updatedMessages);
-                            setIsCrownButtonPressed(false);
-                            figma.closePlugin();
-                            resolve(); // Resolve the promise when the message is updated, no value needed
-                          } else if (msg.type === 'cancel-edit') {
-                            console.log("canceled");
-                            setIsCrownButtonPressed(false);
-                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                          } else if (msg.type === 'close-plugin') {
-                            console.log("closed");
-                            setIsCrownButtonPressed(false);
-                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                            resolve(); // Optionally resolve the promise here, since the action is completed
-                          }
+        console.log("in options:", userName);
+        return new Promise<void>((resolve, reject) => {
+          figma.showUI(__uiFiles__.options, { width: 350, height: 50 });
+    
+          // Listen for messages from the options.html iframe
+          figma.ui.onmessage = (msg) => {
+            if (msg.type === "edit-message") {
+              const messageToEdit = messages.find((message) => message.id === id);
+              if (messageToEdit && !messageToEdit.deleted) {
+                figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
+                figma.ui.postMessage({
+                  type: "edit-message",
+                  payload: messageToEdit.text,
+                });
+                figma.ui.onmessage = (msg) => {
+                  if (msg.type === "update-message") {
+                    const updatedText = msg.payload.message;
+                    const anonymous = msg.payload.anonymous;
+                    const updatedMessages = messages.map((message) => {
+                      if (message.id === id) {
+                        return {
+                          ...message,
+                          text: updatedText,
+                          anonymous: anonymous,
+                          edited: true,
                         };
-                      } else {
-                        console.log('Message not found.');
-                        setIsCrownButtonPressed(false);
-                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
                       }
-
-                  } else if (msg.type === 'edit-user') {
-                    console.log("calling edit from options");
-                      // Handle edit message action
-                      const messageToEdit = messages.find(message => message.id === id);
-                      if (messageToEdit && !messageToEdit.deleted) {
-                        // Open the UI modal with the message content
-                        console.log(messageToEdit.deleted)
-                        console.log("opening modal");
-                        figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
-                        figma.ui.postMessage({ type: 'edit-message', payload: messageToEdit.sender });
-                        console.log("opened");
-                        figma.ui.onmessage = msg => {
-                          if (msg.type === 'update-message') {
-                            console.log("updated");
-                            // Process the updated message text
-                            const updatedText = msg.payload.message;
-                            const anonymous = msg.payload.anonymous;
-                            console.log(msg.payload);
-                            const updatedMessages = messages.map(message => {
-                              if (message.id === id) {
-                                return { ...message, sender: updatedText, anonymous: anonymous, edited: true };
-                              }
-                              return message;
-                            });
-                            setMessages(updatedMessages);
-                            setIsCrownButtonPressed(false);
-                            figma.closePlugin();
-                            resolve(); // Resolve the promise when the message is updated, no value needed
-                          } else if (msg.type === 'cancel-edit') {
-                            console.log("canceled");
-                            setIsCrownButtonPressed(false);
-                            reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                          } else if (msg.type === 'close-plugin') {
-                            console.log("closed");
-                            setIsCrownButtonPressed(false);
-                            figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                            resolve(); // Optionally resolve the promise here, since the action is completed
-                          }
-                        };
-                      } else {
-                        console.log('Message not found.');
-                        setIsCrownButtonPressed(false);
-                        reject('Message not found.'); // Reject the promise if the message to edit is not found, providing a reason as a string
-                      }
-
-                  } else if (msg.type === 'update-prompt') {
-                      console.log("calling prompt from options");
-                      figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
-
-                      figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
-                      console.log("opened");
-
-                      figma.ui.onmessage = msg => {
-                        if (msg.type === 'update-message') {
-                              const updatedText = msg.payload.message;
-                              setPrompt(updatedText);
-                              setIsCrownButtonPressed(false);
-                              figma.closePlugin();
-                              resolve(); 
-                            } else if (msg.type === 'cancel-edit') {
-                              console.log("canceled");
-                              setIsCrownButtonPressed(false);
-                              reject('Edit canceled by user.'); // Reject the promise if editing is canceled, providing a reason as a string
-                            } else if (msg.type === 'close-plugin') {
-                              console.log("closed");
-                              setIsCrownButtonPressed(false);
-                              figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
-                              resolve(); // Optionally resolve the promise here, since the action is completed
-                            }
-                          };
-
-                  } else if (msg.type === 'delete-message') {
-                      // Handle delete message action
-                      handleDeleteMessage(id);
-                      setIsCrownButtonPressed(false);
-                      resolve();
-                  } else if (msg.type === 'pin-message') {
-                      // Handle pin message action
-                      handlePinMessage(id);
-                      setIsCrownButtonPressed(false);
-                      resolve();
-                      
-                  } else if (msg.type === 'close-options') {
-                      // Handle closing the options iframe
-                      setIsCrownButtonPressed(false);
-                      resolve();
+                      return message;
+                    });
+                    setMessages(updatedMessages);
+                    setIsCrownButtonPressed(false);
+                    figma.closePlugin();
+                    resolve();
+                  } else if (msg.type === "cancel-edit") {
+                    setIsCrownButtonPressed(false);
+                    reject("Edit canceled by user.");
+                  } else if (msg.type === "close-plugin") {
+                    setIsCrownButtonPressed(false);
+                    figma.closePlugin();
+                    resolve();
                   }
+                };
+              } else {
+                console.log("Message not found.");
+                setIsCrownButtonPressed(false);
+                reject("Message not found.");
+              }
+            } else if (msg.type === "edit-user") {
+              const messageToEdit = messages.find((message) => message.id === id);
+              if (messageToEdit && !messageToEdit.deleted) {
+                figma.showUI(__uiFiles__.main, { width: 400, height: 320 });
+                figma.ui.postMessage({
+                  type: "edit-message",
+                  payload: messageToEdit.sender,
+                });
+                figma.ui.onmessage = (msg) => {
+                  if (msg.type === "update-message") {
+                    const updatedText = msg.payload.message;
+                    const anonymous = msg.payload.anonymous;
+                    const updatedMessages = messages.map((message) => {
+                      if (message.id === id) {
+                        return {
+                          ...message,
+                          sender: updatedText,
+                          anonymous: anonymous,
+                          edited: true,
+                        };
+                      }
+                      return message;
+                    });
+                    setMessages(updatedMessages);
+                    setIsCrownButtonPressed(false);
+                    figma.closePlugin();
+                    resolve();
+                  } else if (msg.type === "cancel-edit") {
+                    setIsCrownButtonPressed(false);
+                    reject("Edit canceled by user.");
+                  } else if (msg.type === "close-plugin") {
+                    setIsCrownButtonPressed(false);
+                    figma.closePlugin();
+                    resolve();
+                  }
+                };
+              } else {
+                console.log("Message not found.");
+                setIsCrownButtonPressed(false);
+                reject("Message not found.");
+              }
+            } else if (msg.type === "update-prompt") {
+              figma.showUI(__uiFiles__.main, { width: 400, height: 250 });
+              figma.ui.postMessage({ type: "edit-prompt", payload: inPrompt });
+              figma.ui.onmessage = (msg) => {
+                if (msg.type === "update-message") {
+                  const updatedText = msg.payload.message;
+                  setPrompt(updatedText);
+                  setIsCrownButtonPressed(false);
+                  figma.closePlugin();
+                  resolve();
+                } else if (msg.type === "cancel-edit") {
+                  setIsCrownButtonPressed(false);
+                  reject("Edit canceled by user.");
+                } else if (msg.type === "close-plugin") {
+                  setIsCrownButtonPressed(false);
+                  figma.closePlugin();
+                  resolve();
+                }
               };
-<<<<<<< Updated upstream
-          });
-=======
             } else if (msg.type === "delete-message") {
               handleDeleteMessage(id);
               setIsCrownButtonPressed(false);
@@ -984,97 +978,34 @@ function ChatWidget() {
             widgetButtonColor={widgetButtonColor}
           />
         ));
->>>>>>> Stashed changes
     };
 
+   <AutoLayout
+  direction="horizontal"
+  padding={{ top: getWidgetValue(10), bottom: getWidgetValue(10),right: getWidgetValue(10) }}
+  horizontalAlignItems="end"
+  verticalAlignItems="center"
+>
+  <AutoLayout
+    cornerRadius={getWidgetValue(4)}
+    padding={{ top: getWidgetValue(10), bottom: getWidgetValue(10), left: getWidgetValue(20), right: getWidgetValue(20) }}
+    onClick={handleSortByVotesToggle}
+    fill={widgetButtonColor} // The color of the button
+  >
+    <Text fontSize={getWidgetValue(25)} fill="#FFFFFF">Sort by Votes</Text>
+  </AutoLayout>
+</AutoLayout>
 
-
-
-
-    const getTotalDirectReplies = (messageId: string): number => {
-      
-      const message = messages.filter((msg) => msg.parentId === messageId);
-      if (message){
-        //return the messag ereply from that message
-      }
-      return 0;
-  };
-
+        
     
-      const sortedMessages = [...messages].sort((a, b) => {
-          if (a.pinned && !b.pinned) {
-              return -1; // a comes before b
-          }
-          if (!a.pinned && b.pinned) {
-              return 1; // a comes after b
-          }
-          return 0; // no change in order
-      });
-
-      const filteredMessages = sortedMessages.filter(message => message.parentId === parentId);
-
-      if (filteredMessages.length === 0) {
-        // Show "No messages" when there are no messages
-        return <AutoLayout
-                padding={getWidgetValue(30)}
-                direction="vertical"
-                spacing={getWidgetValue(20)}
-                width={getWidgetValue(800)}
-                height={getWidgetValue(250)}
-                horizontalAlignItems={"center"}
-                verticalAlignItems={"center"}
-                >
-                  <Text
-                  fill="#60666D"
-                  fontSize={getWidgetValue(36)}
-                  fontWeight={500}
-                  lineHeight={getWidgetValue(20.4)}
-                  >
-                    No messages yet
-                  </Text>
-                  <Text
-                  fill="#8E939A"
-                  fontSize={getWidgetValue(24)}
-                  lineHeight={getWidgetValue(20.4)}
-                  >
-                    Send a message with the add message button below.
-                  </Text>
-              </AutoLayout>
-      }
-      return sortedMessages
-      .filter(message => message.parentId === parentId)
-      .map((message) => (
-          <MessageBubble
-              key={message.id}
-              message={message}
-              onReply={() => handleReplyToMessage(message.id, )}
-              onEdit={() => handleEditToMessage(message.id)}
-              onDelete={() => handleDeleteMessage(message.id)}
-              onDeleteConfirm={() => handleDeleteConfirm(message.id)}
-              onShowReplies={() => handleShowReplies(message.id)}
-              replyChain={renderMessages(message.id)}
-              replyToId={replyToId}
-              user={userName}
-              getMessageDepth={getMessageDepth}
-              onPin={handlePinMessage}
-              totalReplies={getTotalReplies(message.id)}
-              onUpvote={() => onUpvote(message.id)}
-              onDownvote={()=> onDownvote(message.id)}
-              onOptionsClick={() => handleOptionsClick(message.id)}
-              updateUserName={() => updateUserName()}
-              getTotalDirectReplies = {(messageID) => getTotalDirectReplies(message.id)}
-              messageFontSize={messageFontSize}
-              widgetWidth={widgetWidth}
-              widgetButtonColor={widgetButtonColor}
-          />
-      ));
-    };
 
 useEffect(()=>{
   if (isCrownButtonPressed) {
     setIsCrownButtonPressed(false);
-    console.log('crown', isCrownButtonPressed);
+    console.log('crown123', isCrownButtonPressed);
   figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+  console.log('logid', logId);
+  figma.ui.postMessage({ type: 'set-widget-log-id', payload: logId });
   figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
   figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
   figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -1084,10 +1015,6 @@ useEffect(()=>{
   figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
   figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
   figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
-<<<<<<< Updated upstream
-  figma.ui.onmessage = msg => {
-    if (msg.type === 'update-prompt') {
-=======
   figma.ui.postMessage({ type: 'current-anonymous', payload: alwaysAnonymous });
   figma.ui.onmessage = async (msg) => {
     console.log('message',msg);
@@ -1101,7 +1028,6 @@ useEffect(()=>{
 
       
     } else if (msg.type === 'update-prompt') {
->>>>>>> Stashed changes
       console.log("calling prompt from options");
       figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
       figma.ui.postMessage({ type: 'edit-prompt', payload: inPrompt });
@@ -1295,13 +1221,14 @@ useEffect(()=>{
 }})
 
 const handleOptionsClickChat = () => {
-  console.log('waiting');
+  console.log('waiting123');
   updateUserName();
   setIsCrownButtonPressed(true);
 
   // return new Promise<void>(() => {
   return new Promise<void>((resolve, reject) => {
     figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 205 });
+    figma.ui.postMessage({ type: 'current-widgetId', payload: logId }); // Pass widgetId to the UI
     figma.ui.postMessage({ type: 'alreadyLoggedIn', payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue', payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue', payload: borderWidth });
@@ -1331,7 +1258,7 @@ const handleOptionsClickChat = () => {
     });
   });
 };
-  return (
+return (
   <AutoLayout
     direction="vertical"
     spacing={getWidgetValue(8)}
@@ -1343,69 +1270,102 @@ const handleOptionsClickChat = () => {
     minWidth={widgetWidth}
     fill={borderColor}
   >
-  <AutoLayout
-    direction="vertical"
-    spacing={8}
-    padding={getWidgetValue(10)}
-    stroke={borderColor}
-    strokeWidth={getWidgetValue(2)}
-    cornerRadius={getWidgetValue(widgetCornerRadius-2)}
-    onClick={updateUserName}
-    minWidth={widgetWidth}
-    fill={'#FFFFFF'}
-  >
+    <AutoLayout
+      direction="vertical"
+      spacing={8}
+      padding={getWidgetValue(10)}
+      stroke={borderColor}
+      strokeWidth={getWidgetValue(2)}
+      cornerRadius={getWidgetValue(widgetCornerRadius - 2)}
+      onClick={updateUserName}
+      minWidth={widgetWidth}
+      fill={'#FFFFFF'}
+    >
       <AutoLayout
-              cornerRadius={getWidgetValue(4)}
-              padding={{ top: getWidgetValue(15), bottom: getWidgetValue(2), left: getWidgetValue(770), right: getWidgetValue(10) }}
-              onClick={handleOptionsClickChat}
-          >
-              <SVG
-                src={adminI}
-                onClick={handleOptionsClickChat}
-              />
-      </AutoLayout>
-      <AutoLayout
-        padding={{ top: 0, bottom: getWidgetValue(20), left: getWidgetValue(20) }}
+        cornerRadius={getWidgetValue(4)}
+        padding={{
+          top: getWidgetValue(15),
+          bottom: getWidgetValue(2),
+          left: getWidgetValue(590), // Adjust this value to position correctly
+          right: getWidgetValue(10),
+        }}
+        verticalAlignItems="center"
+        horizontalAlignItems="end"
       >
+        {/* Adding Sort By Votes Button first */}
+        <AutoLayout
+          cornerRadius={getWidgetValue(100)}
+          padding={{
+            top: getWidgetValue(5),
+            bottom: getWidgetValue(5),
+            left: getWidgetValue(20),
+            right: getWidgetValue(20),
+          }}
+          onClick={handleSortByVotesToggle}
+          fill={widgetButtonColor} // The color of the button
+        >
+          <Text fontSize={getWidgetValue(25)} fill="#FFFFFF">
+            Sort by Votes
+          </Text>
+        </AutoLayout>
+
+        {/* Crown SVG comes after the button */}
+        <AutoLayout padding={{ left: getWidgetValue(10) }}>
+          <SVG src={adminI} onClick={handleOptionsClickChat} />
+        </AutoLayout>
+      </AutoLayout>
+
+      <AutoLayout padding={{ top: 0, bottom: getWidgetValue(20), left: getWidgetValue(20) }}>
         <Text
-        fill={promptColor}
-        fontSize={getWidgetValue(titleFontSize)}
-        fontWeight={700}
-        width={getWidgetValue(770)}
-        lineHeight={getWidgetValue(65)}
+          fill={promptColor}
+          fontSize={getWidgetValue(titleFontSize)}
+          fontWeight={700}
+          width={getWidgetValue(770)}
+          lineHeight={getWidgetValue(65)}
         >
           {inPrompt ? inPrompt : 'Chat'}
         </Text>
       </AutoLayout>
+
       <AutoLayout
-          direction="vertical"
-          spacing={getWidgetValue(1)}
-          padding={getWidgetValue(8)}
-          stroke={borderColor}
-          cornerRadius={getWidgetValue(10)}
-          minWidth={getWidgetValue(480)}
+        direction="vertical"
+        spacing={getWidgetValue(1)}
+        padding={getWidgetValue(8)}
+        stroke={borderColor}
+        cornerRadius={getWidgetValue(10)}
+        minWidth={getWidgetValue(480)}
       >
-          {renderMessages()}
+        {renderMessages()}
       </AutoLayout>
 
-      <AutoLayout direction="vertical" spacing={getWidgetValue(8)} padding={getWidgetValue(8)} onClick={updateUserName} horizontalAlignItems={"end"} minWidth={widgetWidth}>
+      <AutoLayout
+        direction="vertical"
+        spacing={getWidgetValue(8)}
+        padding={getWidgetValue(8)}
+        onClick={updateUserName}
+        horizontalAlignItems={'end'}
+        minWidth={widgetWidth}
+      >
         <AutoLayout
           direction="horizontal"
           onClick={openMessageInputModal}
           fill={widgetButtonColor}
-          padding={getWidgetValue(10)}
+          padding={{ top: getWidgetValue(10), bottom: getWidgetValue(10), left: getWidgetValue(10), right: getWidgetValue(20) }}
           cornerRadius={getWidgetValue(100)}
         >
           <AutoLayout padding={getWidgetValue(8)}>
-          <SVG src={plus} width={getWidgetValue(30)} height={getWidgetValue(30)}></SVG>
+            <SVG src={plus} width={getWidgetValue(30)} height={getWidgetValue(30)} />
           </AutoLayout>
-          <Text fontSize={getWidgetValue(36)} fill="#FFFFFF">Add Message  </Text>
+          <Text fontSize={getWidgetValue(36)} fill="#FFFFFF">
+            Add Message
+          </Text>
         </AutoLayout>
       </AutoLayout>
     </AutoLayout>
+  </AutoLayout>
+);
 
-    </AutoLayout>
-  );
+
 }
 
 
@@ -1507,25 +1467,17 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
         <AutoLayout
           direction="horizontal"
           width={getWidgetValue(800)}
-          padding={{ top: getWidgetValue(10), bottom: getWidgetValue(1), left: getWidgetValue(4), right: getWidgetValue(8)}}
+          padding={{ top: getWidgetValue(10), bottom: getWidgetValue(1), left: getWidgetValue(4), right: getWidgetValue(2)}}
         >
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="start"
-            width={getWidgetValue(520)}
+            width={getWidgetValue(490)}
             spacing={getWidgetValue(20)}
           >
-<<<<<<< Updated upstream
-            {message.userIcon ? ( // Add this block to display the user icon
-                            <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
-                        ) : (
-                            <SVG src="<svg>...<svg>" width={getWidgetValue(30)} height={getWidgetValue(30)} /> // SVG code for question mark icon
-                        )}
-=======
             {!message.anonymous && message.userIcon && message.userIcon !== "None" ? (
               <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
             ) : null}
->>>>>>> Stashed changes
               <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
@@ -1541,8 +1493,8 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="end"
-            padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(8), right: getWidgetValue(8) }}
-            width={getWidgetValue(200)}
+            padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(1), right: getWidgetValue(8) }}
+            width={getWidgetValue(260)}
           >
             <Text fontSize={getWidgetValue(25)} fill={messageStyle.color} horizontalAlignText={"right"}>
               {message.timestamp}
