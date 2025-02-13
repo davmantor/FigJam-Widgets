@@ -112,10 +112,16 @@ function Widget() {
         setShadowSpread(msg.spread);
       }
       if (msg.type === 'resetResponse') { // New message type
-        resetResponse();
+        resetResponse(response);
       }
       if (msg.type === 'resetAll') {
         waitForTask(handleResetAll());
+      }
+      if (msg.type === 'duplicate') {
+        duplicateWidget(widgetId);
+      }
+      if (msg.type === 'duplicateAll') {
+        waitForTask(handleDuplicateAll());
       }
       if (msg.type === 'setWidgetId') {
         setWidgetId(msg.widgetId);
@@ -130,12 +136,42 @@ function Widget() {
     }
     });
 
-  const resetResponse = async (currentWidgetId: string|null=null) => {
+  const resetResponse = async (response: string, currentWidgetId: string|null=null) => {
     let self = false;
     if (!currentWidgetId) {
       currentWidgetId = widgetId;
       self = true;
     }
+
+    if (response.trim() !== "") {
+      console.log("push response");
+      const name = figma.currentUser?.name || "User";
+      const photoUrl = figma.currentUser?.photoUrl || null;
+      const timestamp = new Date().toISOString(); // Get the current timestamp
+  
+      const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
+  
+      try {
+        const res = await fetch('https://figjam-widgets.onrender.com/textentrywidget/add-response', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+  
+        const result = await res.json();
+  
+        if (res.status === 200) {
+          console.log('Response saved successfully');
+        } else {
+          console.error('Failed to submit data.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
   
     if (self) {
       setResponse("");  // Clear the response field
@@ -144,7 +180,7 @@ function Widget() {
     }
   
     try {
-      const res = await fetch('http://localhost:4000/textentrywidget/reset-widget', {
+      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reset-widget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -172,7 +208,7 @@ function Widget() {
         continue;
       }
       console.log("resetting widget", widget.widgetSyncedState.widgetId);
-      const result = await resetResponse(widget.widgetSyncedState.widgetId);
+      const result = await resetResponse(widget.widgetSyncedState.response, widget.widgetSyncedState.widgetId);
       if (result) {
         widget.setWidgetSyncedState({
           ...widget.widgetSyncedState, // previous values are overwritten
@@ -183,6 +219,36 @@ function Widget() {
       }
     }
     figma.ui.postMessage({ type: 'resetAll', group: !!group, status: 'success' });
+  }
+
+  const duplicateWidget = async (figmaWidgetId: string|null) => {
+    if (figmaWidgetId === null) {
+      console.error('Widget ID is missing.');
+      return;
+    }
+    console.log("duplicating widget", figmaWidgetId);
+    const node = figma.currentPage.findOne((node: any) => node.widgetSyncedState && node.widgetSyncedState.widgetId === figmaWidgetId) as WidgetNode;
+    if (!node) {
+      console.error('Could not find widget node.', node);
+      return;
+    }
+    const clone = node.cloneWidget({...node.widgetSyncedState});
+    // transform absolutely (x and y will use relative transforms to parent, which produces incorrect results)
+    clone.x = node.absoluteTransform[0][2] + 20;
+    clone.y = node.absoluteTransform[1][2] + 20;
+    figma.ui.postMessage({ type: 'duplicate', status: 'success' });
+  }
+
+  const handleDuplicateAll = async () => {
+    const nodes = figma.currentPage.findAll((node: any) => node.type === "WIDGET" && node.name === 'Text Entry Widget') as WidgetNode[];
+    for (const node of nodes) {
+      console.log("duplicating widget", node.widgetSyncedState.widgetId);
+      const clone = node.cloneWidget({});
+      // transform absolutely (x and y will use relative transforms to parent, which produces incorrect results)
+      clone.x = node.absoluteTransform[0][2] + 20;
+      clone.y = node.absoluteTransform[1][2] + 20;
+    }
+    figma.ui.postMessage({ type: 'duplicateAll', status: 'success' });
   }
   
   
@@ -206,7 +272,7 @@ function Widget() {
     const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
   
     try {
-      const res = await fetch('http://localhost:4000/textentrywidget/submit', {
+      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -236,7 +302,7 @@ function Widget() {
     const data = { widgetId };
   
     try {
-      const res = await fetch('http://localhost:4000/textentrywidget/refresh', {
+      const res = await fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
