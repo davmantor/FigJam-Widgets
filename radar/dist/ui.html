@@ -19,10 +19,30 @@
       max-width: 400px;
       max-height: 400px;
     }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: center;
+      display: none;
+      width: 250px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
+  <div id="popup">Generating chart... This window will close automatically.</div>
   <canvas id="radarChart"></canvas>
 
   <script>
@@ -36,7 +56,7 @@
       const { type, payload } = event.data.pluginMessage;
 
       if (type === 'render-polar-plot') {
-        const polls = payload.sanitizedPolls;
+        const polls = payload.orderedPolls;
         console.log('polls', payload);
 
         // Extract labels and data from polls
@@ -49,6 +69,9 @@
         chartTitle = payload.chartTitle || chartTitle;
         chartColor = payload.chartColor || chartColor;
         titleFontSize = payload.titleFontSize || titleFontSize;
+
+        // Show the popup message
+        showPopup();
 
         // Render the radar chart with new settings
         renderRadarChart(labels, data, chartTitle, chartColor, titleFontSize);
@@ -86,7 +109,7 @@
             },
             title: {
               display: true,
-              text: title,
+              text: "",
               color: "#000", // Title text color
               font: {
                 size: fontSize, // Set the title font size
@@ -122,6 +145,16 @@
         },
       });
     }
+
+    function showPopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'flex';
+    }
+    
+    function hidePopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'none';
+    }
     
     function sendChartToWidget() {
         const canvas = document.getElementById('radarChart');
@@ -138,6 +171,7 @@
         // Introduce a delay before sending the close UI message
         setTimeout(() => {
           console.log('Sending close-ui message to widget.');
+          hidePopup();
           parent.postMessage(
             { pluginMessage: { type: 'close-ui' } },
             '*'

@@ -233,13 +233,26 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
 
   try {
-   
-    const widget = await Widget.findOneAndUpdate(
-      { widgetId },
-      { $set: { showPrevious: false } },
-      { new: true }
-    );
+    const widget = await Widget.findOne({ widgetId });
+
+    if (!widget) {
+      return res.status(404).send('Widget not found');
+    }
+
+    // Move the current response into previous only if it has content
+    if (widget.current.response) {
+      widget.previous.push(widget.current);
+    }
+
+    // Reset the current response
     widget.current = { response: "", userName: "", photoUrl: "", timestamp: Date.now() };
+
+
+    widget.showPrevious = false;
+
+    await widget.save();
+
+    res.json({ status: 'success', widget });
 
     if (widget) {
       res.json({ status: 'success', widget });
@@ -318,6 +331,7 @@ app.post('/textentrywidget/reveal-previous', async (req, res) => {
 
 app.post('/textentrywidget/submit', async (req, res) => {
   const { widgetId, response, userName, photoUrl, timestamp } = req.body;
+  console.log(response);
 
   console.log('Received data:', { widgetId, response, userName, photoUrl, timestamp }); // Debugging line
   try {
@@ -447,14 +461,15 @@ app.post('/polls', async (req, res) => {
 app.post('/polls/create', async (req, res) => {
   console.log("new widget created");
   try {
-    const { title, options } = req.body;
+    const { title, subheading, options, group } = req.body;
 
     const newPoll = new PollModel({
       title,
+      subheading,
       options,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      group: group || 'None' 
+      group: group
     });    
 
     await newPoll.save();

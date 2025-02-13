@@ -143,6 +143,10 @@
         document.getElementById('messageInput').placeholder = `Reply to: ${payload.text.substring(0, 30)}...` // Show reply-to message snippet
         document.getElementById('sendMessage').innerText = 'Send Reply'; // Update button to indicate reply action
         anonymousContainer.style.display = 'block'; // Show checkbox when replying to a message
+      } else if (type === 'edit-subheading') {
+        document.getElementById('messageInput').value = payload;
+        document.getElementById('sendMessage').innerText = 'Update Subheading';
+        anonymousContainer.style.display = 'none'; 
       }
     };
 
@@ -168,6 +172,8 @@
       console.log("MODAL CANCEL");
       parent.postMessage({ pluginMessage: { type: 'close-plugin' } }, '*');
     };
+
+    
 
   </script>
 </body>

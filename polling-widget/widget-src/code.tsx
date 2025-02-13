@@ -30,10 +30,7 @@ interface TextBoxProps {
   submitted: boolean;
   votes: number[];
   onVote: () => void;
-<<<<<<< HEAD
-=======
   handleVote: () => void;
->>>>>>> main
   updateUserName: () => void;
   userVote: boolean;
   voters: CustomUser[];
@@ -78,30 +75,6 @@ function ProgressBar({ votes, totalVotes, widgetWidth, barColor }: { votes: numb
   );
 }
 
-function ProgressBar({ votes, totalVotes }: { votes: number; totalVotes: number }) {
-  const parentWidth = 250;
-  const percentage = totalVotes === 0 ? 0 : (votes / totalVotes) * 100;
-  console.log("votes: " + votes);
-  console.log("totalVotes: " + totalVotes);
-  const width = percentage === 0 ? 1 : (percentage / 100) * parentWidth;
-  console.log("width: " + percentage);
-  return (
-    <AutoLayout
-      width={parentWidth}
-      height={8}
-      cornerRadius={4}
-      fill="#E6E6E6"
-      strokeWidth={0}
-    >
-      <AutoLayout
-        width={width}
-        height="fill-parent"
-        cornerRadius={4}
-        fill="#A259FF"
-      />
-    </AutoLayout>
-  );
-}
 
 function TextBox({
   index,
@@ -119,10 +92,6 @@ function TextBox({
   voters,
   isAnonymous,
   totalVoters,
-<<<<<<< HEAD
-  updateUserName  // Accept totalVoters as a prop
-}: TextBoxProps & { totalVoters: number }) {
-=======
   updateUserName,  // Accept totalVoters and updateUserName
   pollId,          // Add pollId for context if needed
   entries,          // Add entries for additional context
@@ -137,7 +106,6 @@ function TextBox({
     const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
     return Math.floor(input * scalingRatio); // Scale the input value by the ratio
   }
->>>>>>> main
 
   const handleEditEnd = (e: { characters: string }) => {
     onValueChange(index, e.characters);
@@ -151,13 +119,8 @@ function TextBox({
   };
   
 
-<<<<<<< HEAD
-  const handleClick = () => {
-    updateUserName();
-=======
   const handleClick = async () => {
     updateUserName();  // Ensure the user name is up-to-date
->>>>>>> main
     if (submitted) {
       console.log("previous voters:" + voters);
       await onVote();  // This will update local states like votes and voters
@@ -204,12 +167,9 @@ function TextBox({
       setEditingIndex(index);  // If not submitted, continue with editing
     }
   };
-<<<<<<< HEAD
-=======
   
   
   
->>>>>>> main
 // Now the voters array contains both the original and fake voters
 
   const displayedVoters = voters.slice(0, 4);
@@ -222,20 +182,6 @@ function TextBox({
   console.log(additionalVotes);
 
   return (
-<<<<<<< HEAD
-    <AutoLayout direction="vertical" spacing={4} width="fill-parent">
-      <AutoLayout direction="horizontal" spacing={8} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
-        <AutoLayout
-          direction="horizontal"
-          spacing={8}
-          padding={8}
-          cornerRadius={4}
-          stroke={isEditing ? '#24CE16' : '#E6E6E6'}
-          strokeWidth={2}
-          verticalAlignItems="center"
-          fill={'#FFFFFF'}
-          width={250}
-=======
     <AutoLayout direction="vertical" spacing={getWidgetValue(4)} width="fill-parent">
       <AutoLayout direction="horizontal" spacing={getWidgetValue(8)} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
         <AutoLayout
@@ -247,9 +193,8 @@ function TextBox({
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(500)}
+          width="fill-parent"
           height={getWidgetValue(60)}
->>>>>>> main
         >
           {isEditing ? (
             <Input
@@ -257,17 +202,10 @@ function TextBox({
               onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
               width="fill-parent"
-<<<<<<< HEAD
-              fontSize={isQuestion ? 18 : 16}
-            />
-          ) : (
-            <Text fontSize={isQuestion ? 18 : 16} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent">
-=======
               fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)}
             />
           ) : (
             <Text fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
->>>>>>> main
               {value || (isQuestion ? "Enter poll question" : "Enter option")}
             </Text>
           )}
@@ -281,54 +219,36 @@ function TextBox({
           />
         )}
         {!isQuestion && submitted && (
-<<<<<<< HEAD
-          <AutoLayout direction="horizontal" spacing={4} verticalAlignItems="center">
-            <Text fontSize={16} fill={userVote ? "#24CE16" : "#000000"}>
-              {displayedVoters.length + additionalVotes}
+          <AutoLayout 
+          direction="horizontal" 
+          spacing={getWidgetValue(4)} 
+          verticalAlignItems="center"
+          horizontalAlignItems="end"
+          width="hug-contents"  // Ensures it only takes necessary space
+        >
+          <Text fontSize={getWidgetValue(28)} fill={userVote ? barColor : "#000000"}>
+            {displayedVoters.length + additionalVotes}
+          </Text>
+          {displayedVoters.map((voter, i) => (
+            <Image 
+              key={i} 
+              src={isAnonymous ? AnonSVG : voter.photoUrl} 
+              width={getWidgetValue(28)} 
+              height={getWidgetValue(28)} 
+              cornerRadius={getWidgetValue(14)} 
+            />
+          ))}
+          {additionalVotes > 0 && (
+            <Text fontSize={getWidgetValue(28)} fill="#000000">
+              +{additionalVotes}
             </Text>
-            {displayedVoters.map((voter, i) => (
-              <AutoLayout key={i} width={16} height={16} cornerRadius={8}>
-                {isAnonymous ? (
-                <AutoLayout width={16} height={16} cornerRadius={4}>
-                  <SVG src={AnonSVG} width={16} height={16} />
-                </AutoLayout>
-                ) : (
-                  <Image src={voter.photoUrl} width={16} height={16} cornerRadius={8} />
-=======
-          <AutoLayout direction="horizontal" spacing={getWidgetValue(4)} verticalAlignItems="center">
-            <Text fontSize={getWidgetValue(28)} fill={userVote ? accentColor : "#000000"}>
-              {displayedVoters.length + additionalVotes}
-            </Text>
-            {displayedVoters.map((voter, i) => (
-              <AutoLayout key={i} width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(8)}>
-                {isAnonymous ? (
-                <AutoLayout width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(4)}>
-                  <SVG src={AnonSVG} width={getWidgetValue(28)} height={getWidgetValue(28)} />
-                </AutoLayout>
-                ) : (
-                  <Image src={voter.photoUrl} width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(14)} />
->>>>>>> main
-                )}
-              </AutoLayout>
-            ))}
-            {additionalVotes > 0 && (
-<<<<<<< HEAD
-              <Text fontSize={16} fill="#000000">
-=======
-              <Text fontSize={getWidgetValue(28)} fill="#000000">
->>>>>>> main
-                +{additionalVotes}
-              </Text>
-            )}
-          </AutoLayout>
+          )}
+        </AutoLayout>
+        
         )}
       </AutoLayout>
       {!isQuestion && submitted && (
-<<<<<<< HEAD
-        <ProgressBar votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} />
-=======
         <ProgressBar votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
->>>>>>> main
       )}
     </AutoLayout>
   );
@@ -352,16 +272,10 @@ function PollingWidget() {
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
-<<<<<<< HEAD
-  const [currentUser, setCurrentUser] = useSyncedState<CustomUser | null>('currentUser', null);
-=======
->>>>>>> main
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
   const [pollId, setPollId] = useSyncedState<string>('pollId', "");
   const [logId, setLogId] = useSyncedState<string>('logId', "");
 
-<<<<<<< HEAD
-=======
   const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
 
@@ -374,6 +288,8 @@ function PollingWidget() {
   const [accentColor, setAccentColor] = useSyncedState<string>('accentColor', '#24CE16');
 
   const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 10);
+  const [subheading, setSubheading] = useSyncedState<string>('subheading', "");
+
 
   // Track logId changes
   useEffect(() => {
@@ -386,15 +302,17 @@ function PollingWidget() {
     return Math.floor(input * scalingRatio); // Scale the input value by the ratio
   }
 
->>>>>>> main
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
       setTitle(newValue);
+    } else if (index === -2) {  // Use index -2 for subheading
+      setSubheading(newValue);
     } else {
       const updatedEntries = entries.map((item, i) => (i === index ? newValue : item));
       setEntries(updatedEntries);
     }
   };
+  
 
   const handleRemove = (index: number) => {
     const updatedEntries = entries.filter((_, i) => i !== index);
@@ -410,11 +328,6 @@ function PollingWidget() {
     setEditingIndex(updatedEntries.length - 1);
   };
 
-<<<<<<< HEAD
-  const handleVote = (index: number) => {
-    // Update the user's name before proceeding
-    updateUserName();
-=======
   
 
   const handleVote = async (index: number) => {
@@ -423,7 +336,6 @@ function PollingWidget() {
     console.log(entries);
     console.log(votes);
     console.log(voters);
->>>>>>> main
   
     // Assuming userName is the state variable holding the updated user name
     const userName = figma.currentUser ? figma.currentUser.name : 'Unknown User';
@@ -447,20 +359,6 @@ function PollingWidget() {
     } else {
       // If the user is unvoting the same option, reset userVoteIndex
       setUserVoteIndex(null);
-<<<<<<< HEAD
-    }
-  
-    // Update the state with the new votes and voters arrays
-    setVotes(newVotes);
-    setVoters(newVoters);
-  };
-
-  const toggleAnonymousVote = () => {
-    setIsAnonymous(!isAnonymous);
-  };
-  console.log(userName);
-  const handleSubmit = () => {
-=======
     }
   
     // Update the state with the new votes and voters arrays
@@ -522,6 +420,7 @@ function PollingWidget() {
     // Prepare the data to be sent to the server
     const pollData = {
       title,
+      subheading,
       options: entries.map(entry => ({
         text: entry,        
         votes: 0, 
@@ -536,7 +435,7 @@ function PollingWidget() {
     try {
       console.log(JSON.stringify(pollData));
       // Send the data to the server to create a new poll
-      const response = await fetch('https://figjam-widgets-myhz.onrender.com/polls/create', {
+      const response = await fetch('http://localhost:4000/polls/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -563,11 +462,11 @@ function PollingWidget() {
     }
 
     // Set UI states
->>>>>>> main
     setEntries(entries.map(entry => entry));
     setTitle(title);
     setEditingIndex(null);
     setSubmitted(true);
+    setSubheading(subheading);
   };
   
   
@@ -579,13 +478,7 @@ function PollingWidget() {
     });
   });
 
-  // Create a combined voters array using a Set to ensure uniqueness
-  const combinedVoters = new Set<CustomUser>();
-  voters.forEach(voterArray => {
-    voterArray.forEach(voter => {
-      combinedVoters.add(voter);
-    });
-  });
+
 
   const totalVotes = votes.reduce((acc, voteCount) => acc + voteCount, 0);
 
@@ -595,8 +488,6 @@ function PollingWidget() {
     console.log(userName);
   };
 
-<<<<<<< HEAD
-=======
   const adminI = `<svg width="${getWidgetValue(20)}px" height="${getWidgetValue(20)}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -811,7 +702,29 @@ function PollingWidget() {
             handleOptionsClickChat();
           }
         };
-      }};
+      } else if (msg.type === 'update-subheading') {
+        console.log("Opening UI for subheading edit");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+        figma.ui.postMessage({ type: 'edit-subheading', payload: subheading });
+  
+        figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+                const updatedSubheading = msg.payload.message;
+                console.log("Updated Subheading:", updatedSubheading);
+                setSubheading(updatedSubheading);
+                alreadyLoggedIn = true;
+                setIsCrownButtonPressed(true);
+            } else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+        };}
+    };
   }})
 
   const setWidgetId = async (widgetId: string) => {
@@ -908,9 +821,7 @@ function PollingWidget() {
   };
 
 
->>>>>>> main
   return (
-    
     <AutoLayout
       direction="vertical"
       verticalAlignItems="start"
@@ -922,57 +833,75 @@ function PollingWidget() {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-    {/* Crown button in the top right, outside the white background */}
-    <AutoLayout
-      direction="horizontal"
-      verticalAlignItems="start"
-      width="fill-parent"
-      horizontalAlignItems="end"
-      height={getWidgetValue(20)}  // Adjust the height as needed
-      padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}  // Adjust the padding as needed
-    >
-      <SVG src={adminI} onClick={handleOptionsClickChat} />
-    </AutoLayout>
-    <AutoLayout
-    width="fill-parent"
-    verticalAlignItems="center"
-    onClick={() => setEditingIndex(-1)}  // Set the index to -1 to trigger title editing
-  >
-    {editingIndex === -1 ? (
-      <Input
-        value={title}
-<<<<<<< HEAD
-        onValueChange={handleValueChange}
-        isQuestion={true}
-        isEditing={editingIndex === -1}
-        setEditingIndex={setEditingIndex}
-        submitted={submitted}
-        votes={0}
-        onVote={() => {}}
-        userVote={false}
-        voters={[]}
-        isAnonymous={isAnonymous}
-        totalVoters={combinedVoters.size}  // Pass combinedVoters.size here
-        updateUserName={updateUserName}  // Pass updateUserName here
-=======
-        onTextEditEnd={(e) => handleValueChange(-1, e.characters)}  // Update the title on edit end
-        placeholder="Enter poll title"
+      {/* Crown button in the top right, outside the white background */}
+      <AutoLayout
+        direction="horizontal"
+        verticalAlignItems="start"
         width="fill-parent"
-        fontSize={getWidgetValue(30)}   // Scale title size
-        fontWeight="bold"
->>>>>>> main
-      />
-    ) : (
-      <Text
-        fontSize={getWidgetValue(30)}
-        fontWeight="bold"
-        width="fill-parent"
-        horizontalAlignText="left"
+        horizontalAlignItems="end"
+        height={getWidgetValue(20)}
+        padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
       >
-        {title || "Enter poll title"}
-      </Text>
-    )}
-  </AutoLayout>
+        <SVG src={adminI} onClick={handleOptionsClickChat} />
+      </AutoLayout>
+  
+      {/* Title Section */}
+      <AutoLayout
+        width="fill-parent"
+        verticalAlignItems="center"
+        onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
+      >
+        {editingIndex === -1 ? (
+          <Input
+            value={title}
+            onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
+            placeholder="Enter poll title"
+            width="fill-parent"
+            fontSize={getWidgetValue(30)}
+            fontWeight="bold"
+          />
+        ) : (
+          <Text
+            fontSize={getWidgetValue(30)}
+            fontWeight="bold"
+            width="fill-parent"
+            horizontalAlignText="left"
+          >
+            {title || "Enter poll title"}
+          </Text>
+        )}
+      </AutoLayout>
+  
+      {/* Subheading Section */}
+      <AutoLayout
+        width="fill-parent"
+        verticalAlignItems="center"
+        onClick={() => setEditingIndex(-2)} // Set the index to -2 to trigger subheading editing
+      >
+        {editingIndex === -2 ? (
+          <Input
+            value={subheading}
+            onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
+            placeholder="Enter subheading"
+            width="fill-parent"
+            fontSize={getWidgetValue(20)}
+            fontWeight="normal"
+            fill="#666666"
+          />
+        ) : (
+          <Text
+            fontSize={getWidgetValue(20)}
+            fontWeight="normal"
+            width="fill-parent"
+            horizontalAlignText="left"
+            fill="#666666"
+          >
+            {subheading || "Enter subheading"}
+          </Text>
+        )}
+      </AutoLayout>
+  
+      {/* Poll Options */}
       {entries.map((item, index) => (
         <TextBox
           key={index}
@@ -983,26 +912,22 @@ function PollingWidget() {
           isEditing={editingIndex === index}
           setEditingIndex={setEditingIndex}
           submitted={submitted}
-          votes={votes}            // Pass votes
+          votes={votes}
           onVote={() => handleVote(index)}
           userVote={userVoteIndex === index}
-          voters={voters[index]}          // Pass voters
+          voters={voters[index]}
           isAnonymous={isAnonymous}
-<<<<<<< HEAD
-          totalVoters={combinedVoters.size}  // Pass combinedVoters.size here
-          updateUserName={updateUserName}  // Pass updateUserName here
-=======
-          totalVoters={combinedVoters.size}  
-          updateUserName={updateUserName}  
-          entries={entries}               // Pass entries
-          pollId={pollId}                 // Pass pollId
+          totalVoters={combinedVoters.size}
+          updateUserName={updateUserName}
+          entries={entries}
+          pollId={pollId}
           widgetWidth={widgetWidth}
           barColor={barColor}
           accentColor={accentColor}
           promptColor={promptColor}
->>>>>>> main
         />
       ))}
+  
       {!submitted && (
         <>
           <SVG
@@ -1042,20 +967,17 @@ function PollingWidget() {
           </AutoLayout>
         </>
       )}
+      
       {submitted && (
-<<<<<<< HEAD
-        <AutoLayout width="fill-parent" padding={{ top: 10 }}>
-          <Text fontSize={12} fill="#808080" width="fill-parent">
-=======
         <AutoLayout width="fill-parent" padding={{ top: getWidgetValue(10) }}>
           <Text fontSize={getWidgetValue(12)} fill="#808080" width="fill-parent">
->>>>>>> main
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>
       )}
     </AutoLayout>
   );
+  
 }
 
 widget.register(PollingWidget);

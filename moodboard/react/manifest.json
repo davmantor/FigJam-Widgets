@@ -3,14 +3,10 @@
   "id": "1463258273200914454",
   "api": "1.0.0",
   "main": "dist/code.js",
-<<<<<<< HEAD
   "ui": {
     "main": "dist/ui.html",
     "optionsChat": "dist/optionsChat.html"
   },
-=======
-  "ui": "ui.html",
->>>>>>> main
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",

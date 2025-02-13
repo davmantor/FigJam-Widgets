@@ -139,6 +139,13 @@
                 <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
                 <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
               </div>
+              <div class="button1" onclick="updateSubheading()">
+                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705..."></path>
+                </svg>
+                Subheading
+              </div>
+              
 
         </div>
     </div>
@@ -285,6 +292,12 @@
             // Send a message to the plugin to update the widget button color
             parent.postMessage({ pluginMessage: {type: 'update-widgetCornerRadius'} }, '*');
         }
+        function updateSubheading() {
+            console.log("Sending subheading update request to code.tsx");
+            parent.postMessage({ pluginMessage: { type: 'update-subheading' } }, '*');
+        }
+        
+          
 
     </script>
 </body>
