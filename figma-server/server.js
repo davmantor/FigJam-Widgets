@@ -252,8 +252,6 @@ app.post('/textentrywidget/reset-widget', async (req, res) => {
 
     await widget.save();
 
-    res.json({ status: 'success', widget });
-
     if (widget) {
       res.json({ status: 'success', widget });
     } else {

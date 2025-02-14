@@ -835,18 +835,11 @@ function PollingWidget() {
     >
       {/* Crown button in the top right, outside the white background */}
       <AutoLayout
-        direction="horizontal"
-        verticalAlignItems="start"
-        width="fill-parent"
-        horizontalAlignItems="end"
-        height={getWidgetValue(20)}
-        padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
+      verticalAlignItems="center"
+      width="fill-parent"
       >
-        <SVG src={adminI} onClick={handleOptionsClickChat} />
-      </AutoLayout>
-  
-      {/* Title Section */}
-      <AutoLayout
+
+<AutoLayout
         width="fill-parent"
         verticalAlignItems="center"
         onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
@@ -871,6 +864,25 @@ function PollingWidget() {
           </Text>
         )}
       </AutoLayout>
+      
+      <AutoLayout
+        direction="horizontal"
+        verticalAlignItems="start"
+        width="fill-parent"
+        horizontalAlignItems="end"
+        height={getWidgetValue(20)}
+        padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
+      >
+        <SVG src={adminI} onClick={handleOptionsClickChat} />
+      </AutoLayout>
+
+      {/* Title Section */}
+      
+
+      </AutoLayout>
+      
+  
+      
   
       {/* Subheading Section */}
       <AutoLayout

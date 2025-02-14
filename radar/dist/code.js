@@ -154,7 +154,7 @@
         width: 20,
         height: 20
       }
-    )), groupSet ? /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", spacing: 8, padding: 6, width: "fill-parent", verticalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(AutoLayout, { padding: 6, cornerRadius: 4, fill: "#FFA500", onClick: () => fetchPollData(), verticalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(Text, { fill: "#FFFFFF", fontSize: 12 }, "Refresh Chart")), /* @__PURE__ */ figma.widget.h(AutoLayout, { verticalAlignItems: "center", padding: 6 }, /* @__PURE__ */ figma.widget.h(Text, { fontSize: titleFontSize, fontWeight: "bold", fill: "#000000" }, chartTitle))) : (
+    )), groupSet ? /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", spacing: 8, padding: 6, width: "fill-parent", verticalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(AutoLayout, { padding: 6, cornerRadius: 4, fill: "#FFA500", onClick: () => fetchPollData(), verticalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(Text, { fill: "#FFFFFF", fontSize: 12 }, "Refresh Chart"))) : (
       // Existing Search Bar Layout
       /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", spacing: 8, padding: 6, fill: "#F0F0F0", cornerRadius: 8, width: "fill-parent", verticalAlignItems: "center" }, /* @__PURE__ */ figma.widget.h(
         Input,

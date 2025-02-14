@@ -172,12 +172,6 @@ function Widget() {
       <Text fill="#FFFFFF" fontSize={12}>Refresh Chart</Text>
     </AutoLayout>
 
-    {/* Chart Title (Wrapped for Consistent Height) */}
-    <AutoLayout verticalAlignItems="center" padding={6}>
-      <Text fontSize={titleFontSize} fontWeight="bold" fill="#000000">
-        {chartTitle}
-      </Text>
-    </AutoLayout>
   </AutoLayout>
 ) : (
   // Existing Search Bar Layout
