@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wordcloud</title>
+    <title>Quote</title>
   </head>
   <style>
     body {
@@ -39,6 +39,7 @@
       flex-grow: 1;
       display: flex;
       gap: 5px;
+      width: 380px; 
       flex-direction: column;
       align-items: flex-end;
     }
@@ -67,16 +68,48 @@
     }
     textarea {
       width: 100%;
+      height: 100px;
       flex-grow: 1;
       padding: 10px;
       font-size: 1em;
       font-family: unset;
       resize: none;
     }
-    .btn-row {
+    .btn-row, .input-row {
       display: flex;
+      gap: 10px;
       justify-content: flex-end;
       align-items: center;
+    }
+    .input-row {
+      gap: 5px;
+      background-color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .input-row button {
+      padding: 5px 10px;
+      vertical-align: center;
+      border: none;
+    }
+    .input-row button.active {
+      background-color: #000;
+      color: #fff;
+    }
+    input[type="color"] {
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: unset;
+      border: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
     }
   </style>
   <body>
@@ -93,6 +126,14 @@
           placeholder="Author (optional)..."
         />
         <div class="btn-row">
+          <button id="reset-style" onclick="resetStyle()">Reset</button>
+          <div class="input-row">
+            <button id="fontSize-s" onclick="setFontSize('s')">S</button>
+            <button id="fontSize-m" onclick="setFontSize('m')">M</button>
+            <button id="fontSize-l" onclick="setFontSize('l')">L</button>
+          </div>
+          <input type="color" id="color" value="#000000" oninput="setBackgroundColor(this.value)" />
+          <input type="color" id="textColor" value="#000000" oninput="setTextColor(this.value)" />
           <button onclick="updateQuote()">Update</button>
         </div>
       </div>
@@ -104,7 +145,16 @@
     <script>
       const citation = document.getElementById("citation");
       const quote = document.getElementById("quote");
+      const defaultStyle = {
+        backgroundColor: "#ffd966",
+        textColor: "#000000",
+        fontSize: 24,
+        fontFamily: "Lora",
+      };
+      let style = JSON.parse(JSON.stringify(defaultStyle));
       window.onmessage = (event) => {
+        style = event.data.pluginMessage.style;
+        updateStyle();
         quote.innerText = event.data.pluginMessage.quote;
         citation.value = event.data.pluginMessage.citation;
         citation.onkeydown = (e) => {
@@ -121,10 +171,57 @@
         quote.focus();
       };
 
+      const sizes = {
+        s: 12,
+        m: 24,
+        l: 36,
+      }
+
+      function updateStyle() {
+        document.body.style.backgroundColor = style.backgroundColor;
+        document.getElementById("color").value = style.backgroundColor;
+        document.getElementById("textColor").value = style.textColor;
+        document.body.style.color = style.textColor;
+        document.getElementById("quote").style.fontSize = `${style.fontSize * (3/4)}px`;
+        document.getElementById("quote").style.color = style.textColor;
+        document.getElementById("citation").style.color = style.textColor;
+        document.body.style.fontFamily = `"${style.fontFamily}", "Inter", sans-serif`;
+        document.getElementById("fontSize-s").classList.remove("active");
+        document.getElementById("fontSize-m").classList.remove("active");
+        document.getElementById("fontSize-l").classList.remove("active");
+        document.getElementById(`fontSize-${Object.keys(sizes).find(key => sizes[key] === style.fontSize)}`).classList.add("active");
+
+        if (JSON.stringify(style) !== JSON.stringify(defaultStyle)) {
+          document.getElementById("reset-style").style.display = "block";
+        } else {
+          document.getElementById("reset-style").style.display = "none";
+        }
+      }
+
+      function setFontSize(size) {
+        style.fontSize = sizes[size];
+        updateStyle();
+      }
+
+      function setBackgroundColor(color) {
+        style.backgroundColor = color;
+        updateStyle();
+      }
+
+      function setTextColor(color) {
+        style.textColor = color;
+        updateStyle();
+      }
+
       function detectEnter(e) {
         if (e.key === "Enter") {
           updateQuote();
         }
+      }
+
+      function resetStyle() {
+        style = JSON.parse(JSON.stringify(defaultStyle));
+        updateStyle();
       }
 
       function updateQuote() {
@@ -134,6 +231,7 @@
               type: "textSubmit",
               quote: document.getElementById("quote").value,
               citation: document.getElementById("citation").value,
+              style
             },
           },
           "*"
