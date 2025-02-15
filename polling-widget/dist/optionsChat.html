@@ -238,15 +238,20 @@
         var deleteConfirmation = false;
 
         function checkPin() {
-            var pin = document.getElementById("pinInput").value;
+            var pinInput = document.getElementById("pinInput");
+            var pin = pinInput.value;
+        
             if (pin === correctPin) {
                 document.getElementById("pinForm").style.display = "none";
                 document.getElementById("adminControls").style.display = "block";
             } else {
                 alert("Incorrect PIN.");
-                parent.postMessage({ pluginMessage: { type: 'close-options' } }, '*');
+                pinInput.value = ""; // Clear input field
+                pinInput.disabled = false; // Ensure it remains enabled
+                pinInput.focus(); // Bring focus back for immediate retry
             }
         }
+        
 
         function updatePrompt() {
             // Send a message to the plugin to pin the message

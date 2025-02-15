@@ -231,6 +231,7 @@ const sendUpdate = async () => {
 
 app.post('/textentrywidget/reset-widget', async (req, res) => {
   const { widgetId } = req.body;
+  console.log(widgetId, req.body);
 
   try {
     const widget = await Widget.findOne({ widgetId });
