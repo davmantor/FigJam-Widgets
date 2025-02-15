@@ -1,4 +1,4 @@
-const { widget } = figma;
+const { widget, group } = figma;
 const {
   useSyncedState,
   useSyncedMap,
@@ -20,6 +20,8 @@ const MIN_WORDS = 10;
 const PADDING = 16;
 const MAX_WORDS_IN_WORDCLOUD = 100;
 
+const RESET_ICON = `<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="var(--figma-color-icon-onbrand-secondary, rgba(255, 255, 255, .8))" stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>`
+
 interface WordcloudWord {
   x: number;
   y: number;
@@ -37,6 +39,7 @@ function Widget() {
   const [wordsNeeded, setWordsNeeded] = useSyncedState<number>("wordsNeeded", MIN_WORDS);
   const [timerSeconds, setTimerSeconds] = useSyncedState<number>("timerSeconds", TIMER_SECONDS);
   const [responses, setResponses] = useSyncedState<number>("responses", 0);
+  const [spawnSide, setSpawnSide] = useSyncedState<"left" | "right" | "top" | "bottom">("spawnSide", "top");
   const votes = useSyncedMap<number>("votes");
   const widgetId = useWidgetNodeId();
 
@@ -94,18 +97,23 @@ function Widget() {
       section.appendChild(text);
     }
 
-    section.x =
-      node.absoluteTransform[0][2] + node.width / 2 - section.width / 2;
-    section.y = node.absoluteTransform[1][2] - section.height - 16;
+    group([section, ...section.children], figma.currentPage);
 
-    /*// create image node
-    const image = await figma.createImageAsync(wordcloudImg);
-    const frame = figma.createFrame();
-    frame.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: image.hash }];
-    frame.resize(300, 300);
-    figma.currentPage.appendChild(frame);
-    frame.x = node.x + node.width / 2 - frame.width / 2;
-    frame.y = node.y - frame.height - 16;*/
+    if (spawnSide === "left") {
+      section.x = node.absoluteTransform[0][2] - section.width - 16;
+      section.y =
+        node.absoluteTransform[1][2] + node.height / 2 - section.height / 2;
+    } else if (spawnSide === "right") {
+      section.x = node.absoluteTransform[0][2] + node.width + 16;
+      section.y =
+        node.absoluteTransform[1][2] + node.height / 2 - section.height / 2;
+    } else if (spawnSide === "top") {
+      section.x = node.absoluteTransform[0][2] + node.width / 2 - section.width / 2;
+      section.y = node.absoluteTransform[1][2] - section.height - 16;
+    } else {
+      section.x = node.absoluteTransform[0][2] + node.width / 2 - section.width / 2;
+      section.y = node.absoluteTransform[1][2] + node.height + 16;
+    }
   };
 
   const responsesLeft = () => {
@@ -121,7 +129,9 @@ function Widget() {
       if (msg.type === "addWord") {
         if (msg.word !== "") {
           for (let word of msg.word.split(" ")) {
-            votes.set(word, (votes.get(word) || 0) + 1);
+            const newVotes = (votes.get(word) || 0) + 1;
+            votes.set(word, newVotes);
+            figma.ui.postMessage({ type: "addWord", word, votes: newVotes });
           }
         }
       }
@@ -147,7 +157,7 @@ function Widget() {
       tooltip: 'Responses needed',
       propertyName: 'responsesNeeded',
       options: [
-        { option: '1', label: '1 responses' },
+        { option: '1', label: '1 response' },
         { option: '2', label: '2 responses' },
         { option: '3', label: '3 responses' },
         { option: '4', label: '4 responses' },
@@ -184,8 +194,36 @@ function Widget() {
         { option: '120', label: '120 seconds' },
       ],
       selectedOption: timerSeconds.toString(),
+    },
+      {
+        itemType: "dropdown",
+        tooltip: "Create wordcloud on",
+        propertyName: "spawnSide",
+        selectedOption: spawnSide,
+        options: [
+          { option: "top", label: "Top" },
+          { option: "bottom", label: "Bottom" },
+          { option: "left", label: "Left" },
+          { option: "right", label: "Right" },
+        ],
+      },
+    {
+      itemType: 'separator'
+    },
+    {
+      itemType: 'action',
+      tooltip: 'Reset',
+      icon: RESET_ICON,
+      propertyName: 'reset',
     }
   ], async ({ propertyName, propertyValue }) => {
+    if (propertyName === 'reset') {
+      setResponses(0);
+      // No clear method for maps?
+      for (const key of votes.keys()) {
+        votes.delete(key);
+      }
+    }
     if (!propertyValue) return;
     if (propertyName === 'responsesNeeded') {
       setResponsesNeeded(parseInt(propertyValue));
@@ -195,6 +233,9 @@ function Widget() {
     }
     if (propertyName === 'timer') {
       setTimerSeconds(parseInt(propertyValue));
+    }
+    if (propertyName === "spawnSide") {
+      setSpawnSide(propertyValue as "left" | "right" | "top" | "bottom");
     }
   });
 
@@ -226,9 +267,10 @@ function Widget() {
           fill="#cccccc"
           padding={{ left: 16, right: 16, top: 5, bottom: 5 }}
           cornerRadius={100}
+          maxHeight={38}
           onClick={openInputMenu}
         >
-          <Text>Add words</Text>
+          <Text fontSize={24}>Add words</Text>
         </AutoLayout>
         <AutoLayout
           direction="vertical"
@@ -237,17 +279,18 @@ function Widget() {
           fill="#cccccc"
           padding={{ left: 16, right: 16, top: 5, bottom: 5 }}
           cornerRadius={100}
+          maxHeight={38}
           onClick={thresholdMet ? createWordcloud : undefined}
         >
-          <Text>{thresholdMet ? "" : "🔒 "}Generate</Text>
+          <Text lineHeight={thresholdMet ? 24 : 18} fontSize={thresholdMet ? 24 : 18}>{thresholdMet ? "" : "🔒 "}Generate</Text>
           {(!thresholdMet && responsesToGo > 0) && (
-            <Text fontSize={8}>
+            <Text fontSize={8} paragraphIndent={29}>
               Need {responsesToGo} more{" "}
               {responsesToGo === 1 ? "response" : "responses"}
             </Text>
           )}
           {(!thresholdMet && responsesToGo <= 0 && wordsToGo > 0) && (
-            <Text fontSize={8}>
+            <Text fontSize={8} paragraphIndent={29}>
               Need {wordsLeft()} more {wordsToGo === 1 ? "word" : "words"}
             </Text>
           )}
