@@ -148,6 +148,20 @@
         document.getElementById('sendMessage').innerText = 'Update Subheading';
         anonymousContainer.style.display = 'none'; 
       }
+      else if (type === 'edit-headingFontSize') {
+        document.getElementById('messageInput').value = payload;
+        document.getElementById('sendMessage').innerText = 'Update Heading Font Size';
+        anonymousContainer.style.display = 'none';
+    } else if (type === 'edit-subheadingFontSize') {
+        document.getElementById('messageInput').value = payload;
+        document.getElementById('sendMessage').innerText = 'Update Subheading Font Size';
+        anonymousContainer.style.display = 'none';
+    } else if (type === 'edit-choiceFontSize') {
+        document.getElementById('messageInput').value = payload;
+        document.getElementById('sendMessage').innerText = 'Update Choice Font Size';
+        anonymousContainer.style.display = 'none';
+    }
+    
     };
 
     // Send button click handler

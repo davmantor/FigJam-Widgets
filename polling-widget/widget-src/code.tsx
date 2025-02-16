@@ -51,7 +51,7 @@ function ProgressBar({ votes, totalVotes, widgetWidth, barColor }: { votes: numb
     const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
     return Math.floor(input * scalingRatio); // Scale the input value by the ratio
   }
-  const parentWidth = getWidgetValue(500);
+  const parentWidth = getWidgetValue(740);
   const percentage = totalVotes === 0 ? 0 : (votes / totalVotes) * 100;
   console.log("votes: " + votes);
   console.log("totalVotes: " + totalVotes);
@@ -280,15 +280,20 @@ function PollingWidget() {
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
 
 
-  const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 400);
+  const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 300);
   const [borderWidth, setBorderWidth] = useSyncedState<number>('borderWidth', 2);
   const [borderColor, setBorderColor] = useSyncedState<string>('borderColor', '#E6E6E6');
   const [promptColor, setPromptColor] = useSyncedState<string>('promptColor', '#000000');
   const [barColor, setBarColor] = useSyncedState<string>('barColor', '#A259FF');
   const [accentColor, setAccentColor] = useSyncedState<string>('accentColor', '#24CE16');
 
-  const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 10);
+  const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 15);
   const [subheading, setSubheading] = useSyncedState<string>('subheading', "");
+
+  const [headingFontSize, setHeadingFontSize] = useSyncedState<number>('headingFontSize', 28);
+  const [subheadingFontSize, setSubheadingFontSize] = useSyncedState<number>('subheadingFontSize', 20);
+  const [choiceFontSize, setChoiceFontSize] = useSyncedState<number>('choiceFontSize', 16);
+
 
 
   // Track logId changes
@@ -724,6 +729,76 @@ function PollingWidget() {
                 handleOptionsClickChat();
             }
         };}
+        else if (msg.type === 'update-headingFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-headingFontSize', payload: headingFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setHeadingFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+
+                  setIsCrownButtonPressed(true);
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+          };
+      } else if (msg.type === 'update-subheadingFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-subheadingFontSize', payload: subheadingFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setSubheadingFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+
+                  setIsCrownButtonPressed(true);
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+                setIsCrownButtonPressed(true);
+
+            }
+          };
+      } else if (msg.type === 'update-choiceFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-choiceFontSize', payload: choiceFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setChoiceFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+                  setIsCrownButtonPressed(true);
+
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+          };
+      }
+      
     };
   }})
 
@@ -833,13 +908,12 @@ function PollingWidget() {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-      {/* Crown button in the top right, outside the white background */}
-      <AutoLayout
-      verticalAlignItems="center"
-      width="fill-parent"
-      >
-
 <AutoLayout
+direction="horizontal"
+width="fill-parent"
+>
+      {/* Title Section */}
+      <AutoLayout
         width="fill-parent"
         verticalAlignItems="center"
         onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
@@ -850,12 +924,12 @@ function PollingWidget() {
             onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
             placeholder="Enter poll title"
             width="fill-parent"
-            fontSize={getWidgetValue(30)}
+            fontSize={headingFontSize}
             fontWeight="bold"
           />
         ) : (
           <Text
-            fontSize={getWidgetValue(30)}
+            fontSize={headingFontSize}
             fontWeight="bold"
             width="fill-parent"
             horizontalAlignText="left"
@@ -864,7 +938,11 @@ function PollingWidget() {
           </Text>
         )}
       </AutoLayout>
-      
+      {/* Crown button in the top right, outside the white background */}
+      <AutoLayout
+      verticalAlignItems="center"
+      width="fill-parent"
+      >
       <AutoLayout
         direction="horizontal"
         verticalAlignItems="start"
@@ -875,9 +953,7 @@ function PollingWidget() {
       >
         <SVG src={adminI} onClick={handleOptionsClickChat} />
       </AutoLayout>
-
-      {/* Title Section */}
-      
+      </AutoLayout>
 
       </AutoLayout>
       
@@ -896,13 +972,13 @@ function PollingWidget() {
             onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
             placeholder="Enter subheading"
             width="fill-parent"
-            fontSize={getWidgetValue(20)}
+            fontSize={subheadingFontSize}
             fontWeight="normal"
             fill="#666666"
           />
         ) : (
           <Text
-            fontSize={getWidgetValue(20)}
+          fontSize={subheadingFontSize}
             fontWeight="normal"
             width="fill-parent"
             horizontalAlignText="left"
@@ -982,7 +1058,7 @@ function PollingWidget() {
       
       {submitted && (
         <AutoLayout width="fill-parent" padding={{ top: getWidgetValue(10) }}>
-          <Text fontSize={getWidgetValue(12)} fill="#808080" width="fill-parent">
+          <Text fontSize={choiceFontSize} fill="#808080" width="fill-parent">
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>

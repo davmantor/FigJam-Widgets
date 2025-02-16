@@ -134,6 +134,18 @@
                 </svg>
                 Accent Color:
             </div> 
+            <div id="headingFontSizeButton" class="button1" onclick="updateHeadingFontSize()">
+                Heading Font Size
+            </div> 
+            
+            <div id="subheadingFontSizeButton" class="button1" onclick="updateSubheadingFontSize()">
+                Subheading Font Size
+            </div>
+            
+            <div id="choiceFontSizeButton" class="button1" onclick="updateChoiceFontSize()">
+                Choice/Vote Font Size
+            </div>
+            
             <div class="widget-details-container">
                 <label for="customWidgetGroupInput">Widget Group:</label>
                 <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
@@ -301,7 +313,17 @@
             console.log("Sending subheading update request to code.tsx");
             parent.postMessage({ pluginMessage: { type: 'update-subheading' } }, '*');
         }
+        function updateHeadingFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-headingFontSize' } }, '*');
+        }
         
+        function updateSubheadingFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-subheadingFontSize' } }, '*');
+        }
+        
+        function updateChoiceFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-choiceFontSize' } }, '*');
+        }
           
 
     </script>
