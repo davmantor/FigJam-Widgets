@@ -42,16 +42,17 @@ interface TextBoxProps {
   barColor: string;
   accentColor: string;
   promptColor: string;
+  fontSize: number;
 }
 
 
-function ProgressBar({ votes, totalVotes, widgetWidth, barColor }: { votes: number; totalVotes: number; widgetWidth: number; barColor: string }) {
+function ProgressBar({ votes, totalVotes, widgetWidth, barColor, barWidth }: { votes: number; totalVotes: number; widgetWidth: number; barColor: string, barWidth: number }) {
   function getWidgetValue(input: number): number {
     const currentWidgetWidth = widgetWidth; // Get the current widget width
     const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
     return Math.floor(input * scalingRatio); // Scale the input value by the ratio
   }
-  const parentWidth = getWidgetValue(740);
+  const parentWidth = barWidth;
   const percentage = totalVotes === 0 ? 0 : (votes / totalVotes) * 100;
   console.log("votes: " + votes);
   console.log("totalVotes: " + totalVotes);
@@ -98,7 +99,8 @@ function TextBox({
   widgetWidth,
   barColor,
   accentColor,
-  promptColor
+  promptColor,
+  fontSize
 }: TextBoxProps & { totalVoters: number; pollId?: string; entries?: string[] }) {
 
   function getWidgetValue(input: number): number {
@@ -193,8 +195,8 @@ function TextBox({
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width="fill-parent"
-          height={getWidgetValue(60)}
+          width={getWidgetValue(710)}
+          height='hug-contents'
         >
           {isEditing ? (
             <Input
@@ -202,10 +204,10 @@ function TextBox({
               onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
               width="fill-parent"
-              fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)}
+              fontSize={isQuestion ? fontSize : fontSize - 4}
             />
           ) : (
-            <Text fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
+            <Text fontSize={isQuestion ? fontSize : fontSize - 4} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
               {value || (isQuestion ? "Enter poll question" : "Enter option")}
             </Text>
           )}
@@ -248,7 +250,7 @@ function TextBox({
         )}
       </AutoLayout>
       {!isQuestion && submitted && (
-        <ProgressBar votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
+        <ProgressBar barWidth={getWidgetValue(710)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
       )}
     </AutoLayout>
   );
@@ -1013,6 +1015,7 @@ width="fill-parent"
           barColor={barColor}
           accentColor={accentColor}
           promptColor={promptColor}
+          fontSize = {choiceFontSize}
         />
       ))}
   
