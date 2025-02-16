@@ -6,9 +6,8 @@
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
-  "editorType": [
-    "figjam"
-  ],
+  "editorType": ["figjam"],
+  "permissions": ["currentuser"],
   "containsWidget": true,
   "widgetApi": "1.0.0",
   "ui": "ui.html",

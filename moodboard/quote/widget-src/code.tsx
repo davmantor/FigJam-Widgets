@@ -17,46 +17,73 @@ function Widget() {
     "citation",
     null
   );
+  const [spawnSide, setSpawnSide] = useSyncedState<
+    "left" | "right" | "top" | "bottom"
+  >("spawnSide", "top");
+  const [style, setStyle] = useSyncedState<any>("style", {
+    backgroundColor: "#ffd966",
+    textColor: "#000000",
+    fontSize: 24,
+    fontFamily: "Lora",
+  });
 
   const createQuote = async (quote: string) => {
     if (quote === "") return;
     const node = (await figma.getNodeByIdAsync(widgetId)) as WidgetNode;
     const clone = node.cloneWidget({ quote });
-    clone.x = node.absoluteTransform[0][2] + node.width / 2 - clone.width / 2;
-    clone.y = node.absoluteTransform[1][2] - clone.height - 16;
+    // estimate width (not perfect, but close enough)
+    const width = Math.min(quote.length * 16 + 80, clone.width + 80);
+    if (spawnSide === "left") {
+      clone.x = node.absoluteTransform[0][2] - width - 16;
+      clone.y =
+        node.absoluteTransform[1][2] + node.height / 2 - clone.height / 2;
+    } else if (spawnSide === "right") {
+      clone.x = node.absoluteTransform[0][2] + node.width + 16;
+      clone.y =
+        node.absoluteTransform[1][2] + node.height / 2 - clone.height / 2;
+    } else if (spawnSide === "top") {
+      clone.x = node.absoluteTransform[0][2] + node.width / 2 - width / 2;
+      clone.y = node.absoluteTransform[1][2] - clone.height - 16;
+    } else {
+      clone.x = node.absoluteTransform[0][2] + node.width / 2 - width / 2;
+      clone.y = node.absoluteTransform[1][2] + node.height + 16;
+    }
   };
 
   if (quote) {
-    let propertyMenuItems = [
-      {
-        itemType: "action",
-        tooltip: "Edit Quote",
-        propertyName: "editText",
-        icon: PENCIL_ICON,
-      },
-    ];
+    usePropertyMenu(
+      [
+        {
+          itemType: "action",
+          tooltip: "Edit Quote",
+          propertyName: "editText",
+          icon: PENCIL_ICON,
+        },
+      ],
+      async ({ propertyName }) => {
+        if (propertyName === "editText") {
+          return new Promise((resolve) => {
+            figma.showUI(__html__, { width: 500, height: 250 });
 
-    usePropertyMenu(propertyMenuItems, async ({ propertyName }) => {
-      if (propertyName === "editText") {
-        return new Promise((resolve) => {
-          figma.showUI(__html__, { width: 500, height: 250 });
+            figma.ui.postMessage({
+              quote,
+              citation,
+              style
+            });
 
-          figma.ui.postMessage({
-            quote,
-            citation,
+            figma.ui.onmessage = (data) => {
+              if (data.type === "textSubmit") {
+                setQuote(data.quote.trim());
+                setCitation(data.citation.trim());
+                setStyle(data.style);
+              }
+              figma.closePlugin();
+              resolve();
+            };
           });
-
-          figma.ui.onmessage = (data) => {
-            if (data.type === "textSubmit") {
-              setQuote(data.quote.trim());
-              setCitation(data.citation.trim());
-            }
-            figma.closePlugin();
-            resolve();
-          };
-        });
+        }
       }
-    });
+    );
     return (
       <AutoLayout
         effect={[
@@ -68,26 +95,27 @@ function Widget() {
           },
         ]}
         minHeight={80}
-        fill="#FFD966"
+        fill={style.backgroundColor}
         padding={{ left: 16, right: 16, top: 8, bottom: 8 }}
         spacing={8}
         verticalAlignItems="center"
       >
         <AutoLayout height="fill-parent" verticalAlignItems="start">
-          <Text fontSize={64} lineHeight={64} fontFamily="Lora">
+          <Text fill={style.textColor} fontSize={style.fontSize * (8/3)} lineHeight={style.fontSize * (8/3)} fontFamily="Lora">
             “
           </Text>
         </AutoLayout>
         <AutoLayout direction="vertical" width="hug-contents" maxWidth={600}>
-          <Text width="fill-parent" fontSize={24} fontFamily="Lora">
+          <Text width="fill-parent" fontSize={style.fontSize} fontFamily={style.fontFamily} fill={style.textColor}>
             {quote}
           </Text>
-          {(!!citation) && (
+          {!!citation && (
             <Text
               width="fill-parent"
               horizontalAlignText="right"
-              fontFamily="Lora"
-              fontSize={18}
+              fontFamily={style.fontFamily}
+              fill={style.textColor}
+              fontSize={style.fontSize * (3/4)}
               italic={true}
             >
               {citation}
@@ -95,13 +123,35 @@ function Widget() {
           )}
         </AutoLayout>
         <AutoLayout height="fill-parent" verticalAlignItems="end">
-          <Text fontSize={64} lineHeight={0} fontFamily="Lora">
+          <Text fill={style.textColor} fontSize={style.fontSize * (8/3)} lineHeight={0} fontFamily="Lora">
             ”
           </Text>
         </AutoLayout>
       </AutoLayout>
     );
   }
+
+  usePropertyMenu(
+    [
+      {
+        itemType: "dropdown",
+        tooltip: "Create quotes on",
+        propertyName: "spawnSide",
+        selectedOption: spawnSide,
+        options: [
+          { option: "top", label: "Top" },
+          { option: "bottom", label: "Bottom" },
+          { option: "left", label: "Left" },
+          { option: "right", label: "Right" },
+        ],
+      },
+    ],
+    (msg) => {
+      if (msg.propertyName === "spawnSide") {
+        setSpawnSide(msg.propertyValue as "left" | "right" | "top" | "bottom");
+      }
+    }
+  );
 
   return (
     <AutoLayout
@@ -135,6 +185,7 @@ function Widget() {
           fontSize={24}
           verticalAlignText="center"
           value=""
+          truncate={3}
           placeholder="Type your quote here"
           onTextEditEnd={(e) => createQuote(e.characters)}
         />
