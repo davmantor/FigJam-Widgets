@@ -195,7 +195,7 @@ function TextBox({
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(710)}
+          width={getWidgetValue(650)}
           height='hug-contents'
         >
           {isEditing ? (
@@ -228,16 +228,16 @@ function TextBox({
           horizontalAlignItems="end"
           width="hug-contents"  // Ensures it only takes necessary space
         >
-          <Text fontSize={getWidgetValue(28)} fill={userVote ? barColor : "#000000"}>
+          <Text fontSize={fontSize} fill={userVote ? barColor : "#000000"}>
             {displayedVoters.length + additionalVotes}
           </Text>
           {displayedVoters.map((voter, i) => (
             <Image 
               key={i} 
               src={isAnonymous ? AnonSVG : voter.photoUrl} 
-              width={getWidgetValue(28)} 
-              height={getWidgetValue(28)} 
-              cornerRadius={getWidgetValue(14)} 
+              width={fontSize} 
+              height={fontSize} 
+              cornerRadius={fontSize} 
             />
           ))}
           {additionalVotes > 0 && (
@@ -250,7 +250,7 @@ function TextBox({
         )}
       </AutoLayout>
       {!isQuestion && submitted && (
-        <ProgressBar barWidth={getWidgetValue(710)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
+        <ProgressBar barWidth={getWidgetValue(650)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
       )}
     </AutoLayout>
   );
@@ -911,53 +911,54 @@ function PollingWidget() {
       width={widgetWidth}
     >
 <AutoLayout
-direction="horizontal"
-width="fill-parent"
+  direction="horizontal"
+  width="fill-parent"
+  spacing={getWidgetValue(0)}
+  verticalAlignItems="center"
 >
-      {/* Title Section */}
-      <AutoLayout
+  {/* Title Section */}
+  <AutoLayout
+    width="fill-parent"
+    verticalAlignItems="center"
+    onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
+    padding={{ left: getWidgetValue(2) }}
+  >
+    {editingIndex === -1 ? (
+      <Input
+        value={title}
+        onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
+        placeholder="Enter poll title"
         width="fill-parent"
-        verticalAlignItems="center"
-        onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
-      >
-        {editingIndex === -1 ? (
-          <Input
-            value={title}
-            onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
-            placeholder="Enter poll title"
-            width="fill-parent"
-            fontSize={headingFontSize}
-            fontWeight="bold"
-          />
-        ) : (
-          <Text
-            fontSize={headingFontSize}
-            fontWeight="bold"
-            width="fill-parent"
-            horizontalAlignText="left"
-          >
-            {title || "Enter poll title"}
-          </Text>
-        )}
-      </AutoLayout>
-      {/* Crown button in the top right, outside the white background */}
-      <AutoLayout
-      verticalAlignItems="center"
-      width="fill-parent"
-      >
-      <AutoLayout
-        direction="horizontal"
-        verticalAlignItems="start"
+        fontSize={headingFontSize}
+        fontWeight="bold"
+        horizontalAlignText="left"
+      />
+    ) : (
+      <Text
+        fontSize={headingFontSize}
+        fontWeight="bold"
         width="fill-parent"
-        horizontalAlignItems="end"
-        height={getWidgetValue(20)}
-        padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
+        horizontalAlignText="left"
       >
-        <SVG src={adminI} onClick={handleOptionsClickChat} />
-      </AutoLayout>
-      </AutoLayout>
+        {title || "Enter poll title"}
+      </Text>
+    )}
+  </AutoLayout>
 
-      </AutoLayout>
+  {/* Crown button aligned to the end */}
+  <AutoLayout
+    direction="horizontal"
+    verticalAlignItems="start"
+    width="hug-contents" 
+    height={getWidgetValue(20)}
+    padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
+  >
+    <SVG src={adminI} onClick={handleOptionsClickChat} />
+  </AutoLayout>
+</AutoLayout>
+
+
+
       
   
       
