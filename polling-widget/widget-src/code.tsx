@@ -1,6 +1,9 @@
 const { widget, showUI, ui } = figma;
 const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
+import { widgetVersion } from "./version";
+
+
 const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
 <defs>
 </defs>
@@ -295,8 +298,24 @@ function PollingWidget() {
   const [headingFontSize, setHeadingFontSize] = useSyncedState<number>('headingFontSize', 28);
   const [subheadingFontSize, setSubheadingFontSize] = useSyncedState<number>('subheadingFontSize', 20);
   const [choiceFontSize, setChoiceFontSize] = useSyncedState<number>('choiceFontSize', 16);
+  const [publishedAt, setPublishedAt] = useSyncedState<string>(
+    'publishedAt',
+    getPSTDateFromVersion(widgetVersion)
+  );
+  
 
+  function getPSTDateFromVersion(versionDate: string): string {
+    const date = new Date(versionDate);
+    const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+    const pstOffset = -8 * 60 * 60000; // PST is UTC-8
+    const pstDate = new Date(utc + pstOffset);
+    console.log("DATE", pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
+    return pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+
+  }
+  
+  
 
   // Track logId changes
   useEffect(() => {
@@ -442,7 +461,7 @@ function PollingWidget() {
     try {
       console.log(JSON.stringify(pollData));
       // Send the data to the server to create a new poll
-      const response = await fetch('http://localhost:4000/polls/create', {
+      const response = await fetch('https://figjam-widgets-myhz.onrender.com/polls/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -508,7 +527,9 @@ function PollingWidget() {
     if (isCrownButtonPressed) {
       setIsCrownButtonPressed(false);
       console.log('crown123', isCrownButtonPressed);
-    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
+      setPublishedAt(getPSTDateFromVersion(widgetVersion));
+      console.log("Current publishedAt state:", publishedAt);
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -519,6 +540,11 @@ function PollingWidget() {
     figma.ui.postMessage({ type: 'current-widgetId',           payload: logId });
     figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
     figma.ui.postMessage({ type: 'current-pollId',           payload: pollId });
+    figma.ui.postMessage({
+      type: 'current-publishedAt',
+      payload: getPSTDateFromVersion(widgetVersion),
+    });
+    
 
     figma.ui.onmessage = async (msg) => {
       if (msg.type === 'update-prompt') {
@@ -1067,7 +1093,10 @@ function PollingWidget() {
           </Text>
         </AutoLayout>
       )}
+
     </AutoLayout>
+    
+  
   );
   
 }

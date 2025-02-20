@@ -62,6 +62,17 @@
         border-color: #007bff; /* Change the border color on focus */
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle box shadow on focus */
         }
+        .published-info {
+            bottom: 10px; /* 10px from bottom */
+            left: 10px;   /* 10px from left */
+            font-size: 12px;
+            font-weight: 300;       /* Light font */
+            color: #888888;         /* Soft gray color */
+            font-family: Arial, sans-serif;
+            opacity: 0.7;           /* Slight transparency */
+        }
+        
+        
     </style>
 </head>
 <body>
@@ -157,6 +168,11 @@
                 </svg>
                 Subheading
               </div>
+              <div class="published-info">
+                <strong>Compiled:</strong> <span id="publishedAtDisplay">Loading...</span>
+            </div>
+            
+            
               
 
         </div>
@@ -178,7 +194,7 @@
         console.log(widgetId);
         
         // Send the new group to the server
-        fetch('http://localhost:4000/polls/update-group', {
+        fetch('https://figjam-widgets-myhz.onrender.com/polls/update-group', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -242,6 +258,10 @@
                 case 'current-pollId':
                     widgetId = event.data.pluginMessage.payload;
                     console.log("widgetID", widgetId);
+                    break;
+                case 'current-publishedAt':
+                    console.log("DATE IN UI");
+                    document.getElementById('publishedAtDisplay').textContent = payload || "Not Published";
                     break;
             }
         };
