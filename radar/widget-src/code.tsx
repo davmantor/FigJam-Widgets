@@ -1,26 +1,50 @@
+import { widgetVersion } from "./version";
+
 const { widget } = figma;
 const { AutoLayout, Text, Input, Image, SVG } = widget;
 
 function Widget() {
-  const [chartTitle, setChartTitle] = widget.useSyncedState("chartTitle", "Poll Results");
-  const [dataPointLabels, setDataPointLabels] = widget.useSyncedState("dataPointLabels", {});
-  const [widgetWidth, setWidgetWidth] = widget.useSyncedState("widgetWidth", 300);
-  const [widgetHeight, setWidgetHeight] = widget.useSyncedState("widgetHeight", 300);
-  const [titleFontSize, setTitleFontSize] = widget.useSyncedState("titleFontSize", 16);
-  const [messageFontSize, setMessageFontSize] = widget.useSyncedState("messageFontSize", 14);
-  const [chartColor, setChartColor] = widget.useSyncedState("chartColor", "#007AFF");
+  const [chartTitle, setChartTitle] = widget.useSyncedState(
+    "chartTitle",
+    "Poll Results"
+  );
+  const [dataPointLabels, setDataPointLabels] = widget.useSyncedState(
+    "dataPointLabels",
+    {}
+  );
+  const [widgetWidth, setWidgetWidth] = widget.useSyncedState(
+    "widgetWidth",
+    300
+  );
+  const [widgetHeight, setWidgetHeight] = widget.useSyncedState(
+    "widgetHeight",
+    300
+  );
+
+  const [style, setStyle] = widget.useSyncedState("style", {
+    titleFontSize: 16,
+    labelFontSize: 14,
+    chartColor: "#007AFF",
+    refreshColor: "#FFA500",
+    cornerRadius: 8,
+  });
 
   const [chartImage, setChartImage] = widget.useSyncedState("chartImage", null);
   const [groupSet, setGroupSet] = widget.useSyncedState("groupSet", false);
-  const [errorMessage, setErrorMessage] = widget.useSyncedState("errorMessage", "None");
+  const [errorMessage, setErrorMessage] = widget.useSyncedState(
+    "errorMessage",
+    "None"
+  );
   const [polls, setPolls] = widget.useSyncedState("polls", []);
   const [userInput, setUserInput] = widget.useSyncedState("userInput", "");
-  const [pollOrder, setPollOrder] = widget.useSyncedState<string[]>("pollOrder", []);
-
+  const [pollOrder, setPollOrder] = widget.useSyncedState<string[]>(
+    "pollOrder",
+    []
+  );
 
   // Open Admin Panel
   const openAdminMenu = () => {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 300 });
       console.log(pollOrder);
 
@@ -31,24 +55,23 @@ function Widget() {
           dataPointLabels,
           widgetWidth,
           widgetHeight,
-          titleFontSize,
-          chartColor,
-          pollOrder
+          style,
+          pollOrder,
+          widgetVersion,
         },
       });
 
       figma.ui.onmessage = (msg) => {
         if (msg.type === "update-poll-order") {
           setPollOrder(msg.payload); // Store updated order
-          console.log('widget side', pollOrder);
-      } else if (msg.type === "update-admin-settings") {
+          console.log("widget side", pollOrder);
+        } else if (msg.type === "update-admin-settings") {
           console.log(msg.payload);
           setChartTitle(msg.payload.chartTitle);
           setDataPointLabels(msg.payload.dataPointLabels);
           setWidgetWidth(msg.payload.widgetWidth);
           setWidgetHeight(msg.payload.widgetHeight);
-          setTitleFontSize(msg.payload.titleFontSize);
-          setChartColor(msg.payload.chartColor);
+          setStyle(msg.payload.style);
         } else if (msg.type === "close-plugin") {
           figma.closePlugin();
           resolve();
@@ -66,7 +89,9 @@ function Widget() {
     setGroupSet(true);
 
     try {
-      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/group/${userInput}`);
+      const response = await fetch(
+        `https://figjam-widgets-myhz.onrender.com/polls/group/${userInput}`
+      );
       if (!response.ok) throw new Error("Failed to fetch polls.");
 
       const data = await response.json();
@@ -74,16 +99,19 @@ function Widget() {
 
       // Ensure data is an array
       if (!Array.isArray(data)) {
-        console.error("Invalid data format. Expected an array, got:", typeof data);
+        console.error(
+          "Invalid data format. Expected an array, got:",
+          typeof data
+        );
         throw new Error("Invalid data format: Expected an array.");
       }
 
-      const sanitizedPolls = data.map(poll => ({
+      const sanitizedPolls = data.map((poll) => ({
         title: poll.subheading,
-        options: poll.options.map(option => ({
+        options: poll.options.map((option) => ({
           text: option.text,
-          votes: option.votes
-        }))
+          votes: option.voters.length, // votes is unreliable and doesn't always update
+        })),
       }));
 
       console.log("Sanitized Polls:", sanitizedPolls);
@@ -91,21 +119,22 @@ function Widget() {
       console.log(pollOrder);
       console.log(pollOrder.length);
       console.log(pollOrder.length == 0);
-      
+
       let orderedPolls = sanitizedPolls;
       console.log("Ordered Polls:", orderedPolls);
 
-
       if (pollOrder.length == 0) {
-        console.log(sanitizedPolls.map(poll => poll.title));
-        setPollOrder(sanitizedPolls.map(poll => poll.title) as string[]);
+        console.log(sanitizedPolls.map((poll) => poll.title));
+        setPollOrder(sanitizedPolls.map((poll) => poll.title) as string[]);
         console.log(pollOrder);
         console.log(orderedPolls);
       } else {
-        console.log('in else');
+        console.log("in else");
         orderedPolls = pollOrder
-        .map(subheading => sanitizedPolls.find(poll => poll.title === subheading))
-        .filter(Boolean); // Remove any undefined entries
+          .map((subheading) =>
+            sanitizedPolls.find((poll) => poll.title === subheading)
+          )
+          .filter(Boolean); // Remove any undefined entries
       }
       console.log(pollOrder);
       console.log("Ordered Polls:", orderedPolls);
@@ -118,26 +147,35 @@ function Widget() {
         return;
       }
 
-      return new Promise((resolve) => {
-        figma.showUI(__uiFiles__.main, { width: 400, height: 400 });
+      return new Promise<void>((resolve) => {
+        figma.showUI(__uiFiles__.main, {
+          visible: false,
+        });
         figma.ui.postMessage({
-          type: 'render-polar-plot',
-          payload: {orderedPolls, chartTitle, dataPointLabels, chartColor, titleFontSize },
+          type: "render-polar-plot",
+          payload: {
+            orderedPolls,
+            chartTitle,
+            dataPointLabels,
+            style,
+            widgetWidth,
+            widgetHeight,
+          },
         });
 
         figma.ui.onmessage = (message) => {
           console.log("Received message from UI:", message);
 
-          if (message.type === 'chart-image') {
+          if (message.type === "chart-image") {
             setChartImage(message.payload);
             figma.closePlugin();
+            figma.notify("Rendered new responses successfully.");
             resolve();
           } else {
             console.warn("Unexpected message type:", message.type);
           }
         };
       });
-
     } catch (error) {
       console.error("Error fetching polls:", error);
       setErrorMessage(error.message || "An error occurred.");
@@ -146,13 +184,29 @@ function Widget() {
   };
 
   return (
-    <AutoLayout direction="vertical" spacing={16} padding={16} width={widgetWidth}>
+    <AutoLayout
+      direction="vertical"
+      width={widgetWidth}
+      fill="#FFFFFF"
+      cornerRadius={style.cornerRadius}
+      stroke="#E6E6E6"
+      strokeWidth={1}
+    >
       {/* Row with Admin Button and Search/Refresh Button */}
-      <AutoLayout direction="horizontal" spacing={8} width="fill-parent" padding={8}>
+      <AutoLayout
+        direction="horizontal"
+        verticalAlignItems="center"
+        spacing={8}
+        padding={16}
+        fill="#F0F0F0"
+        width="fill-parent"
+      >
         {/* Admin Crown Icon Button */}
-        <AutoLayout padding={11} onClick={openAdminMenu}>
+        <AutoLayout onClick={openAdminMenu}>
           <SVG
-            src={`<svg width="${titleFontSize - 2}px" height="${titleFontSize - 2}px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            src={`<svg width="${style.titleFontSize - 2}px" height="${
+              style.titleFontSize - 2
+            }px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
     <g id="SVGRepo_iconCarrier">
@@ -166,48 +220,88 @@ function Widget() {
 
         {/* Search Bar or Refresh Button */}
         {groupSet ? (
-  <AutoLayout direction="horizontal" spacing={8} padding={6} width="fill-parent" verticalAlignItems="center">
-    {/* Refresh Button */}
-    <AutoLayout padding={6} cornerRadius={4} fill="#FFA500" onClick={() => fetchPollData()} verticalAlignItems="center">
-      <Text fill="#FFFFFF" fontSize={12}>Refresh Chart</Text>
-    </AutoLayout>
-
-  </AutoLayout>
-) : (
-  // Existing Search Bar Layout
-  <AutoLayout direction="horizontal" spacing={8} padding={6} fill="#F0F0F0" cornerRadius={8} width="fill-parent" verticalAlignItems="center">
-    <Input
-      placeholder="Search Group Name..."
-      value={userInput}
-      onTextEditEnd={(event) => setUserInput(event.characters?.trim() || "")}
-      width="fill-parent"
-    />
-    <AutoLayout padding={5} cornerRadius={50} fill={chartColor} onClick={() => fetchPollData()} verticalAlignItems="center">
-      <SVG
-        src={`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <AutoLayout
+            direction="horizontal"
+            spacing={8}
+            width="fill-parent"
+            verticalAlignItems="center"
+          >
+            {/* Refresh Button */}
+            <AutoLayout
+              padding={6}
+              cornerRadius={4}
+              fill={style.refreshColor}
+              onClick={() => fetchPollData()}
+              verticalAlignItems="center"
+            >
+              <Text fill="#FFFFFF" fontSize={12}>
+                Refresh Responses
+              </Text>
+            </AutoLayout>
+          </AutoLayout>
+        ) : (
+          // Existing Search Bar Layout
+          <AutoLayout
+            direction="horizontal"
+            spacing={8}
+            padding={6}
+            fill="#F0F0F0"
+            cornerRadius={8}
+            width="fill-parent"
+            verticalAlignItems="center"
+          >
+            <Input
+              placeholder="Search Group Name..."
+              value={userInput}
+              onTextEditEnd={(event) =>
+                setUserInput(event.characters?.trim() || "")
+              }
+              width="fill-parent"
+            />
+            <AutoLayout
+              padding={5}
+              cornerRadius={50}
+              fill={style.chartColor}
+              onClick={() => fetchPollData()}
+              verticalAlignItems="center"
+            >
+              <SVG
+                src={`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>`}
-        width={18}
-        height={18}
-      />
-    </AutoLayout>
-  </AutoLayout>
-)}
-
-
+                width={18}
+                height={18}
+              />
+            </AutoLayout>
+          </AutoLayout>
+        )}
       </AutoLayout>
 
       {/* Chart Image on a New Line */}
       {chartImage && (
-        <AutoLayout>
-          <Image src={chartImage} width={widgetWidth * 0.8} height={widgetHeight * 0.8} cornerRadius={8} />
+        <AutoLayout
+          direction="vertical"
+          verticalAlignItems="center"
+          horizontalAlignItems="center"
+          width="fill-parent"
+          padding={{ top: 8 }}
+        >
+          <Text fontSize={style.titleFontSize}>{chartTitle}</Text>
+          <Image
+            src={chartImage}
+            width={widgetWidth}
+            height={widgetHeight}
+            cornerRadius={8}
+          />
         </AutoLayout>
       )}
 
       {/* Error Message */}
       {errorMessage && errorMessage !== "None" && (
-        <Text fill="#FF0000" fontSize={12}>{errorMessage}</Text>
+        <Text fill="#FF0000" fontSize={12}>
+          {errorMessage}
+        </Text>
       )}
     </AutoLayout>
   );
