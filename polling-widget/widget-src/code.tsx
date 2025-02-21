@@ -295,13 +295,14 @@ function PollingWidget() {
   const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 15);
   const [subheading, setSubheading] = useSyncedState<string>('subheading', "");
 
-  const [headingFontSize, setHeadingFontSize] = useSyncedState<number>('headingFontSize', 28);
-  const [subheadingFontSize, setSubheadingFontSize] = useSyncedState<number>('subheadingFontSize', 20);
+  const [headingFontSize, setHeadingFontSize] = useSyncedState<number>('headingFontSize', 20);
+  const [subheadingFontSize, setSubheadingFontSize] = useSyncedState<number>('subheadingFontSize', 14);
   const [choiceFontSize, setChoiceFontSize] = useSyncedState<number>('choiceFontSize', 16);
   const [publishedAt, setPublishedAt] = useSyncedState<string>(
     'publishedAt',
     getPSTDateFromVersion(widgetVersion)
   );
+  const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
   
 
   function getPSTDateFromVersion(versionDate: string): string {
@@ -544,6 +545,10 @@ function PollingWidget() {
       type: 'current-publishedAt',
       payload: getPSTDateFromVersion(widgetVersion),
     });
+    figma.ui.postMessage({ type: 'current-headingFontSize', payload: headingFontSize });
+    figma.ui.postMessage({ type: 'current-subheadingFontSize', payload: subheadingFontSize });
+    figma.ui.postMessage({ type: 'current-choiceFontSize', payload: choiceFontSize });
+    figma.ui.postMessage({ type: 'current-widgetGroup', payload: widgetGroup });
     
 
     figma.ui.onmessage = async (msg) => {
@@ -826,6 +831,9 @@ function PollingWidget() {
             }
           };
       }
+      else if (msg.type === 'update-widgetGroup') {
+        setWidgetGroup(msg.payload); // Store in state
+      }
       
     };
   }})
@@ -944,32 +952,32 @@ function PollingWidget() {
 >
   {/* Title Section */}
   <AutoLayout
-    width="fill-parent"
-    verticalAlignItems="center"
-    onClick={() => setEditingIndex(-1)} // Set the index to -1 to trigger title editing
-    padding={{ left: getWidgetValue(2) }}
-  >
-    {editingIndex === -1 ? (
-      <Input
-        value={title}
-        onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
-        placeholder="Enter poll title"
-        width="fill-parent"
-        fontSize={headingFontSize}
-        fontWeight="bold"
-        horizontalAlignText="left"
-      />
-    ) : (
-      <Text
-        fontSize={headingFontSize}
-        fontWeight="bold"
-        width="fill-parent"
-        horizontalAlignText="left"
-      >
-        {title || "Enter poll title"}
-      </Text>
-    )}
-  </AutoLayout>
+  width="fill-parent"
+  verticalAlignItems="center"
+  onClick={() => !submitted && setEditingIndex(-1)} // Prevent editing if submitted
+  padding={{ left: getWidgetValue(2) }}
+>
+  {editingIndex === -1 ? (
+    <Input
+      value={title}
+      onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
+      placeholder="Enter poll title"
+      width="fill-parent"
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      horizontalAlignText="left"
+    />
+  ) : (
+    <Text
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      width="fill-parent"
+      horizontalAlignText="left"
+    >
+      {title || "Enter poll title"}
+    </Text>
+  )}
+</AutoLayout>
 
   {/* Crown button aligned to the end */}
   <AutoLayout
@@ -991,32 +999,32 @@ function PollingWidget() {
   
       {/* Subheading Section */}
       <AutoLayout
-        width="fill-parent"
-        verticalAlignItems="center"
-        onClick={() => setEditingIndex(-2)} // Set the index to -2 to trigger subheading editing
-      >
-        {editingIndex === -2 ? (
-          <Input
-            value={subheading}
-            onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
-            placeholder="Enter subheading"
-            width="fill-parent"
-            fontSize={subheadingFontSize}
-            fontWeight="normal"
-            fill="#666666"
-          />
-        ) : (
-          <Text
-          fontSize={subheadingFontSize}
-            fontWeight="normal"
-            width="fill-parent"
-            horizontalAlignText="left"
-            fill="#666666"
-          >
-            {subheading || "Enter subheading"}
-          </Text>
-        )}
-      </AutoLayout>
+  width="fill-parent"
+  verticalAlignItems="center"
+  onClick={() => !submitted && setEditingIndex(-2)} // Prevent editing if submitted
+>
+  {editingIndex === -2 ? (
+    <Input
+      value={subheading}
+      onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
+      placeholder="Enter subheading"
+      width="fill-parent"
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      fill="#666666"
+    />
+  ) : (
+    <Text
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      width="fill-parent"
+      horizontalAlignText="left"
+      fill="#666666"
+    >
+      {subheading || "Enter subheading"}
+    </Text>
+  )}
+</AutoLayout>
   
       {/* Poll Options */}
       {entries.map((item, index) => (
