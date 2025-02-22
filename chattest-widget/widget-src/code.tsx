@@ -63,6 +63,7 @@ type MessageBubbleProps = {
     messageFontSize: number
     widgetWidth: number
     widgetButtonColor: string
+    getRelativeTimestamp: (timestamp: string) => string;
 };
 
 function generateLogId() {
@@ -91,6 +92,8 @@ function ChatWidget() {
    
     
     const [logId, setLogId] = useSyncedState('newMessage', Date.now());
+    const [alwaysAnonymous, setAlwaysAnonymous] = useSyncedState('alwaysAnonymous', false);
+
     
 
    
@@ -133,25 +136,33 @@ function ChatWidget() {
       return Math.floor(input * scalingRatio); // Scale the input value by the ratio
     }
 
-    function convertISOToDateTime(isoString: string): string {
-      // Create a new Date object from the ISO string
+    function getRelativeTimestamp(isoString: string): string {
       const date = new Date(isoString);
-    
-      // Extract the components of the date and time
-      const year = date.getFullYear();
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = monthNames[date.getMonth()]; // Get the abbreviated month name
-      const day = date.getDate();
-      const hours = date.getHours();
-      const minutes = padWithZero(date.getMinutes());
-    
-      // Convert the time to 12-hour format
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-    
-      // Return the formatted date and time string (e.g., "Sep 09, 2024 12:52 PM")
-      return `${month} ${day}, ${year} ${formattedHours}:${minutes} ${ampm}`;
-    }
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
+      const diffWeeks = Math.floor(diffDays / 7);
+  
+      console.log(`Timestamp: ${isoString}, Now: ${now.toISOString()}, Difference in seconds: ${diffSeconds}`);
+  
+      if (diffSeconds < 60) {
+          return `${diffSeconds}s ago`;
+      } else if (diffMinutes < 60) {
+          return `${diffMinutes}m ago`;
+      } else if (diffHours < 24) {
+          return `${diffHours}h ago`;
+      } else if (diffDays < 7) {
+          return `${diffDays}d ago`;
+      } else if (diffWeeks < 4) {
+          return `${diffWeeks}w ago`;
+      } else {
+          return date.toLocaleDateString(); // Return full date for older timestamps
+      }
+  }
+  
     
     // Helper function to pad single digit numbers with a leading zero
     function padWithZero(number: number): string {
@@ -287,6 +298,7 @@ function ChatWidget() {
               setIsCrownButtonPressed(false);
               console.log("closed");
 
+
           figma.closePlugin(); // Close the plugin UI when 'close-plugin' message is received
           resolve(); // Optionally resolve the promise here, since the action is completed
         }
@@ -351,16 +363,18 @@ function ChatWidget() {
         const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
         const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
+        
     
         // Loop through each message and process them similarly to how you'd handle a single message
         messages.forEach(async (message) => {
+          const enforcedAnonymous = alwaysAnonymous || message.anonymous;
           // Use defaults or provided values
           const validatedMessage: Message = {
             id: message.id || newId,
             parentId: message.parentId || null,
             text: message.text || '',
             sender: message.sender || 'Anonymous',
-            timestamp: message.timestamp ? convertISOToDateTime(message.timestamp) : timestampString,
+            timestamp: message.timestamp ? getRelativeTimestamp(message.timestamp)            : timestampString,
             edited: message.edited || false,
             deleteConfirm: message.deleteConfirm || false,
             showReplies: message.showReplies || false,
@@ -370,9 +384,9 @@ function ChatWidget() {
             downvotedUsers: message.downvotedUsers || [],
             directreply: message.directreply || 0,
             logId: message.logId || 0,
-            anonymous: message.anonymous || false,
-            userIcon: message.userIcon || "",
-          };
+            anonymous: enforcedAnonymous,
+            userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
+            };
     
           // Add the message to the queue and process it
           messageQueue.push(validatedMessage);
@@ -404,6 +418,8 @@ function ChatWidget() {
           const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
           const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
           const userIcon = anonymous ? "None" : figma.currentUser ? figma.currentUser.photoUrl : null;
+          const enforcedAnonymous = alwaysAnonymous || anonymous; // Force anonymous if the toggle is on
+
 
     
           const newMessageObject: Message = {
@@ -421,9 +437,10 @@ function ChatWidget() {
             downvotedUsers: [],
             directreply: 0,
             logId: logId,
-            userIcon: userIcon,
-            anonymous: anonymous,
-          };
+            anonymous: enforcedAnonymous,
+            userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
+    };
+          
     
           try {
             console.log('newMessage before sending:', newMessageObject);
@@ -456,6 +473,7 @@ function ChatWidget() {
         }
       }
     };
+    
     
     const onUpvote = (id: string) => {
       setMessages(prevMessages => prevMessages.map(message => {
@@ -875,6 +893,11 @@ function ChatWidget() {
               setIsCrownButtonPressed(false);
               resolve();
             }
+
+              else if (msg.type === 'toggle-anonymous-mode') {
+                setAlwaysAnonymous(msg.payload);
+              }
+          
           };
         });
       };
@@ -962,6 +985,7 @@ function ChatWidget() {
             messageFontSize={messageFontSize}
             widgetWidth={widgetWidth}
             widgetButtonColor={widgetButtonColor}
+            getRelativeTimestamp={getRelativeTimestamp}
           />
         ));
     };
@@ -1001,7 +1025,9 @@ useEffect(()=>{
   figma.ui.postMessage({ type: 'current-promptColor',        payload: promptColor });
   figma.ui.postMessage({ type: 'current-widgetButtonColor',  payload: widgetButtonColor });
   figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
+  figma.ui.postMessage({ type: 'current-anonymous', payload: alwaysAnonymous });
   figma.ui.onmessage = async (msg) => {
+    console.log('message',msg);
     if (msg.type === 'load-chats') {
       console.log("Loading new chats...", msg.messages);
       const newMessages = msg.messages;
@@ -1196,7 +1222,12 @@ useEffect(()=>{
           handleOptionsClickChat();
         }
       };
-    }};
+    } else if (msg.type === 'toggle-anonymous-mode') {
+      console.log("HERE", alwaysAnonymous, msg.payload);
+      setAlwaysAnonymous(msg.payload);
+      console.log("HERE2", alwaysAnonymous,  msg.payload);
+  }
+  };
 }})
 
 const handleOptionsClickChat = () => {
@@ -1348,7 +1379,7 @@ return (
 }
 
 
-function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth, widgetButtonColor}: MessageBubbleProps) {
+function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEdit, replyChain, replyToId, user, onDeleteConfirm, getMessageDepth, onShowReplies, onPin, totalReplies, onUpvote, onDownvote,  onOptionsClick, updateUserName, messageFontSize, widgetWidth, widgetButtonColor, getRelativeTimestamp}: MessageBubbleProps) {
   
   //console.log("MessageBubble called with message:", message, "and replyToId:", replyToId);
   
@@ -1454,11 +1485,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={getWidgetValue(490)}
             spacing={getWidgetValue(20)}
           >
-            {message.userIcon && message.userIcon !== "None" ? (
-                  <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
-                ) : (
-                  <SVG src={AnonSVG} width={getWidgetValue(40)} height={getWidgetValue(40)} />
-                )}
+            {message.anonymous ? (
+  <SVG src={AnonSVG} width={getWidgetValue(40)} height={getWidgetValue(40)} />
+) : (
+  message.userIcon && message.userIcon !== "None" ? (
+    <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
+  ) : null
+)}
+
               <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>
@@ -1478,7 +1512,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={getWidgetValue(260)}
           >
             <Text fontSize={getWidgetValue(25)} fill={messageStyle.color} horizontalAlignText={"right"}>
-              {message.timestamp}
+            {getRelativeTimestamp(message.timestamp)}
             </Text>
           </AutoLayout>
 
