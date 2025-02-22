@@ -23,9 +23,11 @@ function Widget() {
 
   const [style, setStyle] = widget.useSyncedState("style", {
     titleFontSize: 16,
-    labelFontSize: 14,
+    labelFontSize: 12,
     chartColor: "#007AFF",
     refreshColor: "#FFA500",
+    backgroundColor: "#FFFFFF",
+    backgroundOpacity: 1,
     cornerRadius: 8,
   });
 
@@ -45,7 +47,7 @@ function Widget() {
   // Open Admin Panel
   const openAdminMenu = () => {
     return new Promise<void>((resolve) => {
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 300 });
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 400 });
       console.log(pollOrder);
 
       figma.ui.postMessage({
@@ -72,6 +74,8 @@ function Widget() {
           setWidgetWidth(msg.payload.widgetWidth);
           setWidgetHeight(msg.payload.widgetHeight);
           setStyle(msg.payload.style);
+          // rerender
+          fetchPollData();
         } else if (msg.type === "close-plugin") {
           figma.closePlugin();
           resolve();
@@ -187,9 +191,14 @@ function Widget() {
     <AutoLayout
       direction="vertical"
       width={widgetWidth}
-      fill="#FFFFFF"
+      fill={
+        style.backgroundColor +
+        ("00" + Math.round(style.backgroundOpacity * 255).toString(16)).slice(
+          -2
+        )
+      }
       cornerRadius={style.cornerRadius}
-      stroke="#E6E6E6"
+      stroke={style.backgroundOpacity > 0 ? "#E6E6E6" : undefined}
       strokeWidth={1}
     >
       {/* Row with Admin Button and Search/Refresh Button */}
@@ -198,8 +207,11 @@ function Widget() {
         verticalAlignItems="center"
         spacing={8}
         padding={16}
-        fill="#F0F0F0"
+        fill="#00000011"
         width="fill-parent"
+        cornerRadius={
+          style.backgroundOpacity > 0 ? undefined : style.cornerRadius
+        }
       >
         {/* Admin Crown Icon Button */}
         <AutoLayout onClick={openAdminMenu}>
@@ -245,8 +257,8 @@ function Widget() {
             direction="horizontal"
             spacing={8}
             padding={6}
-            fill="#F0F0F0"
-            cornerRadius={8}
+            fill="#FFFFFF"
+            cornerRadius={4}
             width="fill-parent"
             verticalAlignItems="center"
           >

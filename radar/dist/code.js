@@ -46,9 +46,11 @@
     );
     const [style, setStyle] = widget.useSyncedState("style", {
       titleFontSize: 16,
-      labelFontSize: 14,
+      labelFontSize: 12,
       chartColor: "#007AFF",
       refreshColor: "#FFA500",
+      backgroundColor: "#FFFFFF",
+      backgroundOpacity: 1,
       cornerRadius: 8
     });
     const [chartImage, setChartImage] = widget.useSyncedState("chartImage", null);
@@ -65,7 +67,7 @@
     );
     const openAdminMenu = () => {
       return new Promise((resolve) => {
-        figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 300 });
+        figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 400 });
         console.log(pollOrder);
         figma.ui.postMessage({
           type: "load-admin-settings",
@@ -90,6 +92,7 @@
             setWidgetWidth(msg.payload.widgetWidth);
             setWidgetHeight(msg.payload.widgetHeight);
             setStyle(msg.payload.style);
+            fetchPollData();
           } else if (msg.type === "close-plugin") {
             figma.closePlugin();
             resolve();
@@ -188,9 +191,11 @@
       {
         direction: "vertical",
         width: widgetWidth,
-        fill: "#FFFFFF",
+        fill: style.backgroundColor + ("00" + Math.round(style.backgroundOpacity * 255).toString(16)).slice(
+          -2
+        ),
         cornerRadius: style.cornerRadius,
-        stroke: "#E6E6E6",
+        stroke: style.backgroundOpacity > 0 ? "#E6E6E6" : void 0,
         strokeWidth: 1
       },
       /* @__PURE__ */ figma.widget.h(
@@ -200,8 +205,9 @@
           verticalAlignItems: "center",
           spacing: 8,
           padding: 16,
-          fill: "#F0F0F0",
-          width: "fill-parent"
+          fill: "#00000011",
+          width: "fill-parent",
+          cornerRadius: style.backgroundOpacity > 0 ? void 0 : style.cornerRadius
         },
         /* @__PURE__ */ figma.widget.h(AutoLayout, { onClick: openAdminMenu }, /* @__PURE__ */ figma.widget.h(
           SVG,
@@ -244,8 +250,8 @@
               direction: "horizontal",
               spacing: 8,
               padding: 6,
-              fill: "#F0F0F0",
-              cornerRadius: 8,
+              fill: "#FFFFFF",
+              cornerRadius: 4,
               width: "fill-parent",
               verticalAlignItems: "center"
             },

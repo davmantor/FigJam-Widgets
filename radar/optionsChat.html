@@ -45,12 +45,16 @@
       .hidden {
         display: none;
       }
-      .color-picker-container {
+      .color-picker-container,
+      .slider-container {
         display: flex;
         flex-direction: row; /* Stack items horizontally */
         align-items: center; /* Center items horizontally */
         gap: 8px; /* Space between elements */
         margin-top: 5px;
+      }
+      .slider-container label {
+        white-space: nowrap;
       }
 
       .color-preview {
@@ -101,13 +105,27 @@
       <label for="dataPointLabels">Data Point Labels (comma-separated):</label>
       <input type="text" id="dataPointLabels" />
 
-      <label for="widgetWidth">Widget Width:</label>
-      <input type="number" id="widgetWidth" min="100" max="800" />
-
-      <label for="widgetHeight">Widget Height:</label>
-      <input type="number" id="widgetHeight" min="100" max="800" />
+      <label for="widgetWidth">Graph dimensions:</label>
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          padding-bottom: 5px;
+        "
+      >
+        <input type="number" id="widgetWidth" min="100" max="800" />
+        x
+        <input type="number" id="widgetHeight" min="100" max="800" />
+      </div>
+      <i style="font-size: 12px">
+        The graph is rendered at 2x the dimensions for better quality.
+      </i>
 
       <h3>Style</h3>
+      <p style="font-size: 14px; margin-top: 0">
+        You may need to refresh the graph to see your changes.
+      </p>
       <label for="titleFontSize">Title Font Size:</label>
       <input type="number" id="titleFontSize" min="10" max="30" />
 
@@ -120,14 +138,26 @@
       <label for="chartColor">Chart Color:</label>
       <div class="color-picker-container">
         <input class="color-preview" type="color" id="chartColor" />
-        <div class="color-preview" id="colorPreview"></div>
+        <div class="color-preview"></div>
         <span class="hex-code" id="hexCode">#000000</span>
+      </div>
+
+      <label for="backgroundColor">Background Color:</label>
+      <div class="color-picker-container">
+        <input class="color-preview" type="color" id="backgroundColor" />
+        <div class="color-preview"></div>
+        <span class="hex-code" id="hexCode">#000000</span>
+      </div>
+      <div class="slider-container">
+        <label for="backgroundOpacity">Background Opacity:</label>
+        <input type="range" id="backgroundOpacity" min="0" max="1" step="0.1" />
+        <span id="opacityValue">0</span>
       </div>
 
       <label for="refreshColor">Refresh Button Color:</label>
       <div class="color-picker-container">
         <input class="color-preview" type="color" id="refreshColor" />
-        <div class="color-preview" id="colorPreview"></div>
+        <div class="color-preview"></div>
         <span class="hex-code" id="hexCode">#000000</span>
       </div>
       <h2>Poll Subheading Order</h2>
@@ -177,7 +207,6 @@
         // Color Picker Handling
         const colorInput = document.getElementById("chartColor");
         const hexCodeDisplay = document.getElementById("hexCode");
-        const colorPreview = document.getElementById("colorPreview");
 
         function updateColorDisplay() {
           document
@@ -194,6 +223,20 @@
                 hexCodeDisplay.textContent = colorInput.value.toUpperCase();
               });
             });
+        }
+
+        function updateOpacityDisplay() {
+          const backgroundOpacity =
+            document.getElementById("backgroundOpacity");
+          const opacityValue = document.getElementById("opacityValue");
+          opacityValue.textContent = parseFloat(
+              backgroundOpacity.value
+            ).toFixed(1);
+          backgroundOpacity.addEventListener("input", () => {
+            opacityValue.textContent = parseFloat(
+              backgroundOpacity.value
+            ).toFixed(1);
+          });
         }
 
         let pollOrderList = document.getElementById("pollOrderList");
@@ -304,6 +347,10 @@
               msg.payload.style.labelFontSize;
             document.getElementById("refreshColor").value =
               msg.payload.style.refreshColor;
+            document.getElementById("backgroundColor").value =
+              msg.payload.style.backgroundColor;
+            document.getElementById("backgroundOpacity").value =
+              msg.payload.style.backgroundOpacity;
             document.getElementById("cornerRadius").value =
               msg.payload.style.cornerRadius;
             document.getElementById("widgetVersion").innerText =
@@ -311,6 +358,7 @@
             updatePollOrderUI(subheadings);
 
             updateColorDisplay();
+            updateOpacityDisplay();
           }
         };
 
@@ -348,6 +396,10 @@
                 10
               ),
               chartColor: document.getElementById("chartColor").value,
+              backgroundColor: document.getElementById("backgroundColor").value,
+              backgroundOpacity: parseFloat(
+                document.getElementById("backgroundOpacity").value
+              ),
               refreshColor: document.getElementById("refreshColor").value,
             };
 
