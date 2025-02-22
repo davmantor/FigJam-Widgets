@@ -15,6 +15,29 @@ const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www
 </svg>`;
 
 
+const Dropdown: any = ({ options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useSyncedState("dropdownOpen", false);
+
+  return (
+    <AutoLayout direction="vertical" spacing={4}>
+      <AutoLayout onClick={() => setIsOpen(!isOpen)} fill="#E6E6E6" padding={8} cornerRadius={4}>
+        <Text fontSize={14}>{value || "Select a Likert Scale"}</Text>
+      </AutoLayout>
+      {isOpen && (
+        <AutoLayout direction="vertical" spacing={4} padding={4} fill="#F9F9F9" cornerRadius={4}>
+          {options.map((option, index) => (
+            <AutoLayout key={index} onClick={() => { onChange(option); setIsOpen(false); }}>
+              <Text fontSize={12}>{option}</Text>
+            </AutoLayout>
+          ))}
+        </AutoLayout>
+      )}
+    </AutoLayout>
+  );
+};
+
+
+
 interface CustomUser {
   name: string;
   photoUrl: string;
@@ -177,13 +200,15 @@ function TextBox({
   
 // Now the voters array contains both the original and fake voters
 
-  const displayedVoters = voters.slice(0, 4);
+
+
+const displayedVoters = (voters || []).slice(0, 4);
   console.log("Voters:");
   displayedVoters.forEach((voter, i) => {
     console.log(`Voter ${i + 1}: Name = ${voter.name}, Photo URL = ${voter.photoUrl}`);
   });
   console.log(displayedVoters.length);
-  const additionalVotes = voters.length - displayedVoters.length;
+const additionalVotes = (voters?.length || 0) - displayedVoters.length;
   console.log(additionalVotes);
 
   return (
@@ -303,8 +328,29 @@ function PollingWidget() {
     getPSTDateFromVersion(widgetVersion)
   );
   const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
+  const [selectedScale, setSelectedScale] = useSyncedState("selectedScale", null);
   
 
+
+const likertScales: Record<string, string[]> = {
+  fourPointAgreeDisagree: ["Agree", "Somewhat Agree", "Somewhat Disagree", "Disagree"],
+  fourPointIntensity: ["Not at all", "Slightly", "Moderately", "Extremely"],
+  fivePointDiverging: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"],
+  fivePointIntensity: ["Never", "Rarely", "Sometimes", "Often", "Always"]
+};
+
+
+function handleScaleSelection(scaleKey: string) {
+  if (likertScales[scaleKey]) {
+      setSelectedScale(scaleKey);
+      setEntries([...likertScales[scaleKey]]);
+  }
+}
+
+
+  
+
+  
   function getPSTDateFromVersion(versionDate: string): string {
     const date = new Date(versionDate);
     const utc = date.getTime() + date.getTimezoneOffset() * 60000;
@@ -523,6 +569,7 @@ function PollingWidget() {
     </g>
     </svg>`;
 
+  
 
   useEffect(()=>{
     if (isCrownButtonPressed) {
@@ -944,6 +991,14 @@ function PollingWidget() {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
+      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <Dropdown
+        options={Object.keys(likertScales)}
+        value={selectedScale}
+        onChange={handleScaleSelection}
+      />
+    </AutoLayout>
+
 <AutoLayout
   direction="horizontal"
   width="fill-parent"
