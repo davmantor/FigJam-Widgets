@@ -1,5 +1,5 @@
 const { widget, showUI, ui } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
+const { useSyncedState, useSyncedMap, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
 const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
 <defs>
@@ -35,6 +35,7 @@ interface TextBoxProps {
   userVote: boolean;
   voters: CustomUser[];
   isAnonymous: boolean;
+  isMultiVoteEnabled: boolean;
   totalVoters: number;
   entries: string[];    // Add entries prop
   pollId: string; // Add pollId prop
@@ -90,6 +91,7 @@ function TextBox({
   userVote,
   voters,
   isAnonymous,
+  isMultiVoteEnabled,
   totalVoters,
   updateUserName,  // Accept totalVoters and updateUserName
   pollId,          // Add pollId for context if needed
@@ -265,10 +267,14 @@ function PollingWidget() {
   const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
+  
+
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
   const [pollId, setPollId] = useSyncedState<string>('pollId', "");
   const [logId, setLogId] = useSyncedState<string>('logId', "");
+  const [isMultiVoteEnabled, setIsMultiVoteEnabled] = useSyncedState<boolean>('isMultiVoteEnabled', false); 
+  const userVotes = useSyncedMap<number[]>('userVotes');
 
   const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
@@ -331,24 +337,47 @@ function PollingWidget() {
   
     const newVotes = [...votes];
     const newVoters = [...voters];
-  
+    console.log('MULTIVOTE TRUE');
+    console.log(isMultiVoteEnabled);
     // Ensure the user is removed from all other voters arrays
-    newVoters.forEach((voterArray, i) => {
+    
+if (isMultiVoteEnabled) {
+  // Multi-vote ON: Check if user already voted for this option
+  const alreadyVoted = newVoters[index].some(voter => voter.name === userName);
+
+  if (alreadyVoted) {
+      // Remove vote from this option
+      newVoters[index] = newVoters[index].filter(voter => voter.name !== userName);
+      newVotes[index]--;
+  } else {
+      // Add vote to this option
+      newVoters[index] = [...newVoters[index], { name: userName, photoUrl: figma.currentUser?.photoUrl || '' }];
+      newVotes[index]++;
+  }
+} else {
+  // Multi-vote OFF: Ensure the user only votes for one option
+  newVoters.forEach((voterArray, i) => {
       newVoters[i] = voterArray.filter(voter => voter.name !== userName);
       if (userVoteIndex === i) {
-        newVotes[i]--;  // Decrease vote count for the previous option
+          newVotes[i]--;  // Decrease vote count for the previous option
       }
-    });
-  
-    if (userVoteIndex !== index) {
-      // Add the vote to the new option if it's a different one
+  });
+
+  if (userVoteIndex !== index) {
+      // If user is voting for a new option
       newVotes[index]++;
       newVoters[index] = [...newVoters[index], { name: userName, photoUrl: figma.currentUser?.photoUrl || '' }];
       setUserVoteIndex(index);
-    } else {
-      // If the user is unvoting the same option, reset userVoteIndex
+  } else {
+      // If user is unvoting the same option, reset userVoteIndex
       setUserVoteIndex(null);
-    }
+  }
+}
+      // Add the vote to the new option if it's a different one
+ 
+
+      //check if user is already in option voting array and remove vote if true
+
   
     // Update the state with the new votes and voters arrays
     await setVotes(newVotes);
@@ -374,9 +403,10 @@ function PollingWidget() {
 
     console.log(totalVotes);
   
-    console.log("UPDATED POLL");
+    console.log("UPDATED POLL1");
     console.log(updatedPoll);
     console.log(pollId);
+    console.log(votes);
   
     // Wait for the database to update before proceeding
     try {
@@ -402,6 +432,9 @@ function PollingWidget() {
   const toggleAnonymousVote = () => {
     setIsAnonymous(prevState => !prevState);  // Toggle the value
   };
+  const toggleMultiSelect = () => {
+    setIsMultiVoteEnabled(prevState => !prevState);
+  };
   
   console.log(userName);
   const handleSubmit = async () => {
@@ -416,6 +449,7 @@ function PollingWidget() {
       })),
       totalVotes: 0,
       isAnonymous: isAnonymous,
+      isMultiVoteEnabled: isMultiVoteEnabled,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -848,10 +882,18 @@ function PollingWidget() {
           userVote={userVoteIndex === index}
           voters={voters[index]}          // Pass voters
           isAnonymous={isAnonymous}
+<<<<<<< Updated upstream
           totalVoters={combinedVoters.size}  
           updateUserName={updateUserName}  
           entries={entries}               // Pass entries
           pollId={pollId}                 // Pass pollId
+=======
+          isMultiVoteEnabled = {isMultiVoteEnabled}
+          totalVoters={combinedVoters.size}
+          updateUserName={updateUserName}
+          entries={entries}
+          pollId={pollId}
+>>>>>>> Stashed changes
           widgetWidth={widgetWidth}
           barColor={barColor}
           accentColor={accentColor}
@@ -882,6 +924,20 @@ function PollingWidget() {
               />
               <Text fontSize={16} fill="#000000">Vote Anonymously</Text>
             </AutoLayout>
+            <AutoLayout
+                    direction="horizontal"
+                    spacing={getWidgetValue(8)}
+                    verticalAlignItems="center"
+                    onClick={toggleMultiSelect}
+                  >
+                    <SVG
+                      src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="${isMultiVoteEnabled ? 'black' : 'none'}" stroke="black" stroke-width="2">
+                              <rect width="16" height="16" rx="2" />
+                            </svg>`}
+                    />
+                    <Text fontSize={16} fill="#000000">Multi Select</Text>
+                  </AutoLayout>
+
           </AutoLayout>
           <AutoLayout
             fill={accentColor}
@@ -898,11 +954,13 @@ function PollingWidget() {
         </>
       )}
       {submitted && (
+        <>
         <AutoLayout width="fill-parent" padding={{ top: getWidgetValue(10) }}>
           <Text fontSize={getWidgetValue(12)} fill="#808080" width="fill-parent">
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>
+                  </>
       )}
     </AutoLayout>
   );
