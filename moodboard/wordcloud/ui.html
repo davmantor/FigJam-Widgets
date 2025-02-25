@@ -145,6 +145,15 @@
           calc(var(--circumference) - calc((0 * var(--circumference)) / 100));
       }
     }
+    .widget-info {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 0.75em;
+    }
   </style>
   <body>
     <div id="wordcloud-start">
@@ -157,6 +166,7 @@
         Once we have enough responses, we'll generate a word cloud at the end!
       </p>
       <button id="start-wordcloud" onclick="startWordcloud()">Let's go!</button>
+      <div class="widget-info">Compiled <b id="widget-version">Unknown</b></div>
     </div>
     <div id="wordcloud-entry" style="display: none">
       <h2>Enter words that fit the topic</h2>
@@ -196,11 +206,27 @@
       let maxWordsInWordcloud = 100;
       let givenUp = false;
       let userWords = [];
+      let widgetVersion = "Unknown";
 
       const DIMS = [300, 300];
 
       document.getElementById("wordcloud-result").style.width = DIMS[0] + "px";
       document.getElementById("wordcloud-result").style.height = DIMS[1] + "px";
+
+      function getPSTDateFromVersion(versionDate) {
+        const date = new Date(versionDate);
+        const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+        const pstOffset = -8 * 60 * 60000; // PST is UTC-8
+        const pstDate = new Date(utc + pstOffset);
+        console.log(
+          "DATE",
+          pstDate.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+        );
+
+        return pstDate.toLocaleString("en-US", {
+          timeZone: "America/Los_Angeles",
+        });
+      }
 
       window.onmessage = (event) => {
         if (!event.data.pluginMessage) {
@@ -214,6 +240,10 @@
             event.data.pluginMessage.params.maxWordsInWordcloud;
           document.getElementById("seconds").innerText = seconds;
           document.getElementById("start-wordcloud").focus();
+          document.getElementById("widget-version").innerText =
+            getPSTDateFromVersion(
+              event.data.pluginMessage.params.widgetVersion
+            );
         }
         if (type === "words") {
           console.log(event.data.pluginMessage.words);
@@ -289,7 +319,6 @@
         userWords.push(word);
 
         parent.postMessage({ pluginMessage: { type: "addWord", word } }, "*");
-        
 
         // create word in word-list
         const wordList = document.getElementById("word-list");
