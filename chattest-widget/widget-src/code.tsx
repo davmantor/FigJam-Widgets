@@ -346,12 +346,13 @@ function ChatWidget() {
         console.log(newId);
     
         const timestampDate = new Date(timestamp);
+        const date = timestampDate.toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: '2-digit' });
         const hours = timestampDate.getHours();
         const minutes = timestampDate.getMinutes();
         const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
         const ampm = hours >= 12 ? 'PM' : 'AM';
         const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-        const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+        const timestampString = `${date} ${formattedHours}:${formattedMinutes} ${ampm}`;
         const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
         const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null;
         
@@ -401,12 +402,13 @@ function ChatWidget() {
           console.log(newId);
     
           const timestampDate = new Date(timestamp);
+          const date = timestampDate.toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: '2-digit' });
           const hours = timestampDate.getHours();
           const minutes = timestampDate.getMinutes();
           const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
           const ampm = hours >= 12 ? 'PM' : 'AM';
           const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-          const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+          const timestampString = `${date} ${formattedHours}:${formattedMinutes} ${ampm}`;
           const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
           const userIcon = anonymous ? "None" : figma.currentUser ? figma.currentUser.photoUrl : null;
           const enforcedAnonymous = alwaysAnonymous || anonymous; // Force anonymous if the toggle is on
@@ -524,12 +526,13 @@ function ChatWidget() {
             const randomString = generateRandomString(); // Generate a random string
             const newId = `${timestamp}${randomString}${userName}`;
             const timestampDate = new Date(timestamp);
+            const date = timestampDate.toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: '2-digit' });
             const hours = timestampDate.getHours();
             const minutes = timestampDate.getMinutes();
             const formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
             const ampm = hours >= 12 ? 'PM' : 'AM';
             const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-            const timestampString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+            const timestampString = `${date} ${formattedHours}:${formattedMinutes} ${ampm}`;
             const currentUserName = figma.currentUser && figma.currentUser.name ? figma.currentUser.name : userName;
             const userIcon = figma.currentUser ? figma.currentUser.photoUrl : null; // Add this line
 
@@ -1466,12 +1469,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
       >
         <AutoLayout
           direction="horizontal"
+          verticalAlignItems="center"
           width={getWidgetValue(800)}
           padding={{ top: getWidgetValue(10), bottom: getWidgetValue(1), left: getWidgetValue(4), right: getWidgetValue(2)}}
         >
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="start"
+            verticalAlignItems="center"
             width={getWidgetValue(490)}
             spacing={getWidgetValue(20)}
           >
@@ -1493,11 +1498,12 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="end"
+            verticalAlignItems="center"
             padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(1), right: getWidgetValue(8) }}
             width={getWidgetValue(260)}
           >
-            <Text fontSize={getWidgetValue(25)} fill={messageStyle.color} horizontalAlignText={"right"}>
-              {message.timestamp}
+            <Text fontSize={getWidgetValue(15)} fill={messageStyle.color} horizontalAlignText={"right"}>
+              {message.timestamp.replace(" ", "\n")}
             </Text>
           </AutoLayout>
 

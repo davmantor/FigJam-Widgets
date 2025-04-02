@@ -124,6 +124,9 @@
       justify-content: flex-start;
       gap: 10px;
     }
+    .response-header .header-text {
+      white-space: nowrap;
+    }
     .response-header .header-text-content {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -138,9 +141,14 @@
       border-radius: 100%;
       flex-shrink: 0;
     }
+    .response-header .timestamp {
+      margin-left: 5px;
+      white-space: pre;
+      font-size: 12px;
+      text-align: center;
+    }
     .response-header.current-response {
       background-color: transparent;
-      cursor: default;
     }
     .response-header .current-response-label {
       background-color: #444;
@@ -716,6 +724,9 @@
         
             // --- HEADER ---
             const responseHeader = document.createElement('div');
+            responseHeader.onclick = () => {
+              handleUnsavedChanges(-1, responseHeader);
+            };
             responseHeader.className = 'response-header current-response';
 
             if (data.widget.current.photoUrl) {
@@ -744,6 +755,61 @@
             responseHeader.appendChild(currentResponseLabel);
 
             responseItem.appendChild(responseHeader);
+
+            // --- CONTENT ---
+            const responseContent = document.createElement('div');
+            responseContent.className = 'response-content';
+        
+            const userNameInput = document.createElement('input');
+            userNameInput.className = 'input input-small';
+            userNameInput.type = 'text';
+            userNameInput.value = data.widget.current.userName;
+            userNameInput.placeholder = 'User Name';
+            userNameInput.oninput = (event) => {
+              unsavedUserName = event.target.value;
+              unsavedResponse = responseInput.value;
+              currentEditingIndex = -1;
+            };
+        
+            const responseInput = document.createElement('textarea');
+            responseInput.className = 'input input-large';
+            responseInput.value = data.widget.current.response;
+            responseInput.placeholder = 'Response';
+            responseInput.oninput = (event) => {
+              unsavedResponse = event.target.value;
+              unsavedUserName = userNameInput.value;
+              currentEditingIndex = -1;
+            };
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            buttonContainer.style.marginBottom = '0px';
+
+            const saveButton = document.createElement('button');
+            saveButton.className = 'button';
+            saveButton.style.flexGrow = '1';
+            saveButton.innerText = 'Save';
+            saveButton.onclick = () => {
+              // loading state
+              saveButton.parentElement.style.opacity = '0.5';
+              saveButton.parentElement.style.pointerEvents = 'none';
+              let newPhotoUrl = undefined;
+              if (data.widget.current.userName === userNameInput.value) {
+                newPhotoUrl = data.widget.current.photoUrl;
+              }
+              editCurrentResponse(responseInput.value, userNameInput.value, newPhotoUrl);
+              unsavedResponse = null;
+              unsavedUserName = null;
+              currentEditingIndex = null;
+            };
+
+            responseContent.appendChild(userNameInput);
+            responseContent.appendChild(responseInput);
+            buttonContainer.appendChild(saveButton);
+            responseContent.appendChild(buttonContainer);
+
+            responseItem.appendChild(responseHeader);
+            responseItem.appendChild(responseContent);
 
             previousResponsesContainer.appendChild(responseItem);
 
@@ -784,6 +850,14 @@
             headerTextContent.textContent = response.response;
             responseHeader.appendChild(headerTextContent);
 
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            const timestamp = new Date(response.timestamp);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+            const formattedDate = timestamp.toLocaleString('en-US', options);
+            timestampDiv.textContent = formattedDate.replace(", ", "\n");
+            responseHeader.appendChild(timestampDiv);
+
             // --- CONTENT ---
             const responseContent = document.createElement('div');
             responseContent.className = 'response-content';
@@ -821,7 +895,11 @@
               // loading state
               saveButton.parentElement.style.opacity = '0.5';
               saveButton.parentElement.style.pointerEvents = 'none';
-              updateResponse(index, responseInput.value, userNameInput.value);
+              let newPhotoUrl = undefined;
+              if (response.userName === userNameInput.value) {
+                newPhotoUrl = response.photoUrl;
+              }
+              updateResponse(index, responseInput.value, userNameInput.value, newPhotoUrl);
               unsavedResponse = null;
               unsavedUserName = null;
               currentEditingIndex = null;
@@ -908,13 +986,16 @@
       });
     }
 
-    function updateResponse(index, newResponse, newUserName) {
+    function updateResponse(index, newResponse, newUserName, newPhotoUrl=undefined) {
+      if (index === -1) {
+        return editCurrentResponse(newResponse, newUserName);
+      }
       fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/edit-response', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ widgetId, responseIndex: index, newResponse, newUserName })
+        body: JSON.stringify({ widgetId, responseIndex: index, newResponse, newUserName, newPhotoUrl })
       })
       .then(res => res.json())
       .then(data => {
@@ -926,6 +1007,27 @@
       })
       .catch(error => {
         console.error('Error updating response:', error);
+      });
+    }
+
+    function editCurrentResponse(newResponse, newUserName, newPhotoUrl=undefined) {
+      fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/edit-current', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ widgetId, newResponse, newUserName, newPhotoUrl })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'updated') {
+          refresh();
+        } else {
+          console.error('Failed to edit current response');
+        }
+      })
+      .catch(error => {
+        console.error('Error editing current response:', error);
       });
     }
 

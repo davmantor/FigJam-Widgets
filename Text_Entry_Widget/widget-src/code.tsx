@@ -1,6 +1,13 @@
 const { widget } = figma;
 const { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
 
+function timeString(time: number) {
+  const date = new Date(time);
+  const timeString = date.toLocaleTimeString('en-US').replace(/(^0|:\d{2} )/g, ' ');
+  const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  return `${dateString} ${timeString}`;
+}
+
 const AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
     <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>`;
@@ -34,6 +41,7 @@ function Widget() {
   const [borderWidth, setBorderWidth] = useSyncedState<number>("borderWidth", 1);
   const [fontSize, setFontSize] = useSyncedState<number>("fontSize", 16);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
+  const [timestamp, setTimestamp] = useSyncedState<number>("timestamp", 0);
   const [userPhotoUrl, setUserPhotoUrl] = useSyncedState<string | null>("userPhotoUrl", null);
   const [shadowColor, setShadowColor] = useSyncedState<string>("shadowColor", "#000000");
   const [shadowOffsetX, setShadowOffsetX] = useSyncedState<number>("shadowOffsetX", 0);
@@ -143,36 +151,7 @@ function Widget() {
       self = true;
     }
 
-    if (response.trim() !== "") {
-      console.log("push response");
-      const name = figma.currentUser?.name || "User";
-      const photoUrl = figma.currentUser?.photoUrl || null;
-      const timestamp = new Date().toISOString(); // Get the current timestamp
-  
-      const data = { widgetId: widgetId ?? "", response, userName: name, photoUrl, timestamp };
-  
-      try {
-        const res = await fetch('https://figjam-widgets.onrender.com/textentrywidget/add-response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-  
-        const result = await res.json();
-  
-        if (res.status === 200) {
-          console.log('Response saved successfully');
-        } else {
-          console.error('Failed to submit data.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
-
-  
+    // Response should be pushed to server in the reset-widget call
     if (self) {
       setResponse("");  // Clear the response field
       setSubmitted(false);  // Allow new submissions
@@ -285,6 +264,7 @@ function Widget() {
       if (res.status === 200) {
         setPreviousResponses(result.widget.previous);
         setShowPrevious(result.widget.showPrevious);
+        setTimestamp(result.widget.current.timestamp);
       } else {
         console.error('Failed to submit data.');
       }
@@ -479,7 +459,7 @@ function Widget() {
             <SVG src={AnonSVG} width={fontSize+5} height={fontSize+5} />
           )}
           <Text fontSize={fontSize} fill="#333" width="fill-parent">
-            {userName}: {response}
+            {userName} ({timeString(timestamp)}): {response}
           </Text>
         </AutoLayout>
       )}
@@ -544,6 +524,7 @@ function Widget() {
       >
         <Text fontSize={8} fill="#FFFFFF">↓</Text>
       </AutoLayout>
+      <Text fontSize={10}>{scrollIndex + 1}/{previousResponses.length}</Text>
     </AutoLayout>
   </AutoLayout>
 )}

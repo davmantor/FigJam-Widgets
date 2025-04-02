@@ -417,6 +417,25 @@ app.post('/textentrywidget/add-response', async (req, res) => {
   }
 });
 
+app.post('/textentrywidget/edit-current', async (req, res) => {
+  const { widgetId, newResponse, newUserName, newPhotoUrl } = req.body;
+  try {
+    let widget = await Widget.findOne({ widgetId });
+    if (widget && widget.current) {
+      widget.current.response = newResponse;
+      widget.current.userName = newUserName;
+      widget.current.photoUrl = newPhotoUrl; // Update photoUrl
+      await widget.save();
+      return res.json({ status: 'updated' });
+    } else {
+      return res.status(404).send('Response not found');
+    }
+  } catch (error) {
+    console.error('Error editing current response:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.post('/textentrywidget/edit-response', async (req, res) => {
   const { widgetId, responseIndex, newResponse, newUserName, newPhotoUrl } = req.body;
   try {
