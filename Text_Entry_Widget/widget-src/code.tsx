@@ -3,8 +3,8 @@ const { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Im
 
 function timeString(time: number) {
   const date = new Date(time);
-  const timeString = date.toLocaleTimeString('en-US').replace(/(^0|:\d{2} )/g, ' ');
-  const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  const timeString = date.toLocaleTimeString('en-US').replace(/^0/, '').replace(/:\d{2} /, ' ');
+  const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
   return `${dateString} ${timeString}`;
 }
 
@@ -294,7 +294,7 @@ function Widget() {
   
       if (res.status === 200) {
         console.log(result)
-        return {previous: result.widget.previous, showPrevious: result.widget.showPrevious};
+        return {previous: result.widget.previous, showPrevious: result.widget.showPrevious, current: result.widget.current};
       } else {
         return null;
       }
@@ -314,6 +314,11 @@ function Widget() {
     if (responses !== null) {
       setPreviousResponses(responses.previous);
       setShowPrevious(responses.showPrevious);
+      if (responses.current) {
+        setResponse(responses.current.response);
+        setUserName(responses.current.userName);
+        setUserPhotoUrl(responses.current.photoUrl || null);
+      }
     }
   };
   
@@ -399,17 +404,16 @@ function Widget() {
         spread: shadowSpread,
       }}
     >
-      <AutoLayout
-        direction="horizontal"
-        width="fill-parent"
-        horizontalAlignItems="end"
-        onClick={openAdminMenu}
-      >
-        <SVG src={AdminMenuIcon} width={fontSize}
-  height={fontSize}/>
-      </AutoLayout>
       {!submitted && (
   <>
+    <AutoLayout
+      direction="horizontal"
+      width="fill-parent"
+      horizontalAlignItems="end"
+      onClick={openAdminMenu}
+    >
+      <SVG src={AdminMenuIcon} width={fontSize} height={fontSize}/>
+    </AutoLayout>
     <Input
       placeholder="Your response: "
       value={response}
@@ -446,20 +450,41 @@ function Widget() {
       {submitted && (
         <AutoLayout
           padding={{ left: 10, right: 10, top: 5, bottom: 5 }}
-          cornerRadius={10}
+          cornerRadius={5}
           stroke="#000"
           strokeWidth={1}
           width="fill-parent"
-          direction="horizontal"
-          spacing={5}
+          direction="vertical"
+          spacing={2}
         >
-          {userPhotoUrl ? (
-            <Image src={userPhotoUrl} width={fontSize+5} height={fontSize+5} cornerRadius={fontSize/1.5} />
-          ) : (
-            <SVG src={AnonSVG} width={fontSize+5} height={fontSize+5} />
-          )}
+          <AutoLayout
+            width="fill-parent"
+            direction="horizontal"
+            verticalAlignItems="center"
+            spacing={5}
+          >
+            {userPhotoUrl ? (
+              <Image src={userPhotoUrl} width={fontSize+5} height={fontSize+5} cornerRadius={fontSize/1.5} />
+            ) : (
+              <SVG src={AnonSVG} width={fontSize+5} height={fontSize+5} />
+            )}
+            <Text fontSize={fontSize} fill="#333">
+              {userName}
+            </Text>
+            <Text fontSize={fontSize} fill="#999">
+              ({timeString(timestamp)}):
+            </Text>
+            <AutoLayout
+              direction="horizontal"
+              width="fill-parent"
+              horizontalAlignItems="end"
+              onClick={openAdminMenu}
+            >
+              <SVG src={AdminMenuIcon} width={fontSize} height={fontSize} />
+            </AutoLayout>
+          </AutoLayout>
           <Text fontSize={fontSize} fill="#333" width="fill-parent">
-            {userName} ({timeString(timestamp)}): {response}
+            {response}
           </Text>
         </AutoLayout>
       )}
@@ -472,7 +497,7 @@ function Widget() {
       height="fill-parent"
       overflow="hidden"
       fill="#F0F0F0"
-      cornerRadius={10}
+      cornerRadius={5}
       stroke="#000000"
       strokeWidth={1}
     >
@@ -511,7 +536,7 @@ function Widget() {
       <AutoLayout
         padding={10}
         cornerRadius={5}
-        fill="#007BFF"
+        fill={scrollIndex === 0 ? "#E6F2FF" : "#007BFF"}
         onClick={handleScrollUp}
       >
         <Text fontSize={8} fill="#FFFFFF">↑</Text>
@@ -519,7 +544,7 @@ function Widget() {
       <AutoLayout
         padding={10}
         cornerRadius={5}
-        fill="#007BFF"
+        fill={scrollIndex + 1 === previousResponses.length ? "#E6F2FF" : "#007BFF"}
         onClick={handleScrollDown}
       >
         <Text fontSize={8} fill="#FFFFFF">↓</Text>

@@ -45,8 +45,8 @@
   var { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
   function timeString(time) {
     const date = new Date(time);
-    const timeString2 = date.toLocaleTimeString("en-US").replace(/(^0|:\d{2} )/g, " ");
-    const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    const timeString2 = date.toLocaleTimeString("en-US").replace(/^0/, "").replace(/:\d{2} /, " ");
+    const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
     return `${dateString} ${timeString2}`;
   }
   var AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
@@ -299,7 +299,7 @@
         const result = yield res.json();
         if (res.status === 200) {
           console.log(result);
-          return { previous: result.widget.previous, showPrevious: result.widget.showPrevious };
+          return { previous: result.widget.previous, showPrevious: result.widget.showPrevious, current: result.widget.current };
         } else {
           return null;
         }
@@ -315,6 +315,11 @@
       if (responses !== null) {
         setPreviousResponses(responses.previous);
         setShowPrevious(responses.showPrevious);
+        if (responses.current) {
+          setResponse(responses.current.response);
+          setUserName(responses.current.userName);
+          setUserPhotoUrl(responses.current.photoUrl || null);
+        }
       }
     });
     const handleRevealAll = (group = void 0) => __async(this, null, function* () {
@@ -393,7 +398,7 @@
           spread: shadowSpread
         }
       },
-      /* @__PURE__ */ figma.widget.h(
+      !submitted && /* @__PURE__ */ figma.widget.h(figma.widget.Fragment, null, /* @__PURE__ */ figma.widget.h(
         AutoLayout,
         {
           direction: "horizontal",
@@ -401,16 +406,8 @@
           horizontalAlignItems: "end",
           onClick: openAdminMenu
         },
-        /* @__PURE__ */ figma.widget.h(
-          SVG,
-          {
-            src: AdminMenuIcon,
-            width: fontSize,
-            height: fontSize
-          }
-        )
-      ),
-      !submitted && /* @__PURE__ */ figma.widget.h(figma.widget.Fragment, null, /* @__PURE__ */ figma.widget.h(
+        /* @__PURE__ */ figma.widget.h(SVG, { src: AdminMenuIcon, width: fontSize, height: fontSize })
+      ), /* @__PURE__ */ figma.widget.h(
         Input,
         {
           placeholder: "Your response: ",
@@ -446,15 +443,36 @@
         AutoLayout,
         {
           padding: { left: 10, right: 10, top: 5, bottom: 5 },
-          cornerRadius: 10,
+          cornerRadius: 5,
           stroke: "#000",
           strokeWidth: 1,
           width: "fill-parent",
-          direction: "horizontal",
-          spacing: 5
+          direction: "vertical",
+          spacing: 2
         },
-        userPhotoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: userPhotoUrl, width: fontSize + 5, height: fontSize + 5, cornerRadius: fontSize / 1.5 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: fontSize + 5, height: fontSize + 5 }),
-        /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333", width: "fill-parent" }, userName, " (", timeString(timestamp), "): ", response)
+        /* @__PURE__ */ figma.widget.h(
+          AutoLayout,
+          {
+            width: "fill-parent",
+            direction: "horizontal",
+            verticalAlignItems: "center",
+            spacing: 5
+          },
+          userPhotoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: userPhotoUrl, width: fontSize + 5, height: fontSize + 5, cornerRadius: fontSize / 1.5 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: fontSize + 5, height: fontSize + 5 }),
+          /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333" }, userName),
+          /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#999" }, "(", timeString(timestamp), "):"),
+          /* @__PURE__ */ figma.widget.h(
+            AutoLayout,
+            {
+              direction: "horizontal",
+              width: "fill-parent",
+              horizontalAlignItems: "end",
+              onClick: openAdminMenu
+            },
+            /* @__PURE__ */ figma.widget.h(SVG, { src: AdminMenuIcon, width: fontSize, height: fontSize })
+          )
+        ),
+        /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333", width: "fill-parent" }, response)
       ),
       showPrevious && previousResponses.length > 0 && /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", width: "fill-parent", height: "fill-parent", padding: 0, spacing: 0 }, /* @__PURE__ */ figma.widget.h(
         AutoLayout,
@@ -465,7 +483,7 @@
           height: "fill-parent",
           overflow: "hidden",
           fill: "#F0F0F0",
-          cornerRadius: 10,
+          cornerRadius: 5,
           stroke: "#000000",
           strokeWidth: 1
         },
@@ -500,7 +518,7 @@
           {
             padding: 10,
             cornerRadius: 5,
-            fill: "#007BFF",
+            fill: scrollIndex === 0 ? "#E6F2FF" : "#007BFF",
             onClick: handleScrollUp
           },
           /* @__PURE__ */ figma.widget.h(Text, { fontSize: 8, fill: "#FFFFFF" }, "\u2191")
@@ -510,7 +528,7 @@
           {
             padding: 10,
             cornerRadius: 5,
-            fill: "#007BFF",
+            fill: scrollIndex + 1 === previousResponses.length ? "#E6F2FF" : "#007BFF",
             onClick: handleScrollDown
           },
           /* @__PURE__ */ figma.widget.h(Text, { fontSize: 8, fill: "#FFFFFF" }, "\u2193")

@@ -1502,7 +1502,7 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             padding={{ top: getWidgetValue(2), bottom: getWidgetValue(2), left: getWidgetValue(1), right: getWidgetValue(8) }}
             width={getWidgetValue(260)}
           >
-            <Text fontSize={getWidgetValue(15)} fill={messageStyle.color} horizontalAlignText={"right"}>
+            <Text fontSize={getWidgetValue(16)} fill={messageStyle.color} horizontalAlignText={"right"}>
               {message.timestamp.replace(" ", "\n")}
             </Text>
           </AutoLayout>
