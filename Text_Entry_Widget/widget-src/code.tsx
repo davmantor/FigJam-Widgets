@@ -43,8 +43,12 @@ function Widget() {
   const [scrollIndex, setScrollIndex] = useSyncedState<number>("scrollIndex", 0);
 
   // Dynamically calculate item height based on the length of the response
-  const calculateItemHeight = (response: string) => Math.max(50, response.length / 2);
-  const itemsPerPage = Math.floor(height / 50); // Adjust "50" based on the average item height
+  const calculateItemHeight = (response: string) => {
+    const charactersPerLine = width / (fontSize * 0.6); // 0.6 is avg char width ratio
+    const lines = Math.ceil(response.length / charactersPerLine);
+    return Math.max(50, lines * (fontSize + 6)); // Add spacing for padding
+  };
+    const itemsPerPage = 1; // Adjust "50" based on the average item height
 
 
   const handleScrollUp = () => {
@@ -283,7 +287,10 @@ function Widget() {
       const result = await res.json();
   
       if (res.status === 200) {
-        setPreviousResponses(result.widget.previous);
+        const sortedResponses = result.widget.previous.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        setPreviousResponses(sortedResponses);
         setShowPrevious(result.widget.showPrevious);
       } else {
         console.error('Failed to submit data.');
@@ -332,7 +339,10 @@ function Widget() {
   
     const responses = await getRefreshedResponses(currentWidgetId);
     if (responses !== null) {
-      setPreviousResponses(responses.previous);
+      const sortedResponses = responses.previous.sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      setPreviousResponses(sortedResponses);
       setShowPrevious(responses.showPrevious);
     }
   };
@@ -513,9 +523,17 @@ function Widget() {
           ) : (
             <SVG src={AnonSVG} width={20} height={20} />
           )}
-          <Text fontSize={16} fill="#333" width="fill-parent">
-            {prev.userName}: {prev.response}
-          </Text>
+          <Text
+          fontSize={16}
+          fill="#333"
+          width="fill-parent"
+          verticalAlignText="top"
+          horizontalAlignText="left"
+          textAutoResize="height"
+        >
+          {prev.userName}: {prev.response}
+        </Text>
+
         </AutoLayout>
       ))}
     </AutoLayout>

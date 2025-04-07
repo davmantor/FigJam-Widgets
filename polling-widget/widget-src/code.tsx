@@ -15,19 +15,73 @@ const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www
 </svg>`;
 
 
-const Dropdown: any = ({ options, value, onChange }) => {
+const Dropdown: any = ({ options, value, onChange, dropdownWidth, submitted }) => {
   const [isOpen, setIsOpen] = useSyncedState("dropdownOpen", false);
 
+  if (submitted) {
+    return (<AutoLayout
+    height={1}
+    >
+
+    </AutoLayout>); // Hide the dropdown when the poll is submitted
+  }
+
   return (
-    <AutoLayout direction="vertical" spacing={4}>
-      <AutoLayout onClick={() => setIsOpen(!isOpen)} fill="#E6E6E6" padding={8} cornerRadius={4}>
-        <Text fontSize={14}>{value || "Select a Likert Scale"}</Text>
+    <AutoLayout
+      direction="vertical"
+      spacing={4}
+      width={dropdownWidth} // Matches option boxes
+    >
+      {/* Dropdown Header */}
+      <AutoLayout
+        onClick={() => setIsOpen(!isOpen)}
+        fill="#E6E6E6"
+        padding={{ left: 10, right: 10, top: 6, bottom: 6 }}
+        cornerRadius={6}
+        stroke="#BDBDBD"
+        strokeWidth={1}
+        verticalAlignItems="center"
+        width="fill-parent"
+      >
+        <Text fontSize={14} width="fill-parent">
+          {value || "Select a Likert Scale"}
+        </Text>
+        <SVG
+          src={`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>`}
+          width={12}
+          height={12}
+        />
       </AutoLayout>
+
+      {/* Dropdown Options */}
       {isOpen && (
-        <AutoLayout direction="vertical" spacing={4} padding={4} fill="#F9F9F9" cornerRadius={4}>
+        <AutoLayout
+          direction="vertical"
+          spacing={4}
+          padding={6}
+          fill="#FFFFFF"
+          cornerRadius={6}
+          stroke="#BDBDBD"
+          strokeWidth={1}
+          width="fill-parent"
+          shadow="small"
+        >
           {options.map((option, index) => (
-            <AutoLayout key={index} onClick={() => { onChange(option); setIsOpen(false); }}>
-              <Text fontSize={12}>{option}</Text>
+            <AutoLayout
+              key={index}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              padding={{ left: 10, right: 10, top: 6, bottom: 6 }}
+              cornerRadius={4}
+              fill="#F9F9F9"
+              width="fill-parent"
+              hoverStyle={{ fill: "#E0E0E0" }}
+            >
+              <Text fontSize={12} width="fill-parent">
+                {option}
+              </Text>
             </AutoLayout>
           ))}
         </AutoLayout>
@@ -35,6 +89,8 @@ const Dropdown: any = ({ options, value, onChange }) => {
     </AutoLayout>
   );
 };
+
+
 
 
 
@@ -577,7 +633,7 @@ function handleScaleSelection(scaleKey: string) {
       console.log('crown123', isCrownButtonPressed);
       setPublishedAt(getPSTDateFromVersion(widgetVersion));
       console.log("Current publishedAt state:", publishedAt);
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
+      figma.showUI(__uiFiles__.optionsChat, { width: 500, height: 400 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -879,7 +935,8 @@ function handleScaleSelection(scaleKey: string) {
           };
       }
       else if (msg.type === 'update-widgetGroup') {
-        setWidgetGroup(msg.payload); // Store in state
+        console.log(msg.widgetGroup);
+        setWidgetGroup(msg.widgetGroup); // Store in state
       }
       
     };
@@ -991,13 +1048,6 @@ function handleScaleSelection(scaleKey: string) {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-      <AutoLayout direction="vertical" spacing={8} padding={8}>
-      <Dropdown
-        options={Object.keys(likertScales)}
-        value={selectedScale}
-        onChange={handleScaleSelection}
-      />
-    </AutoLayout>
 
 <AutoLayout
   direction="horizontal"
@@ -1080,6 +1130,15 @@ function handleScaleSelection(scaleKey: string) {
     </Text>
   )}
 </AutoLayout>
+  <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <Dropdown
+      options={Object.keys(likertScales)}
+      value={selectedScale}
+      onChange={handleScaleSelection}
+      dropdownWidth={widgetWidth/1.5} 
+      submitted={submitted}
+    />
+    </AutoLayout>
   
       {/* Poll Options */}
       {entries.map((item, index) => (

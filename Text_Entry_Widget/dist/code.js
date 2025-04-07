@@ -77,8 +77,12 @@
     const [shadowBlur, setShadowBlur] = useSyncedState("shadowBlur", 10);
     const [shadowSpread, setShadowSpread] = useSyncedState("shadowSpread", 0);
     const [scrollIndex, setScrollIndex] = useSyncedState("scrollIndex", 0);
-    const calculateItemHeight = (response2) => Math.max(50, response2.length / 2);
-    const itemsPerPage = Math.floor(height / 50);
+    const calculateItemHeight = (response2) => {
+      const charactersPerLine = width / (fontSize * 0.6);
+      const lines = Math.ceil(response2.length / charactersPerLine);
+      return Math.max(50, lines * (fontSize + 6));
+    };
+    const itemsPerPage = 1;
     const handleScrollUp = () => {
       setScrollIndex((prev) => Math.max(0, prev - 1));
     };
@@ -290,7 +294,10 @@
         });
         const result = yield res.json();
         if (res.status === 200) {
-          setPreviousResponses(result.widget.previous);
+          const sortedResponses = result.widget.previous.sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          );
+          setPreviousResponses(sortedResponses);
           setShowPrevious(result.widget.showPrevious);
         } else {
           console.error("Failed to submit data.");
@@ -302,7 +309,8 @@
       }
     });
     const getRefreshedResponses = (widgetId2) => __async(this, null, function* () {
-      if (!widgetId2) return null;
+      if (!widgetId2)
+        return null;
       console.log("refresh inside", widgetId2);
       const data = { widgetId: widgetId2 };
       try {
@@ -326,11 +334,15 @@
       }
     });
     const handleRefresh = (currentWidgetId) => __async(this, null, function* () {
-      if (!currentWidgetId) return;
+      if (!currentWidgetId)
+        return;
       console.log("refresh inside", currentWidgetId);
       const responses = yield getRefreshedResponses(currentWidgetId);
       if (responses !== null) {
-        setPreviousResponses(responses.previous);
+        const sortedResponses = responses.previous.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        setPreviousResponses(sortedResponses);
         setShowPrevious(responses.showPrevious);
       }
     });
@@ -500,7 +512,20 @@
             height: calculateItemHeight(prev.response)
           },
           prev.photoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: prev.photoUrl, width: 20, height: 20, cornerRadius: 10 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: 20, height: 20 }),
-          /* @__PURE__ */ figma.widget.h(Text, { fontSize: 16, fill: "#333", width: "fill-parent" }, prev.userName, ": ", prev.response)
+          /* @__PURE__ */ figma.widget.h(
+            Text,
+            {
+              fontSize: 16,
+              fill: "#333",
+              width: "fill-parent",
+              verticalAlignText: "top",
+              horizontalAlignText: "left",
+              textAutoResize: "height"
+            },
+            prev.userName,
+            ": ",
+            prev.response
+          )
         ))
       ), /* @__PURE__ */ figma.widget.h(
         AutoLayout,
