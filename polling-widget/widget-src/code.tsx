@@ -824,7 +824,7 @@ if (isMultiVoteEnabled) {
       direction="vertical"
       verticalAlignItems="start"
       spacing={getWidgetValue(8)}
-      padding={getWidgetValue(8)}
+      padding={getWidgetValue(24)}
       cornerRadius={getWidgetValue(widgetCornerRadius)}
       fill={'#FFFFFF'}
       stroke={borderColor}
@@ -882,18 +882,11 @@ if (isMultiVoteEnabled) {
           userVote={userVoteIndex === index}
           voters={voters[index]}          // Pass voters
           isAnonymous={isAnonymous}
-<<<<<<< Updated upstream
-          totalVoters={combinedVoters.size}  
-          updateUserName={updateUserName}  
-          entries={entries}               // Pass entries
-          pollId={pollId}                 // Pass pollId
-=======
           isMultiVoteEnabled = {isMultiVoteEnabled}
           totalVoters={combinedVoters.size}
           updateUserName={updateUserName}
           entries={entries}
           pollId={pollId}
->>>>>>> Stashed changes
           widgetWidth={widgetWidth}
           barColor={barColor}
           accentColor={accentColor}
@@ -922,7 +915,7 @@ if (isMultiVoteEnabled) {
                         <rect width="16" height="16" rx="2" />
                       </svg>`}
               />
-              <Text fontSize={16} fill="#000000">Vote Anonymously</Text>
+              <Text fontSize={12} fill="#000000">Vote Anonymously</Text>
             </AutoLayout>
             <AutoLayout
                     direction="horizontal"
@@ -935,7 +928,7 @@ if (isMultiVoteEnabled) {
                               <rect width="16" height="16" rx="2" />
                             </svg>`}
                     />
-                    <Text fontSize={16} fill="#000000">Multi Select</Text>
+                    <Text fontSize={12} fill="#000000">Multi Select</Text>
                   </AutoLayout>
 
           </AutoLayout>
