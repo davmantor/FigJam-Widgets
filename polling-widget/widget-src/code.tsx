@@ -215,7 +215,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
 
   return (
     <AutoLayout direction="vertical" spacing={getWidgetValue(4)} width="fill-parent">
-      <AutoLayout direction="horizontal" spacing={getWidgetValue(8)} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
+      <AutoLayout direction="horizontal" spacing={getWidgetValue(4)} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
         <AutoLayout
           direction="horizontal"
           spacing={getWidgetValue(8)}
@@ -225,7 +225,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(650)}
+          width={getWidgetValue(550)}
           height='hug-contents'
         >
           {isEditing ? (
@@ -270,6 +270,22 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               cornerRadius={fontSize} 
             />
           ))}
+           {displayedVoters.length >= 1 && (
+                <AutoLayout
+              
+                   fill="#808080"
+                  cornerRadius={getWidgetValue(8)}
+                   verticalAlignItems="center"
+                  horizontalAlignItems="center">
+                    <Text fontSize={12} fill="#FFFFFF">
+                    + {displayedVoters.length + additionalVotes}
+                    </Text>
+                    </AutoLayout>
+            )
+            }
+          
+
+
           {additionalVotes > 0 && (
             <Text fontSize={getWidgetValue(28)} fill="#000000">
               +{additionalVotes}
@@ -278,6 +294,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
         </AutoLayout>
         
         )}
+
       </AutoLayout>
       {!isQuestion && submitted && (
         <ProgressBar barWidth={getWidgetValue(650)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
