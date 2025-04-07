@@ -1,3 +1,5 @@
+import { widgetVersion } from "./version";
+
 const { widget, group } = figma;
 const {
   useSyncedState,
@@ -48,6 +50,7 @@ function Widget() {
       seconds: timerSeconds,
       maxWordsInWordcloud: MAX_WORDS_IN_WORDCLOUD,
       currentUser: figma.currentUser,
+      widgetVersion
     };
 
     figma.showUI(__html__, { width: 400, height: 300 });

@@ -43,6 +43,12 @@
   // widget-src/code.tsx
   var { widget } = figma;
   var { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
+  function timeString(time) {
+    const date = new Date(time);
+    const timeString2 = date.toLocaleTimeString("en-US").replace(/^0/, "").replace(/:\d{2} /, " ");
+    const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
+    return `${dateString} ${timeString2}`;
+  }
   var AdminMenuIcon = `<svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="https://www.w3.org/2000/svg">
     <path d="M3 8L4.44293 16.6576C4.76439 18.5863 6.43315 20 8.38851 20H15.6115C17.5668 20 19.2356 18.5863 19.5571 16.6576L21 8M3 8L6.75598 11.0731C7.68373 11.8321 9.06623 11.6102 9.70978 10.5989L12 7M3 8C3.82843 8 4.5 7.32843 4.5 6.5C4.5 5.67157 3.82843 5 3 5C2.17157 5 1.5 5.67157 1.5 6.5C1.5 7.32843 2.17157 8 3 8ZM21 8L17.244 11.0731C16.3163 11.8321 14.9338 11.6102 14.2902 10.5989L12 7M21 8C21.8284 8 22.5 7.32843 22.5 6.5C22.5 5.67157 21.8284 5 21 5C20.1716 5 19.5 5.67157 19.5 6.5C19.5 7.32843 20.1716 8 21 8ZM12 7C12.8284 7 13.5 6.32843 13.5 5.5C13.5 4.67157 12.8284 4 12 4C11.1716 4 10.5 4.67157 10.5 5.5C10.5 6.32843 11.1716 7 12 7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>`;
@@ -70,6 +76,7 @@
     const [borderWidth, setBorderWidth] = useSyncedState("borderWidth", 1);
     const [fontSize, setFontSize] = useSyncedState("fontSize", 16);
     const [userName, setUserName] = useSyncedState("userName", "");
+    const [timestamp, setTimestamp] = useSyncedState("timestamp", 0);
     const [userPhotoUrl, setUserPhotoUrl] = useSyncedState("userPhotoUrl", null);
     const [shadowColor, setShadowColor] = useSyncedState("shadowColor", "#000000");
     const [shadowOffsetX, setShadowOffsetX] = useSyncedState("shadowOffsetX", 0);
@@ -169,35 +176,10 @@
       };
     });
     const resetResponse = (response2, currentWidgetId = null) => __async(this, null, function* () {
-      var _a, _b;
       let self = false;
       if (!currentWidgetId) {
         currentWidgetId = widgetId;
         self = true;
-      }
-      if (response2.trim() !== "") {
-        console.log("push response");
-        const name = ((_a = figma.currentUser) == null ? void 0 : _a.name) || "User";
-        const photoUrl = ((_b = figma.currentUser) == null ? void 0 : _b.photoUrl) || null;
-        const timestamp = (/* @__PURE__ */ new Date()).toISOString();
-        const data = { widgetId: widgetId != null ? widgetId : "", response: response2, userName: name, photoUrl, timestamp };
-        try {
-          const res = yield fetch("https://figjam-widgets.onrender.com/textentrywidget/add-response", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-          });
-          const result = yield res.json();
-          if (res.status === 200) {
-            console.log("Response saved successfully");
-          } else {
-            console.error("Failed to submit data.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
       }
       if (self) {
         setResponse("");
@@ -278,12 +260,12 @@
       setIsSubmitting(true);
       const name = ((_a = figma.currentUser) == null ? void 0 : _a.name) || "User";
       const photoUrl = ((_b = figma.currentUser) == null ? void 0 : _b.photoUrl) || null;
-      const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+      const timestamp2 = (/* @__PURE__ */ new Date()).toISOString();
       setUserName(name);
       setUserPhotoUrl(photoUrl);
       setSubmitted(true);
-      setPreviousResponses((prev) => [{ response, userName: name, photoUrl, timestamp }, ...prev]);
-      const data = { widgetId: widgetId != null ? widgetId : "", response, userName: name, photoUrl, timestamp };
+      setPreviousResponses((prev) => [{ response, userName: name, photoUrl, timestamp: timestamp2 }, ...prev]);
+      const data = { widgetId: widgetId != null ? widgetId : "", response, userName: name, photoUrl, timestamp: timestamp2 };
       try {
         const res = yield fetch("https://figjam-widgets-myhz.onrender.com/textentrywidget/submit", {
           method: "POST",
@@ -299,6 +281,7 @@
           );
           setPreviousResponses(sortedResponses);
           setShowPrevious(result.widget.showPrevious);
+          setTimestamp(result.widget.current.timestamp);
         } else {
           console.error("Failed to submit data.");
         }
@@ -324,7 +307,7 @@
         const result = yield res.json();
         if (res.status === 200) {
           console.log(result);
-          return { previous: result.widget.previous, showPrevious: result.widget.showPrevious };
+          return { previous: result.widget.previous, showPrevious: result.widget.showPrevious, current: result.widget.current };
         } else {
           return null;
         }
@@ -344,6 +327,11 @@
         );
         setPreviousResponses(sortedResponses);
         setShowPrevious(responses.showPrevious);
+        if (responses.current) {
+          setResponse(responses.current.response);
+          setUserName(responses.current.userName);
+          setUserPhotoUrl(responses.current.photoUrl || null);
+        }
       }
     });
     const handleRevealAll = (group = void 0) => __async(this, null, function* () {
@@ -422,7 +410,7 @@
           spread: shadowSpread
         }
       },
-      /* @__PURE__ */ figma.widget.h(
+      !submitted && /* @__PURE__ */ figma.widget.h(figma.widget.Fragment, null, /* @__PURE__ */ figma.widget.h(
         AutoLayout,
         {
           direction: "horizontal",
@@ -430,16 +418,8 @@
           horizontalAlignItems: "end",
           onClick: openAdminMenu
         },
-        /* @__PURE__ */ figma.widget.h(
-          SVG,
-          {
-            src: AdminMenuIcon,
-            width: fontSize,
-            height: fontSize
-          }
-        )
-      ),
-      !submitted && /* @__PURE__ */ figma.widget.h(figma.widget.Fragment, null, /* @__PURE__ */ figma.widget.h(
+        /* @__PURE__ */ figma.widget.h(SVG, { src: AdminMenuIcon, width: fontSize, height: fontSize })
+      ), /* @__PURE__ */ figma.widget.h(
         Input,
         {
           placeholder: "Your response: ",
@@ -475,15 +455,36 @@
         AutoLayout,
         {
           padding: { left: 10, right: 10, top: 5, bottom: 5 },
-          cornerRadius: 10,
+          cornerRadius: 5,
           stroke: "#000",
           strokeWidth: 1,
           width: "fill-parent",
-          direction: "horizontal",
-          spacing: 5
+          direction: "vertical",
+          spacing: 2
         },
-        userPhotoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: userPhotoUrl, width: fontSize + 5, height: fontSize + 5, cornerRadius: fontSize / 1.5 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: fontSize + 5, height: fontSize + 5 }),
-        /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333", width: "fill-parent" }, userName, ": ", response)
+        /* @__PURE__ */ figma.widget.h(
+          AutoLayout,
+          {
+            width: "fill-parent",
+            direction: "horizontal",
+            verticalAlignItems: "center",
+            spacing: 5
+          },
+          userPhotoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: userPhotoUrl, width: fontSize + 5, height: fontSize + 5, cornerRadius: fontSize / 1.5 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: fontSize + 5, height: fontSize + 5 }),
+          /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333" }, userName),
+          /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#999" }, "(", timeString(timestamp), "):"),
+          /* @__PURE__ */ figma.widget.h(
+            AutoLayout,
+            {
+              direction: "horizontal",
+              width: "fill-parent",
+              horizontalAlignItems: "end",
+              onClick: openAdminMenu
+            },
+            /* @__PURE__ */ figma.widget.h(SVG, { src: AdminMenuIcon, width: fontSize, height: fontSize })
+          )
+        ),
+        /* @__PURE__ */ figma.widget.h(Text, { fontSize, fill: "#333", width: "fill-parent" }, response)
       ),
       showPrevious && previousResponses.length > 0 && /* @__PURE__ */ figma.widget.h(AutoLayout, { direction: "horizontal", width: "fill-parent", height: "fill-parent", padding: 0, spacing: 0 }, /* @__PURE__ */ figma.widget.h(
         AutoLayout,
@@ -494,7 +495,7 @@
           height: "fill-parent",
           overflow: "hidden",
           fill: "#F0F0F0",
-          cornerRadius: 10,
+          cornerRadius: 5,
           stroke: "#000000",
           strokeWidth: 1
         },
@@ -542,7 +543,7 @@
           {
             padding: 10,
             cornerRadius: 5,
-            fill: "#007BFF",
+            fill: scrollIndex === 0 ? "#E6F2FF" : "#007BFF",
             onClick: handleScrollUp
           },
           /* @__PURE__ */ figma.widget.h(Text, { fontSize: 8, fill: "#FFFFFF" }, "\u2191")
@@ -552,11 +553,12 @@
           {
             padding: 10,
             cornerRadius: 5,
-            fill: "#007BFF",
+            fill: scrollIndex + 1 === previousResponses.length ? "#E6F2FF" : "#007BFF",
             onClick: handleScrollDown
           },
           /* @__PURE__ */ figma.widget.h(Text, { fontSize: 8, fill: "#FFFFFF" }, "\u2193")
-        )
+        ),
+        /* @__PURE__ */ figma.widget.h(Text, { fontSize: 10 }, scrollIndex + 1, "/", previousResponses.length)
       ))
     );
   }

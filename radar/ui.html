@@ -87,8 +87,8 @@
 
       function renderRadarChart(labels, data, title, style, width, height) {
         const canvas = document.createElement("canvas");
-        canvas.setAttribute("width", width.toString());
-        canvas.setAttribute("height", height.toString());
+        canvas.setAttribute("width", (width * 2).toString());
+        canvas.setAttribute("height", (height * 2).toString());
         document.body.appendChild(canvas);
 
         console.log("rendering chart");
@@ -135,7 +135,8 @@
                 pointLabels: {
                   color: "#000", // Black font for labels
                   font: {
-                    size: style.labelFontSize, // Slightly smaller font size for point labels
+                    weight: "bold",
+                    size: style.labelFontSize * 2, // Slightly smaller font size for point labels
                   },
                 },
                 ticks: {
