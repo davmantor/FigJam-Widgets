@@ -6,10 +6,17 @@ const PollSchema = new mongoose.Schema({
     unique: true,
     default: () => new mongoose.Types.ObjectId().toString(),
   },
-  group:{type: String,  default: "None"},
+  group: {
+    type: String,
+    default: "None"
+  },
   title: {
     type: String,
     required: true,
+  },
+  subheading: {  // ➕ Added subheading field
+    type: String,
+    default: "",  // Optional, can be empty if not provided
   },
   options: [
     {
@@ -39,4 +46,4 @@ const PollSchema = new mongoose.Schema({
   },
 });
 
-module.exports = PollSchema
+module.exports = PollSchema;

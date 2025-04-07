@@ -1,6 +1,6 @@
 {
-  "name": "quote",
-  "id": "1445572123776858346",
+  "name": "wordcloud",
+  "id": "1460800419684738181",
   "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
@@ -9,9 +9,10 @@
   "editorType": [
     "figjam"
   ],
-  "ui": "ui.html",
   "containsWidget": true,
   "widgetApi": "1.0.0",
+  "ui": "ui.html",
+  "permissions": ["currentuser"],
   "networkAccess": {
     "allowedDomains": [
       "none"

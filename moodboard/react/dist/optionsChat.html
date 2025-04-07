@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #login-container, #settings-container {
+            display: none;
+        }
+
+        #login-container {
+            display: block;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-container">
+        <h2>Enter Password</h2>
+        <input type="password" id="passwordInput" placeholder="Enter password">
+        <button onclick="checkPassword()">Login</button>
+        <p id="error-message" style="color: red; display: none;">Incorrect password. Try again.</p>
+    </div>
+
+    <div id="settings-container">
+        <h2>Emoji & Text Size Settings</h2>
+
+        <label for="emojiSize">Emoji Size (px)</label>
+        <input type="number" id="emojiSize" min="10" max="200" step="1">
+
+        <label for="textSize">Text Size (px)</label>
+        <input type="number" id="textSize" min="10" max="100" step="1">
+
+        <button id="saveButton">Save Settings</button>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const password = document.getElementById("passwordInput").value;
+            if (password === "312cmpm15") {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("settings-container").style.display = "block";
+            } else {
+                document.getElementById("error-message").style.display = "block";
+            }
+        }
+
+        // Receive current emoji and text size values from Figma
+        window.onmessage = (event) => {
+            const { emojiSize, textSize } = event.data.pluginMessage;
+
+            if (emojiSize !== undefined) {
+                document.getElementById("emojiSize").value = emojiSize;
+            }
+            if (textSize !== undefined) {
+                document.getElementById("textSize").value = textSize;
+            }
+        };
+
+        document.getElementById("saveButton").addEventListener("click", () => {
+            const emojiSize = parseInt(document.getElementById("emojiSize").value, 10);
+            const textSize = parseInt(document.getElementById("textSize").value, 10);
+
+            // Send updated values back to Figma
+            parent.postMessage(
+                {
+                    pluginMessage: {
+                        type: "updateSettings",
+                        emojiSize,
+                        textSize
+                    }
+                },
+                "*"
+            );
+        });
+    </script>
+
+</body>
+</html>

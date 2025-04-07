@@ -1,5 +1,5 @@
 {
-  "name": "radar",
+  "name": "wordcloud",
   "version": "1.0.0",
   "description": "Your Figma widget",
   "scripts": {
@@ -46,5 +46,8 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "wordcloud": "^1.2.3"
   }
 }

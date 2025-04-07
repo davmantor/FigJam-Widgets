@@ -1,4 +1,7 @@
 const { widget, showUI, ui } = figma;
+
+import { widgetVersion } from "./version";
+
 const { useSyncedState, useSyncedMap, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
 const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
@@ -10,6 +13,29 @@ const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www
 	<path d="M 45 90 c -10.613 0 -20.922 -3.773 -29.028 -10.625 c -0.648 -0.548 -0.88 -1.444 -0.579 -2.237 C 20.034 64.919 31.933 56.71 45 56.71 s 24.966 8.209 29.607 20.428 c 0.301 0.793 0.069 1.689 -0.579 2.237 C 65.922 86.227 55.613 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
 </g>
 </svg>`;
+
+
+const Dropdown: any = ({ options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useSyncedState("dropdownOpen", false);
+
+  return (
+    <AutoLayout direction="vertical" spacing={4}>
+      <AutoLayout onClick={() => setIsOpen(!isOpen)} fill="#E6E6E6" padding={8} cornerRadius={4}>
+        <Text fontSize={14}>{value || "Select a Likert Scale"}</Text>
+      </AutoLayout>
+      {isOpen && (
+        <AutoLayout direction="vertical" spacing={4} padding={4} fill="#F9F9F9" cornerRadius={4}>
+          {options.map((option, index) => (
+            <AutoLayout key={index} onClick={() => { onChange(option); setIsOpen(false); }}>
+              <Text fontSize={12}>{option}</Text>
+            </AutoLayout>
+          ))}
+        </AutoLayout>
+      )}
+    </AutoLayout>
+  );
+};
+
 
 
 interface CustomUser {
@@ -43,16 +69,17 @@ interface TextBoxProps {
   barColor: string;
   accentColor: string;
   promptColor: string;
+  fontSize: number;
 }
 
 
-function ProgressBar({ votes, totalVotes, widgetWidth, barColor }: { votes: number; totalVotes: number; widgetWidth: number; barColor: string }) {
+function ProgressBar({ votes, totalVotes, widgetWidth, barColor, barWidth }: { votes: number; totalVotes: number; widgetWidth: number; barColor: string, barWidth: number }) {
   function getWidgetValue(input: number): number {
     const currentWidgetWidth = widgetWidth; // Get the current widget width
     const scalingRatio = currentWidgetWidth / 800; // Calculate the scaling ratio
     return Math.floor(input * scalingRatio); // Scale the input value by the ratio
   }
-  const parentWidth = getWidgetValue(500);
+  const parentWidth = barWidth;
   const percentage = totalVotes === 0 ? 0 : (votes / totalVotes) * 100;
   console.log("votes: " + votes);
   console.log("totalVotes: " + totalVotes);
@@ -75,6 +102,7 @@ function ProgressBar({ votes, totalVotes, widgetWidth, barColor }: { votes: numb
     </AutoLayout>
   );
 }
+
 
 function TextBox({
   index,
@@ -99,7 +127,8 @@ function TextBox({
   widgetWidth,
   barColor,
   accentColor,
-  promptColor
+  promptColor,
+  fontSize
 }: TextBoxProps & { totalVoters: number; pollId?: string; entries?: string[] }) {
 
   function getWidgetValue(input: number): number {
@@ -173,13 +202,15 @@ function TextBox({
   
 // Now the voters array contains both the original and fake voters
 
-  const displayedVoters = voters.slice(0, 4);
+
+
+const displayedVoters = (voters || []).slice(0, 4);
   console.log("Voters:");
   displayedVoters.forEach((voter, i) => {
     console.log(`Voter ${i + 1}: Name = ${voter.name}, Photo URL = ${voter.photoUrl}`);
   });
   console.log(displayedVoters.length);
-  const additionalVotes = voters.length - displayedVoters.length;
+const additionalVotes = (voters?.length || 0) - displayedVoters.length;
   console.log(additionalVotes);
 
   return (
@@ -194,8 +225,8 @@ function TextBox({
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(500)}
-          height={getWidgetValue(60)}
+          width={getWidgetValue(650)}
+          height='hug-contents'
         >
           {isEditing ? (
             <Input
@@ -203,10 +234,10 @@ function TextBox({
               onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
               width="fill-parent"
-              fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)}
+              fontSize={isQuestion ? fontSize : fontSize - 4}
             />
           ) : (
-            <Text fontSize={isQuestion ? getWidgetValue(28) : getWidgetValue(24)} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
+            <Text fontSize={isQuestion ? fontSize : fontSize - 4} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
               {value || (isQuestion ? "Enter poll question" : "Enter option")}
             </Text>
           )}
@@ -220,31 +251,36 @@ function TextBox({
           />
         )}
         {!isQuestion && submitted && (
-          <AutoLayout direction="horizontal" spacing={getWidgetValue(4)} verticalAlignItems="center">
-            <Text fontSize={getWidgetValue(28)} fill={userVote ? accentColor : "#000000"}>
-              {displayedVoters.length + additionalVotes}
+          <AutoLayout 
+          direction="horizontal" 
+          spacing={getWidgetValue(4)} 
+          verticalAlignItems="center"
+          horizontalAlignItems="end"
+          width="hug-contents"  // Ensures it only takes necessary space
+        >
+          <Text fontSize={fontSize} fill={userVote ? barColor : "#000000"}>
+            {displayedVoters.length + additionalVotes}
+          </Text>
+          {displayedVoters.map((voter, i) => (
+            <Image 
+              key={i} 
+              src={isAnonymous ? AnonSVG : voter.photoUrl} 
+              width={fontSize} 
+              height={fontSize} 
+              cornerRadius={fontSize} 
+            />
+          ))}
+          {additionalVotes > 0 && (
+            <Text fontSize={getWidgetValue(28)} fill="#000000">
+              +{additionalVotes}
             </Text>
-            {displayedVoters.map((voter, i) => (
-              <AutoLayout key={i} width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(8)}>
-                {isAnonymous ? (
-                <AutoLayout width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(4)}>
-                  <SVG src={AnonSVG} width={getWidgetValue(28)} height={getWidgetValue(28)} />
-                </AutoLayout>
-                ) : (
-                  <Image src={voter.photoUrl} width={getWidgetValue(28)} height={getWidgetValue(28)} cornerRadius={getWidgetValue(14)} />
-                )}
-              </AutoLayout>
-            ))}
-            {additionalVotes > 0 && (
-              <Text fontSize={getWidgetValue(28)} fill="#000000">
-                +{additionalVotes}
-              </Text>
-            )}
-          </AutoLayout>
+          )}
+        </AutoLayout>
+        
         )}
       </AutoLayout>
       {!isQuestion && submitted && (
-        <ProgressBar votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
+        <ProgressBar barWidth={getWidgetValue(650)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
       )}
     </AutoLayout>
   );
@@ -280,14 +316,59 @@ function PollingWidget() {
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
 
 
-  const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 400);
+  const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 300);
   const [borderWidth, setBorderWidth] = useSyncedState<number>('borderWidth', 2);
   const [borderColor, setBorderColor] = useSyncedState<string>('borderColor', '#E6E6E6');
   const [promptColor, setPromptColor] = useSyncedState<string>('promptColor', '#000000');
   const [barColor, setBarColor] = useSyncedState<string>('barColor', '#A259FF');
   const [accentColor, setAccentColor] = useSyncedState<string>('accentColor', '#24CE16');
 
-  const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 10);
+  const [widgetCornerRadius, setWidgetCornerRadius] = useSyncedState<number>('widgetCornerRadius', 15);
+  const [subheading, setSubheading] = useSyncedState<string>('subheading', "");
+
+  const [headingFontSize, setHeadingFontSize] = useSyncedState<number>('headingFontSize', 20);
+  const [subheadingFontSize, setSubheadingFontSize] = useSyncedState<number>('subheadingFontSize', 14);
+  const [choiceFontSize, setChoiceFontSize] = useSyncedState<number>('choiceFontSize', 16);
+  const [publishedAt, setPublishedAt] = useSyncedState<string>(
+    'publishedAt',
+    getPSTDateFromVersion(widgetVersion)
+  );
+  const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
+  const [selectedScale, setSelectedScale] = useSyncedState("selectedScale", null);
+  
+
+
+const likertScales: Record<string, string[]> = {
+  fourPointAgreeDisagree: ["Agree", "Somewhat Agree", "Somewhat Disagree", "Disagree"],
+  fourPointIntensity: ["Not at all", "Slightly", "Moderately", "Extremely"],
+  fivePointDiverging: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"],
+  fivePointIntensity: ["Never", "Rarely", "Sometimes", "Often", "Always"]
+};
+
+
+function handleScaleSelection(scaleKey: string) {
+  if (likertScales[scaleKey]) {
+      setSelectedScale(scaleKey);
+      setEntries([...likertScales[scaleKey]]);
+  }
+}
+
+
+  
+
+  
+  function getPSTDateFromVersion(versionDate: string): string {
+    const date = new Date(versionDate);
+    const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+    const pstOffset = -8 * 60 * 60000; // PST is UTC-8
+    const pstDate = new Date(utc + pstOffset);
+    console.log("DATE", pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+    return pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+
+  }
+  
+  
 
   // Track logId changes
   useEffect(() => {
@@ -303,11 +384,14 @@ function PollingWidget() {
   const handleValueChange = (index: number, newValue: string) => {
     if (index === -1) {
       setTitle(newValue);
+    } else if (index === -2) {  // Use index -2 for subheading
+      setSubheading(newValue);
     } else {
       const updatedEntries = entries.map((item, i) => (i === index ? newValue : item));
       setEntries(updatedEntries);
     }
   };
+  
 
   const handleRemove = (index: number) => {
     const updatedEntries = entries.filter((_, i) => i !== index);
@@ -442,6 +526,7 @@ if (isMultiVoteEnabled) {
     // Prepare the data to be sent to the server
     const pollData = {
       title,
+      subheading,
       options: entries.map(entry => ({
         text: entry,        
         votes: 0, 
@@ -488,6 +573,7 @@ if (isMultiVoteEnabled) {
     setTitle(title);
     setEditingIndex(null);
     setSubmitted(true);
+    setSubheading(subheading);
   };
   
   
@@ -498,6 +584,8 @@ if (isMultiVoteEnabled) {
       combinedVoters.add(voter);
     });
   });
+
+
 
   const totalVotes = votes.reduce((acc, voteCount) => acc + voteCount, 0);
 
@@ -515,12 +603,15 @@ if (isMultiVoteEnabled) {
     </g>
     </svg>`;
 
+  
 
   useEffect(()=>{
     if (isCrownButtonPressed) {
       setIsCrownButtonPressed(false);
       console.log('crown123', isCrownButtonPressed);
-    figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
+      setPublishedAt(getPSTDateFromVersion(widgetVersion));
+      console.log("Current publishedAt state:", publishedAt);
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -531,6 +622,15 @@ if (isMultiVoteEnabled) {
     figma.ui.postMessage({ type: 'current-widgetId',           payload: logId });
     figma.ui.postMessage({ type: 'current-widgetCornerRadius', payload: widgetCornerRadius });
     figma.ui.postMessage({ type: 'current-pollId',           payload: pollId });
+    figma.ui.postMessage({
+      type: 'current-publishedAt',
+      payload: getPSTDateFromVersion(widgetVersion),
+    });
+    figma.ui.postMessage({ type: 'current-headingFontSize', payload: headingFontSize });
+    figma.ui.postMessage({ type: 'current-subheadingFontSize', payload: subheadingFontSize });
+    figma.ui.postMessage({ type: 'current-choiceFontSize', payload: choiceFontSize });
+    figma.ui.postMessage({ type: 'current-widgetGroup', payload: widgetGroup });
+    
 
     figma.ui.onmessage = async (msg) => {
       if (msg.type === 'update-prompt') {
@@ -721,7 +821,102 @@ if (isMultiVoteEnabled) {
             handleOptionsClickChat();
           }
         };
-      }};
+      } else if (msg.type === 'update-subheading') {
+        console.log("Opening UI for subheading edit");
+        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+        figma.ui.postMessage({ type: 'edit-subheading', payload: subheading });
+  
+        figma.ui.onmessage = msg => {
+            if (msg.type === 'update-message') {
+                const updatedSubheading = msg.payload.message;
+                console.log("Updated Subheading:", updatedSubheading);
+                setSubheading(updatedSubheading);
+                alreadyLoggedIn = true;
+                setIsCrownButtonPressed(true);
+            } else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+        };}
+        else if (msg.type === 'update-headingFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-headingFontSize', payload: headingFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setHeadingFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+
+                  setIsCrownButtonPressed(true);
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+          };
+      } else if (msg.type === 'update-subheadingFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-subheadingFontSize', payload: subheadingFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setSubheadingFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+
+                  setIsCrownButtonPressed(true);
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+                setIsCrownButtonPressed(true);
+
+            }
+          };
+      } else if (msg.type === 'update-choiceFontSize') {
+          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
+          figma.ui.postMessage({ type: 'edit-choiceFontSize', payload: choiceFontSize.toString() });
+      
+          figma.ui.onmessage = msg => {
+              if (msg.type === 'update-message') {
+                  setChoiceFontSize(Number(msg.payload.message));
+                  alreadyLoggedIn = true;
+                  setIsCrownButtonPressed(true);
+
+
+              }
+              else if (msg.type === 'close-plugin') {
+                console.log("closed");
+                setIsCrownButtonPressed(false);
+                figma.closePlugin();
+            } else if (msg.type === 'back-action') {
+                console.log("back");
+                alreadyLoggedIn = true;
+                handleOptionsClickChat();
+            }
+          };
+      }
+      else if (msg.type === 'update-widgetGroup') {
+        setWidgetGroup(msg.payload); // Store in state
+      }
+      
+    };
   }})
 
   const setWidgetId = async (widgetId: string) => {
@@ -819,7 +1014,6 @@ if (isMultiVoteEnabled) {
 
 
   return (
-    
     <AutoLayout
       direction="vertical"
       verticalAlignItems="start"
@@ -831,42 +1025,97 @@ if (isMultiVoteEnabled) {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-    {/* Crown button in the top right, outside the white background */}
-    <AutoLayout
-      direction="horizontal"
-      verticalAlignItems="start"
-      width="fill-parent"
-      horizontalAlignItems="end"
-      height={getWidgetValue(20)}  // Adjust the height as needed
-      padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}  // Adjust the padding as needed
-    >
-      <SVG src={adminI} onClick={handleOptionsClickChat} />
-    </AutoLayout>
-    <AutoLayout
-    width="fill-parent"
-    verticalAlignItems="center"
-    onClick={() => setEditingIndex(-1)}  // Set the index to -1 to trigger title editing
-  >
-    {editingIndex === -1 ? (
-      <Input
-        value={title}
-        onTextEditEnd={(e) => handleValueChange(-1, e.characters)}  // Update the title on edit end
-        placeholder="Enter poll title"
-        width="fill-parent"
-        fontSize={getWidgetValue(30)}   // Scale title size
-        fontWeight="bold"
+      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <Dropdown
+        options={Object.keys(likertScales)}
+        value={selectedScale}
+        onChange={handleScaleSelection}
       />
-    ) : (
-      <Text
-        fontSize={getWidgetValue(30)}
-        fontWeight="bold"
-        width="fill-parent"
-        horizontalAlignText="left"
-      >
-        {title || "Enter poll title"}
-      </Text>
-    )}
+    </AutoLayout>
+
+<AutoLayout
+  direction="horizontal"
+  width="fill-parent"
+  spacing={getWidgetValue(0)}
+  verticalAlignItems="center"
+>
+  {/* Title Section */}
+  <AutoLayout
+  width="fill-parent"
+  verticalAlignItems="center"
+  onClick={() => !submitted && setEditingIndex(-1)} // Prevent editing if submitted
+  padding={{ left: getWidgetValue(2) }}
+>
+  {editingIndex === -1 ? (
+    <Input
+      value={title}
+      onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
+      placeholder="Enter poll title"
+      width="fill-parent"
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      horizontalAlignText="left"
+    />
+  ) : (
+    <Text
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      width="fill-parent"
+      horizontalAlignText="left"
+    >
+      {title || "Enter poll title"}
+    </Text>
+  )}
+</AutoLayout>
+
+  {/* Crown button aligned to the end */}
+  <AutoLayout
+    direction="horizontal"
+    verticalAlignItems="start"
+    width="hug-contents" 
+    height={getWidgetValue(20)}
+    padding={{ right: getWidgetValue(2), top: getWidgetValue(2) }}
+  >
+    <SVG src={adminI} onClick={handleOptionsClickChat} />
   </AutoLayout>
+</AutoLayout>
+
+
+
+      
+  
+      
+  
+      {/* Subheading Section */}
+      <AutoLayout
+  width="fill-parent"
+  verticalAlignItems="center"
+  onClick={() => !submitted && setEditingIndex(-2)} // Prevent editing if submitted
+>
+  {editingIndex === -2 ? (
+    <Input
+      value={subheading}
+      onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
+      placeholder="Enter subheading"
+      width="fill-parent"
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      fill="#666666"
+    />
+  ) : (
+    <Text
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      width="fill-parent"
+      horizontalAlignText="left"
+      fill="#666666"
+    >
+      {subheading || "Enter subheading"}
+    </Text>
+  )}
+</AutoLayout>
+  
+      {/* Poll Options */}
       {entries.map((item, index) => (
         <TextBox
           key={index}
@@ -877,11 +1126,15 @@ if (isMultiVoteEnabled) {
           isEditing={editingIndex === index}
           setEditingIndex={setEditingIndex}
           submitted={submitted}
-          votes={votes}            // Pass votes
+          votes={votes}
           onVote={() => handleVote(index)}
           userVote={userVoteIndex === index}
-          voters={voters[index]}          // Pass voters
+          voters={voters[index]}
           isAnonymous={isAnonymous}
+          totalVoters={combinedVoters.size}
+          updateUserName={updateUserName}
+          entries={entries}
+          pollId={pollId}
           isMultiVoteEnabled = {isMultiVoteEnabled}
           totalVoters={combinedVoters.size}
           updateUserName={updateUserName}
@@ -891,8 +1144,10 @@ if (isMultiVoteEnabled) {
           barColor={barColor}
           accentColor={accentColor}
           promptColor={promptColor}
+          fontSize = {choiceFontSize}
         />
       ))}
+  
       {!submitted && (
         <>
           <SVG
@@ -946,17 +1201,22 @@ if (isMultiVoteEnabled) {
           </AutoLayout>
         </>
       )}
+      
       {submitted && (
         <>
         <AutoLayout width="fill-parent" padding={{ top: getWidgetValue(10) }}>
-          <Text fontSize={getWidgetValue(12)} fill="#808080" width="fill-parent">
+          <Text fontSize={choiceFontSize} fill="#808080" width="fill-parent">
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>
                   </>
       )}
+
     </AutoLayout>
+    
+  
   );
+  
 }
 
 widget.register(PollingWidget);

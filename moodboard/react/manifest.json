@@ -4,7 +4,8 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": {
-    "main": "dist/ui.html"
+    "main": "dist/ui.html",
+    "optionsChat": "dist/optionsChat.html"
   },
   "capabilities": [],
   "enableProposedApi": false,

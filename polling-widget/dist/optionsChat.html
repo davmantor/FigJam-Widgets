@@ -10,16 +10,43 @@
             padding: 0;
         }
         .container {
-            padding-top: 2px;
+            padding: 10px;
             text-align: center;
             display: flex;
-            flex-direction: row; /* Arrange items horizontally */
-            flex-wrap: wrap;     /* Allow items to wrap */
-            justify-content: center; /* Optional: Keeps the items centered in the container */
+            flex-direction: column;
             align-items: center;
-            width: auto;
         }
-
+        .widget-entry-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+        .input {
+            padding: 6px 12px;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: #007aff;
+        }
+        .admin-controls {
+            display: none;
+            margin-top: 10px;
+        }
         .pinForm {
             padding-top: 5px;
             text-align: center;
@@ -45,23 +72,18 @@
             
         }
         
-        .icon {
-            margin-top: 1px;
-            margin-bottom: 1px;
-            margin-right: 5px;
+
+        .published-info {
+            bottom: 10px; /* 10px from bottom */
+            left: 10px;   /* 10px from left */
+            font-size: 12px;
+            font-weight: 300;       /* Light font */
+            color: #888888;         /* Soft gray color */
+            font-family: Arial, sans-serif;
+            opacity: 0.7;           /* Slight transparency */
         }
-        .input {
-        padding: 6px 12px;
-        border: 2px solid #ccc;
-        border-radius: 20px; /* Adjust the border-radius to change the curvature */
-        width: 200px;
-        outline: none; /* Remove the default focus outline */
-        }
-        /* Optional: Add some styling for better visual appeal */
-        .input:focus {
-        border-color: #007bff; /* Change the border color on focus */
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle box shadow on focus */
-        }
+        
+        
     </style>
 </head>
 <body>
@@ -69,6 +91,8 @@
         <div id="pinForm">
             <input class="input" type="password" id="pinInput" placeholder="Enter admin password">
             <button class="button1" onclick="checkPin()">Submit</button>
+            <p id="error-message" style="color: red; display: none;">Incorrect password. Try again.</p>
+
         </div>
         <div id="adminControls" style="display: none;">
 
@@ -134,11 +158,41 @@
                 </svg>
                 Accent Color:
             </div> 
-            <div class="widget-details-container">
-                <label for="customWidgetGroupInput">Widget Group:</label>
-                <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
-                <button class="button" id="setWidgetGroupButton">Set Widget Group</button>
+            <div id="headingFontSizeButton" class="button1" onclick="updateHeadingFontSize()">
+                Heading Font Size
+            </div> 
+            
+            <div id="subheadingFontSizeButton" class="button1" onclick="updateSubheadingFontSize()">
+                Subheading Font Size
+            </div>
+            
+            <div id="choiceFontSizeButton" class="button1" onclick="updateChoiceFontSize()">
+                Choice/Vote Font Size
+            </div>
+            
+            <div class="container">
+                <div class="widget-entry-bar">
+                    <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
+                    <button class="icon-button" id="setWidgetGroupButton" title="Set Widget Group">
+                        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2a10 10 0 1 1-10 10A10 10 0 0 1 12 2zm-1 14h2v-4h3l-4-4-4 4h3z" />
+                        </svg>
+                    </button>
+                </div>
+                <p id="widgetCountInfo">Widgets in group: <span id="widgetCount">0</span></p>
+            </div>
+              <div class="button1" onclick="updateSubheading()">
+                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705..."></path>
+                </svg>
+                Subheading
               </div>
+              <div class="published-info">
+                <strong>Compiled:</strong> <span id="publishedAtDisplay">Loading...</span>
+            </div>
+            
+            
+              
 
         </div>
     </div>
@@ -147,37 +201,66 @@
         let widgetId = null;
 
 
+        let debounceTimer;
+        const customWidgetGroupInput = document.getElementById("customWidgetGroupInput");
+        const widgetCountDisplay = document.getElementById("widgetCount");
+        const errorMessage = document.getElementById("error-message");
 
-        const setWidgetGroupButton = document.getElementById('setWidgetGroupButton');
-        const customWidgetGroupInput = document.getElementById('customWidgetGroupInput');
-        setWidgetGroupButton.onclick = () => {
-      const customWidgetGroup = customWidgetGroupInput.value.trim();
-      
-      if (customWidgetGroup) {
-        widgetGroup = customWidgetGroup;
-        customWidgetGroupInput.value = widgetGroup;
-        console.log(widgetId);
-        
-        // Send the new group to the server
-        fetch('http://localhost:4000/polls/update-group', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ widgetId, group: widgetGroup })
-        })
-        .then(() => {
-          console.log("Group updated on the server after button click.");
-        })
-        .catch(error => {
-          console.error('Error updating group after button click:', error);
-        });
-        
-        parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
-      } else {
-        alert('Please enter a valid Widget Group.');
-      }
-    };
+        // Function to fetch the number of polls in the entered group
+        function countPollsInGroup(groupName) {
+            if (!groupName) {
+                widgetCountDisplay.textContent = "0";
+                return;
+            }
+
+            fetch(`https://figjam-widgets-myhz.onrender.com/polls/group/${encodeURIComponent(groupName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        widgetCountDisplay.textContent = data.length; // Update count
+                    } else {
+                        widgetCountDisplay.textContent = "0"; // No polls found
+                    }
+                    errorMessage.style.display = "none"; // Hide any error messages
+                })
+                .catch(() => {
+                    errorMessage.style.display = "block";
+                    widgetCountDisplay.textContent = "0";
+                });
+        }
+
+        // Debounce function to avoid excessive API calls
+        function debounceCheck() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                countPollsInGroup(customWidgetGroupInput.value.trim());
+            }, 500); // 500ms delay to reduce server calls
+        }
+
+        // Event listener to check group usage as user types
+        customWidgetGroupInput.addEventListener("input", debounceCheck);
+
+        // Set Widget Group on button click
+        document.getElementById("setWidgetGroupButton").onclick = () => {
+            const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+            if (customWidgetGroup) {
+                fetch("https://figjam-widgets-myhz.onrender.com/polls/update-group", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ group: customWidgetGroup })
+                })
+                .then(() => {
+                    console.log("Group updated on the server.");
+                    parent.postMessage({ pluginMessage: { type: "setWidgetGroup", widgetGroup: customWidgetGroup } }, "*");
+                })
+                .catch(error => {
+                    console.error("Error updating group:", error);
+                });
+            } else {
+                alert("Please enter a valid Widget Group.");
+            }
+        };
         let widgetGroup = "None"; 
         window.onmessage = function(event) {
             console.log("called123!");
@@ -224,22 +307,42 @@
                     widgetId = event.data.pluginMessage.payload;
                     console.log("widgetID", widgetId);
                     break;
+                case 'current-publishedAt':
+                    console.log("DATE IN UI");
+                    document.getElementById('publishedAtDisplay').textContent = payload || "Not Published";
+                    break;
+                    case 'current-headingFontSize':
+                    document.getElementById('headingFontSizeButton').innerText = `Heading Font Size: ${payload}px`;
+                    break;
+                  case 'current-subheadingFontSize':
+                    document.getElementById('subheadingFontSizeButton').innerText = `Subheading Font Size: ${payload}px`;
+                    break;
+                  case 'current-choiceFontSize':
+                    document.getElementById('choiceFontSizeButton').innerText = `Choice Font Size: ${payload}px`;
+                    break;
+                  case 'current-widgetGroup':
+                    document.getElementById('customWidgetGroupInput').value = payload || "None"; // Display the widget group
+                    break;
             }
         };
 
         var correctPin = "312cmpm15";
         var deleteConfirmation = false;
 
+        let failedAttempts = 0;
+
         function checkPin() {
-            var pin = document.getElementById("pinInput").value;
-            if (pin === correctPin) {
+            const password = document.getElementById("pinInput").value;
+            if (password === "312cmpm15") {
                 document.getElementById("pinForm").style.display = "none";
                 document.getElementById("adminControls").style.display = "block";
             } else {
-                alert("Incorrect PIN.");
-                parent.postMessage({ pluginMessage: { type: 'close-options' } }, '*');
+                document.getElementById("error-message").style.display = "block";
             }
         }
+        
+
+        
 
         function updatePrompt() {
             // Send a message to the plugin to pin the message
@@ -285,6 +388,32 @@
             // Send a message to the plugin to update the widget button color
             parent.postMessage({ pluginMessage: {type: 'update-widgetCornerRadius'} }, '*');
         }
+        function updateSubheading() {
+            console.log("Sending subheading update request to code.tsx");
+            parent.postMessage({ pluginMessage: { type: 'update-subheading' } }, '*');
+        }
+        function updateHeadingFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-headingFontSize' } }, '*');
+        }
+        
+        function updateSubheadingFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-subheadingFontSize' } }, '*');
+        }
+        
+        function updateChoiceFontSize() {
+            parent.postMessage({ pluginMessage: { type: 'update-choiceFontSize' } }, '*');
+        }
+        document.getElementById('setWidgetGroupButton').onclick = () => {
+            const customWidgetGroup = document.getElementById('customWidgetGroupInput').value.trim();
+          
+            if (customWidgetGroup) {
+              parent.postMessage({ pluginMessage: { type: 'update-widgetGroup', payload: customWidgetGroup } }, '*');
+            } else {
+              alert('Please enter a valid Widget Group.');
+            }
+          };
+          
+          
 
     </script>
 </body>

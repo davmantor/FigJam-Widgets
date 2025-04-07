@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar Chart</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      height: 100vh;
+      background-color: #e0f7fa; /* Light blue background */
+    }
+    canvas {
+      max-width: 400px;
+      max-height: 400px;
+    }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: center;
+      display: none;
+      width: 250px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div id="popup">Generating chart... This window will close automatically.</div>
+  <canvas id="radarChart"></canvas>
+
+  <script>
+    let radarChart; // Variable to hold the radar chart instance
+    let chartTitle = "Poll Results"; // Default title
+    let chartColor = "#32CD32"; // Default color (Lime Green)
+    let titleFontSize = 16; // Default title font size
+
+    // Listen for messages from the Figma widget
+    window.onmessage = (event) => {
+      const { type, payload } = event.data.pluginMessage;
+
+      if (type === 'render-polar-plot') {
+        const polls = payload.orderedPolls;
+        console.log('polls', payload);
+
+        // Extract labels and data from polls
+        const labels = polls.map((poll) => poll.title);
+        const data = polls.map((poll) => 
+          poll.options.reduce((acc, option, index) => acc + (5 - index) * option.votes, 0)
+        );
+
+        // Get settings from Figma plugin
+        chartTitle = payload.chartTitle || chartTitle;
+        chartColor = payload.chartColor || chartColor;
+        titleFontSize = payload.titleFontSize || titleFontSize;
+
+        // Show the popup message
+        showPopup();
+
+        // Render the radar chart with new settings
+        renderRadarChart(labels, data, chartTitle, chartColor, titleFontSize);
+      }
+    };
+
+    function renderRadarChart(labels, data, title, color, fontSize) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+    
+      if (radarChart) {
+        radarChart.destroy(); // Destroy the previous chart if it exists
+      }
+    
+      radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: title, // Set an empty label to avoid duplication in the legend
+            data: data,
+            backgroundColor: color + "55", // Semi-transparent background color
+            borderColor: color, // Line color
+            borderWidth: 2,
+            pointBackgroundColor: color,
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: color,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false, // Hide the legend to avoid duplication
+            },
+            title: {
+              display: true,
+              text: "",
+              color: "#000", // Title text color
+              font: {
+                size: fontSize, // Set the title font size
+                weight: "bold",
+              },
+            },
+          },
+          scales: {
+            r: {
+              grid: {
+                color: '#ccc', // Light grey grid lines
+              },
+              angleLines: {
+                color: '#ccc', // Light grey axis lines
+              },
+              pointLabels: {
+                color: '#000', // Black font for labels
+                font: {
+                  size: fontSize - 2, // Slightly smaller font size for point labels
+                },
+              },
+              ticks: {
+                display: false, // Hide scale numbers
+              },
+            },
+          },
+          animation: {
+            onComplete: () => {
+              console.log('Animation completed, sending chart to widget');
+              sendChartToWidget();
+            },
+          },
+        },
+      });
+    }
+
+    function showPopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'flex';
+    }
+    
+    function hidePopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'none';
+    }
+    
+    function sendChartToWidget() {
+        const canvas = document.getElementById('radarChart');
+        const imageUrl = canvas.toDataURL('image/png'); // Convert chart to image URL
+      
+        console.log('Preparing to send chart image to widget:', imageUrl);
+      
+        // Send the image back to the widget
+        parent.postMessage(
+          { pluginMessage: { type: 'chart-image', payload: imageUrl } },
+          '*'
+        );
+      
+        // Introduce a delay before sending the close UI message
+        setTimeout(() => {
+          console.log('Sending close-ui message to widget.');
+          hidePopup();
+          parent.postMessage(
+            { pluginMessage: { type: 'close-ui' } },
+            '*'
+          );
+        }, 10000); // Delay of 10 seconds
+    }
+  </script>
+</body>
+</html>

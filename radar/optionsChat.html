@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Settings</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f8f8f8;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background-color: #007aff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+      }
+      button:hover {
+        background-color: #005bb5;
+      }
+      .hidden {
+        display: none;
+      }
+      .color-picker-container,
+      .slider-container {
+        display: flex;
+        flex-direction: row; /* Stack items horizontally */
+        align-items: center; /* Center items horizontally */
+        gap: 8px; /* Space between elements */
+        margin-top: 5px;
+      }
+      .slider-container label {
+        white-space: nowrap;
+      }
+
+      .color-preview {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .hex-code {
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .sortable-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sortable-list li {
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        cursor: grab;
+      }
+
+      .sortable-list li.dragging {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Admin Settings</h2>
+
+    <div id="passwordSection">
+      <label for="adminPassword">Enter Password:</label>
+      <input type="password" id="adminPassword" placeholder="Enter password" />
+      <button id="checkPassword">Submit</button>
+      <p id="errorMessage" style="color: red; font-size: 14px; display: none">
+        Incorrect password. Please try again.
+      </p>
+    </div>
+
+    <div id="adminControls" class="hidden">
+      <label for="chartTitle">Chart Title:</label>
+      <input type="text" id="chartTitle" />
+
+      <label for="dataPointLabels">Data Point Labels (comma-separated):</label>
+      <input type="text" id="dataPointLabels" />
+
+      <label for="widgetWidth">Graph dimensions:</label>
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          padding-bottom: 5px;
+        "
+      >
+        <input type="number" id="widgetWidth" min="100" max="800" />
+        x
+        <input type="number" id="widgetHeight" min="100" max="800" />
+      </div>
+      <i style="font-size: 12px">
+        The graph is rendered at 2x the dimensions for better quality.
+      </i>
+
+      <h3>Style</h3>
+      <p style="font-size: 14px; margin-top: 0">
+        You may need to refresh the graph to see your changes.
+      </p>
+      <label for="titleFontSize">Title Font Size:</label>
+      <input type="number" id="titleFontSize" min="10" max="30" />
+
+      <label for="labelFontSize">Label Font Size:</label>
+      <input type="number" id="labelFontSize" min="10" max="30" />
+
+      <label for="cornerRadius">Corner Radius:</label>
+      <input type="number" id="cornerRadius" min="0" max="30" />
+
+      <label for="chartColor">Chart Color:</label>
+      <div class="color-picker-container">
+        <input class="color-preview" type="color" id="chartColor" />
+        <div class="color-preview"></div>
+        <span class="hex-code" id="hexCode">#000000</span>
+      </div>
+
+      <label for="backgroundColor">Background Color:</label>
+      <div class="color-picker-container">
+        <input class="color-preview" type="color" id="backgroundColor" />
+        <div class="color-preview"></div>
+        <span class="hex-code" id="hexCode">#000000</span>
+      </div>
+      <div class="slider-container">
+        <label for="backgroundOpacity">Background Opacity:</label>
+        <input type="range" id="backgroundOpacity" min="0" max="1" step="0.1" />
+        <span id="opacityValue">0</span>
+      </div>
+
+      <label for="refreshColor">Refresh Button Color:</label>
+      <div class="color-picker-container">
+        <input class="color-preview" type="color" id="refreshColor" />
+        <div class="color-preview"></div>
+        <span class="hex-code" id="hexCode">#000000</span>
+      </div>
+      <h2>Poll Subheading Order</h2>
+      <ul id="pollOrderList" class="sortable-list"></ul>
+
+      <button id="saveSettings">Save Settings</button>
+      <p
+        style="
+          text-align: center;
+          margin: 0 auto;
+          padding: 12px;
+          padding-top: 24px;
+        "
+      >
+        Compiled <b id="widgetVersion">Unknown</b>
+      </p>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const correctPassword = "312cmpm15";
+        const passwordInput = document.getElementById("adminPassword");
+        const checkPasswordButton = document.getElementById("checkPassword");
+        const adminControls = document.getElementById("adminControls");
+        const errorMessage = document.getElementById("errorMessage");
+
+        function checkPassword() {
+          const enteredPassword = passwordInput.value.trim();
+          if (enteredPassword === correctPassword) {
+            adminControls.classList.remove("hidden");
+            passwordInput.value = "";
+            document.getElementById("passwordSection").classList.add("hidden");
+          } else {
+            errorMessage.style.display = "block";
+          }
+        }
+
+        checkPasswordButton.addEventListener("click", checkPassword);
+        passwordInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            checkPassword();
+          }
+        });
+
+        passwordInput.focus();
+
+        // Color Picker Handling
+        const colorInput = document.getElementById("chartColor");
+        const hexCodeDisplay = document.getElementById("hexCode");
+
+        function updateColorDisplay() {
+          document
+            .querySelectorAll("input.color-preview")
+            .forEach((colorInput) => {
+              const parent = colorInput.parentElement;
+              const colorPreview = parent.querySelector("div.color-preview");
+              colorPreview.style.backgroundColor = colorInput.value;
+              const hexCodeDisplay = parent.querySelector(".hex-code");
+              hexCodeDisplay.textContent = colorInput.value.toUpperCase();
+
+              colorInput.addEventListener("input", () => {
+                colorPreview.style.backgroundColor = colorInput.value;
+                hexCodeDisplay.textContent = colorInput.value.toUpperCase();
+              });
+            });
+        }
+
+        function updateOpacityDisplay() {
+          const backgroundOpacity =
+            document.getElementById("backgroundOpacity");
+          const opacityValue = document.getElementById("opacityValue");
+          opacityValue.textContent = parseFloat(
+              backgroundOpacity.value
+            ).toFixed(1);
+          backgroundOpacity.addEventListener("input", () => {
+            opacityValue.textContent = parseFloat(
+              backgroundOpacity.value
+            ).toFixed(1);
+          });
+        }
+
+        let pollOrderList = document.getElementById("pollOrderList");
+
+        function updatePollOrderUI(subheadings) {
+          pollOrderList.innerHTML = "";
+          subheadings.forEach((subheading) => {
+            let li = document.createElement("li");
+            li.textContent = subheading;
+            li.draggable = true;
+
+            li.addEventListener("dragstart", () => {
+              li.classList.add("dragging");
+            });
+
+            li.addEventListener("dragend", () => {
+              li.classList.remove("dragging");
+              savePollOrder(); // Save order after dragging
+            });
+
+            pollOrderList.appendChild(li);
+          });
+        }
+
+        pollOrderList.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          const dragging = document.querySelector(".dragging");
+          const afterElement = getDragAfterElement(pollOrderList, e.clientY);
+          if (afterElement == null) {
+            pollOrderList.appendChild(dragging);
+          } else {
+            pollOrderList.insertBefore(dragging, afterElement);
+          }
+        });
+
+        function getDragAfterElement(container, y) {
+          const draggableElements = [
+            ...container.querySelectorAll("li:not(.dragging)"),
+          ];
+          return draggableElements.reduce(
+            (closest, child) => {
+              const box = child.getBoundingClientRect();
+              const offset = y - box.top - box.height / 2;
+              if (offset < 0 && offset > closest.offset) {
+                return { offset, element: child };
+              } else {
+                return closest;
+              }
+            },
+            { offset: Number.NEGATIVE_INFINITY }
+          ).element;
+        }
+
+        function savePollOrder() {
+          const newOrder = [...pollOrderList.children].map(
+            (li) => li.textContent
+          );
+          console.log("pop up side", newOrder);
+          parent.postMessage(
+            { pluginMessage: { type: "update-poll-order", payload: newOrder } },
+            "*"
+          );
+        }
+
+        function getPSTDateFromVersion(versionDate) {
+          const date = new Date(versionDate);
+          const utc = date.getTime() + date.getTimezoneOffset() * 60000;
+          const pstOffset = -8 * 60 * 60000; // PST is UTC-8
+          const pstDate = new Date(utc + pstOffset);
+          console.log(
+            "DATE",
+            pstDate.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+          );
+
+          return pstDate.toLocaleString("en-US", {
+            timeZone: "America/Los_Angeles",
+          });
+        }
+
+        // Listen for initial settings from Figma plugin
+        window.onmessage = (event) => {
+          const msg = event.data.pluginMessage;
+          if (msg.type === "load-admin-settings") {
+            const subheadings = msg.payload.pollOrder || [];
+            console.log("Subheadings from polls array:", subheadings);
+            subheadings.forEach((subheading, index) => {
+              console.log(
+                `Subheading ${index + 1}:`,
+                subheading.title ||
+                  subheading.subheading ||
+                  JSON.stringify(subheading)
+              );
+            });
+            document.getElementById("chartTitle").value =
+              msg.payload.chartTitle;
+            document.getElementById("dataPointLabels").value = Object.values(
+              msg.payload.dataPointLabels
+            ).join(", ");
+            document.getElementById("widgetWidth").value =
+              msg.payload.widgetWidth;
+            document.getElementById("widgetHeight").value =
+              msg.payload.widgetHeight;
+            document.getElementById("titleFontSize").value =
+              msg.payload.style.titleFontSize;
+            document.getElementById("chartColor").value =
+              msg.payload.style.chartColor;
+            document.getElementById("labelFontSize").value =
+              msg.payload.style.labelFontSize;
+            document.getElementById("refreshColor").value =
+              msg.payload.style.refreshColor;
+            document.getElementById("backgroundColor").value =
+              msg.payload.style.backgroundColor;
+            document.getElementById("backgroundOpacity").value =
+              msg.payload.style.backgroundOpacity;
+            document.getElementById("cornerRadius").value =
+              msg.payload.style.cornerRadius;
+            document.getElementById("widgetVersion").innerText =
+              getPSTDateFromVersion(msg.payload.widgetVersion);
+            updatePollOrderUI(subheadings);
+
+            updateColorDisplay();
+            updateOpacityDisplay();
+          }
+        };
+
+        document
+          .getElementById("saveSettings")
+          .addEventListener("click", () => {
+            const chartTitle = document.getElementById("chartTitle").value;
+            const dataPointLabels = document
+              .getElementById("dataPointLabels")
+              .value.split(",")
+              .reduce((acc, label, index) => {
+                acc[`point${index + 1}`] = label.trim();
+                return acc;
+              }, {});
+            const widgetWidth = parseInt(
+              document.getElementById("widgetWidth").value,
+              10
+            );
+            const widgetHeight = parseInt(
+              document.getElementById("widgetHeight").value,
+              10
+            );
+
+            const style = {
+              titleFontSize: parseInt(
+                document.getElementById("titleFontSize").value,
+                10
+              ),
+              labelFontSize: parseInt(
+                document.getElementById("labelFontSize").value,
+                10
+              ),
+              cornerRadius: parseInt(
+                document.getElementById("cornerRadius").value,
+                10
+              ),
+              chartColor: document.getElementById("chartColor").value,
+              backgroundColor: document.getElementById("backgroundColor").value,
+              backgroundOpacity: parseFloat(
+                document.getElementById("backgroundOpacity").value
+              ),
+              refreshColor: document.getElementById("refreshColor").value,
+            };
+
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: "update-admin-settings",
+                  payload: {
+                    chartTitle,
+                    dataPointLabels,
+                    widgetWidth,
+                    widgetHeight,
+                    style,
+                  },
+                },
+              },
+              "*"
+            );
+
+            parent.postMessage(
+              { pluginMessage: { type: "close-plugin" } },
+              "*"
+            );
+          });
+      });
+    </script>
+  </body>
+</html>
