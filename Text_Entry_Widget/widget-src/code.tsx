@@ -1,9 +1,14 @@
 const { widget } = figma;
 const { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
 
-function timeString(time: number) {
+function timeString(time: string) {
   const date = new Date(time);
-  const timeString = date.toLocaleTimeString('en-US').replace(/^0/, '').replace(/:\d{2} /, ' ');
+  const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+  let minutes = date.getMinutes().toString();
+  if (minutes.length < 2) {
+    minutes = '0' + minutes;
+  }
+  const timeString = `${date.getHours() % 12 || 12}:${minutes} ${ampm}`;
   const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
   return `${dateString} ${timeString}`;
 }
@@ -41,7 +46,7 @@ function Widget() {
   const [borderWidth, setBorderWidth] = useSyncedState<number>("borderWidth", 1);
   const [fontSize, setFontSize] = useSyncedState<number>("fontSize", 16);
   const [userName, setUserName] = useSyncedState<string>("userName", "");
-  const [timestamp, setTimestamp] = useSyncedState<number>("timestamp", 0);
+  const [timestamp, setTimestamp] = useSyncedState<string>("timestamp", "1970-01-01T00:00:00.000Z");
   const [userPhotoUrl, setUserPhotoUrl] = useSyncedState<string | null>("userPhotoUrl", null);
   const [shadowColor, setShadowColor] = useSyncedState<string>("shadowColor", "#000000");
   const [shadowOffsetX, setShadowOffsetX] = useSyncedState<number>("shadowOffsetX", 0);
@@ -131,6 +136,9 @@ function Widget() {
       if (msg.type === 'duplicateAll') {
         waitForTask(handleDuplicateAll());
       }
+      if (msg.type === 'duplicateGroup') {
+        waitForTask(handleDuplicateAll(msg.widgetGroup));
+      }
       if (msg.type === 'setWidgetId') {
         setWidgetId(msg.widgetId);
         handleRefresh(msg.widgetId);
@@ -218,16 +226,19 @@ function Widget() {
     figma.ui.postMessage({ type: 'duplicate', status: 'success' });
   }
 
-  const handleDuplicateAll = async () => {
+  const handleDuplicateAll = async (group?: string) => {
     const nodes = figma.currentPage.findAll((node: any) => node.type === "WIDGET" && node.name === 'Text Entry Widget') as WidgetNode[];
     for (const node of nodes) {
+      if (group && node.widgetSyncedState.widgetGroup !== group) {
+        continue;
+      }
       console.log("duplicating widget", node.widgetSyncedState.widgetId);
       const clone = node.cloneWidget({});
       // transform absolutely (x and y will use relative transforms to parent, which produces incorrect results)
       clone.x = node.absoluteTransform[0][2] + 20;
       clone.y = node.absoluteTransform[1][2] + 20;
     }
-    figma.ui.postMessage({ type: 'duplicateAll', status: 'success' });
+    figma.ui.postMessage({ type: 'duplicateAll', group: !!group, status: 'success' });
   }
   
   
@@ -312,12 +323,18 @@ function Widget() {
   
     const responses = await getRefreshedResponses(currentWidgetId);
     if (responses !== null) {
+      console.log(responses)
       setPreviousResponses(responses.previous);
       setShowPrevious(responses.showPrevious);
-      if (responses.current) {
+      if (responses.current && responses.current.response) {
+        setSubmitted(true);
         setResponse(responses.current.response);
         setUserName(responses.current.userName);
+        setTimestamp(responses.current.timestamp);
         setUserPhotoUrl(responses.current.photoUrl || null);
+      } else {
+        setSubmitted(false);
+
       }
     }
   };
