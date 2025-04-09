@@ -550,8 +550,10 @@
     };
 
     revealGroupButton.onclick = () => {
+      const confirmed = confirm("Are you sure you want to reveal this group?");
+      if (!confirmed) return;
+    
       const customWidgetGroup = customWidgetGroupInput.value.trim();
-
       revealGroupButton.style.opacity = '0.5';
       revealGroupButton.style.pointerEvents = 'none';
       revealGroupButton.innerText = 'Revealing...';
@@ -562,20 +564,24 @@
         alert('Please enter a valid Widget Group to reveal.');
       }
     };
+    
 
     resetGroupButton.onclick = () => {
+      const confirmed = confirm("Are you sure you want to reset this group?");
+      if (!confirmed) return;
+    
       const customWidgetGroup = customWidgetGroupInput.value.trim();
-
       resetGroupButton.style.opacity = '0.5';
       resetGroupButton.style.pointerEvents = 'none';
       resetGroupButton.innerText = 'Resetting...';
-    
+      
       if (customWidgetGroup) {
         parent.postMessage({ pluginMessage: { type: 'resetGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
         alert('Please enter a valid Widget Group to reset.');
       }
     };
+    
     
     function revealPreviousResponsesOnly() {
       fetch('https://figjam-widgets-myhz.onrender.com/textentrywidget/reveal-previous', {
@@ -619,11 +625,15 @@
     
 
     resetResponseButton.onclick = () => {
+      const confirmed = confirm("Are you sure you want to reset the current response?");
+      if (!confirmed) return;
+    
       parent.postMessage({ pluginMessage: { type: 'resetResponse' } }, '*');
       setTimeout(() => {
         refresh();
       }, 1000);
     };
+    
 
     duplicateButton.onclick = () => {
       duplicateButton.style.opacity = '0.5';
@@ -654,18 +664,26 @@
     };
 
     resetAllButton.onclick = () => {
+      const confirmed = confirm("Are you sure you want to reset ALL widgets?");
+      if (!confirmed) return;
+    
       resetAllButton.style.opacity = '0.5';
       resetAllButton.style.pointerEvents = 'none';
-      resetAllButton.innerText = 'Resetting...'
+      resetAllButton.innerText = 'Resetting...';
       parent.postMessage({ pluginMessage: { type: 'resetAll' } }, '*');
     };
+    
 
     revealAllButton.onclick = () => {
+      const confirmed = confirm("Are you sure you want to reveal ALL responses?");
+      if (!confirmed) return;
+    
       revealAllButton.style.opacity = '0.5';
       revealAllButton.style.pointerEvents = 'none';
       revealAllButton.innerText = 'Revealing...';
       parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
     };
+    
 
     widthInput.onchange = (event) => {
       const width = parseInt(event.target.value, 10);

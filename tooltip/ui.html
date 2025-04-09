@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Widget UI</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: sans-serif;
+    }
+    .hidden {
+      display: none;
+    }
+
+    .row {
+      margin-bottom: 8px;
+    }
+    label {
+      font-size: 14px;
+      color: #333;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+    }
+    .button {
+      cursor: pointer;
+      padding: 6px 12px;
+      margin-top: 8px;
+      border: none;
+      background: #6200ee;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .button:hover {
+      background: #4e00ba;
+    }
+
+    /* The “detailedInfo” flow elements */
+    #detailedFlow {
+      margin-top: 12px;
+      border-top: 1px solid #ccc;
+      padding-top: 12px;
+    }
+    #detailedDisplay {
+      padding: 8px;
+      background: #f0f0f0;
+      margin-bottom: 12px;
+    }
+    #pwRow, #editorRow {
+      margin-bottom: 12px;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Minimal label editing UI -->
+  <div id="labelFlow" class="hidden">
+    <div class="row">
+      <label>Short Label:</label>
+      <input type="text" id="labelInput"/>
+    </div>
+    <button class="button" id="saveLabelBtn">Save Label</button>
+  </div>
+
+  <!-- Detailed Info flow, includes password check -->
+  <div id="detailedFlow" class="hidden">
+    <div id="detailedDisplay"></div>
+    <div id="pwRow">
+      <label>Enter password to edit:</label>
+      <input type="password" id="pwInput"/>
+      <button class="button" id="verifyBtn" style="margin-top:8px;">Verify</button>
+    </div>
+    <div id="editorRow" class="hidden">
+      <label>Edit Detailed Info:</label>
+      <textarea id="editTextarea"></textarea>
+      <button class="button" id="saveDetailsBtn">Save</button>
+    </div>
+  </div>
+
+  <script>
+    const PASSWORD = "312cmpm15";
+    let currentLabel = "";
+    let currentDetailedInfo = "";
+    let verified = false;
+
+    onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      // 1) If user triggered "editLabel" from property menu
+      if (msg.type === "editLabel") {
+        document.getElementById("labelFlow").classList.remove("hidden");
+        currentLabel = msg.payload.currentLabel || "";
+        document.getElementById("labelInput").value = currentLabel;
+      }
+
+      // 2) If user clicked the widget => "init" for detailed flow
+      else if (msg.type === "init") {
+        document.getElementById("detailedFlow").classList.remove("hidden");
+        currentLabel = msg.payload.shortLabel || "";
+        currentDetailedInfo = msg.payload.detailedInfo || "";
+        document.getElementById("detailedDisplay").textContent = 
+          currentDetailedInfo;
+      }
+    };
+
+    // -- Label Flow --
+    document.getElementById("saveLabelBtn").onclick = () => {
+      const newLabel = document.getElementById("labelInput").value;
+      parent.postMessage({
+        pluginMessage: {
+          type: "updateShortLabel",
+          payload: { newLabel }
+        }
+      }, "*");
+      // You can hide the UI or keep it open:
+      parent.postMessage({ pluginMessage: { type: "closeUI" } }, "*");
+    };
+
+    // -- Detailed Flow --
+    document.getElementById("verifyBtn").onclick = () => {
+      const pw = document.getElementById("pwInput").value;
+      if (pw === PASSWORD) {
+        verified = true;
+        document.getElementById("pwRow").classList.add("hidden");
+        document.getElementById("editorRow").classList.remove("hidden");
+        document.getElementById("editTextarea").value = currentDetailedInfo;
+      } else {
+        alert("Wrong password!");
+      }
+    };
+
+    document.getElementById("saveDetailsBtn").onclick = () => {
+      if (!verified) {
+        alert("Must verify password first.");
+        return;
+      }
+      const newInfo = document.getElementById("editTextarea").value;
+      currentDetailedInfo = newInfo;
+      parent.postMessage({
+        pluginMessage: {
+          type: "updateDetailedInfo",
+          payload: { newInfo }
+        }
+      }, "*");
+      // Hide or keep open
+      parent.postMessage({ pluginMessage: { type: "closeUI" } }, "*");
+    };
+  </script>
+</body>
+</html>

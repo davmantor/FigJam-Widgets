@@ -37,7 +37,16 @@
             border: none;
             cursor: pointer;
             margin-left: 8px;
+            width: 40px;  /* Increased width */
+            height: 40px; /* Increased height */
+            padding: 10px; /* Added padding for better clickability */
         }
+        
+        .icon-button svg {
+            width: 24px;  /* Increase icon size */
+            height: 24px;
+        }
+        
         .icon {
             width: 20px;
             height: 20px;
@@ -102,6 +111,14 @@
                 </svg>          
                 Prompt
             </div> 
+
+            <div class="button1" onclick="updateSubheading()">
+                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
+                </svg>
+                Subheading
+            </div>
+            
 
             <div class="button1" onclick="updateWidgetId()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
@@ -181,12 +198,6 @@
                 </div>
                 <p id="widgetCountInfo">Widgets in group: <span id="widgetCount">0</span></p>
             </div>
-              <div class="button1" onclick="updateSubheading()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705..."></path>
-                </svg>
-                Subheading
-              </div>
               <div class="published-info">
                 <strong>Compiled:</strong> <span id="publishedAtDisplay">Loading...</span>
             </div>
@@ -240,28 +251,7 @@
         // Event listener to check group usage as user types
         customWidgetGroupInput.addEventListener("input", debounceCheck);
 
-        // Set Widget Group on button click
-        document.getElementById("setWidgetGroupButton").onclick = () => {
-            const customWidgetGroup = customWidgetGroupInput.value.trim();
-
-            if (customWidgetGroup) {
-                fetch("https://figjam-widgets-myhz.onrender.com/polls/update-group", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ group: customWidgetGroup })
-                })
-                .then(() => {
-                    console.log("Group updated on the server.");
-                    parent.postMessage({ pluginMessage: { type: "setWidgetGroup", widgetGroup: customWidgetGroup } }, "*");
-                })
-                .catch(error => {
-                    console.error("Error updating group:", error);
-                });
-            } else {
-                alert("Please enter a valid Widget Group.");
-            }
-        };
-        let widgetGroup = "None"; 
+        
         window.onmessage = function(event) {
             console.log("called123!");
             var messageType = event.data.pluginMessage.type;
@@ -322,6 +312,7 @@
                     break;
                   case 'current-widgetGroup':
                     document.getElementById('customWidgetGroupInput').value = payload || "None"; // Display the widget group
+                    countPollsInGroup(payload);
                     break;
             }
         };
@@ -404,13 +395,34 @@
             parent.postMessage({ pluginMessage: { type: 'update-choiceFontSize' } }, '*');
         }
         document.getElementById('setWidgetGroupButton').onclick = () => {
-            const customWidgetGroup = document.getElementById('customWidgetGroupInput').value.trim();
-          
+            const customWidgetGroup = customWidgetGroupInput.value.trim();
+            console.log("HELLO", customWidgetGroup);
+
+            if(widgetId){
+
             if (customWidgetGroup) {
-              parent.postMessage({ pluginMessage: { type: 'update-widgetGroup', payload: customWidgetGroup } }, '*');
+                fetch("https://figjam-widgets-myhz.onrender.com/polls/update-group", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ widgetId: widgetId, group: customWidgetGroup })
+                })
+                .then(() => {
+                    console.log("Group updated on the server.");
+                    parent.postMessage({ pluginMessage: { type: "update-widgetGroup", widgetGroup: customWidgetGroup } }, "*");
+
+                    let currentCount = parseInt(widgetCountDisplay.textContent, 10) || 0;
+                    widgetCountDisplay.textContent = currentCount + 1;
+                })
+                .catch(error => {
+                    console.error("Error updating group:", error);
+                });
             } else {
-              alert('Please enter a valid Widget Group.');
+                alert("Please enter a valid Widget Group.");
             }
+        }
+        else{
+            alert("Please submit the Widget before entering a group.");
+        }
           };
           
           
