@@ -289,6 +289,7 @@
     <p>These options will help you update widgets to the latest version. No data should be lost, but double check each widget if you're unsure.</p>
     <div class="button-container">
       <button class="button danger" id="duplicateButton">Duplicate this widget</button>
+      <button class="button danger" id="duplicateGroupButton">Duplicate group</button>
       <button class="button danger" id="duplicateAllButton">Duplicate ALL widgets</button>
     </div>
   </div>
@@ -331,6 +332,7 @@
     const revealGroupButton = document.getElementById('revealGroupButton');
     const resetGroupButton = document.getElementById('resetGroupButton');
     const duplicateButton = document.getElementById('duplicateButton');
+    const duplicateGroupButton = document.getElementById('duplicateGroupButton');
     const duplicateAllButton = document.getElementById('duplicateAllButton');
 
     const AnonSVG = `<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 256 256" xml:space="preserve">
@@ -454,9 +456,15 @@
         refresh();
       }
       if (type === 'duplicateAll') {
-        duplicateAllButton.innerText = 'Duplicate ALL widgets';
-        duplicateAllButton.style.opacity = '';
-        duplicateAllButton.style.pointerEvents = '';
+        if (event.data.pluginMessage.group) {
+          duplicateGroupButton.innerText = 'Duplicate group';
+          duplicateGroupButton.style.opacity = '';
+          duplicateGroupButton.style.pointerEvents = '';
+        } else {
+          duplicateAllButton.innerText = 'Duplicate ALL widgets';
+          duplicateAllButton.style.opacity = '';
+          duplicateAllButton.style.pointerEvents = '';
+        }
       } else if (type === 'duplicate') {
         duplicateButton.innerText = 'Duplicate this widget';
         duplicateButton.style.opacity = '';
@@ -634,6 +642,20 @@
       parent.postMessage({ pluginMessage: { type: 'duplicate' } }, '*');
     };
 
+    duplicateGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+      duplicateGroupButton.style.opacity = '0.5';
+      duplicateGroupButton.style.pointerEvents = 'none';
+      duplicateGroupButton.innerText = 'Duplicating group...';
+    
+      if (customWidgetGroup) {
+        parent.postMessage({ pluginMessage: { type: 'duplicateGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        alert('Please enter a valid Widget Group to reset.');
+      }
+    };
+
     duplicateAllButton.onclick = () => {
       duplicateAllButton.style.opacity = '0.5';
       duplicateAllButton.style.pointerEvents = 'none';
@@ -798,6 +820,14 @@
               unsavedUserName = userNameInput.value;
               currentEditingIndex = -1;
             };
+
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            const timestamp = new Date(data.widget.current.timestamp);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+            const formattedDate = timestamp.toLocaleString('en-US', options);
+            timestampDiv.textContent = formattedDate.replace(", ", "\n");
+            responseHeader.appendChild(timestampDiv);
 
             const buttonContainer = document.createElement('div');
             buttonContainer.className = 'button-container';
