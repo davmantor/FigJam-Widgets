@@ -303,8 +303,7 @@
       }
     });
     const getRefreshedResponses = (widgetId2) => __async(this, null, function* () {
-      if (!widgetId2)
-        return null;
+      if (!widgetId2) return null;
       console.log("refresh inside", widgetId2);
       const data = { widgetId: widgetId2 };
       try {
@@ -328,8 +327,7 @@
       }
     });
     const handleRefresh = (currentWidgetId) => __async(this, null, function* () {
-      if (!currentWidgetId)
-        return;
+      if (!currentWidgetId) return;
       console.log("refresh inside", currentWidgetId);
       const responses = yield getRefreshedResponses(currentWidgetId);
       if (responses !== null) {
