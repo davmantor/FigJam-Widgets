@@ -1,0 +1,1428 @@
+
+=== LOG CHUNK: 2025-04-02T21:57:03Z to 2025-04-03T09:57:03Z ===
+2025-04-02 22:19:07        userName: 'est',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7b2dff0728ce62428c6'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:26.916Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'asd',
+2025-04-02 22:19:07        userName: 'assad',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7b9dff0728ce62428d1'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:33.313Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'saetase',
+2025-04-02 22:19:07        userName: 'ttt',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7bbdff0728ce62428df'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:35.987Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'sdf',
+2025-04-02 22:19:07        userName: 'sdf',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7bddff0728ce62428f0'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:37.710Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'Hello world! asdasd',
+2025-04-02 22:19:07        userName: 'Alexander Sherbrooke',
+2025-04-02 22:19:07        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:17:08.957Z,
+2025-04-02 22:19:07        _id: new ObjectId('67edb7cddff0728ce624292e')
+2025-04-02 22:19:07      }
+2025-04-02 22:19:07    ],
+2025-04-02 22:19:07    showPrevious: true,
+2025-04-02 22:19:07    __v: 6
+2025-04-02 22:19:07  }
+2025-04-02 22:19:07  inside widget
+2025-04-02 22:19:07  Updated widget: {
+2025-04-02 22:19:07    current: {
+2025-04-02 22:19:07      response: 'W',
+2025-04-02 22:19:07      userName: 'Alexander Sherbrooke',
+2025-04-02 22:19:07      photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-02 22:19:07      timestamp: 2025-04-02T22:19:07.113Z
+2025-04-02 22:19:07    },
+2025-04-02 22:19:07    _id: new ObjectId('67edb765dff0728ce62428b7'),
+2025-04-02 22:19:07    widgetId: '1391195703137776986-1743632222360-603119275',
+2025-04-02 22:19:07    Group: 'None',
+2025-04-02 22:19:07    previous: [
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'E6F2FF',
+2025-04-02 22:19:07        userName: 'asd',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7b0dff0728ce62428be'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:24.583Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'asd',
+2025-04-02 22:19:07        userName: 'est',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7b2dff0728ce62428c6'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:26.916Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'asd',
+2025-04-02 22:19:07        userName: 'assad',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7b9dff0728ce62428d1'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:33.313Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'saetase',
+2025-04-02 22:19:07        userName: 'ttt',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7bbdff0728ce62428df'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:35.987Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'sdf',
+2025-04-02 22:19:07        userName: 'sdf',
+2025-04-02 22:19:07        _id: new ObjectId('67edb7bddff0728ce62428f0'),
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:18:37.710Z
+2025-04-02 22:19:07      },
+2025-04-02 22:19:07      {
+2025-04-02 22:19:07        response: 'Hello world! asdasd',
+2025-04-02 22:19:07        userName: 'Alexander Sherbrooke',
+2025-04-02 22:19:07        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-02 22:19:07        timestamp: 2025-04-02T22:17:08.957Z,
+2025-04-02 22:19:07        _id: new ObjectId('67edb7cddff0728ce624292e')
+2025-04-02 22:19:07      }
+2025-04-02 22:19:07    ],
+2025-04-02 22:19:07    showPrevious: true,
+2025-04-02 22:19:07    __v: 6
+2025-04-02 22:19:07  }
+2025-04-03 08:56:49  { group: 'Test' }
+2025-04-03 08:56:49  Test
+2025-04-03 09:03:53  { group: 'rraa' }
+2025-04-03 09:03:53  rraa
+2025-04-03 09:03:54  { group: 'rraa' }
+2025-04-03 09:03:54  rraa
+2025-04-03 09:04:04  { group: 'rraa' }
+2025-04-03 09:04:04  rraa
+2025-04-03 09:04:16  { group: 'Процессы' }
+2025-04-03 09:04:16  Процессы
+2025-04-03 09:29:23  { group: 'Group 1' }
+2025-04-03 09:29:23  Group 1
+2025-04-03 09:31:03  { group: 'Group 1' }
+2025-04-03 09:31:03  Group 1
+
+=== LOG CHUNK: 2025-04-03T09:57:03Z to 2025-04-03T21:57:03Z ===
+2025-04-03 21:40:35    },
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:33.209Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67cfdb079b3495a02e9308d1'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024187581-209162565',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: false,
+2025-04-03 21:40:35      __v: 1
+2025-04-03 21:40:35    }
+2025-04-03 21:40:35  ]
+2025-04-03 21:40:35  Query result: {
+2025-04-03 21:40:35    acknowledged: true,
+2025-04-03 21:40:35    modifiedCount: 5,
+2025-04-03 21:40:35    upsertedId: null,
+2025-04-03 21:40:35    upsertedCount: 0,
+2025-04-03 21:40:35    matchedCount: 5
+2025-04-03 21:40:35  }
+2025-04-03 21:40:35  Matched Widgets2: [
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:32.816Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67bf58ce5632347fddafdb92'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024181788-705650154',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      __v: 1,
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: true
+2025-04-03 21:40:35    },
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:33.469Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67cfc8989b3495a02e930882'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024194305-902237747',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: true,
+2025-04-03 21:40:35      __v: 1
+2025-04-03 21:40:35    },
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:34.063Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67cfc97a5632347fddd456c6'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024215263-993539859',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      __v: 11,
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: true
+2025-04-03 21:40:35    },
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:33.780Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67cfc9d65632347fddd45734'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024201897-310893718',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      __v: 1,
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: true
+2025-04-03 21:40:35    },
+2025-04-03 21:40:35    {
+2025-04-03 21:40:35      current: {
+2025-04-03 21:40:35        response: '',
+2025-04-03 21:40:35        userName: '',
+2025-04-03 21:40:35        photoUrl: '',
+2025-04-03 21:40:35        timestamp: 2025-04-02T19:56:33.209Z
+2025-04-03 21:40:35      },
+2025-04-03 21:40:35      _id: new ObjectId('67cfdb079b3495a02e9308d1'),
+2025-04-03 21:40:35      widgetId: '1391195703137776986-1740024187581-209162565',
+2025-04-03 21:40:35      Group: 'pi-6',
+2025-04-03 21:40:35      previous: [ [Object] ],
+2025-04-03 21:40:35      showPrevious: true,
+2025-04-03 21:40:35      __v: 1
+2025-04-03 21:40:35    }
+2025-04-03 21:40:35  ]
+2025-04-03 21:40:41  1391195703137776986-1740024181788-705650154 { widgetId: '1391195703137776986-1740024181788-705650154' }
+2025-04-03 21:40:41  1391195703137776986-1740024187581-209162565 { widgetId: '1391195703137776986-1740024187581-209162565' }
+2025-04-03 21:40:42  1391195703137776986-1740024194305-902237747 { widgetId: '1391195703137776986-1740024194305-902237747' }
+2025-04-03 21:40:42  1391195703137776986-1740024201897-310893718 { widgetId: '1391195703137776986-1740024201897-310893718' }
+2025-04-03 21:40:42  1391195703137776986-1740024215263-993539859 { widgetId: '1391195703137776986-1740024215263-993539859' }
+
+=== LOG CHUNK: 2025-04-03T21:57:03Z to 2025-04-04T09:57:03Z ===
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object]
+2025-04-04 07:02:02      ],
+2025-04-04 07:02:02      showPrevious: false,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    }
+2025-04-04 07:02:02  ]
+2025-04-04 07:02:02  Query result: {
+2025-04-04 07:02:02    acknowledged: true,
+2025-04-04 07:02:02    modifiedCount: 5,
+2025-04-04 07:02:02    upsertedId: null,
+2025-04-04 07:02:02    upsertedCount: 0,
+2025-04-04 07:02:02    matchedCount: 5
+2025-04-04 07:02:02  }
+2025-04-04 07:02:02  Matched Widgets2: [
+2025-04-04 07:02:02    {
+2025-04-04 07:02:02      current: {
+2025-04-04 07:02:02        response: '',
+2025-04-04 07:02:02        userName: '',
+2025-04-04 07:02:02        photoUrl: '',
+2025-04-04 07:02:02        timestamp: 2025-04-02T16:56:48.103Z
+2025-04-04 07:02:02      },
+2025-04-04 07:02:02      _id: new ObjectId('66e9097bac3d89f374ab386d'),
+2025-04-04 07:02:02      widgetId: '1391195703137776986-1726531183007-354454533',
+2025-04-04 07:02:02      __v: 10,
+2025-04-04 07:02:02      previous: [ [Object], [Object], [Object], [Object], [Object], [Object] ],
+2025-04-04 07:02:02      showPrevious: true,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    },
+2025-04-04 07:02:02    {
+2025-04-04 07:02:02      current: {
+2025-04-04 07:02:02        response: '',
+2025-04-04 07:02:02        userName: '',
+2025-04-04 07:02:02        photoUrl: '',
+2025-04-04 07:02:02        timestamp: 2025-04-02T16:56:48.832Z
+2025-04-04 07:02:02      },
+2025-04-04 07:02:02      _id: new ObjectId('66e909c7ac3d89f374ac45f1'),
+2025-04-04 07:02:02      widgetId: '1391195703137776986-1726531189324-016009450',
+2025-04-04 07:02:02      __v: 10,
+2025-04-04 07:02:02      previous: [ [Object], [Object], [Object], [Object], [Object], [Object] ],
+2025-04-04 07:02:02      showPrevious: true,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    },
+2025-04-04 07:02:02    {
+2025-04-04 07:02:02      current: {
+2025-04-04 07:02:02        response: '',
+2025-04-04 07:02:02        userName: '',
+2025-04-04 07:02:02        photoUrl: '',
+2025-04-04 07:02:02        timestamp: 2025-04-02T16:56:49.598Z
+2025-04-04 07:02:02      },
+2025-04-04 07:02:02      _id: new ObjectId('66e909fdac3d89f374ad047c'),
+2025-04-04 07:02:02      widgetId: '1391195703137776986-1726548477753-764504845',
+2025-04-04 07:02:02      __v: 10,
+2025-04-04 07:02:02      previous: [ [Object], [Object], [Object], [Object], [Object], [Object] ],
+2025-04-04 07:02:02      showPrevious: true,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    },
+2025-04-04 07:02:02    {
+2025-04-04 07:02:02      current: {
+2025-04-04 07:02:02        response: '',
+2025-04-04 07:02:02        userName: '',
+2025-04-04 07:02:02        photoUrl: '',
+2025-04-04 07:02:02        timestamp: 2025-04-02T16:56:50.280Z
+2025-04-04 07:02:02      },
+2025-04-04 07:02:02      _id: new ObjectId('66e90b29ac3d89f374b12f29'),
+2025-04-04 07:02:02      widgetId: '1391195703137776986-1726531210741-345535084',
+2025-04-04 07:02:02      __v: 9,
+2025-04-04 07:02:02      previous: [ [Object], [Object], [Object], [Object], [Object] ],
+2025-04-04 07:02:02      showPrevious: true,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    },
+2025-04-04 07:02:02    {
+2025-04-04 07:02:02      current: {
+2025-04-04 07:02:02        response: '',
+2025-04-04 07:02:02        userName: '',
+2025-04-04 07:02:02        photoUrl: '',
+2025-04-04 07:02:02        timestamp: 2025-04-02T16:56:51.025Z
+2025-04-04 07:02:02      },
+2025-04-04 07:02:02      _id: new ObjectId('66e90b74ac3d89f374b2378a'),
+2025-04-04 07:02:02      widgetId: '1391195703137776986-1726531215390-630718121',
+2025-04-04 07:02:02      __v: 15,
+2025-04-04 07:02:02      previous: [
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object], [Object],
+2025-04-04 07:02:02        [Object]
+2025-04-04 07:02:02      ],
+2025-04-04 07:02:02      showPrevious: true,
+2025-04-04 07:02:02      Group: 'aero-p12'
+2025-04-04 07:02:02    }
+2025-04-04 07:02:02  ]
+2025-04-04 07:02:30  1391195703137776986-1726531183007-354454533 { widgetId: '1391195703137776986-1726531183007-354454533' }
+2025-04-04 07:02:30  1391195703137776986-1726531189324-016009450 { widgetId: '1391195703137776986-1726531189324-016009450' }
+2025-04-04 07:02:30  1391195703137776986-1726548477753-764504845 { widgetId: '1391195703137776986-1726548477753-764504845' }
+2025-04-04 07:02:30  1391195703137776986-1726531210741-345535084 { widgetId: '1391195703137776986-1726531210741-345535084' }
+2025-04-04 07:02:31  1391195703137776986-1726531215390-630718121 { widgetId: '1391195703137776986-1726531215390-630718121' }
+
+=== LOG CHUNK: 2025-04-04T09:57:03Z to 2025-04-04T21:57:03Z ===
+2025-04-04 21:53:58        _id: new ObjectId('67295815ce134b4b745cbeea')
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'The core insight can be extended by introducing different audiences to test this, such as different age groups and seeing if there is a correlation between age and extent of trust of the automated vehicle.',
+2025-04-04 21:53:58        userName: 'Stacy',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/6d07e8fb-c022-4f13-a086-ec87e89635f9',
+2025-04-04 21:53:58        timestamp: 2024-11-19T21:25:02.069Z,
+2025-04-04 21:53:58        _id: new ObjectId('677df2269035e8319cea73c7')
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'the controlled environment and pre-programmed vehicle routes may not fully reflect real-world AV interactions',
+2025-04-04 21:53:58        userName: 'Tisha',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/4cf1004e-bb66-4ee9-b5cd-c6360d765800',
+2025-04-04 21:53:58        timestamp: 2025-02-25T05:55:40.856Z,
+2025-04-04 21:53:58        _id: new ObjectId('67eefb6ddff0728ce62459bc')
+2025-04-04 21:53:58      }
+2025-04-04 21:53:58    ],
+2025-04-04 21:53:58    showPrevious: false,
+2025-04-04 21:53:58    Group: 'exai-p4'
+2025-04-04 21:53:58  }
+2025-04-04 21:53:58  inside widget
+2025-04-04 21:53:58  Updated widget: {
+2025-04-04 21:53:58    current: {
+2025-04-04 21:53:58      response: 'One insight that I think could be answered with this method is AI assisted driving. Instead of having the AI do all the driving, we could have a human driver operate the vehicle and have an AI assistant help them with the driving to have a smoother experience. We can document the experience of the participants and see if AI can enhance the driving experience.',
+2025-04-04 21:53:58      userName: 'Chris',
+2025-04-04 21:53:58      photoUrl: 'https://s3-alpha.figma.com/profile/a3f8b350-9cc1-4fba-9e25-445c9a19ad0a',
+2025-04-04 21:53:58      timestamp: 2025-04-04T21:53:58.718Z
+2025-04-04 21:53:58    },
+2025-04-04 21:53:58    _id: new ObjectId('66e8f38cac3d89f3745c316c'),
+2025-04-04 21:53:58    widgetId: '1391195703137776986-1726541653613-464016583',
+2025-04-04 21:53:58    __v: 14,
+2025-04-04 21:53:58    previous: [
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: "Although these two models didn't really seem to have any major preference over one another, I wonder which method pedestrians would prefer and if they would align with the preferences of passengers of AVs. Also, some people suspected that the cars in the experiment had a predetermined path, and I wonder if this would skew the results that were presented in the paper.",
+2025-04-04 21:53:58        userName: 'Ian Yam',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f60603600b523f56dd2d'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:22:46.436Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'After reading the paper and seeing the pros and cons of both behaviors, it seems that the best behavior to build trust might just be a mix of both behaviors. The participants wanted a machine that seemed all knowing and acted like a machine, but also acted human at certain types of roads.',
+2025-04-04 21:53:58        userName: 'Noah Tyler',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f67f03600b523f56dd84'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:24:47.371Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: "I found this paper intriguing as it demonstrates the importance of user acceptance in technology adoption. I also find the topic of autonomous vehicles very fascinating. In the future, I'd hope to work on projects in this field while considering different aspects of user friendliness and a new feature's overall design.",
+2025-04-04 21:53:58        userName: 'Chloe Chang',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f68603600b523f56ddaf'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:24:54.487Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'One potential extension of the core insight could involve exploring the cultural and societal factors influencing trust and acceptance of automated vehicles. This could involve conducting cross-cultural studies to understand how attitudes towards automation vary across different regions or countries.',
+2025-04-04 21:53:58        userName: 'Krithik Dhandapani',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f68e03600b523f56ddeb'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:25:02.409Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'The paper touched on communication between autonomous vehicles and pedestrians, which sounds extremely interesting to me. How would this even work? Would this confuse the AV? How would the AV balance prioritizing the pedestrian and considering human thought versus the rules?',
+2025-04-04 21:53:58        userName: 'Rahul Punji',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f69703600b523f56de4d'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:25:11.482Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'The paper identifies several limitations, including the need for more robust high-level psychological and social models of pedestrian behavior and the challenge of integrating these models with lower-level perception and tracking systems. Extending research to develop more quantitative algorithms from qualitative behavioral models and improving real-time applicability of these models would be interesting areas for further study​',
+2025-04-04 21:53:58        userName: 'Tanvi Jambhale',
+2025-04-04 21:53:58        _id: new ObjectId('66e8f69f03600b523f56dead'),
+2025-04-04 21:53:58        timestamp: 2024-09-17T03:25:19.558Z
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'This paper sparked a limitation that would be interesting to solve which is how it would solve moral dilemmas in times of traffic because the conclusion was they start of the human like driving and slowly transition into machine like driving and that would cause some issues because machines can not have emotions like humans and during these issues human thinking machines are necessary to make the right decision.',
+2025-04-04 21:53:58        userName: 'Akshera Paladhi',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/f6bbe726-8d3c-45cc-843b-345b7bdc0116',
+2025-04-04 21:53:58        timestamp: 2024-10-06T22:37:21.319Z,
+2025-04-04 21:53:58        _id: new ObjectId('6706cd4e47c68b97b9107817')
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'Investigate how cultural backgrounds influence trust and acceptance of AV driving styles. Driving behaviors considered "human-like" in one culture might differ in another.',
+2025-04-04 21:53:58        userName: 'dalal',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/16044e0c-576e-456a-9069-214d1facae87',
+2025-04-04 21:53:58        timestamp: 2024-10-09T18:37:01.769Z,
+2025-04-04 21:53:58        _id: new ObjectId('67295815ce134b4b745cbeea')
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'The core insight can be extended by introducing different audiences to test this, such as different age groups and seeing if there is a correlation between age and extent of trust of the automated vehicle.',
+2025-04-04 21:53:58        userName: 'Stacy',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/6d07e8fb-c022-4f13-a086-ec87e89635f9',
+2025-04-04 21:53:58        timestamp: 2024-11-19T21:25:02.069Z,
+2025-04-04 21:53:58        _id: new ObjectId('677df2269035e8319cea73c7')
+2025-04-04 21:53:58      },
+2025-04-04 21:53:58      {
+2025-04-04 21:53:58        response: 'the controlled environment and pre-programmed vehicle routes may not fully reflect real-world AV interactions',
+2025-04-04 21:53:58        userName: 'Tisha',
+2025-04-04 21:53:58        photoUrl: 'https://s3-alpha.figma.com/profile/4cf1004e-bb66-4ee9-b5cd-c6360d765800',
+2025-04-04 21:53:58        timestamp: 2025-02-25T05:55:40.856Z,
+2025-04-04 21:53:58        _id: new ObjectId('67eefb6ddff0728ce62459bc')
+2025-04-04 21:53:58      }
+2025-04-04 21:53:58    ],
+2025-04-04 21:53:58    showPrevious: false,
+2025-04-04 21:53:58    Group: 'exai-p4'
+2025-04-04 21:53:58  }
+
+=== LOG CHUNK: 2025-04-04T21:57:03Z to 2025-04-05T09:57:03Z ===
+2025-04-05 00:50:04    widgetId: '1391195703137776986-1743631459845-095802184',
+2025-04-05 00:50:04    Group: 'ssn-p6',
+2025-04-05 00:50:04    __v: 3,
+2025-04-05 00:50:04    previous: [
+2025-04-05 00:50:04      {
+2025-04-05 00:50:04        response: ' Figures highlight the process, from biofilm formation on electrodes to generating consistent energy outputs (1-25 μW). The authors use energy harvesting circuits to extract energy efficiently from these MFCs, enabling integration with modern low-power ICs.',
+2025-04-05 00:50:04        userName: 'Arushi',
+2025-04-05 00:50:04        _id: new ObjectId('67eee5447e71b96ff696b66f'),
+2025-04-05 00:50:04        timestamp: 2025-04-03T19:45:08.096Z
+2025-04-05 00:50:04      }
+2025-04-05 00:50:04    ],
+2025-04-05 00:50:04    showPrevious: false
+2025-04-05 00:50:04  }
+2025-04-05 00:50:04  inside widget
+2025-04-05 00:50:04  Updated widget: {
+2025-04-05 00:50:04    current: {
+2025-04-05 00:50:04      response: 'They startt with reproducible benchtop MFCs  to study microbial activity and power generation under controlled conditions. These experiments help them understand how microbial biofilms grow and how much steady low level power can be produced by them over time. Then to validate the system in real-world conditions they deploy MFCs in an outdoor farm in Stanford, CA. This measures the power output in relation to the soil conditions. The data showed a clear correlation between environmental conditions and MFC performance.',
+2025-04-05 00:50:04      userName: 'colin posat',
+2025-04-05 00:50:04      photoUrl: 'https://s3-alpha.figma.com/profile/6b134566-1d26-49a3-82ab-a858c1b9f6db',
+2025-04-05 00:50:04      timestamp: 2025-04-05T00:50:04.641Z
+2025-04-05 00:50:04    },
+2025-04-05 00:50:04    _id: new ObjectId('67edb45f19a745b739201b9f'),
+2025-04-05 00:50:04    widgetId: '1391195703137776986-1743631459845-095802184',
+2025-04-05 00:50:04    Group: 'ssn-p6',
+2025-04-05 00:50:04    __v: 3,
+2025-04-05 00:50:04    previous: [
+2025-04-05 00:50:04      {
+2025-04-05 00:50:04        response: ' Figures highlight the process, from biofilm formation on electrodes to generating consistent energy outputs (1-25 μW). The authors use energy harvesting circuits to extract energy efficiently from these MFCs, enabling integration with modern low-power ICs.',
+2025-04-05 00:50:04        userName: 'Arushi',
+2025-04-05 00:50:04        _id: new ObjectId('67eee5447e71b96ff696b66f'),
+2025-04-05 00:50:04        timestamp: 2025-04-03T19:45:08.096Z
+2025-04-05 00:50:04      }
+2025-04-05 00:50:04    ],
+2025-04-05 00:50:04    showPrevious: false
+2025-04-05 00:50:04  }
+2025-04-05 00:50:06  The core insight of this paper is the creation of a power source for farms that is reliable, sustainable, and cost effective. This solution is called the Microbial Fuel Cell which is planted in soil and captures electrons from the respiratory process of the soil, capture them via an anode, and route them to a cathode creating electricity. This introduces cheap sustainable energy for farm systems.
+2025-04-05 00:50:06  Received data: {
+2025-04-05 00:50:06    widgetId: '1391195703137776986-1725928377054-845645101',
+2025-04-05 00:50:06    response: 'The core insight of this paper is the creation of a power source for farms that is reliable, sustainable, and cost effective. This solution is called the Microbial Fuel Cell which is planted in soil and captures electrons from the respiratory process of the soil, capture them via an anode, and route them to a cathode creating electricity. This introduces cheap sustainable energy for farm systems.',
+2025-04-05 00:50:06    userName: 'colin posat',
+2025-04-05 00:50:06    photoUrl: 'https://s3-alpha.figma.com/profile/6b134566-1d26-49a3-82ab-a858c1b9f6db',
+2025-04-05 00:50:06    timestamp: '2025-04-05T00:50:05.984Z'
+2025-04-05 00:50:06  }
+2025-04-05 00:50:06  {
+2025-04-05 00:50:06    current: {
+2025-04-05 00:50:06      response: '',
+2025-04-05 00:50:06      userName: '',
+2025-04-05 00:50:06      photoUrl: '',
+2025-04-05 00:50:06      timestamp: 2025-04-04T05:53:53.557Z
+2025-04-05 00:50:06    },
+2025-04-05 00:50:06    _id: new ObjectId('66e3381eac3d89f37470b325'),
+2025-04-05 00:50:06    widgetId: '1391195703137776986-1725928377054-845645101',
+2025-04-05 00:50:06    __v: 4,
+2025-04-05 00:50:06    previous: [
+2025-04-05 00:50:06      {
+2025-04-05 00:50:06        response: 'The core insight is harnessing Microbial Fuel Cells (MFCs) as a sustainable energy source for powering embedded systems and sensor networks in agricultural settings, aiming to bridge the gap between theoretical understanding and practical application of MFCs in real-world scenarios.',
+2025-04-05 00:50:06        userName: 'Size Liu',
+2025-04-05 00:50:06        _id: new ObjectId('66e338292d1de6faa2ccd52a'),
+2025-04-05 00:50:06        timestamp: 2024-09-12T18:51:21.639Z
+2025-04-05 00:50:06      },
+2025-04-05 00:50:06      {
+2025-04-05 00:50:06        response: 'Traditional energy sources like solar, batteries, and RF energy are unsuitable for many applications due to limitations like location constraints and high maintenance. The challenge lies in creating sustainable and long-lasting energy solutions for such low-power electronics.',
+2025-04-05 00:50:06        userName: 'arushi',
+2025-04-05 00:50:06        photoUrl: 'https://s3-alpha.figma.com/profile/0f1ec8c6-0363-4521-a4eb-5066490063c7',
+2025-04-05 00:50:06        timestamp: 2025-01-14T07:34:04.254Z,
+2025-04-05 00:50:06        _id: new ObjectId('6786139fb04d516b3b74d556')
+2025-04-05 00:50:06      }
+2025-04-05 00:50:06    ],
+2025-04-05 00:50:06    showPrevious: false,
+2025-04-05 00:50:06    Group: 'ssn-p6'
+2025-04-05 00:50:06  }
+2025-04-05 00:50:06  inside widget
+2025-04-05 00:50:06  Updated widget: {
+2025-04-05 00:50:06    current: {
+2025-04-05 00:50:06      response: 'The core insight of this paper is the creation of a power source for farms that is reliable, sustainable, and cost effective. This solution is called the Microbial Fuel Cell which is planted in soil and captures electrons from the respiratory process of the soil, capture them via an anode, and route them to a cathode creating electricity. This introduces cheap sustainable energy for farm systems.',
+2025-04-05 00:50:06      userName: 'colin posat',
+2025-04-05 00:50:06      photoUrl: 'https://s3-alpha.figma.com/profile/6b134566-1d26-49a3-82ab-a858c1b9f6db',
+2025-04-05 00:50:06      timestamp: 2025-04-05T00:50:05.984Z
+2025-04-05 00:50:06    },
+2025-04-05 00:50:06    _id: new ObjectId('66e3381eac3d89f37470b325'),
+2025-04-05 00:50:06    widgetId: '1391195703137776986-1725928377054-845645101',
+2025-04-05 00:50:06    __v: 4,
+2025-04-05 00:50:06    previous: [
+2025-04-05 00:50:06      {
+2025-04-05 00:50:06        response: 'The core insight is harnessing Microbial Fuel Cells (MFCs) as a sustainable energy source for powering embedded systems and sensor networks in agricultural settings, aiming to bridge the gap between theoretical understanding and practical application of MFCs in real-world scenarios.',
+2025-04-05 00:50:06        userName: 'Size Liu',
+2025-04-05 00:50:06        _id: new ObjectId('66e338292d1de6faa2ccd52a'),
+2025-04-05 00:50:06        timestamp: 2024-09-12T18:51:21.639Z
+2025-04-05 00:50:06      },
+2025-04-05 00:50:06      {
+2025-04-05 00:50:06        response: 'Traditional energy sources like solar, batteries, and RF energy are unsuitable for many applications due to limitations like location constraints and high maintenance. The challenge lies in creating sustainable and long-lasting energy solutions for such low-power electronics.',
+2025-04-05 00:50:06        userName: 'arushi',
+2025-04-05 00:50:06        photoUrl: 'https://s3-alpha.figma.com/profile/0f1ec8c6-0363-4521-a4eb-5066490063c7',
+2025-04-05 00:50:06        timestamp: 2025-01-14T07:34:04.254Z,
+2025-04-05 00:50:06        _id: new ObjectId('6786139fb04d516b3b74d556')
+2025-04-05 00:50:06      }
+2025-04-05 00:50:06    ],
+2025-04-05 00:50:06    showPrevious: false,
+2025-04-05 00:50:06    Group: 'ssn-p6'
+2025-04-05 00:50:06  }
+
+=== LOG CHUNK: 2025-04-05T09:57:03Z to 2025-04-05T21:57:03Z ===
+2025-04-05 20:31:40    current: {
+2025-04-05 20:31:40      response: '',
+2025-04-05 20:31:40      userName: '',
+2025-04-05 20:31:40      photoUrl: '',
+2025-04-05 20:31:40      timestamp: 2025-03-31T16:18:07.071Z
+2025-04-05 20:31:40    },
+2025-04-05 20:31:40    _id: new ObjectId('6714843d3d60a620a8a37cd3'),
+2025-04-05 20:31:40    widgetId: '1391195703137776986-1727813984202-988331566',
+2025-04-05 20:31:40    Group: 'binn-p3',
+2025-04-05 20:31:40    __v: 11,
+2025-04-05 20:31:40    previous: [
+2025-04-05 20:31:40      {
+2025-04-05 20:31:40        response: 'Your response: I think one prominent limitation is the complexity of computing gradients in SNNs, specifically the need for neurons to spike in order to compute gradients.',
+2025-04-05 20:31:40        userName: 'Jackie',
+2025-04-05 20:31:40        photoUrl: 'https://s3-alpha.figma.com/profile/f6c82fc7-3086-4750-b3a5-8c33da819801',
+2025-04-05 20:31:40        timestamp: 2024-10-20T04:17:01.011Z,
+2025-04-05 20:31:40        _id: new ObjectId('67295af1ce134b4b745d0ac8')
+2025-04-05 20:31:40      },
+2025-04-05 20:31:40      {
+2025-04-05 20:31:40        response: 'This section sparked the idea of utilizing different mathematical functions to solve problems in machine learning. Indeed, taking the derivatives of spike times with respect to the weights is a mathematical function. Furthermore, the neural network itself is a series of mathematical functions. Thus this is an example of the intersection between computer science and mathematics. This connection prompted the question for me: how can we create more mathematical functions to further increase the efficiency of neural networks?',
+2025-04-05 20:31:40        userName: 'Clara Sapugay',
+2025-04-05 20:31:40        photoUrl: 'https://s3-alpha.figma.com/profile/dd95c791-4e55-4c22-9bea-01d11127d377',
+2025-04-05 20:31:40        timestamp: 2024-11-13T02:30:27.354Z,
+2025-04-05 20:31:40        _id: new ObjectId('677dd10b9035e8319ce9da67')
+2025-04-05 20:31:40      },
+2025-04-05 20:31:40      {
+2025-04-05 20:31:40        response: 'I find this paper extremely interesting - I think the way they represent the way the brain learns and functions to learn is something that probably could be applicable in many more spaces.',
+2025-04-05 20:31:40        userName: 'John Gebreselassie',
+2025-04-05 20:31:40        photoUrl: 'https://s3-alpha.figma.com/profile/c047e124-1d54-4ce5-a9b0-712a77aef0ab',
+2025-04-05 20:31:40        timestamp: 2025-02-22T07:51:12.317Z,
+2025-04-05 20:31:40        _id: new ObjectId('67ba1d589b3495a02e92eb93')
+2025-04-05 20:31:40      },
+2025-04-05 20:31:40      {
+2025-04-05 20:31:40        response: 'This paper exemplifies the idea that SNNs use much much less energy than that of traditional machine learning models, allowing a new structure that isn’t as dependent on energy as machine learning.',
+2025-04-05 20:31:40        userName: 'saketh mach',
+2025-04-05 20:31:40        photoUrl: 'https://s3-alpha.figma.com/profile/98d3d0c1-251b-4bd0-989f-7c1f81cc06a5',
+2025-04-05 20:31:40        timestamp: 2025-02-22T18:54:16.093Z,
+2025-04-05 20:31:40        _id: new ObjectId('67d105789b3495a02e9309c1')
+2025-04-05 20:31:40      },
+2025-04-05 20:31:40      {
+2025-04-05 20:31:40        response: 'The paper describes encoding schemes seperately(rate, latency, delta modulation), each with distinct strengths and weaknesses. A potentially engaging improvement is to explore an adaptive hybrid encoding method that dynamically switches between these schemes based on real-time data patterns, balancing energy efficiency, accuracy, and speed.',
+2025-04-05 20:31:40        userName: 'satvik khanna',
+2025-04-05 20:31:40        photoUrl: 'https://s3-alpha.figma.com/profile/57a8cf17-c039-4b06-b6f0-80197a8de567',
+2025-04-05 20:31:40        timestamp: 2025-03-12T03:54:32.401Z,
+2025-04-05 20:31:40        _id: new ObjectId('67d1058b9b3495a02e9309ce')
+2025-04-05 20:31:40      }
+2025-04-05 20:31:40    ],
+2025-04-05 20:31:40    showPrevious: true
+2025-04-05 20:31:40  }
+2025-04-05 20:31:40  inside widget
+2025-04-05 20:31:41  Updated widget: {
+2025-04-05 20:31:41    current: {
+2025-04-05 20:31:41      response: 'The paper did spark ideas. I did take Calculus and it’s interesting to see derivatives being used to find spike times. I’m curious if they use any graphs in 2D or vector space to track which part of the brains’ spike times.',
+2025-04-05 20:31:41      userName: 'Veda Lee',
+2025-04-05 20:31:41      photoUrl: 'https://s3-alpha.figma.com/profile/1376557a-8b5f-41a8-9089-b650925b9f3f',
+2025-04-05 20:31:41      timestamp: 2025-04-05T20:31:39.521Z
+2025-04-05 20:31:41    },
+2025-04-05 20:31:41    _id: new ObjectId('6714843d3d60a620a8a37cd3'),
+2025-04-05 20:31:41    widgetId: '1391195703137776986-1727813984202-988331566',
+2025-04-05 20:31:41    Group: 'binn-p3',
+2025-04-05 20:31:41    __v: 11,
+2025-04-05 20:31:41    previous: [
+2025-04-05 20:31:41      {
+2025-04-05 20:31:41        response: 'Your response: I think one prominent limitation is the complexity of computing gradients in SNNs, specifically the need for neurons to spike in order to compute gradients.',
+2025-04-05 20:31:41        userName: 'Jackie',
+2025-04-05 20:31:41        photoUrl: 'https://s3-alpha.figma.com/profile/f6c82fc7-3086-4750-b3a5-8c33da819801',
+2025-04-05 20:31:41        timestamp: 2024-10-20T04:17:01.011Z,
+2025-04-05 20:31:41        _id: new ObjectId('67295af1ce134b4b745d0ac8')
+2025-04-05 20:31:41      },
+2025-04-05 20:31:41      {
+2025-04-05 20:31:41        response: 'This section sparked the idea of utilizing different mathematical functions to solve problems in machine learning. Indeed, taking the derivatives of spike times with respect to the weights is a mathematical function. Furthermore, the neural network itself is a series of mathematical functions. Thus this is an example of the intersection between computer science and mathematics. This connection prompted the question for me: how can we create more mathematical functions to further increase the efficiency of neural networks?',
+2025-04-05 20:31:41        userName: 'Clara Sapugay',
+2025-04-05 20:31:41        photoUrl: 'https://s3-alpha.figma.com/profile/dd95c791-4e55-4c22-9bea-01d11127d377',
+2025-04-05 20:31:41        timestamp: 2024-11-13T02:30:27.354Z,
+2025-04-05 20:31:41        _id: new ObjectId('677dd10b9035e8319ce9da67')
+2025-04-05 20:31:41      },
+2025-04-05 20:31:41      {
+2025-04-05 20:31:41        response: 'I find this paper extremely interesting - I think the way they represent the way the brain learns and functions to learn is something that probably could be applicable in many more spaces.',
+2025-04-05 20:31:41        userName: 'John Gebreselassie',
+2025-04-05 20:31:41        photoUrl: 'https://s3-alpha.figma.com/profile/c047e124-1d54-4ce5-a9b0-712a77aef0ab',
+2025-04-05 20:31:41        timestamp: 2025-02-22T07:51:12.317Z,
+2025-04-05 20:31:41        _id: new ObjectId('67ba1d589b3495a02e92eb93')
+2025-04-05 20:31:41      },
+2025-04-05 20:31:41      {
+2025-04-05 20:31:41        response: 'This paper exemplifies the idea that SNNs use much much less energy than that of traditional machine learning models, allowing a new structure that isn’t as dependent on energy as machine learning.',
+2025-04-05 20:31:41        userName: 'saketh mach',
+2025-04-05 20:31:41        photoUrl: 'https://s3-alpha.figma.com/profile/98d3d0c1-251b-4bd0-989f-7c1f81cc06a5',
+2025-04-05 20:31:41        timestamp: 2025-02-22T18:54:16.093Z,
+2025-04-05 20:31:41        _id: new ObjectId('67d105789b3495a02e9309c1')
+2025-04-05 20:31:41      },
+2025-04-05 20:31:41      {
+2025-04-05 20:31:41        response: 'The paper describes encoding schemes seperately(rate, latency, delta modulation), each with distinct strengths and weaknesses. A potentially engaging improvement is to explore an adaptive hybrid encoding method that dynamically switches between these schemes based on real-time data patterns, balancing energy efficiency, accuracy, and speed.',
+2025-04-05 20:31:41        userName: 'satvik khanna',
+2025-04-05 20:31:41        photoUrl: 'https://s3-alpha.figma.com/profile/57a8cf17-c039-4b06-b6f0-80197a8de567',
+2025-04-05 20:31:41        timestamp: 2025-03-12T03:54:32.401Z,
+2025-04-05 20:31:41        _id: new ObjectId('67d1058b9b3495a02e9309ce')
+2025-04-05 20:31:41      }
+2025-04-05 20:31:41    ],
+2025-04-05 20:31:41    showPrevious: true
+2025-04-05 20:31:41  }
+
+=== LOG CHUNK: 2025-04-05T21:57:03Z to 2025-04-06T09:57:03Z ===
+2025-04-06 06:38:26      userName: '',
+2025-04-06 06:38:26      photoUrl: '',
+2025-04-06 06:38:26      timestamp: 2025-04-06T06:38:26.530Z
+2025-04-06 06:38:26    },
+2025-04-06 06:38:26    _id: new ObjectId('67f0197819a745b73924aa33'),
+2025-04-06 06:38:26    widgetId: '1391195703137776986-1743753043846-409960534',
+2025-04-06 06:38:26    Group: 'ngen-p10',
+2025-04-06 06:38:26    __v: 0,
+2025-04-06 06:38:26    previous: [],
+2025-04-06 06:38:26    showPrevious: false
+2025-04-06 06:38:26  }
+2025-04-06 06:38:26  inside widget
+2025-04-06 06:38:26  Updated widget: {
+2025-04-06 06:38:26    current: {
+2025-04-06 06:38:26      response: 'For the first test, the authors measure ChatGPT’s gender bias by using varied prompts of an interaction between two people described by their occupation describing one of the people. The professions are taken randomly from a corpus. There are 7 templates of different interactions in everyday situations. Three different variations of the same prompt using a different pronoun (she/he/they) are put into ChatGPT. The model is asked a simple question about the interaction, of which there is a “correct” answer based on common sense. The percentage of incorrect responses and the number of inconsistent answers across the three variations are recorded. To analyze narrative generation, ChatGPT is prompted to write a story of a character given their profession and the authors recorded the gender ChatGPT assigns that character based on their name.',
+2025-04-06 06:38:26      userName: 'Lillian Hamilton',
+2025-04-06 06:38:26      photoUrl: 'https://s3-alpha.figma.com/profile/283682ee-5026-4b1b-ae8d-070098f9f331',
+2025-04-06 06:38:26      timestamp: 2025-04-06T06:38:26.158Z
+2025-04-06 06:38:26    },
+2025-04-06 06:38:26    _id: new ObjectId('67f0197819a745b73924aa33'),
+2025-04-06 06:38:26    widgetId: '1391195703137776986-1743753043846-409960534',
+2025-04-06 06:38:26    Group: 'ngen-p10',
+2025-04-06 06:38:26    __v: 0,
+2025-04-06 06:38:26    previous: [],
+2025-04-06 06:38:26    showPrevious: false
+2025-04-06 06:38:26  }
+2025-04-06 06:44:50  There are certain collections of different categories of words in natural language that are useful in this type of analysis such as the corpus of professions, and the dataset showing a name’s most likely gender. This paper is an example that would be a useful reference for setting up a similar kind of study. This paper’s specific method of using varying prompts based on a template to track bias and inconsistencies in ChatGPT could possibly used similarly in further research on other kinds of bias exhibited by ChatGPT.
+2025-04-06 06:44:50  Received data: {
+2025-04-06 06:44:50    widgetId: '1391195703137776986-1743753032920-908301163',
+2025-04-06 06:44:50    response: 'There are certain collections of different categories of words in natural language that are useful in this type of analysis such as the corpus of professions, and the dataset showing a name’s most likely gender. This paper is an example that would be a useful reference for setting up a similar kind of study. This paper’s specific method of using varying prompts based on a template to track bias and inconsistencies in ChatGPT could possibly used similarly in further research on other kinds of bias exhibited by ChatGPT.',
+2025-04-06 06:44:50    userName: 'Lillian Hamilton',
+2025-04-06 06:44:50    photoUrl: 'https://s3-alpha.figma.com/profile/283682ee-5026-4b1b-ae8d-070098f9f331',
+2025-04-06 06:44:50    timestamp: '2025-04-06T06:44:50.399Z'
+2025-04-06 06:44:50  }
+2025-04-06 06:44:50  {
+2025-04-06 06:44:50    current: {
+2025-04-06 06:44:50      response: '',
+2025-04-06 06:44:50      userName: '',
+2025-04-06 06:44:50      photoUrl: '',
+2025-04-06 06:44:50      timestamp: 2025-04-06T06:44:50.704Z
+2025-04-06 06:44:50    },
+2025-04-06 06:44:50    _id: new ObjectId('67f0198419a745b73924aa55'),
+2025-04-06 06:44:50    widgetId: '1391195703137776986-1743753032920-908301163',
+2025-04-06 06:44:50    Group: 'ngen-p10',
+2025-04-06 06:44:50    __v: 0,
+2025-04-06 06:44:50    previous: [],
+2025-04-06 06:44:50    showPrevious: false
+2025-04-06 06:44:50  }
+2025-04-06 06:44:50  inside widget
+2025-04-06 06:44:50  Updated widget: {
+2025-04-06 06:44:50    current: {
+2025-04-06 06:44:50      response: 'There are certain collections of different categories of words in natural language that are useful in this type of analysis such as the corpus of professions, and the dataset showing a name’s most likely gender. This paper is an example that would be a useful reference for setting up a similar kind of study. This paper’s specific method of using varying prompts based on a template to track bias and inconsistencies in ChatGPT could possibly used similarly in further research on other kinds of bias exhibited by ChatGPT.',
+2025-04-06 06:44:50      userName: 'Lillian Hamilton',
+2025-04-06 06:44:50      photoUrl: 'https://s3-alpha.figma.com/profile/283682ee-5026-4b1b-ae8d-070098f9f331',
+2025-04-06 06:44:50      timestamp: 2025-04-06T06:44:50.399Z
+2025-04-06 06:44:50    },
+2025-04-06 06:44:50    _id: new ObjectId('67f0198419a745b73924aa55'),
+2025-04-06 06:44:50    widgetId: '1391195703137776986-1743753032920-908301163',
+2025-04-06 06:44:50    Group: 'ngen-p10',
+2025-04-06 06:44:50    __v: 0,
+2025-04-06 06:44:50    previous: [],
+2025-04-06 06:44:50    showPrevious: false
+2025-04-06 06:44:50  }
+2025-04-06 06:50:41  There are many directions that can be explored from this paper. In this paper, the pronoun (they) was included in the prompt variations but it was not analyzed as in depth as (she/he) so there may be room for further investigation in gender bias toward people who use they/they pronouns. Similarly, there was the possibility of limitations arising from names that may not be associated  with a specific gender that could be explored. Additionally, as mentioned at the end of the paper, one could possibly do similar research about bias in ChatGPT’s narrative generation in regards to other subject matter such as racial bias or intersectional biases such as both race and gender.
+2025-04-06 06:50:41  Received data: {
+2025-04-06 06:50:41    widgetId: '1391195703137776986-1743753027068-820585312',
+2025-04-06 06:50:41    response: 'There are many directions that can be explored from this paper. In this paper, the pronoun (they) was included in the prompt variations but it was not analyzed as in depth as (she/he) so there may be room for further investigation in gender bias toward people who use they/they pronouns. Similarly, there was the possibility of limitations arising from names that may not be associated  with a specific gender that could be explored. Additionally, as mentioned at the end of the paper, one could possibly do similar research about bias in ChatGPT’s narrative generation in regards to other subject matter such as racial bias or intersectional biases such as both race and gender.',
+2025-04-06 06:50:41    userName: 'Lillian Hamilton',
+2025-04-06 06:50:41    photoUrl: 'https://s3-alpha.figma.com/profile/283682ee-5026-4b1b-ae8d-070098f9f331',
+2025-04-06 06:50:41    timestamp: '2025-04-06T06:50:41.371Z'
+2025-04-06 06:50:41  }
+2025-04-06 06:50:41  {
+2025-04-06 06:50:41    current: {
+2025-04-06 06:50:41      response: '',
+2025-04-06 06:50:41      userName: '',
+2025-04-06 06:50:41      photoUrl: '',
+2025-04-06 06:50:41      timestamp: 2025-04-06T06:50:41.673Z
+2025-04-06 06:50:41    },
+2025-04-06 06:50:41    _id: new ObjectId('67f0199019a745b73924aa6f'),
+2025-04-06 06:50:41    widgetId: '1391195703137776986-1743753027068-820585312',
+2025-04-06 06:50:41    Group: 'ngen-p10',
+2025-04-06 06:50:41    __v: 0,
+2025-04-06 06:50:41    previous: [],
+2025-04-06 06:50:41    showPrevious: false
+2025-04-06 06:50:41  }
+2025-04-06 06:50:41  inside widget
+2025-04-06 06:50:41  Updated widget: {
+2025-04-06 06:50:41    current: {
+2025-04-06 06:50:41      response: 'There are many directions that can be explored from this paper. In this paper, the pronoun (they) was included in the prompt variations but it was not analyzed as in depth as (she/he) so there may be room for further investigation in gender bias toward people who use they/they pronouns. Similarly, there was the possibility of limitations arising from names that may not be associated  with a specific gender that could be explored. Additionally, as mentioned at the end of the paper, one could possibly do similar research about bias in ChatGPT’s narrative generation in regards to other subject matter such as racial bias or intersectional biases such as both race and gender.',
+2025-04-06 06:50:41      userName: 'Lillian Hamilton',
+2025-04-06 06:50:41      photoUrl: 'https://s3-alpha.figma.com/profile/283682ee-5026-4b1b-ae8d-070098f9f331',
+2025-04-06 06:50:41      timestamp: 2025-04-06T06:50:41.371Z
+2025-04-06 06:50:41    },
+2025-04-06 06:50:41    _id: new ObjectId('67f0199019a745b73924aa6f'),
+2025-04-06 06:50:41    widgetId: '1391195703137776986-1743753027068-820585312',
+2025-04-06 06:50:41    Group: 'ngen-p10',
+2025-04-06 06:50:41    __v: 0,
+2025-04-06 06:50:41    previous: [],
+2025-04-06 06:50:41    showPrevious: false
+2025-04-06 06:50:41  }
+
+=== LOG CHUNK: 2025-04-06T09:57:03Z to 2025-04-06T21:57:03Z ===
+2025-04-06 21:08:23        _id: new ObjectId('67ea0c479b3495a02e93715d')
+2025-04-06 21:08:23      }
+2025-04-06 21:08:23    ],
+2025-04-06 21:08:23    showPrevious: true
+2025-04-06 21:08:23  }
+2025-04-06 21:32:37  One limitation with SNNs that I see, which may be a commonly pointed out fault, is difficulty in training a SNN model. Standard ANNs are trained through backpropagation, which involves calculating the error with respect to weights, and updating the weights to decrease this error. Mathematically, backpropagation involves finding the derivative of the loss to update the weights. This cannot be applied to the concept of spikes, which are constant values of 1s and 0s, as the derivative of any constant is 0. While there may exist workarounds, they may not be faster in terms of training a model than an ANN. Regardless, this would be an interesting concept to explore, and the discovery of a workaround that is potentially faster than backpropagation would open the possibilities of applying SNNs at a larger scale.
+2025-04-06 21:32:37  Received data: {
+2025-04-06 21:32:37    widgetId: '1391195703137776986-1727813858936-859968678',
+2025-04-06 21:32:37    response: 'One limitation with SNNs that I see, which may be a commonly pointed out fault, is difficulty in training a SNN model. Standard ANNs are trained through backpropagation, which involves calculating the error with respect to weights, and updating the weights to decrease this error. Mathematically, backpropagation involves finding the derivative of the loss to update the weights. This cannot be applied to the concept of spikes, which are constant values of 1s and 0s, as the derivative of any constant is 0. While there may exist workarounds, they may not be faster in terms of training a model than an ANN. Regardless, this would be an interesting concept to explore, and the discovery of a workaround that is potentially faster than backpropagation would open the possibilities of applying SNNs at a larger scale.',
+2025-04-06 21:32:37    userName: 'asvinod',
+2025-04-06 21:32:37    photoUrl: 'https://s3-alpha.figma.com/profile/0f959f66-ae34-43c2-ba5c-bc47bd8fc2e1',
+2025-04-06 21:32:37    timestamp: '2025-04-06T21:32:36.721Z'
+2025-04-06 21:32:37  }
+2025-04-06 21:32:37  {
+2025-04-06 21:32:37    current: {
+2025-04-06 21:32:37      response: '',
+2025-04-06 21:32:37      userName: '',
+2025-04-06 21:32:37      photoUrl: '',
+2025-04-06 21:32:37      timestamp: 2025-03-31T03:35:30.095Z
+2025-04-06 21:32:37    },
+2025-04-06 21:32:37    _id: new ObjectId('670617482514f218c0065d6e'),
+2025-04-06 21:32:37    widgetId: '1391195703137776986-1727813858936-859968678',
+2025-04-06 21:32:37    Group: 'binn-p2',
+2025-04-06 21:32:37    __v: 16,
+2025-04-06 21:32:37    previous: [
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'Could there be a spiking neuron model that can be used for everything? A jack of all trades rather than just one or two situations.',
+2025-04-06 21:32:37        userName: 'Iris Tai',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/c54fb45f-c440-4976-90b2-832a89b583c3',
+2025-04-06 21:32:37        timestamp: 2024-11-13T04:51:41.495Z,
+2025-04-06 21:32:37        _id: new ObjectId('677dd0139035e8319ce9cf5c')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'This paper possibly sparked ideas about how to possibly make ANNs more efficient.  For example, it may be beneficial to cross neural science and machine learning in order to create a hybrid that allows individuals to be proficient at analyzing biological systems and implementing them into technology.',
+2025-04-06 21:32:37        userName: 'Austin Eng',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/cfc6b82a-4778-44b4-b6c0-871a6c1e850c',
+2025-04-06 21:32:37        timestamp: 2025-02-26T06:33:02.137Z,
+2025-04-06 21:32:37        _id: new ObjectId('67bebc529b3495a02e92f116')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'Something interesting that could be exploring exactly how SNNs enable low-power processing, particularly for edge computing and neuromorphic hardware.',
+2025-04-06 21:32:37        userName: 'haydnsong',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/b0341cd6-00f1-4538-81ed-4c28762fcb4c',
+2025-04-06 21:32:37        timestamp: 2025-02-26T07:01:37.727Z,
+2025-04-06 21:32:37        _id: new ObjectId('67beca1c9b3495a02e92f12d')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'I found it interesting that the paper determined that the occurrence of spikes was more important than their variation. This led to me investigating how such spikes are normalized. It also made me wonder if analyzing the variation in spikes would improve the performance of SNNs (accuracy versus latency)',
+2025-04-06 21:32:37        userName: 'Yash Bodas',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/87c1396b-a05c-4959-b2d7-ca30cfa6d42f',
+2025-04-06 21:32:37        timestamp: 2025-02-26T08:00:28.681Z,
+2025-04-06 21:32:37        _id: new ObjectId('67ea0c479b3495a02e937155')
+2025-04-06 21:32:37      }
+2025-04-06 21:32:37    ],
+2025-04-06 21:32:37    showPrevious: true
+2025-04-06 21:32:37  }
+2025-04-06 21:32:37  inside widget
+2025-04-06 21:32:37  Updated widget: {
+2025-04-06 21:32:37    current: {
+2025-04-06 21:32:37      response: 'One limitation with SNNs that I see, which may be a commonly pointed out fault, is difficulty in training a SNN model. Standard ANNs are trained through backpropagation, which involves calculating the error with respect to weights, and updating the weights to decrease this error. Mathematically, backpropagation involves finding the derivative of the loss to update the weights. This cannot be applied to the concept of spikes, which are constant values of 1s and 0s, as the derivative of any constant is 0. While there may exist workarounds, they may not be faster in terms of training a model than an ANN. Regardless, this would be an interesting concept to explore, and the discovery of a workaround that is potentially faster than backpropagation would open the possibilities of applying SNNs at a larger scale.',
+2025-04-06 21:32:37      userName: 'asvinod',
+2025-04-06 21:32:37      photoUrl: 'https://s3-alpha.figma.com/profile/0f959f66-ae34-43c2-ba5c-bc47bd8fc2e1',
+2025-04-06 21:32:37      timestamp: 2025-04-06T21:32:36.721Z
+2025-04-06 21:32:37    },
+2025-04-06 21:32:37    _id: new ObjectId('670617482514f218c0065d6e'),
+2025-04-06 21:32:37    widgetId: '1391195703137776986-1727813858936-859968678',
+2025-04-06 21:32:37    Group: 'binn-p2',
+2025-04-06 21:32:37    __v: 16,
+2025-04-06 21:32:37    previous: [
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'Could there be a spiking neuron model that can be used for everything? A jack of all trades rather than just one or two situations.',
+2025-04-06 21:32:37        userName: 'Iris Tai',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/c54fb45f-c440-4976-90b2-832a89b583c3',
+2025-04-06 21:32:37        timestamp: 2024-11-13T04:51:41.495Z,
+2025-04-06 21:32:37        _id: new ObjectId('677dd0139035e8319ce9cf5c')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'This paper possibly sparked ideas about how to possibly make ANNs more efficient.  For example, it may be beneficial to cross neural science and machine learning in order to create a hybrid that allows individuals to be proficient at analyzing biological systems and implementing them into technology.',
+2025-04-06 21:32:37        userName: 'Austin Eng',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/cfc6b82a-4778-44b4-b6c0-871a6c1e850c',
+2025-04-06 21:32:37        timestamp: 2025-02-26T06:33:02.137Z,
+2025-04-06 21:32:37        _id: new ObjectId('67bebc529b3495a02e92f116')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'Something interesting that could be exploring exactly how SNNs enable low-power processing, particularly for edge computing and neuromorphic hardware.',
+2025-04-06 21:32:37        userName: 'haydnsong',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/b0341cd6-00f1-4538-81ed-4c28762fcb4c',
+2025-04-06 21:32:37        timestamp: 2025-02-26T07:01:37.727Z,
+2025-04-06 21:32:37        _id: new ObjectId('67beca1c9b3495a02e92f12d')
+2025-04-06 21:32:37      },
+2025-04-06 21:32:37      {
+2025-04-06 21:32:37        response: 'I found it interesting that the paper determined that the occurrence of spikes was more important than their variation. This led to me investigating how such spikes are normalized. It also made me wonder if analyzing the variation in spikes would improve the performance of SNNs (accuracy versus latency)',
+2025-04-06 21:32:37        userName: 'Yash Bodas',
+2025-04-06 21:32:37        photoUrl: 'https://s3-alpha.figma.com/profile/87c1396b-a05c-4959-b2d7-ca30cfa6d42f',
+2025-04-06 21:32:37        timestamp: 2025-02-26T08:00:28.681Z,
+2025-04-06 21:32:37        _id: new ObjectId('67ea0c479b3495a02e937155')
+2025-04-06 21:32:37      }
+2025-04-06 21:32:37    ],
+2025-04-06 21:32:37    showPrevious: true
+2025-04-06 21:32:37  }
+
+=== LOG CHUNK: 2025-04-06T21:57:03Z to 2025-04-07T09:57:03Z ===
+2025-04-07 08:57:44      timestamp: 2025-04-07T08:57:44.817Z
+2025-04-07 08:57:44    },
+2025-04-07 08:57:44    _id: new ObjectId('67e9f9c540c63049a13957f0'),
+2025-04-07 08:57:44    widgetId: '1391195703137776986-1743386962296-064703082',
+2025-04-07 08:57:44    Group: 'uid-p10',
+2025-04-07 08:57:44    __v: 0,
+2025-04-07 08:57:44    previous: [],
+2025-04-07 08:57:44    showPrevious: true
+2025-04-07 08:57:44  }
+2025-04-07 08:57:44  inside widget
+2025-04-07 08:57:44  Updated widget: {
+2025-04-07 08:57:44    current: {
+2025-04-07 08:57:44      response: 'The authors demonstrate their model through a scalable approach, with groups expanding from 6 to over 260 voluntary participants. They emphasize relational design by incorporating structured "get-to-know-you" activities that foster peer bonds, while encouraging creative exploration through exposure to societal themes like ethics and sustainability. By prioritizing breadth-first discussions (covering multiple papers per session), student agency (allowing participants to drive topics), and purpose-driven themes, they show how lightweight, low-commitment groups serve as entry points to research labs. This approach benefits underrepresented students and democratizes access to collaborative, creative CS learning.',
+2025-04-07 08:57:44      userName: 'Prithika',
+2025-04-07 08:57:44      photoUrl: 'https://s3-alpha.figma.com/profile/092888df-9566-4fce-a372-6ad4a6bd8049',
+2025-04-07 08:57:44      timestamp: 2025-04-07T08:57:44.452Z
+2025-04-07 08:57:44    },
+2025-04-07 08:57:44    _id: new ObjectId('67e9f9c540c63049a13957f0'),
+2025-04-07 08:57:44    widgetId: '1391195703137776986-1743386962296-064703082',
+2025-04-07 08:57:44    Group: 'uid-p10',
+2025-04-07 08:57:44    __v: 0,
+2025-04-07 08:57:44    previous: [],
+2025-04-07 08:57:44    showPrevious: true
+2025-04-07 08:57:44  }
+2025-04-07 09:11:08  Rather than concentrating on particular libraries or toolkits, this paper highlights a scalable model for student-driven learning. The paper  include visual illustrations, demonstrating timelines and process diagrams, which help clarify the model. It’s an good reference for designing low commitment, collaborative settings for learning in computer science education, especially when looking to foster innovation, peer relationships, and accessibility in research-centered groups.
+2025-04-07 09:11:08  Received data: {
+2025-04-07 09:11:08    widgetId: '1391195703137776986-1743386954389-967512756',
+2025-04-07 09:11:08    response: 'Rather than concentrating on particular libraries or toolkits, this paper highlights a scalable model for student-driven learning. The paper  include visual illustrations, demonstrating timelines and process diagrams, which help clarify the model. It’s an good reference for designing low commitment, collaborative settings for learning in computer science education, especially when looking to foster innovation, peer relationships, and accessibility in research-centered groups.',
+2025-04-07 09:11:08    userName: 'Prithika',
+2025-04-07 09:11:08    photoUrl: 'https://s3-alpha.figma.com/profile/092888df-9566-4fce-a372-6ad4a6bd8049',
+2025-04-07 09:11:08    timestamp: '2025-04-07T09:11:07.886Z'
+2025-04-07 09:11:08  }
+2025-04-07 09:11:08  {
+2025-04-07 09:11:08    current: {
+2025-04-07 09:11:08      response: '',
+2025-04-07 09:11:08      userName: '',
+2025-04-07 09:11:08      photoUrl: '',
+2025-04-07 09:11:08      timestamp: 2025-04-07T09:11:08.165Z
+2025-04-07 09:11:08    },
+2025-04-07 09:11:08    _id: new ObjectId('67e9f9cc40c63049a1395802'),
+2025-04-07 09:11:08    widgetId: '1391195703137776986-1743386954389-967512756',
+2025-04-07 09:11:08    Group: 'uid-p10',
+2025-04-07 09:11:08    __v: 0,
+2025-04-07 09:11:08    previous: [],
+2025-04-07 09:11:08    showPrevious: true
+2025-04-07 09:11:08  }
+2025-04-07 09:11:08  inside widget
+2025-04-07 09:11:08  Updated widget: {
+2025-04-07 09:11:08    current: {
+2025-04-07 09:11:08      response: 'Rather than concentrating on particular libraries or toolkits, this paper highlights a scalable model for student-driven learning. The paper  include visual illustrations, demonstrating timelines and process diagrams, which help clarify the model. It’s an good reference for designing low commitment, collaborative settings for learning in computer science education, especially when looking to foster innovation, peer relationships, and accessibility in research-centered groups.',
+2025-04-07 09:11:08      userName: 'Prithika',
+2025-04-07 09:11:08      photoUrl: 'https://s3-alpha.figma.com/profile/092888df-9566-4fce-a372-6ad4a6bd8049',
+2025-04-07 09:11:08      timestamp: 2025-04-07T09:11:07.886Z
+2025-04-07 09:11:08    },
+2025-04-07 09:11:08    _id: new ObjectId('67e9f9cc40c63049a1395802'),
+2025-04-07 09:11:08    widgetId: '1391195703137776986-1743386954389-967512756',
+2025-04-07 09:11:08    Group: 'uid-p10',
+2025-04-07 09:11:08    __v: 0,
+2025-04-07 09:11:08    previous: [],
+2025-04-07 09:11:08    showPrevious: true
+2025-04-07 09:11:08  }
+2025-04-07 09:11:20  inside messages
+2025-04-07 09:11:20  done
+2025-04-07 09:14:30  This paper sparked ideas in my mind about applying the concept of Exploratory Reading Groups (ERGs) in different classroom settings and subject areas. I’m  interested in how this model could be adapted across different age groups and subjects. I also wonder how the group dynamics might shift in different contexts—whether in high school classrooms, university courses, or professional development settings. 
+2025-04-07 09:14:30  Received data: {
+2025-04-07 09:14:30    widgetId: '1391195703137776986-1743386942124-644679755',
+2025-04-07 09:14:30    response: 'This paper sparked ideas in my mind about applying the concept of Exploratory Reading Groups (ERGs) in different classroom settings and subject areas. I’m  interested in how this model could be adapted across different age groups and subjects. I also wonder how the group dynamics might shift in different contexts—whether in high school classrooms, university courses, or professional development settings. ',
+2025-04-07 09:14:30    userName: 'Prithika',
+2025-04-07 09:14:30    photoUrl: 'https://s3-alpha.figma.com/profile/092888df-9566-4fce-a372-6ad4a6bd8049',
+2025-04-07 09:14:30    timestamp: '2025-04-07T09:14:30.332Z'
+2025-04-07 09:14:30  }
+2025-04-07 09:14:30  {
+2025-04-07 09:14:30    current: {
+2025-04-07 09:14:30      response: '',
+2025-04-07 09:14:30      userName: '',
+2025-04-07 09:14:30      photoUrl: '',
+2025-04-07 09:14:30      timestamp: 2025-04-07T09:14:30.723Z
+2025-04-07 09:14:30    },
+2025-04-07 09:14:30    _id: new ObjectId('67e9f9d340c63049a1395817'),
+2025-04-07 09:14:30    widgetId: '1391195703137776986-1743386942124-644679755',
+2025-04-07 09:14:30    Group: 'uid-p10',
+2025-04-07 09:14:30    __v: 0,
+2025-04-07 09:14:30    previous: [],
+2025-04-07 09:14:30    showPrevious: true
+2025-04-07 09:14:30  }
+2025-04-07 09:14:30  inside widget
+2025-04-07 09:14:30  Updated widget: {
+2025-04-07 09:14:30    current: {
+2025-04-07 09:14:30      response: 'This paper sparked ideas in my mind about applying the concept of Exploratory Reading Groups (ERGs) in different classroom settings and subject areas. I’m  interested in how this model could be adapted across different age groups and subjects. I also wonder how the group dynamics might shift in different contexts—whether in high school classrooms, university courses, or professional development settings. ',
+2025-04-07 09:14:30      userName: 'Prithika',
+2025-04-07 09:14:30      photoUrl: 'https://s3-alpha.figma.com/profile/092888df-9566-4fce-a372-6ad4a6bd8049',
+2025-04-07 09:14:30      timestamp: 2025-04-07T09:14:30.332Z
+2025-04-07 09:14:30    },
+2025-04-07 09:14:30    _id: new ObjectId('67e9f9d340c63049a1395817'),
+2025-04-07 09:14:30    widgetId: '1391195703137776986-1743386942124-644679755',
+2025-04-07 09:14:30    Group: 'uid-p10',
+2025-04-07 09:14:30    __v: 0,
+2025-04-07 09:14:30    previous: [],
+2025-04-07 09:14:30    showPrevious: true
+2025-04-07 09:14:30  }
+
+=== LOG CHUNK: 2025-04-07T09:57:03Z to 2025-04-07T21:57:03Z ===
+2025-04-07 21:56:21      at ValidationError.inspect (/opt/render/project/src/figma-server/node_modules/mongoose/lib/error/validation.js:50:26)
+2025-04-07 21:56:21      at formatValue (node:internal/util/inspect:806:19)
+2025-04-07 21:56:21      at inspect (node:internal/util/inspect:365:10)
+2025-04-07 21:56:21      at formatWithOptionsInternal (node:internal/util/inspect:2304:40)
+2025-04-07 21:56:21      at formatWithOptions (node:internal/util/inspect:2166:10)
+2025-04-07 21:56:21      at console.value (node:internal/console/constructor:358:14)
+2025-04-07 21:56:21      at console.error (node:internal/console/constructor:395:61)
+2025-04-07 21:56:21      at /opt/render/project/src/figma-server/server.js:505:13
+2025-04-07 21:56:21      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-04-07 21:56:21    errors: {
+2025-04-07 21:56:21      title: ValidatorError: Path `title` is required.
+2025-04-07 21:56:21          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:21          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:21          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:21          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:21        properties: [Object],
+2025-04-07 21:56:21        kind: 'required',
+2025-04-07 21:56:21        path: 'title',
+2025-04-07 21:56:21        value: '',
+2025-04-07 21:56:21        reason: undefined,
+2025-04-07 21:56:21        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:21      },
+2025-04-07 21:56:21      'options.0.text': ValidatorError: Path `text` is required.
+2025-04-07 21:56:21          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:21          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:21          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:21          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:21        properties: [Object],
+2025-04-07 21:56:21        kind: 'required',
+2025-04-07 21:56:21        path: 'text',
+2025-04-07 21:56:21        value: '',
+2025-04-07 21:56:21        reason: undefined,
+2025-04-07 21:56:21        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:21      },
+2025-04-07 21:56:21      'options.1.text': ValidatorError: Path `text` is required.
+2025-04-07 21:56:21          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:21          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:21          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:21          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:21        properties: [Object],
+2025-04-07 21:56:21        kind: 'required',
+2025-04-07 21:56:21        path: 'text',
+2025-04-07 21:56:21        value: '',
+2025-04-07 21:56:21        reason: undefined,
+2025-04-07 21:56:21        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:21      }
+2025-04-07 21:56:21    },
+2025-04-07 21:56:21    _message: 'Poll validation failed'
+2025-04-07 21:56:21  }
+2025-04-07 21:56:55  new widget created
+2025-04-07 21:56:55  Error creating poll: Error: Poll validation failed: title: Path `title` is required., options.0.text: Path `text` is required., options.1.text: Path `text` is required.
+2025-04-07 21:56:55      at ValidationError.inspect (/opt/render/project/src/figma-server/node_modules/mongoose/lib/error/validation.js:50:26)
+2025-04-07 21:56:55      at formatValue (node:internal/util/inspect:806:19)
+2025-04-07 21:56:55      at inspect (node:internal/util/inspect:365:10)
+2025-04-07 21:56:55      at formatWithOptionsInternal (node:internal/util/inspect:2304:40)
+2025-04-07 21:56:55      at formatWithOptions (node:internal/util/inspect:2166:10)
+2025-04-07 21:56:55      at console.value (node:internal/console/constructor:358:14)
+2025-04-07 21:56:55      at console.error (node:internal/console/constructor:395:61)
+2025-04-07 21:56:55      at /opt/render/project/src/figma-server/server.js:505:13
+2025-04-07 21:56:55      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-04-07 21:56:55    errors: {
+2025-04-07 21:56:55      title: ValidatorError: Path `title` is required.
+2025-04-07 21:56:55          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:55          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:55          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:55          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:55        properties: [Object],
+2025-04-07 21:56:55        kind: 'required',
+2025-04-07 21:56:55        path: 'title',
+2025-04-07 21:56:55        value: '',
+2025-04-07 21:56:55        reason: undefined,
+2025-04-07 21:56:55        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:55      },
+2025-04-07 21:56:55      'options.0.text': ValidatorError: Path `text` is required.
+2025-04-07 21:56:55          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:55          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:55          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:55          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:55        properties: [Object],
+2025-04-07 21:56:55        kind: 'required',
+2025-04-07 21:56:55        path: 'text',
+2025-04-07 21:56:55        value: '',
+2025-04-07 21:56:55        reason: undefined,
+2025-04-07 21:56:55        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:55      },
+2025-04-07 21:56:55      'options.1.text': ValidatorError: Path `text` is required.
+2025-04-07 21:56:55          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-07 21:56:55          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-07 21:56:55          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-07 21:56:55          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-07 21:56:55        properties: [Object],
+2025-04-07 21:56:55        kind: 'required',
+2025-04-07 21:56:55        path: 'text',
+2025-04-07 21:56:55        value: '',
+2025-04-07 21:56:55        reason: undefined,
+2025-04-07 21:56:55        [Symbol(mongoose#validatorError)]: true
+2025-04-07 21:56:55      }
+2025-04-07 21:56:55    },
+2025-04-07 21:56:55    _message: 'Poll validation failed'
+2025-04-07 21:56:55  }
+
+=== LOG CHUNK: 2025-04-07T21:57:03Z to 2025-04-08T09:57:03Z ===
+2025-04-08 06:51:43        timestamp: 2024-09-19T20:07:51.684Z
+2025-04-08 06:51:43      },
+2025-04-08 06:51:43      {
+2025-04-08 06:51:43        response: 'This study and the methods involved could potentially apply to automating other machines, such as in healthcare.',
+2025-04-08 06:51:43        userName: 'srushti',
+2025-04-08 06:51:43        photoUrl: 'https://s3-alpha.figma.com/profile/1c3996cd-d4cd-4959-b0c9-86c3aa1295bc',
+2025-04-08 06:51:43        timestamp: 2025-03-06T08:00:43.678Z,
+2025-04-08 06:51:43        _id: new ObjectId('67eefd6bdff0728ce6246811')
+2025-04-08 06:51:43      }
+2025-04-08 06:51:43    ],
+2025-04-08 06:51:43    showPrevious: false,
+2025-04-08 06:51:43    Group: 'exai-p10'
+2025-04-08 06:51:43  }
+2025-04-08 06:52:43  inside messages
+2025-04-08 06:52:44  done
+2025-04-08 07:01:10  This research paper didn’t really show any use of libraries or toolkit but I would see TensorFlow,matplotlib or other for organizing and graphing data but they did show talk about many scenarios where these would be useful.  I really like the outline of the research paper and I would refer back to this paper as a to help me write a way to connect the main point to real world issue and why it would be useful. 
+2025-04-08 07:01:10  
+2025-04-08 07:01:10  Received data: {
+2025-04-08 07:01:10    widgetId: '1391195703137776986-1726773445768-726239345',
+2025-04-08 07:01:10    response: 'This research paper didn’t really show any use of libraries or toolkit but I would see TensorFlow,matplotlib or other for organizing and graphing data but they did show talk about many scenarios where these would be useful.  I really like the outline of the research paper and I would refer back to this paper as a to help me write a way to connect the main point to real world issue and why it would be useful. \n',
+2025-04-08 07:01:10    userName: 'Victor cruz',
+2025-04-08 07:01:10    photoUrl: 'https://s3-alpha.figma.com/profile/2738e66f-71d8-4323-b9f6-dce562ab1569',
+2025-04-08 07:01:10    timestamp: '2025-04-08T07:01:09.778Z'
+2025-04-08 07:01:10  }
+2025-04-08 07:01:10  {
+2025-04-08 07:01:10    current: {
+2025-04-08 07:01:10      response: '',
+2025-04-08 07:01:10      userName: '',
+2025-04-08 07:01:10      photoUrl: '',
+2025-04-08 07:01:10      timestamp: 2025-04-03T21:32:03.562Z
+2025-04-08 07:01:10    },
+2025-04-08 07:01:10    _id: new ObjectId('66ec7985ac3d89f374443cad'),
+2025-04-08 07:01:10    widgetId: '1391195703137776986-1726773445768-726239345',
+2025-04-08 07:01:10    __v: 5,
+2025-04-08 07:01:10    previous: [
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'Yes, I would want to refer back to this paper.',
+2025-04-08 07:01:10        userName: 'Riya Narang',
+2025-04-08 07:01:10        _id: new ObjectId('66ec799503600b523f575dfb'),
+2025-04-08 07:01:10        timestamp: 2024-09-19T19:20:53.374Z
+2025-04-08 07:01:10      },
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'The authors prove their idea by creating a two-dimensional framework that balances automation and human control. They back this up with real-world examples, like how it can be applied to vehicles and medical devices. They tackle technical and ethical challenges head-on, showing how their approach makes systems more reliable, safe, and trustworthy. They also emphasize the importance of designing with the user in mind, making their framework not just theoretical, but practical and effective in everyday applications.',
+2025-04-08 07:01:10        userName: 'Vikita Vaghasia',
+2025-04-08 07:01:10        _id: new ObjectId('66ec799a03600b523f575e19'),
+2025-04-08 07:01:10        timestamp: 2024-09-19T19:20:58.459Z
+2025-04-08 07:01:10      },
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'CMMs, Capability Maturity Models is a method they used to analyze maturity and develop ways of improvement. These would be useful in various different kinds of studies in analyzing and improving the results.',
+2025-04-08 07:01:10        userName: 'srushti',
+2025-04-08 07:01:10        photoUrl: 'https://s3-alpha.figma.com/profile/1c3996cd-d4cd-4959-b0c9-86c3aa1295bc',
+2025-04-08 07:01:10        timestamp: 2025-03-06T07:59:08.098Z,
+2025-04-08 07:01:10        _id: new ObjectId('67eefd6adff0728ce624680b')
+2025-04-08 07:01:10      }
+2025-04-08 07:01:10    ],
+2025-04-08 07:01:10    showPrevious: false,
+2025-04-08 07:01:10    Group: 'exai-p10'
+2025-04-08 07:01:10  }
+2025-04-08 07:01:10  inside widget
+2025-04-08 07:01:10  Updated widget: {
+2025-04-08 07:01:10    current: {
+2025-04-08 07:01:10      response: 'This research paper didn’t really show any use of libraries or toolkit but I would see TensorFlow,matplotlib or other for organizing and graphing data but they did show talk about many scenarios where these would be useful.  I really like the outline of the research paper and I would refer back to this paper as a to help me write a way to connect the main point to real world issue and why it would be useful. \n',
+2025-04-08 07:01:10      userName: 'Victor cruz',
+2025-04-08 07:01:10      photoUrl: 'https://s3-alpha.figma.com/profile/2738e66f-71d8-4323-b9f6-dce562ab1569',
+2025-04-08 07:01:10      timestamp: 2025-04-08T07:01:09.778Z
+2025-04-08 07:01:10    },
+2025-04-08 07:01:10    _id: new ObjectId('66ec7985ac3d89f374443cad'),
+2025-04-08 07:01:10    widgetId: '1391195703137776986-1726773445768-726239345',
+2025-04-08 07:01:10    __v: 5,
+2025-04-08 07:01:10    previous: [
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'Yes, I would want to refer back to this paper.',
+2025-04-08 07:01:10        userName: 'Riya Narang',
+2025-04-08 07:01:10        _id: new ObjectId('66ec799503600b523f575dfb'),
+2025-04-08 07:01:10        timestamp: 2024-09-19T19:20:53.374Z
+2025-04-08 07:01:10      },
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'The authors prove their idea by creating a two-dimensional framework that balances automation and human control. They back this up with real-world examples, like how it can be applied to vehicles and medical devices. They tackle technical and ethical challenges head-on, showing how their approach makes systems more reliable, safe, and trustworthy. They also emphasize the importance of designing with the user in mind, making their framework not just theoretical, but practical and effective in everyday applications.',
+2025-04-08 07:01:10        userName: 'Vikita Vaghasia',
+2025-04-08 07:01:10        _id: new ObjectId('66ec799a03600b523f575e19'),
+2025-04-08 07:01:10        timestamp: 2024-09-19T19:20:58.459Z
+2025-04-08 07:01:10      },
+2025-04-08 07:01:10      {
+2025-04-08 07:01:10        response: 'CMMs, Capability Maturity Models is a method they used to analyze maturity and develop ways of improvement. These would be useful in various different kinds of studies in analyzing and improving the results.',
+2025-04-08 07:01:10        userName: 'srushti',
+2025-04-08 07:01:10        photoUrl: 'https://s3-alpha.figma.com/profile/1c3996cd-d4cd-4959-b0c9-86c3aa1295bc',
+2025-04-08 07:01:10        timestamp: 2025-03-06T07:59:08.098Z,
+2025-04-08 07:01:10        _id: new ObjectId('67eefd6adff0728ce624680b')
+2025-04-08 07:01:10      }
+2025-04-08 07:01:10    ],
+2025-04-08 07:01:10    showPrevious: false,
+2025-04-08 07:01:10    Group: 'exai-p10'
+2025-04-08 07:01:10  }
+2025-04-08 08:23:03  inside messages
+2025-04-08 08:23:03  done
+2025-04-08 09:44:19  inside messages
+2025-04-08 09:44:19  Creating new log
+2025-04-08 09:44:19  done
+2025-04-08 09:45:32  inside messages
+2025-04-08 09:45:32  done
+
+=== LOG CHUNK: 2025-04-08T09:57:03Z to 2025-04-08T21:57:03Z ===
+2025-04-08 17:36:49  yo zach
+2025-04-08 17:36:49  Received data: {
+2025-04-08 17:36:49    widgetId: '1391195703137776986-1744133794578-298008775',
+2025-04-08 17:36:49    response: 'yo zach',
+2025-04-08 17:36:49    userName: 'Darryl',
+2025-04-08 17:36:49    photoUrl: 'https://s3-alpha.figma.com/profile/8f471595-bae3-417d-b5ce-ca49341a894e',
+2025-04-08 17:36:49    timestamp: '2025-04-08T17:36:47.389Z'
+2025-04-08 17:36:49  }
+2025-04-08 17:36:49  null
+2025-04-08 17:36:49  new widget
+2025-04-08 17:36:49  New widget created: {
+2025-04-08 17:36:49    widgetId: '1391195703137776986-1744133794578-298008775',
+2025-04-08 17:36:49    Group: 'None',
+2025-04-08 17:36:49    previous: [],
+2025-04-08 17:36:49    current: {
+2025-04-08 17:36:49      response: 'yo zach',
+2025-04-08 17:36:49      userName: 'Darryl',
+2025-04-08 17:36:49      photoUrl: 'https://s3-alpha.figma.com/profile/8f471595-bae3-417d-b5ce-ca49341a894e',
+2025-04-08 17:36:49      timestamp: 2025-04-08T17:36:47.389Z
+2025-04-08 17:36:49    },
+2025-04-08 17:36:49    showPrevious: false,
+2025-04-08 17:36:49    _id: new ObjectId('67f55eb1dff0728ce624e618'),
+2025-04-08 17:36:49    __v: 0
+2025-04-08 17:36:49  }
+2025-04-08 17:43:57  inside messages
+2025-04-08 17:43:57  Creating new log
+2025-04-08 17:43:57  done
+2025-04-08 17:44:08  inside messages
+2025-04-08 17:44:08  done
+2025-04-08 18:07:09  inside messages
+2025-04-08 18:07:10  done
+2025-04-08 18:41:21  inside messages
+2025-04-08 18:41:22  done
+2025-04-08 19:43:53  new widget created
+2025-04-08 19:43:53  Error creating poll: Error: Poll validation failed: title: Path `title` is required., options.0.text: Path `text` is required., options.1.text: Path `text` is required., options.2.text: Path `text` is required.
+2025-04-08 19:43:53      at ValidationError.inspect (/opt/render/project/src/figma-server/node_modules/mongoose/lib/error/validation.js:50:26)
+2025-04-08 19:43:53      at formatValue (node:internal/util/inspect:806:19)
+2025-04-08 19:43:53      at inspect (node:internal/util/inspect:365:10)
+2025-04-08 19:43:53      at formatWithOptionsInternal (node:internal/util/inspect:2304:40)
+2025-04-08 19:43:53      at formatWithOptions (node:internal/util/inspect:2166:10)
+2025-04-08 19:43:53      at console.value (node:internal/console/constructor:358:14)
+2025-04-08 19:43:53      at console.error (node:internal/console/constructor:395:61)
+2025-04-08 19:43:53      at /opt/render/project/src/figma-server/server.js:505:13
+2025-04-08 19:43:53      at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-04-08 19:43:53    errors: {
+2025-04-08 19:43:53      title: ValidatorError: Path `title` is required.
+2025-04-08 19:43:53          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-08 19:43:53          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-08 19:43:53          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-08 19:43:53          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-08 19:43:53        properties: [Object],
+2025-04-08 19:43:53        kind: 'required',
+2025-04-08 19:43:53        path: 'title',
+2025-04-08 19:43:53        value: '',
+2025-04-08 19:43:53        reason: undefined,
+2025-04-08 19:43:53        [Symbol(mongoose#validatorError)]: true
+2025-04-08 19:43:53      },
+2025-04-08 19:43:53      'options.0.text': ValidatorError: Path `text` is required.
+2025-04-08 19:43:53          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-08 19:43:53          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-08 19:43:53          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-08 19:43:53          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-08 19:43:53        properties: [Object],
+2025-04-08 19:43:53        kind: 'required',
+2025-04-08 19:43:53        path: 'text',
+2025-04-08 19:43:53        value: '',
+2025-04-08 19:43:53        reason: undefined,
+2025-04-08 19:43:53        [Symbol(mongoose#validatorError)]: true
+2025-04-08 19:43:53      },
+2025-04-08 19:43:53      'options.1.text': ValidatorError: Path `text` is required.
+2025-04-08 19:43:53          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-08 19:43:53          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-08 19:43:53          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-08 19:43:53          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-08 19:43:53        properties: [Object],
+2025-04-08 19:43:53        kind: 'required',
+2025-04-08 19:43:53        path: 'text',
+2025-04-08 19:43:53        value: '',
+2025-04-08 19:43:53        reason: undefined,
+2025-04-08 19:43:53        [Symbol(mongoose#validatorError)]: true
+2025-04-08 19:43:53      },
+2025-04-08 19:43:53      'options.2.text': ValidatorError: Path `text` is required.
+2025-04-08 19:43:53          at validate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1367:13)
+2025-04-08 19:43:53          at SchemaType.doValidate (/opt/render/project/src/figma-server/node_modules/mongoose/lib/schemaType.js:1351:7)
+2025-04-08 19:43:53          at /opt/render/project/src/figma-server/node_modules/mongoose/lib/document.js:2986:18
+2025-04-08 19:43:53          at process.processTicksAndRejections (node:internal/process/task_queues:77:11) {
+2025-04-08 19:43:53        properties: [Object],
+2025-04-08 19:43:53        kind: 'required',
+2025-04-08 19:43:53        path: 'text',
+2025-04-08 19:43:53        value: '',
+2025-04-08 19:43:53        reason: undefined,
+2025-04-08 19:43:53        [Symbol(mongoose#validatorError)]: true
+2025-04-08 19:43:53      }
+2025-04-08 19:43:53    },
+2025-04-08 19:43:53    _message: 'Poll validation failed'
+2025-04-08 19:43:53  }
+2025-04-08 20:34:25  inside messages
+2025-04-08 20:34:25  done
+2025-04-08 20:36:21  inside messages
+2025-04-08 20:36:21  done
+
+=== LOG CHUNK: 2025-04-08T21:57:03Z to 2025-04-09T09:57:03Z ===
+2025-04-09 08:42:14      },
+2025-04-09 08:42:14      {
+2025-04-09 08:42:14        response: 'PyTorch is the primary useful library that is used for this analysis. I would refer to someone to this paper if they have experience in coding with PyTorch and are planning on researching the applications of RL.',
+2025-04-09 08:42:14        userName: 'Austin',
+2025-04-09 08:42:14        _id: new ObjectId('67b5f9c3f7c40e67c35a7f92'),
+2025-04-09 08:42:14        timestamp: 2025-02-19T15:33:23.852Z
+2025-04-09 08:42:14      }
+2025-04-09 08:42:14    ],
+2025-04-09 08:42:14    showPrevious: false
+2025-04-09 08:42:14  }
+2025-04-09 08:50:54  One possible extension would be adapting the algorithms for multi-agent environments, where multiple agents learn and interact simultaneously - something not deeply explored in this resource. A limitation is that it focuses mostly on foundational algorithms and doesn’t cover many recent advances like offline RL or large-scale training frameworks, which could be valuable in practical applications.
+2025-04-09 08:50:54  
+2025-04-09 08:50:54  Received data: {
+2025-04-09 08:50:54    widgetId: '1391195703137776986-1727315469183-329898400',
+2025-04-09 08:50:54    response: 'One possible extension would be adapting the algorithms for multi-agent environments, where multiple agents learn and interact simultaneously - something not deeply explored in this resource. A limitation is that it focuses mostly on foundational algorithms and doesn’t cover many recent advances like offline RL or large-scale training frameworks, which could be valuable in practical applications.\n',
+2025-04-09 08:50:54    userName: 'Inika Bhargava',
+2025-04-09 08:50:54    photoUrl: 'https://s3-alpha.figma.com/profile/9e60b3e6-766e-461d-97a7-63aac442afe1',
+2025-04-09 08:50:54    timestamp: '2025-04-09T08:50:53.702Z'
+2025-04-09 08:50:54  }
+2025-04-09 08:50:54  {
+2025-04-09 08:50:54    current: {
+2025-04-09 08:50:54      response: '',
+2025-04-09 08:50:54      userName: '',
+2025-04-09 08:50:54      photoUrl: '',
+2025-04-09 08:50:54      timestamp: 2025-04-04T06:07:10.798Z
+2025-04-09 08:50:54    },
+2025-04-09 08:50:54    _id: new ObjectId('66fcc7a6ac3d89f374ed38b0'),
+2025-04-09 08:50:54    widgetId: '1391195703137776986-1727315469183-329898400',
+2025-04-09 08:50:54    Group: 'autosec-p2',
+2025-04-09 08:50:54    __v: 10,
+2025-04-09 08:50:54    previous: [
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'This paper has sparked ideas for me to help create new mathematical advancements to help allow for the development of AI tools',
+2025-04-09 08:50:54        userName: 'Nathan Pham',
+2025-04-09 08:50:54        _id: new ObjectId('66fcd83105dc6055b9a0b4a1'),
+2025-04-09 08:50:54        timestamp: 2024-10-02T05:20:49.915Z
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'Yes, the part about model-based RL approaches sparks potential ideas for extending core insights, especially in addressing limitations or exploring novel applications within specific domains. It encourages considering ways to enhance or build upon the existing methodologies presented.',
+2025-04-09 08:50:54        userName: 'Shaveta Nuvvuri',
+2025-04-09 08:50:54        _id: new ObjectId('66fcd83e05dc6055b9a0b560'),
+2025-04-09 08:50:54        timestamp: 2024-10-02T05:21:02.014Z
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'A possible extension could involve exploring how RL can handle non-stationary environments or multi-agent scenarios, which can be applied in daily life of people.',
+2025-04-09 08:50:54        userName: 'Lucy',
+2025-04-09 08:50:54        photoUrl: 'https://s3-alpha.figma.com/profile/be49475c-b469-4dd1-a982-e5b1f4dd8bf3',
+2025-04-09 08:50:54        timestamp: 2024-10-09T07:00:23.483Z,
+2025-04-09 08:50:54        _id: new ObjectId('677c643f9035e8319ce96db6')
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'This paper did spot ideas on possibly figuring out how to optimize models quickly with high quality. Overall, this paper would be great for someone who is ready to dig into Reinforcement Learning for a project.',
+2025-04-09 08:50:54        userName: 'Austin',
+2025-04-09 08:50:54        _id: new ObjectId('67b5f9eff7c40e67c35a7f99'),
+2025-04-09 08:50:54        timestamp: 2025-02-19T15:34:07.736Z
+2025-04-09 08:50:54      }
+2025-04-09 08:50:54    ],
+2025-04-09 08:50:54    showPrevious: false
+2025-04-09 08:50:54  }
+2025-04-09 08:50:54  inside widget
+2025-04-09 08:50:54  Updated widget: {
+2025-04-09 08:50:54    current: {
+2025-04-09 08:50:54      response: 'One possible extension would be adapting the algorithms for multi-agent environments, where multiple agents learn and interact simultaneously - something not deeply explored in this resource. A limitation is that it focuses mostly on foundational algorithms and doesn’t cover many recent advances like offline RL or large-scale training frameworks, which could be valuable in practical applications.\n',
+2025-04-09 08:50:54      userName: 'Inika Bhargava',
+2025-04-09 08:50:54      photoUrl: 'https://s3-alpha.figma.com/profile/9e60b3e6-766e-461d-97a7-63aac442afe1',
+2025-04-09 08:50:54      timestamp: 2025-04-09T08:50:53.702Z
+2025-04-09 08:50:54    },
+2025-04-09 08:50:54    _id: new ObjectId('66fcc7a6ac3d89f374ed38b0'),
+2025-04-09 08:50:54    widgetId: '1391195703137776986-1727315469183-329898400',
+2025-04-09 08:50:54    Group: 'autosec-p2',
+2025-04-09 08:50:54    __v: 10,
+2025-04-09 08:50:54    previous: [
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'This paper has sparked ideas for me to help create new mathematical advancements to help allow for the development of AI tools',
+2025-04-09 08:50:54        userName: 'Nathan Pham',
+2025-04-09 08:50:54        _id: new ObjectId('66fcd83105dc6055b9a0b4a1'),
+2025-04-09 08:50:54        timestamp: 2024-10-02T05:20:49.915Z
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'Yes, the part about model-based RL approaches sparks potential ideas for extending core insights, especially in addressing limitations or exploring novel applications within specific domains. It encourages considering ways to enhance or build upon the existing methodologies presented.',
+2025-04-09 08:50:54        userName: 'Shaveta Nuvvuri',
+2025-04-09 08:50:54        _id: new ObjectId('66fcd83e05dc6055b9a0b560'),
+2025-04-09 08:50:54        timestamp: 2024-10-02T05:21:02.014Z
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'A possible extension could involve exploring how RL can handle non-stationary environments or multi-agent scenarios, which can be applied in daily life of people.',
+2025-04-09 08:50:54        userName: 'Lucy',
+2025-04-09 08:50:54        photoUrl: 'https://s3-alpha.figma.com/profile/be49475c-b469-4dd1-a982-e5b1f4dd8bf3',
+2025-04-09 08:50:54        timestamp: 2024-10-09T07:00:23.483Z,
+2025-04-09 08:50:54        _id: new ObjectId('677c643f9035e8319ce96db6')
+2025-04-09 08:50:54      },
+2025-04-09 08:50:54      {
+2025-04-09 08:50:54        response: 'This paper did spot ideas on possibly figuring out how to optimize models quickly with high quality. Overall, this paper would be great for someone who is ready to dig into Reinforcement Learning for a project.',
+2025-04-09 08:50:54        userName: 'Austin',
+2025-04-09 08:50:54        _id: new ObjectId('67b5f9eff7c40e67c35a7f99'),
+2025-04-09 08:50:54        timestamp: 2025-02-19T15:34:07.736Z
+2025-04-09 08:50:54      }
+2025-04-09 08:50:54    ],
+2025-04-09 08:50:54    showPrevious: false
+2025-04-09 08:50:54  }
+
+=== LOG CHUNK: 2025-04-09T09:57:03Z to 2025-04-09T21:57:03Z ===
+2025-04-09 21:35:17  }
+2025-04-09 21:35:17  {
+2025-04-09 21:35:17    current: {
+2025-04-09 21:35:17      response: '',
+2025-04-09 21:35:17      userName: '',
+2025-04-09 21:35:17      photoUrl: '',
+2025-04-09 21:35:17      timestamp: 2025-04-09T21:33:56.151Z
+2025-04-09 21:35:17    },
+2025-04-09 21:35:17    _id: new ObjectId('67f6d65adff0728ce624eaec'),
+2025-04-09 21:35:17    widgetId: '1391195703137776986-1744229972260-816380544',
+2025-04-09 21:35:17    Group: 'mygroup',
+2025-04-09 21:35:17    previous: [
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'aa',
+2025-04-09 21:35:17        userName: 'aaa',
+2025-04-09 21:35:17        _id: new ObjectId('67f6d6a1dff0728ce624eafd'),
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:20:49.897Z
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'sad',
+2025-04-09 21:35:17        userName: 'asda',
+2025-04-09 21:35:17        _id: new ObjectId('67f6d6a5dff0728ce624eb05'),
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:20:53.262Z
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'test',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:19:36.784Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6d72ddff0728ce624eb1f')
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'hi',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:23:12.644Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6e798dff0728ce624eb81')
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'test',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T21:33:24.971Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6e7c4dff0728ce624eba3')
+2025-04-09 21:35:17      }
+2025-04-09 21:35:17    ],
+2025-04-09 21:35:17    showPrevious: false,
+2025-04-09 21:35:17    __v: 5
+2025-04-09 21:35:17  }
+2025-04-09 21:35:17  inside widget
+2025-04-09 21:35:17  Updated widget: {
+2025-04-09 21:35:17    current: {
+2025-04-09 21:35:17      response: 'testa',
+2025-04-09 21:35:17      userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17      photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17      timestamp: 2025-04-09T21:35:16.020Z
+2025-04-09 21:35:17    },
+2025-04-09 21:35:17    _id: new ObjectId('67f6d65adff0728ce624eaec'),
+2025-04-09 21:35:17    widgetId: '1391195703137776986-1744229972260-816380544',
+2025-04-09 21:35:17    Group: 'mygroup',
+2025-04-09 21:35:17    previous: [
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'aa',
+2025-04-09 21:35:17        userName: 'aaa',
+2025-04-09 21:35:17        _id: new ObjectId('67f6d6a1dff0728ce624eafd'),
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:20:49.897Z
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'sad',
+2025-04-09 21:35:17        userName: 'asda',
+2025-04-09 21:35:17        _id: new ObjectId('67f6d6a5dff0728ce624eb05'),
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:20:53.262Z
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'test',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:19:36.784Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6d72ddff0728ce624eb1f')
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'hi',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T20:23:12.644Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6e798dff0728ce624eb81')
+2025-04-09 21:35:17      },
+2025-04-09 21:35:17      {
+2025-04-09 21:35:17        response: 'test',
+2025-04-09 21:35:17        userName: 'Alexander Sherbrooke',
+2025-04-09 21:35:17        photoUrl: 'https://s3-alpha.figma.com/static/user_a_v2.png',
+2025-04-09 21:35:17        timestamp: 2025-04-09T21:33:24.971Z,
+2025-04-09 21:35:17        _id: new ObjectId('67f6e7c4dff0728ce624eba3')
+2025-04-09 21:35:17      }
+2025-04-09 21:35:17    ],
+2025-04-09 21:35:17    showPrevious: false,
+2025-04-09 21:35:17    __v: 5
+2025-04-09 21:35:17  }
+2025-04-09 21:35:48  1391195703137776986-1744229972260-816380544 { widgetId: '1391195703137776986-1744229972260-816380544' }
+2025-04-09 21:44:05  1391195703137776986-1744229972260-816380544 { widgetId: '1391195703137776986-1744229972260-816380544' }
