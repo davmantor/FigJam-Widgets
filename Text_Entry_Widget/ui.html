@@ -182,6 +182,31 @@
       margin-right: 10px;
       flex-grow: 1;
     }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
     
     .shake {
       animation: shakeAnimation 0.5s;
@@ -289,6 +314,7 @@
     <p>These options will help you update widgets to the latest version. No data should be lost, but double check each widget if you're unsure.</p>
     <div class="button-container">
       <button class="button danger" id="duplicateButton">Duplicate this widget</button>
+      <button class="button danger" id="duplicateGroupButton">Duplicate group</button>
       <button class="button danger" id="duplicateAllButton">Duplicate ALL widgets</button>
     </div>
   </div>
@@ -331,6 +357,7 @@
     const revealGroupButton = document.getElementById('revealGroupButton');
     const resetGroupButton = document.getElementById('resetGroupButton');
     const duplicateButton = document.getElementById('duplicateButton');
+    const duplicateGroupButton = document.getElementById('duplicateGroupButton');
     const duplicateAllButton = document.getElementById('duplicateAllButton');
 
     const AnonSVG = `<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 256 256" xml:space="preserve">
@@ -351,6 +378,67 @@
     let unsavedResponse = null;
     let unsavedUserName = null;
     let currentEditingIndex = null;
+
+    function customAlert(message) {
+      const modal = document.createElement('div');
+      modal.classList.add('modal');
+      modal.onclick = () => {
+        modal.remove();
+      };
+      const modalContent = document.createElement('div');
+      modalContent.onclick = (event) => {
+        event.stopPropagation();
+      }
+      modalContent.classList.add('modal-content');
+      modalContent.innerHTML = `<p>${message}</p>`;
+      const closeButton = document.createElement('button');
+      closeButton.innerText = 'Close';
+      closeButton.onclick = () => {
+        modal.remove();
+      };
+      modalContent.appendChild(closeButton);
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+    }
+
+    async function customConfirm(message) {
+      return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.onclick = () => {
+          modal.remove();
+          resolve(false);
+        };
+        const modalContent = document.createElement('div');
+        modalContent.onclick = (event) => {
+          event.stopPropagation();
+        }
+        modalContent.classList.add('modal-content');
+        modalContent.innerHTML = `<p>${message}</p>`;
+        const modalButtonRow = document.createElement('div');
+        modalButtonRow.classList.add('btn-row');
+        const confirmButton = document.createElement('button');
+        confirmButton.classList.add('button');
+        confirmButton.innerText = 'Confirm';
+        const cancelButton = document.createElement('button');
+        cancelButton.classList.add('button');
+        cancelButton.classList.add('danger');
+        cancelButton.innerText = 'Cancel';
+        confirmButton.onclick = () => {
+          modal.remove();
+          resolve(true);
+        };
+        cancelButton.onclick = () => {
+          modal.remove();
+          resolve(false);
+        };
+        modalButtonRow.appendChild(confirmButton);
+        modalButtonRow.appendChild(cancelButton);
+        modalContent.appendChild(modalButtonRow);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+      })
+    }
 
     setWidgetGroupButton.onclick = () => {
       const customWidgetGroup = customWidgetGroupInput.value.trim();
@@ -376,7 +464,7 @@
         
         parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
-        alert('Please enter a valid Widget Group.');
+        customAlert('Please enter a valid Widget Group.');
       }
     };
     
@@ -454,9 +542,15 @@
         refresh();
       }
       if (type === 'duplicateAll') {
-        duplicateAllButton.innerText = 'Duplicate ALL widgets';
-        duplicateAllButton.style.opacity = '';
-        duplicateAllButton.style.pointerEvents = '';
+        if (event.data.pluginMessage.group) {
+          duplicateGroupButton.innerText = 'Duplicate group';
+          duplicateGroupButton.style.opacity = '';
+          duplicateGroupButton.style.pointerEvents = '';
+        } else {
+          duplicateAllButton.innerText = 'Duplicate ALL widgets';
+          duplicateAllButton.style.opacity = '';
+          duplicateAllButton.style.pointerEvents = '';
+        }
       } else if (type === 'duplicate') {
         duplicateButton.innerText = 'Duplicate this widget';
         duplicateButton.style.opacity = '';
@@ -490,7 +584,7 @@
         
         parent.postMessage({ pluginMessage: { type: 'setWidgetGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
-        alert('Please enter a valid Widget Group.');
+        customAlert('Please enter a valid Widget Group.');
       }
     };
     
@@ -541,8 +635,8 @@
       revealPreviousResponsesOnly();
     };
 
-    revealGroupButton.onclick = () => {
-      const confirmed = confirm("Are you sure you want to reveal this group?");
+    revealGroupButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reveal this group?");
       if (!confirmed) return;
     
       const customWidgetGroup = customWidgetGroupInput.value.trim();
@@ -553,13 +647,13 @@
       if (customWidgetGroup) {
         parent.postMessage({ pluginMessage: { type: 'revealGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
-        alert('Please enter a valid Widget Group to reveal.');
+        customAlert('Please enter a valid Widget Group to reveal.');
       }
     };
     
 
-    resetGroupButton.onclick = () => {
-      const confirmed = confirm("Are you sure you want to reset this group?");
+    resetGroupButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reset this group?");
       if (!confirmed) return;
     
       const customWidgetGroup = customWidgetGroupInput.value.trim();
@@ -570,7 +664,7 @@
       if (customWidgetGroup) {
         parent.postMessage({ pluginMessage: { type: 'resetGroup', widgetGroup: customWidgetGroup } }, '*');
       } else {
-        alert('Please enter a valid Widget Group to reset.');
+        customAlert('Please enter a valid Widget Group to reset.');
       }
     };
     
@@ -604,7 +698,7 @@
         customWidgetIdInput.value = widgetId;
         parent.postMessage({ pluginMessage: { type: 'setWidgetId', widgetId: customWidgetId } }, '*');
       } else {
-        alert('Please enter a valid Widget ID.');
+        customAlert('Please enter a valid Widget ID.');
       }
     };
 
@@ -616,8 +710,8 @@
     
     
 
-    resetResponseButton.onclick = () => {
-      const confirmed = confirm("Are you sure you want to reset the current response?");
+    resetResponseButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reset the current response?");
       if (!confirmed) return;
     
       parent.postMessage({ pluginMessage: { type: 'resetResponse' } }, '*');
@@ -634,6 +728,20 @@
       parent.postMessage({ pluginMessage: { type: 'duplicate' } }, '*');
     };
 
+    duplicateGroupButton.onclick = () => {
+      const customWidgetGroup = customWidgetGroupInput.value.trim();
+
+      duplicateGroupButton.style.opacity = '0.5';
+      duplicateGroupButton.style.pointerEvents = 'none';
+      duplicateGroupButton.innerText = 'Duplicating group...';
+    
+      if (customWidgetGroup) {
+        parent.postMessage({ pluginMessage: { type: 'duplicateGroup', widgetGroup: customWidgetGroup } }, '*');
+      } else {
+        customAlert('Please enter a valid Widget Group to reset.');
+      }
+    };
+
     duplicateAllButton.onclick = () => {
       duplicateAllButton.style.opacity = '0.5';
       duplicateAllButton.style.pointerEvents = 'none';
@@ -641,8 +749,8 @@
       parent.postMessage({ pluginMessage: { type: 'duplicateAll' } }, '*');
     };
 
-    resetAllButton.onclick = () => {
-      const confirmed = confirm("Are you sure you want to reset ALL widgets?");
+    resetAllButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reset ALL widgets?");
       if (!confirmed) return;
     
       resetAllButton.style.opacity = '0.5';
@@ -652,8 +760,8 @@
     };
     
 
-    revealAllButton.onclick = () => {
-      const confirmed = confirm("Are you sure you want to reveal ALL responses?");
+    revealAllButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reveal ALL responses?");
       if (!confirmed) return;
     
       revealAllButton.style.opacity = '0.5';
@@ -714,7 +822,7 @@
       if (newResponse && newUserName) {
         addResponse(newResponse, newUserName);
       } else {
-        alert('Both response and user name are required.');
+        customAlert('Both response and user name are required.');
       }
     };
 
@@ -798,6 +906,14 @@
               unsavedUserName = userNameInput.value;
               currentEditingIndex = -1;
             };
+
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            const timestamp = new Date(data.widget.current.timestamp);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+            const formattedDate = timestamp.toLocaleString('en-US', options);
+            timestampDiv.textContent = formattedDate.replace(", ", "\n");
+            responseHeader.appendChild(timestampDiv);
 
             const buttonContainer = document.createElement('div');
             buttonContainer.className = 'button-container';

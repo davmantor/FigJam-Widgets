@@ -45,7 +45,12 @@
   var { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
   function timeString(time) {
     const date = new Date(time);
-    const timeString2 = date.toLocaleTimeString("en-US").replace(/^0/, "").replace(/:\d{2} /, " ");
+    const ampm = date.getHours() >= 12 ? "PM" : "AM";
+    let minutes = date.getMinutes().toString();
+    if (minutes.length < 2) {
+      minutes = "0" + minutes;
+    }
+    const timeString2 = `${date.getHours() % 12 || 12}:${minutes} ${ampm}`;
     const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
     return `${dateString} ${timeString2}`;
   }
@@ -76,7 +81,7 @@
     const [borderWidth, setBorderWidth] = useSyncedState("borderWidth", 1);
     const [fontSize, setFontSize] = useSyncedState("fontSize", 16);
     const [userName, setUserName] = useSyncedState("userName", "");
-    const [timestamp, setTimestamp] = useSyncedState("timestamp", 0);
+    const [timestamp, setTimestamp] = useSyncedState("timestamp", "1970-01-01T00:00:00.000Z");
     const [userPhotoUrl, setUserPhotoUrl] = useSyncedState("userPhotoUrl", null);
     const [shadowColor, setShadowColor] = useSyncedState("shadowColor", "#000000");
     const [shadowOffsetX, setShadowOffsetX] = useSyncedState("shadowOffsetX", 0);
@@ -163,6 +168,9 @@
         if (msg.type === "duplicateAll") {
           waitForTask(handleDuplicateAll());
         }
+        if (msg.type === "duplicateGroup") {
+          waitForTask(handleDuplicateAll(msg.widgetGroup));
+        }
         if (msg.type === "setWidgetId") {
           setWidgetId(msg.widgetId);
           handleRefresh(msg.widgetId);
@@ -241,15 +249,18 @@
       clone.y = node.absoluteTransform[1][2] + 20;
       figma.ui.postMessage({ type: "duplicate", status: "success" });
     });
-    const handleDuplicateAll = () => __async(this, null, function* () {
+    const handleDuplicateAll = (group) => __async(this, null, function* () {
       const nodes = figma.currentPage.findAll((node) => node.type === "WIDGET" && node.name === "Text Entry Widget");
       for (const node of nodes) {
+        if (group && node.widgetSyncedState.widgetGroup !== group) {
+          continue;
+        }
         console.log("duplicating widget", node.widgetSyncedState.widgetId);
         const clone = node.cloneWidget({});
         clone.x = node.absoluteTransform[0][2] + 20;
         clone.y = node.absoluteTransform[1][2] + 20;
       }
-      figma.ui.postMessage({ type: "duplicateAll", status: "success" });
+      figma.ui.postMessage({ type: "duplicateAll", group: !!group, status: "success" });
     });
     const handleSubmit = () => __async(this, null, function* () {
       var _a, _b;
@@ -292,8 +303,7 @@
       }
     });
     const getRefreshedResponses = (widgetId2) => __async(this, null, function* () {
-      if (!widgetId2)
-        return null;
+      if (!widgetId2) return null;
       console.log("refresh inside", widgetId2);
       const data = { widgetId: widgetId2 };
       try {
@@ -317,8 +327,7 @@
       }
     });
     const handleRefresh = (currentWidgetId) => __async(this, null, function* () {
-      if (!currentWidgetId)
-        return;
+      if (!currentWidgetId) return;
       console.log("refresh inside", currentWidgetId);
       const responses = yield getRefreshedResponses(currentWidgetId);
       if (responses !== null) {
@@ -327,10 +336,14 @@
         );
         setPreviousResponses(sortedResponses);
         setShowPrevious(responses.showPrevious);
-        if (responses.current) {
+        if (responses.current && responses.current.response) {
+          setSubmitted(true);
           setResponse(responses.current.response);
           setUserName(responses.current.userName);
+          setTimestamp(responses.current.timestamp);
           setUserPhotoUrl(responses.current.photoUrl || null);
+        } else {
+          setSubmitted(false);
         }
       }
     });
