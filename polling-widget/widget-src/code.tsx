@@ -225,7 +225,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width="fill-parent"
+          width={submitted && !isQuestion ? "hug-contents" : "fill-parent"}
           height='hug-contents'
         >
           {isEditing ? (
@@ -237,7 +237,11 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               fontSize={isQuestion ? fontSize : fontSize - 4}
             />
           ) : (
-            <Text fontSize={isQuestion ? fontSize : fontSize - 4} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
+            <Text 
+              fontSize={isQuestion ? fontSize : fontSize - 4} 
+              fontWeight={isQuestion ? 'bold' : 'normal'}
+              width={submitted && !isQuestion ? "hug-contents" : "fill-parent"} 
+              fill={promptColor}>
               {value || (isQuestion ? "Enter poll question" : "Enter option")}
             </Text>
           )}
