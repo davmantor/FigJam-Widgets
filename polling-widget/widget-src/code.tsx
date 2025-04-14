@@ -1158,10 +1158,6 @@ if (isMultiVoteEnabled) {
           entries={entries}
           pollId={pollId}
           isMultiVoteEnabled = {isMultiVoteEnabled}
-          totalVoters={combinedVoters.size}
-          updateUserName={updateUserName}
-          entries={entries}
-          pollId={pollId}
           widgetWidth={widgetWidth}
           barColor={barColor}
           accentColor={accentColor}
