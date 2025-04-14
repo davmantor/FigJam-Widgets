@@ -262,6 +262,10 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
             {displayedVoters.length + additionalVotes}
           </Text>
           {displayedVoters.map((voter, i) => (
+            <AutoLayout
+              tooltip= {voter.name}
+            >
+              
             <Image 
               key={i} 
               src={isAnonymous ? AnonSVG : voter.photoUrl} 
@@ -269,14 +273,19 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               height={fontSize} 
               cornerRadius={fontSize} 
             />
+            </AutoLayout>
           ))}
            {displayedVoters.length >= 1 && (
-                <AutoLayout
+            <AutoLayout
               
                    fill="#808080"
                   cornerRadius={getWidgetValue(8)}
-                   verticalAlignItems="center"
-                  horizontalAlignItems="center">
+                  verticalAlignItems="center"
+                  horizontalAlignItems="center"
+                  tooltip= {voters.slice(0).map(voter => voter.name).join(', ') || "Other voters"}
+                  
+                  >
+                    
                     <Text fontSize={12} fill="#FFFFFF">
                     + {displayedVoters.length + additionalVotes}
                     </Text>
