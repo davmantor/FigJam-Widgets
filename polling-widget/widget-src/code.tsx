@@ -225,7 +225,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(550)}
+          width="fill-parent"
           height='hug-contents'
         >
           {isEditing ? (
@@ -275,17 +275,14 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
             />
             </AutoLayout>
           ))}
-           {displayedVoters.length >= 1 && (
+           {displayedVoters.length >= 4 && (
             <AutoLayout
-              
                    fill="#808080"
                   cornerRadius={getWidgetValue(8)}
                   verticalAlignItems="center"
                   horizontalAlignItems="center"
-                  tooltip= {voters.slice(0).map(voter => voter.name).join(', ') || "Other voters"}
-                  
+                  tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
                   >
-                    
                     <Text fontSize={12} fill="#FFFFFF">
                     + {displayedVoters.length + additionalVotes}
                     </Text>
@@ -493,7 +490,6 @@ if (isMultiVoteEnabled) {
     await setVotes(newVotes);
     await setVoters(newVoters);
     
-  
 
     // Calculate total votes after voting and unvoting is handled
     let totalVotes = 0;
