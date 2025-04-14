@@ -284,7 +284,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
                   tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
                   >
                     <Text fontSize={12} fill="#FFFFFF">
-                    + {displayedVoters.length + additionalVotes}
+                    + {displayedVoters.length + additionalVotes - 4}
                     </Text>
                     </AutoLayout>
             )
