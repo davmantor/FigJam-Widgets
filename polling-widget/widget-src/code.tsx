@@ -14,7 +14,6 @@ const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www
 </g>
 </svg>`;
 
-
 const Dropdown: any = ({ options, value, onChange }) => {
   const [isOpen, setIsOpen] = useSyncedState("dropdownOpen", false);
 
@@ -102,7 +101,6 @@ function ProgressBar({ votes, totalVotes, widgetWidth, barColor, barWidth }: { v
     </AutoLayout>
   );
 }
-
 
 function TextBox({
   index,
@@ -215,12 +213,12 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
 
   return (
     <AutoLayout direction="vertical" spacing={getWidgetValue(4)} width="fill-parent">
-      <AutoLayout direction="horizontal" spacing={getWidgetValue(4)} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
+      <AutoLayout direction="horizontal" spacing={getWidgetValue(4)}  verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
         <AutoLayout
           direction="horizontal"
           spacing={getWidgetValue(8)}
           padding={getWidgetValue(8)}
-          cornerRadius={getWidgetValue(4)}
+          cornerRadius={getWidgetValue(12)}
           stroke={isEditing ? accentColor : '#E6E6E6'}
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
@@ -233,6 +231,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               value={value}
               onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
+              cornerRadius={getWidgetValue(12)}
               width="fill-parent"
               fontSize={isQuestion ? fontSize : fontSize - 4}
             />
@@ -260,6 +259,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           spacing={getWidgetValue(4)} 
           verticalAlignItems="center"
           horizontalAlignItems="end"
+          cornerRadius={getWidgetValue(12)}
           width="hug-contents"  // Ensures it only takes necessary space
         >
           <Text fontSize={fontSize} fill={userVote ? barColor : "#000000"}>
@@ -282,7 +282,6 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
            {displayedVoters.length >= 4 && (
             <AutoLayout
                    fill="#808080"
-                  cornerRadius={getWidgetValue(8)}
                   verticalAlignItems="center"
                   horizontalAlignItems="center"
                   tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
@@ -293,8 +292,6 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
                     </AutoLayout>
             )
             }
-          
-
 
           {additionalVotes > 0 && (
             <Text fontSize={getWidgetValue(28)} fill="#000000">
@@ -330,7 +327,6 @@ function PollingWidget() {
   const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
-  
 
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
@@ -341,7 +337,6 @@ function PollingWidget() {
 
   const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
-
 
   const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 300);
   const [borderWidth, setBorderWidth] = useSyncedState<number>('borderWidth', 2);
@@ -362,8 +357,6 @@ function PollingWidget() {
   );
   const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
   const [selectedScale, setSelectedScale] = useSyncedState("selectedScale", null);
-  
-
 
 const likertScales: Record<string, string[]> = {
   fourPointAgreeDisagree: ["Agree", "Somewhat Agree", "Somewhat Disagree", "Disagree"],
@@ -379,10 +372,6 @@ function handleScaleSelection(scaleKey: string) {
       setEntries([...likertScales[scaleKey]]);
   }
 }
-
-
-  
-
   
   function getPSTDateFromVersion(versionDate: string): string {
     const date = new Date(versionDate);
@@ -392,11 +381,8 @@ function handleScaleSelection(scaleKey: string) {
     console.log("DATE", pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
     return pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-
   }
   
-  
-
   // Track logId changes
   useEffect(() => {
     console.log("LogId updated:", logId);
@@ -433,8 +419,6 @@ function handleScaleSelection(scaleKey: string) {
     setVoters([...voters, []]);
     setEditingIndex(updatedEntries.length - 1);
   };
-
-  
 
   const handleVote = async (index: number) => {
     // Update the user's name before proceeding
@@ -1106,12 +1090,6 @@ if (isMultiVoteEnabled) {
   </AutoLayout>
 </AutoLayout>
 
-
-
-      
-  
-      
-  
       {/* Subheading Section */}
       <AutoLayout
   width="fill-parent"
@@ -1231,14 +1209,12 @@ if (isMultiVoteEnabled) {
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>
-                  </>
+         </>
       )}
 
     </AutoLayout>
     
-  
   );
-  
 }
 
 widget.register(PollingWidget);
