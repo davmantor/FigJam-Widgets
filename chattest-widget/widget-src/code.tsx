@@ -376,7 +376,7 @@ function ChatWidget() {
             downvotedUsers: message.downvotedUsers || [],
             directreply: message.directreply || 0,
             logId: message.logId || 0,
-            anonymous: enforcedAnonymous,
+            anonymous: enforcedAnonymous || false ,
             userIcon: enforcedAnonymous ? null : figma.currentUser?.photoUrl || null,
             };
     
@@ -1480,9 +1480,14 @@ function MessageBubble({ getTotalDirectReplies, message, onReply, onDelete, onEd
             width={getWidgetValue(490)}
             spacing={getWidgetValue(20)}
           >
-            {!message.anonymous && message.userIcon && message.userIcon !== "None" ? (
-              <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
-            ) : null}
+{message.anonymous ? (
+  <SVG src={AnonSVG} width={getWidgetValue(40)} height={getWidgetValue(40)} />
+) : (
+  message.userIcon && message.userIcon !== "None" ? (
+    <Image src={message.userIcon} width={getWidgetValue(40)} height={getWidgetValue(40)} cornerRadius={getWidgetValue(15)} />
+  ) : null
+)}
+
               <Text fontSize={getWidgetValue(30)} fill={messageStyle.color} horizontalAlignText={"left"}>
                   {(message.deleted || message.anonymous) ? 'Anonymous' : firstName}:
               </Text>

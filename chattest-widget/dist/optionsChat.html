@@ -144,7 +144,12 @@
                 </svg>
                 Corner Radius:
             </div> 
-
+            <div id="globalAnonymousContainer">
+                <label>
+                  <input type="checkbox" id="globalAnonymousCheckbox"> Always send all messages anonymously
+                </label>
+              </div>
+              
         </div>
     </div>
 
@@ -226,6 +231,8 @@
                         document.getElementById("adminControls").style.display = "block";
                     }
                     break;
+                case 'current-anonymous': 
+                    document.getElementById('globalAnonymousCheckbox').checked = payload;
             }
         };
 
@@ -234,6 +241,7 @@
 
         function checkPin() {
             var pin = document.getElementById("pinInput").value;
+            console.log (pin);
             if (pin === correctPin) {
                 document.getElementById("pinForm").style.display = "none";
                 document.getElementById("adminControls").style.display = "block";
@@ -287,6 +295,11 @@
             // Send a message to the plugin to update the widget button color
             parent.postMessage({ pluginMessage: {type: 'update-widgetCornerRadius'} }, '*');
         }
+        document.getElementById('globalAnonymousCheckbox').addEventListener('change', () => {
+        const isChecked = document.getElementById('globalAnonymousCheckbox').checked;
+        parent.postMessage({ pluginMessage: { type: 'toggle-anonymous-mode', payload: isChecked } }, '*');
+        });
+
 
     </script>
 </body>
