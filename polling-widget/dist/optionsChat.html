@@ -110,54 +110,41 @@
                 ID
             </div> 
 
-            <div id="borderColorButton" class="button1" onclick="updateBorderColor()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Border Color: 
-            </div> 
+            <div id="borderColorButton" class="widget-entry-bar">
+                <input type="text" id="borderColorInput" class="input" placeholder="#e0e0e0">
+                <button class="button1" onclick="updateBorderColor()">Set Border Color</button>
+            </div>
 
-            <div id="promptColorButton" class="button1" onclick="updatePromptColor()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Prompt Color: 
-            </div> 
+            <div id="promptColorButton" class="widget-entry-bar">
+                <input type="text" id="promptColorInput" class="input" placeholder="#FFFFFF">
+                <button class="button1" onclick="updatePromptColor()">Set Prompt Color</button>
+            </div>
 
-            <div id="boxWidthButton" class="button1" onclick="updateWidth()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Box Width:
-            </div> 
+            <div id="boxWidthButton" class="widget-entry-bar">
+                <input type="text" id="boxWidthInput" class="input" placeholder="300">
+                <button class="button1" onclick="updateWidth()">Set Box Width</button>
+            </div>
 
-            <div id="borderWidthButton" class="button1" onclick="updateBorderWidth()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Border Width:
-            </div> 
+            <div id="borderWidthButton" class="widget-entry-bar">
+                <input type="text" id="borderWidthInput" class="input" placeholder="2">
+                <button class="button1" onclick="updateBorderWidth()">Set Border Width</button>
+            </div>
 
-            <div id="widgetCornerRadiusButton" class="button1" onclick="updateWidgetCornerRadius()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Corner Radius:
-            </div> 
+            <div id="widgetCornerRadiusButton" class="widget-entry-bar">
+                <input type="text" id="widgetCornerRadiusInput" class="input" placeholder="15px">
+                <button class="button1" onclick="updateWidgetCornerRadius()">Set Corner Radius</button>
+            </div>
+            
 
-            <div id="barColorButton" class="button1" onclick="updateWidgetBarColor()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Bar Color:
-            </div> 
+            <div id="barColorButton" class="widget-entry-bar">
+                <input type="text" id="barColorInput" class="input" placeholder="#f0f0f0">
+                <button class="button1" onclick="updateWidgetBarColor()">Set Bar Color</button>
+            </div>
 
-            <div id="accentColorButton" class="button1" onclick="updateAccentColor()">
-                <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF" stroke-width="0.00024000000000000003">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z" fill="#FFFFFF"></path>
-                </svg>
-                Accent Color:
-            </div> 
+            <div id="accentColorButton" class="widget-entry-bar">
+                <input type="text" id="accentColorInput" class="input" placeholder="#24CE16">
+                <button class="button1" onclick="updateAccentColor()">Set Accent Color</button>
+            </div>
             <div id="headingFontSizeButton" class="button1" onclick="updateHeadingFontSize()">
                 Heading Font Size
             </div> 
@@ -351,32 +338,65 @@
 
         function updatePromptColor() {
             // Send a message to the plugin to pin the message
-            parent.postMessage({ pluginMessage: { type: 'update-promptColor' } }, '*');
+            const newPromptColor = document.getElementById('promptColorInput').value.trim();
+          
+          if (newPromptColor) {
+            parent.postMessage({ pluginMessage: { type: 'update-promptColor', payload: newPromptColor } }, '*');
+          } else {
+            alert('Please enter a valid prompt color.');
+          }
         }
 
         function updateBorderColor() {
-            // Send a message to the plugin to pin the message
-            parent.postMessage({ pluginMessage: { type: 'update-borderColor' } }, '*');
-        }
+            const newBorderColor = document.getElementById('borderColorInput').value.trim();
+          
+          if (newBorderColor) {
+            parent.postMessage({ pluginMessage: { type: 'update-borderColor', payload: newBorderColor } }, '*');
+          } else {
+            alert('Please enter a valid border color.');
+          }
+}
 
         function updateWidth() {
             // Send a message to the plugin to update the width
-            parent.postMessage({ pluginMessage: {type: 'update-width'} }, '*');
+            const newBoxWidth = document.getElementById('boxWidthInput').value.trim();
+          
+          if (newBoxWidth) {
+            parent.postMessage({ pluginMessage: { type: 'update-width', payload: newBoxWidth } }, '*');
+              } else {
+            alert('Please enter a valid box width.');
+      }
         }
 
         function updateBorderWidth() {
             // Send a message to the plugin to update the border width
-            parent.postMessage({ pluginMessage: {type: 'update-borderWidth'} }, '*');
+            const newBorderWidth = document.getElementById('borderWidthInput').value.trim();
+          
+            if (newBorderWidth) {
+              parent.postMessage({ pluginMessage: { type: 'update-borderWidth', payload: newBorderWidth } }, '*');
+                } else {
+              alert('Please enter a valid border width.');
+        }
         }
 
         function updateWidgetBarColor() {
-            // Send a message to the plugin to update the border width
-            parent.postMessage({ pluginMessage: {type: 'update-barColor'} }, '*');
-        }
+            const newBarColor = document.getElementById('barColorInput').value.trim();
+          
+            if (newBarColor) {
+                parent.postMessage({ pluginMessage: { type: 'update-barColor', payload: newBarColor } }, '*');
+          } else {
+                alert('Please enter a valid bar color.');
+          }
+}
 
         function updateAccentColor() {
-            // Send a message to the plugin to update the border width
-            parent.postMessage({ pluginMessage: {type: 'update-accentColor'} }, '*');
+            const newAccentColor = document.getElementById('accentColorInput').value.trim();
+          
+          if (newAccentColor) {
+              parent.postMessage({ pluginMessage: { type: 'update-accentColor', payload: newAccentColor } }, '*');
+        } else {
+              alert('Please enter a valid accent color.');
+        }
         }
 
         function updateWidgetId() {
@@ -385,8 +405,13 @@
         }
 
         function updateWidgetCornerRadius() {
-            // Send a message to the plugin to update the widget button color
-            parent.postMessage({ pluginMessage: {type: 'update-widgetCornerRadius'} }, '*');
+            const newWidgetCornerRadius = document.getElementById('widgetCornerRadiusInput').value.trim();
+          
+            if (newWidgetCornerRadius) {
+                parent.postMessage({ pluginMessage: { type: 'update-widgetCornerRadius', payload: newWidgetCornerRadius } }, '*');
+          } else {
+                alert('Please enter a valid corner radius.');
+          }
         }
         function updateSubheading() {
             console.log("Sending subheading update request to code.tsx");

@@ -665,109 +665,30 @@ if (isMultiVoteEnabled) {
           }
         };
       } else if (msg.type === 'update-width') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            console.log("WIDGETWIDTGSET");
-            const updatedWidth = msg.payload.message;
-            setWidgetWidth(parseInt(updatedWidth, 10));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - boxwidth", msg);
+        const updatedText = msg.payload;
+        setWidgetWidth(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-borderWidth') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedBorderWidth = msg.payload.message;
-            setBorderWidth(parseInt(updatedBorderWidth, 10));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - borderwidth", msg);
+        const updatedText = msg.payload;
+        setBorderWidth(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
         } else if (msg.type === 'update-borderColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setBorderColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - bordercolor", msg);
+        const updatedText = msg.payload;
+        setBorderColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-promptColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setPromptColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - promptcolor", msg);
+        const updatedText = msg.payload;
+        setPromptColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-barColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-barColor', payload: barColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setBarColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - barColor", msg);
+        const updatedText = msg.payload;
+        setBarColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-widgetId') {
         console.log("calling prompt from options");
         figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
@@ -791,46 +712,15 @@ if (isMultiVoteEnabled) {
           }
         };
       } else if (msg.type === 'update-accentColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-accentColor', payload: accentColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setAccentColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - accentColor", msg);
+        const updatedText = msg.payload;
+        setAccentColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-widgetCornerRadius') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-widgetCornerRadius', payload: widgetCornerRadius });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setWidgetCornerRadius(Number(updatedText));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - corner radius", msg);
+        const updatedText = msg.payload;
+        setWidgetCornerRadius(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-subheading') {
         console.log("Opening UI for subheading edit");
         figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
