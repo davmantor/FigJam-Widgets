@@ -264,9 +264,11 @@
                     break;
                 case 'current-borderColor':
                     document.getElementById('borderColorButton').insertAdjacentHTML("beforeend", payload);
+                    document.querySelector('#borderColorButton button').style.backgroundColor = payload;
                     break;
                 case 'current-promptColor':
                     document.getElementById('promptColorButton').insertAdjacentHTML("beforeend", payload);
+                    document.querySelector('#promptColorButton button').style.backgroundColor = payload;
                     break;
                 case 'current-widthValue':
                     document.getElementById('boxWidthButton').insertAdjacentHTML("beforeend", payload + "px");
@@ -280,9 +282,11 @@
                     break;
                 case 'current-barColor':
                     document.getElementById('barColorButton').insertAdjacentHTML("beforeend", payload);
+                    document.querySelector('#barColorButton button').style.backgroundColor = payload;
                     break;
                 case 'current-accentColor':
                     document.getElementById('accentColorButton').insertAdjacentHTML("beforeend", payload);
+                    document.querySelector('#accentColorButton button').style.backgroundColor = payload;
                     break;
                 case 'current-widgetId':
                     document.getElementById('widgetIdButton').insertAdjacentHTML("beforeend", payload);
