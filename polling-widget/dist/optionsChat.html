@@ -117,11 +117,13 @@
             <div id="borderColorButton" class="widget-entry-bar">
                 <input type="color" id="borderColorInput" class="input" value="#e0e0e0">
                 <button class="button1" onclick="updateBorderColor()">Set Border Color</button>
+                <span id="borderColorText" style="margin-left: 8px; font-size: 12px; color: #555;">#e0e0e0</span>
             </div>
 
             <div id="promptColorButton" class="widget-entry-bar">
                 <input type="color" id="promptColorInput" class="input" value="#FFFFFF">
                 <button class="button1" onclick="updatePromptColor()">Set Prompt Color</button>
+                <span id="promptColorText" style="margin-left: 8px; font-size: 12px; color: #555;">#e0e0e0</span>
             </div>
 
             <div id="boxWidthButton" class="widget-entry-bar">
@@ -143,11 +145,13 @@
             <div id="barColorButton" class="widget-entry-bar">
                 <input type="color" id="barColorInput" class="input" value="#f0f0f0">
                 <button class="button1" onclick="updateWidgetBarColor()">Set Bar Color</button>
+                <span id="barColorText" style="margin-left: 8px; font-size: 12px; color: #555;">#e0e0e0</span>
             </div>
 
             <div id="accentColorButton" class="widget-entry-bar">
                 <input type="color" id="accentColorInput" class="input" value="#24CE16">
                 <button class="button1" onclick="updateAccentColor()">Set Accent Color</button>
+                <span id="accentColorText" style="margin-left: 8px; font-size: 12px; color: #555;">#e0e0e0</span>
             </div>
             <div id="headingFontSizeButton" class="button1" onclick="updateHeadingFontSize()">
                 Heading Font Size
@@ -263,12 +267,14 @@
                     document.getElementById('widgetIdDisplay').textContent = event.data.pluginMessage.payload;
                     break;
                 case 'current-borderColor':
-                    document.getElementById('borderColorButton').insertAdjacentHTML("beforeend", payload);
-                    document.querySelector('#borderColorButton button').style.backgroundColor = payload;
+                    document.getElementById('borderColorInput').value = payload;
+                    document.querySelector('#borderColorButton .button1').style.backgroundColor = payload;
+                    document.getElementById('borderColorText').textContent = payload;
                     break;
                 case 'current-promptColor':
-                    document.getElementById('promptColorButton').insertAdjacentHTML("beforeend", payload);
-                    document.querySelector('#promptColorButton button').style.backgroundColor = payload;
+                    document.getElementById('promptColorInput').value = payload;
+                    document.querySelector('#promptColorButton .button1').style.backgroundColor = payload;
+                    document.getElementById('promptColorText').textContent = payload;
                     break;
                 case 'current-widthValue':
                     document.getElementById('boxWidthButton').insertAdjacentHTML("beforeend", payload + "px");
@@ -281,13 +287,13 @@
                     console.log(payload)
                     break;
                 case 'current-barColor':
-                    document.getElementById('barColorButton').insertAdjacentHTML("beforeend", payload);
-                    document.querySelector('#barColorButton button').style.backgroundColor = payload;
-                    break;
+                    document.getElementById('barColorInput').value = payload;
+                    document.querySelector('#barColorButton .button1').style.backgroundColor = payload;
+                    document.getElementById('barColorText').textContent = payload;
                 case 'current-accentColor':
-                    document.getElementById('accentColorButton').insertAdjacentHTML("beforeend", payload);
-                    document.querySelector('#accentColorButton button').style.backgroundColor = payload;
-                    break;
+                    document.getElementById('accentColorInput').value = payload;
+                    document.querySelector('#accentColorButton .button1').style.backgroundColor = payload;
+                    document.getElementById('accentColorText').textContent = payload;
                 case 'current-widgetId':
                     document.getElementById('widgetIdButton').insertAdjacentHTML("beforeend", payload);
                     break;
@@ -357,7 +363,7 @@
 
         function updateBorderColor() {
             const newBorderColor = document.getElementById('borderColorInput').value.trim();
-          
+            
           if (newBorderColor) {
             parent.postMessage({ pluginMessage: { type: 'update-borderColor', payload: newBorderColor } }, '*');
           } else {
@@ -445,7 +451,49 @@
               alert('Please enter a valid Widget Group.');
             }
           };
-          
+          document.addEventListener("DOMContentLoaded", function () {
+            const borderColorInput = document.getElementById('borderColorInput');
+            const borderColorButton = document.getElementById('borderColorInput').nextElementSibling;
+            const borderColorText = document.getElementById('borderColorText');
+            const promptColorInput = document.getElementById('promptColorInput');
+            const promptColorButton = document.getElementById('promptColorInput').nextElementSibling;
+            const promptColorText = document.getElementById('promptColorText');
+            const barColorInput = document.getElementById('barColorInput');
+            const barColorButton = document.getElementById('barColorInput').nextElementSibling;
+            const barColorText = document.getElementById('barColorText');
+            const accentColorInput = document.getElementById('accentColorInput');
+            const accentColorButton = document.getElementById('accentColorInput').nextElementSibling;
+            const accentColorText = document.getElementById('accentColorText');
+
+            borderColorInput.addEventListener('input', function (e) {
+                const color = e.target.value;
+                borderColorButton.style.backgroundColor = color;
+                borderColorButton.style.color = "#fff"; // optional: keep text readable
+                borderColorButton.textContent = "Set Border Color"; // reset label in case it was overwritten
+                borderColorText.textContent = color;
+    });
+            promptColorInput.addEventListener('input', function (e) {
+                const color = e.target.value;
+                promptColorButton.style.backgroundColor = color;
+                promptColorButton.style.color = "#fff"; // optional: keep text readable
+                promptColorButton.textContent = "Set Prompt Color"; // reset label in case it was overwritten
+                promptColorText.textContent = color;
+    });
+            barColorInput.addEventListener('input', function (e) {
+                const color = e.target.value;
+                barColorButton.style.backgroundColor = color;
+                barColorButton.style.color = "#fff"; // optional: keep text readable
+                barColorButton.textContent = "Set Bar Color"; // reset label in case it was overwritten
+                barColorText.textContent = color;
+    });
+            accentColorInput.addEventListener('input', function (e) {
+                const color = e.target.value;
+                accentColorButton.style.backgroundColor = color;
+                accentColorButton.style.color = "#fff"; // optional: keep text readable
+                accentColorButton.textContent = "Set Accent Color"; // reset label in case it was overwritten
+                accentColorText.textContent = color;
+    });
+});
           
 
     </script>
