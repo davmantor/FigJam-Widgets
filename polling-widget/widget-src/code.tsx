@@ -1,8 +1,8 @@
 const { widget, showUI, ui } = figma;
-const { useSyncedState, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
 import { widgetVersion } from "./version";
 
+const { useSyncedState, useSyncedMap, AutoLayout, Input, Text, SVG, Image, useEffect } = widget;
 
 const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
 <defs>
@@ -14,74 +14,19 @@ const AnonSVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www
 </g>
 </svg>`;
 
-
-const Dropdown: any = ({ options, value, onChange, dropdownWidth, submitted }) => {
+const Dropdown: any = ({ options, value, onChange }) => {
   const [isOpen, setIsOpen] = useSyncedState("dropdownOpen", false);
 
-  if (submitted) {
-    return (<AutoLayout
-    height={1}
-    >
-
-    </AutoLayout>); // Hide the dropdown when the poll is submitted
-  }
-
   return (
-    <AutoLayout
-      direction="vertical"
-      spacing={4}
-      width={dropdownWidth} // Matches option boxes
-    >
-      {/* Dropdown Header */}
-      <AutoLayout
-        onClick={() => setIsOpen(!isOpen)}
-        fill="#E6E6E6"
-        padding={{ left: 10, right: 10, top: 6, bottom: 6 }}
-        cornerRadius={6}
-        stroke="#BDBDBD"
-        strokeWidth={1}
-        verticalAlignItems="center"
-        width="fill-parent"
-      >
-        <Text fontSize={14} width="fill-parent">
-          {value || "Select a Likert Scale"}
-        </Text>
-        <SVG
-          src={`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>`}
-          width={12}
-          height={12}
-        />
+    <AutoLayout direction="vertical" spacing={4}>
+      <AutoLayout onClick={() => setIsOpen(!isOpen)} fill="#E6E6E6" padding={8} cornerRadius={4}>
+        <Text fontSize={14}>{value || "Select a Likert Scale"}</Text>
       </AutoLayout>
-
-      {/* Dropdown Options */}
       {isOpen && (
-        <AutoLayout
-          direction="vertical"
-          spacing={4}
-          padding={6}
-          fill="#FFFFFF"
-          cornerRadius={6}
-          stroke="#BDBDBD"
-          strokeWidth={1}
-          width="fill-parent"
-          shadow="small"
-        >
+        <AutoLayout direction="vertical" spacing={4} padding={4} fill="#F9F9F9" cornerRadius={4}>
           {options.map((option, index) => (
-            <AutoLayout
-              key={index}
-              onClick={() => {
-                onChange(option);
-                setIsOpen(false);
-              }}
-              padding={{ left: 10, right: 10, top: 6, bottom: 6 }}
-              cornerRadius={4}
-              fill="#F9F9F9"
-              width="fill-parent"
-              hoverStyle={{ fill: "#E0E0E0" }}
-            >
-              <Text fontSize={12} width="fill-parent">
-                {option}
-              </Text>
+            <AutoLayout key={index} onClick={() => { onChange(option); setIsOpen(false); }}>
+              <Text fontSize={12}>{option}</Text>
             </AutoLayout>
           ))}
         </AutoLayout>
@@ -89,8 +34,6 @@ const Dropdown: any = ({ options, value, onChange, dropdownWidth, submitted }) =
     </AutoLayout>
   );
 };
-
-
 
 
 
@@ -117,6 +60,7 @@ interface TextBoxProps {
   userVote: boolean;
   voters: CustomUser[];
   isAnonymous: boolean;
+  isMultiVoteEnabled: boolean;
   totalVoters: number;
   entries: string[];    // Add entries prop
   pollId: string; // Add pollId prop
@@ -158,7 +102,6 @@ function ProgressBar({ votes, totalVotes, widgetWidth, barColor, barWidth }: { v
   );
 }
 
-
 function TextBox({
   index,
   value,
@@ -174,6 +117,7 @@ function TextBox({
   userVote,
   voters,
   isAnonymous,
+  isMultiVoteEnabled,
   totalVoters,
   updateUserName,  // Accept totalVoters and updateUserName
   pollId,          // Add pollId for context if needed
@@ -269,17 +213,17 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
 
   return (
     <AutoLayout direction="vertical" spacing={getWidgetValue(4)} width="fill-parent">
-      <AutoLayout direction="horizontal" spacing={getWidgetValue(8)} verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
+      <AutoLayout direction="horizontal" spacing={getWidgetValue(4)}  verticalAlignItems="center" width="fill-parent" onClick={handleClick}>
         <AutoLayout
           direction="horizontal"
           spacing={getWidgetValue(8)}
           padding={getWidgetValue(8)}
-          cornerRadius={getWidgetValue(4)}
+          cornerRadius={getWidgetValue(12)}
           stroke={isEditing ? accentColor : '#E6E6E6'}
           strokeWidth={getWidgetValue(4)}
           verticalAlignItems="center"
           fill={'#FFFFFF'}
-          width={getWidgetValue(650)}
+          width={submitted && !isQuestion ? "hug-contents" : "fill-parent"}
           height='hug-contents'
         >
           {isEditing ? (
@@ -287,11 +231,16 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               value={value}
               onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
+              cornerRadius={getWidgetValue(12)}
               width="fill-parent"
               fontSize={isQuestion ? fontSize : fontSize - 4}
             />
           ) : (
-            <Text fontSize={isQuestion ? fontSize : fontSize - 4} fontWeight={isQuestion ? 'bold' : 'normal'} width="fill-parent" fill={promptColor}>
+            <Text 
+              fontSize={isQuestion ? fontSize : fontSize - 4} 
+              fontWeight={isQuestion ? 'bold' : 'normal'}
+              width={submitted && !isQuestion ? "hug-contents" : "fill-parent"} 
+              fill={promptColor}>
               {value || (isQuestion ? "Enter poll question" : "Enter option")}
             </Text>
           )}
@@ -310,12 +259,17 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           spacing={getWidgetValue(4)} 
           verticalAlignItems="center"
           horizontalAlignItems="end"
+          cornerRadius={getWidgetValue(12)}
           width="hug-contents"  // Ensures it only takes necessary space
         >
           <Text fontSize={fontSize} fill={userVote ? barColor : "#000000"}>
             {displayedVoters.length + additionalVotes}
           </Text>
           {displayedVoters.map((voter, i) => (
+            <AutoLayout
+              tooltip= {voter.name}
+            >
+              
             <Image 
               key={i} 
               src={isAnonymous ? AnonSVG : voter.photoUrl} 
@@ -323,7 +277,22 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
               height={fontSize} 
               cornerRadius={fontSize} 
             />
+            </AutoLayout>
           ))}
+           {displayedVoters.length >= 4 && (
+            <AutoLayout
+                   fill="#808080"
+                  verticalAlignItems="center"
+                  horizontalAlignItems="center"
+                  tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
+                  >
+                    <Text fontSize={12} fill="#FFFFFF">
+                    + {displayedVoters.length + additionalVotes - 4}
+                    </Text>
+                    </AutoLayout>
+            )
+            }
+
           {additionalVotes > 0 && (
             <Text fontSize={getWidgetValue(28)} fill="#000000">
               +{additionalVotes}
@@ -332,6 +301,7 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
         </AutoLayout>
         
         )}
+
       </AutoLayout>
       {!isQuestion && submitted && (
         <ProgressBar barWidth={getWidgetValue(650)} votes={displayedVoters.length + additionalVotes} totalVotes={totalVoters} widgetWidth={widgetWidth} barColor={barColor}/>
@@ -357,14 +327,16 @@ function PollingWidget() {
   const [votes, setVotes] = useSyncedState<number[]>('votes', new Array(entries.length).fill(0));
   const [userVoteIndex, setUserVoteIndex] = useSyncedState<number | null>('userVoteIndex', null);
   const [voters, setVoters] = useSyncedState<CustomUser[][]>('voters', new Array(entries.length).fill([]));
+
   const [userName, setUserName] = useSyncedState('userName', 'Unknown User');
   const [isAnonymous, setIsAnonymous] = useSyncedState<boolean>('isAnonymous', false);
   const [pollId, setPollId] = useSyncedState<string>('pollId', "");
   const [logId, setLogId] = useSyncedState<string>('logId', "");
+  const [isMultiVoteEnabled, setIsMultiVoteEnabled] = useSyncedState<boolean>('isMultiVoteEnabled', false); 
+  const userVotes = useSyncedMap<number[]>('userVotes');
 
   const [inPrompt, setPrompt] = useSyncedState('Prompt not set', '');
   const [isCrownButtonPressed, setIsCrownButtonPressed] = useSyncedState('isCrownButtonPressed', false);
-
 
   const [widgetWidth, setWidgetWidth] = useSyncedState<number>('widgetWidth', 300);
   const [borderWidth, setBorderWidth] = useSyncedState<number>('borderWidth', 2);
@@ -385,8 +357,6 @@ function PollingWidget() {
   );
   const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
   const [selectedScale, setSelectedScale] = useSyncedState("selectedScale", null);
-  
-
 
 const likertScales: Record<string, string[]> = {
   fourPointAgreeDisagree: ["Agree", "Somewhat Agree", "Somewhat Disagree", "Disagree"],
@@ -402,10 +372,6 @@ function handleScaleSelection(scaleKey: string) {
       setEntries([...likertScales[scaleKey]]);
   }
 }
-
-
-  
-
   
   function getPSTDateFromVersion(versionDate: string): string {
     const date = new Date(versionDate);
@@ -415,11 +381,8 @@ function handleScaleSelection(scaleKey: string) {
     console.log("DATE", pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
     return pstDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-
   }
   
-  
-
   // Track logId changes
   useEffect(() => {
     console.log("LogId updated:", logId);
@@ -457,8 +420,6 @@ function handleScaleSelection(scaleKey: string) {
     setEditingIndex(updatedEntries.length - 1);
   };
 
-  
-
   const handleVote = async (index: number) => {
     // Update the user's name before proceeding
     updateUserName();
@@ -471,30 +432,52 @@ function handleScaleSelection(scaleKey: string) {
   
     const newVotes = [...votes];
     const newVoters = [...voters];
-  
+    console.log('MULTIVOTE TRUE');
+    console.log(isMultiVoteEnabled);
     // Ensure the user is removed from all other voters arrays
-    newVoters.forEach((voterArray, i) => {
+    
+if (isMultiVoteEnabled) {
+  // Multi-vote ON: Check if user already voted for this option
+  const alreadyVoted = newVoters[index].some(voter => voter.name === userName);
+
+  if (alreadyVoted) {
+      // Remove vote from this option
+      newVoters[index] = newVoters[index].filter(voter => voter.name !== userName);
+      newVotes[index]--;
+  } else {
+      // Add vote to this option
+      newVoters[index] = [...newVoters[index], { name: userName, photoUrl: figma.currentUser?.photoUrl || '' }];
+      newVotes[index]++;
+  }
+} else {
+  // Multi-vote OFF: Ensure the user only votes for one option
+  newVoters.forEach((voterArray, i) => {
       newVoters[i] = voterArray.filter(voter => voter.name !== userName);
       if (userVoteIndex === i) {
-        newVotes[i]--;  // Decrease vote count for the previous option
+          newVotes[i]--;  // Decrease vote count for the previous option
       }
-    });
-  
-    if (userVoteIndex !== index) {
-      // Add the vote to the new option if it's a different one
+  });
+
+  if (userVoteIndex !== index) {
+      // If user is voting for a new option
       newVotes[index]++;
       newVoters[index] = [...newVoters[index], { name: userName, photoUrl: figma.currentUser?.photoUrl || '' }];
       setUserVoteIndex(index);
-    } else {
-      // If the user is unvoting the same option, reset userVoteIndex
+  } else {
+      // If user is unvoting the same option, reset userVoteIndex
       setUserVoteIndex(null);
-    }
+  }
+}
+      // Add the vote to the new option if it's a different one
+ 
+
+      //check if user is already in option voting array and remove vote if true
+
   
     // Update the state with the new votes and voters arrays
     await setVotes(newVotes);
     await setVoters(newVoters);
     
-  
 
     // Calculate total votes after voting and unvoting is handled
     let totalVotes = 0;
@@ -514,9 +497,10 @@ function handleScaleSelection(scaleKey: string) {
 
     console.log(totalVotes);
   
-    console.log("UPDATED POLL");
+    console.log("UPDATED POLL1");
     console.log(updatedPoll);
     console.log(pollId);
+    console.log(votes);
   
     // Wait for the database to update before proceeding
     try {
@@ -542,6 +526,9 @@ function handleScaleSelection(scaleKey: string) {
   const toggleAnonymousVote = () => {
     setIsAnonymous(prevState => !prevState);  // Toggle the value
   };
+  const toggleMultiSelect = () => {
+    setIsMultiVoteEnabled(prevState => !prevState);
+  };
   
   console.log(userName);
   const handleSubmit = async () => {
@@ -557,6 +544,7 @@ function handleScaleSelection(scaleKey: string) {
       })),
       totalVotes: 0,
       isAnonymous: isAnonymous,
+      isMultiVoteEnabled: isMultiVoteEnabled,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -633,7 +621,7 @@ function handleScaleSelection(scaleKey: string) {
       console.log('crown123', isCrownButtonPressed);
       setPublishedAt(getPSTDateFromVersion(widgetVersion));
       console.log("Current publishedAt state:", publishedAt);
-      figma.showUI(__uiFiles__.optionsChat, { width: 500, height: 400 });
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -677,109 +665,30 @@ function handleScaleSelection(scaleKey: string) {
           }
         };
       } else if (msg.type === 'update-width') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-width', payload: widgetWidth });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            console.log("WIDGETWIDTGSET");
-            const updatedWidth = msg.payload.message;
-            setWidgetWidth(parseInt(updatedWidth, 10));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - boxwidth", msg);
+        const updatedText = msg.payload;
+        setWidgetWidth(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-borderWidth') {
-        console.log("calling width from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-borderWidth', payload: borderWidth });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedBorderWidth = msg.payload.message;
-            setBorderWidth(parseInt(updatedBorderWidth, 10));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - borderwidth", msg);
+        const updatedText = msg.payload;
+        setBorderWidth(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
         } else if (msg.type === 'update-borderColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-borderColor', payload: borderColor });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setBorderColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - bordercolor", msg);
+        const updatedText = msg.payload;
+        setBorderColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-promptColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-promptColor', payload: promptColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setPromptColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - promptcolor", msg);
+        const updatedText = msg.payload;
+        setPromptColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-barColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-barColor', payload: barColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setBarColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - barColor", msg);
+        const updatedText = msg.payload;
+        setBarColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-widgetId') {
         console.log("calling prompt from options");
         figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
@@ -803,46 +712,15 @@ function handleScaleSelection(scaleKey: string) {
           }
         };
       } else if (msg.type === 'update-accentColor') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-accentColor', payload: accentColor });
-        console.log("opened");
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setAccentColor(updatedText);
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - accentColor", msg);
+        const updatedText = msg.payload;
+        setAccentColor(updatedText);
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-widgetCornerRadius') {
-        console.log("calling prompt from options");
-        figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-        figma.ui.postMessage({ type: 'edit-widgetCornerRadius', payload: widgetCornerRadius });
-        figma.ui.onmessage = msg => {
-          if (msg.type === 'update-message') {
-            const updatedText = msg.payload.message;
-            setWidgetCornerRadius(Number(updatedText));
-            alreadyLoggedIn = true;
-            setIsCrownButtonPressed(true);
-          } else if (msg.type === 'close-plugin') {
-            console.log("closed");
-            setIsCrownButtonPressed(false);
-            figma.closePlugin();
-          } else if (msg.type === 'back-action') {
-            console.log("back");
-            alreadyLoggedIn = true;
-            handleOptionsClickChat();
-          }
-        };
+        console.log("calling prompt from options - corner radius", msg);
+        const updatedText = msg.payload;
+        setWidgetCornerRadius(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-subheading') {
         console.log("Opening UI for subheading edit");
         figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
@@ -935,8 +813,7 @@ function handleScaleSelection(scaleKey: string) {
           };
       }
       else if (msg.type === 'update-widgetGroup') {
-        console.log(msg.widgetGroup);
-        setWidgetGroup(msg.widgetGroup); // Store in state
+        setWidgetGroup(msg.payload); // Store in state
       }
       
     };
@@ -1041,13 +918,20 @@ function handleScaleSelection(scaleKey: string) {
       direction="vertical"
       verticalAlignItems="start"
       spacing={getWidgetValue(8)}
-      padding={getWidgetValue(8)}
+      padding={getWidgetValue(24)}
       cornerRadius={getWidgetValue(widgetCornerRadius)}
       fill={'#FFFFFF'}
       stroke={borderColor}
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
+      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <Dropdown
+        options={Object.keys(likertScales)}
+        value={selectedScale}
+        onChange={handleScaleSelection}
+      />
+    </AutoLayout>
 
 <AutoLayout
   direction="horizontal"
@@ -1096,12 +980,6 @@ function handleScaleSelection(scaleKey: string) {
   </AutoLayout>
 </AutoLayout>
 
-
-
-      
-  
-      
-  
       {/* Subheading Section */}
       <AutoLayout
   width="fill-parent"
@@ -1130,15 +1008,6 @@ function handleScaleSelection(scaleKey: string) {
     </Text>
   )}
 </AutoLayout>
-  <AutoLayout direction="vertical" spacing={8} padding={8}>
-      <Dropdown
-      options={Object.keys(likertScales)}
-      value={selectedScale}
-      onChange={handleScaleSelection}
-      dropdownWidth={widgetWidth/1.5} 
-      submitted={submitted}
-    />
-    </AutoLayout>
   
       {/* Poll Options */}
       {entries.map((item, index) => (
@@ -1160,6 +1029,7 @@ function handleScaleSelection(scaleKey: string) {
           updateUserName={updateUserName}
           entries={entries}
           pollId={pollId}
+          isMultiVoteEnabled = {isMultiVoteEnabled}
           widgetWidth={widgetWidth}
           barColor={barColor}
           accentColor={accentColor}
@@ -1190,8 +1060,22 @@ function handleScaleSelection(scaleKey: string) {
                         <rect width="16" height="16" rx="2" />
                       </svg>`}
               />
-              <Text fontSize={16} fill="#000000">Vote Anonymously</Text>
+              <Text fontSize={12} fill="#000000">Vote Anonymously</Text>
             </AutoLayout>
+            <AutoLayout
+                    direction="horizontal"
+                    spacing={getWidgetValue(8)}
+                    verticalAlignItems="center"
+                    onClick={toggleMultiSelect}
+                  >
+                    <SVG
+                      src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="${isMultiVoteEnabled ? 'black' : 'none'}" stroke="black" stroke-width="2">
+                              <rect width="16" height="16" rx="2" />
+                            </svg>`}
+                    />
+                    <Text fontSize={12} fill="#000000">Multi Select</Text>
+                  </AutoLayout>
+
           </AutoLayout>
           <AutoLayout
             fill={accentColor}
@@ -1209,18 +1093,18 @@ function handleScaleSelection(scaleKey: string) {
       )}
       
       {submitted && (
+        <>
         <AutoLayout width="fill-parent" padding={{ top: getWidgetValue(10) }}>
           <Text fontSize={choiceFontSize} fill="#808080" width="fill-parent">
             Total votes: {combinedVoters.size}
           </Text>
         </AutoLayout>
+         </>
       )}
 
     </AutoLayout>
     
-  
   );
-  
 }
 
 widget.register(PollingWidget);
