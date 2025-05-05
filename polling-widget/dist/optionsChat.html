@@ -153,16 +153,20 @@
                 <button class="button1" onclick="updateAccentColor()">Set Accent Color</button>
                 <span id="accentColorText" style="margin-left: 8px; font-size: 12px; color: #555;">#e0e0e0</span>
             </div>
-            <div id="headingFontSizeButton" class="button1" onclick="updateHeadingFontSize()">
-                Heading Font Size
-            </div> 
-            
-            <div id="subheadingFontSizeButton" class="button1" onclick="updateSubheadingFontSize()">
-                Subheading Font Size
+
+            <div id="headingFontSizeButton" class="widget-entry-bar">
+                <input type="text" id="headingFontSizeInput" class="input" placeholder="20px">
+                <button class="button1" onclick="updateHeadingFontSize()">Heading Font Size</button>
             </div>
-            
-            <div id="choiceFontSizeButton" class="button1" onclick="updateChoiceFontSize()">
-                Choice/Vote Font Size
+
+            <div id="subheadingFontSizeButton" class="widget-entry-bar">
+                <input type="text" id="subheadingFontSizeInput" class="input" placeholder="14px">
+                <button class="button1" onclick="updateSubheadingFontSize()">Subheading Font Size</button>
+            </div>
+
+            <div id="choiceFontSizeButton" class="widget-entry-bar">
+                <input type="text" id="choiceFontSizeInput" class="input" placeholder="16px">
+                <button class="button1" onclick="updateChoiceFontSize()">Choice/Vote Font Size</button>
             </div>
             
             <div class="container">
@@ -312,16 +316,16 @@
                     console.log("DATE IN UI");
                     document.getElementById('publishedAtDisplay').textContent = payload || "Not Published";
                     break;
-                    case 'current-headingFontSize':
-                    document.getElementById('headingFontSizeButton').innerText = `Heading Font Size: ${payload}px`;
+                case 'current-headingFontSize':
+                    document.getElementById('headingFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
                     break;
-                  case 'current-subheadingFontSize':
-                    document.getElementById('subheadingFontSizeButton').innerText = `Subheading Font Size: ${payload}px`;
+                case 'current-subheadingFontSize':
+                    document.getElementById('subheadingFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
                     break;
-                  case 'current-choiceFontSize':
-                    document.getElementById('choiceFontSizeButton').innerText = `Choice Font Size: ${payload}px`;
+                case 'current-choiceFontSize':
+                    document.getElementById('choiceFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
                     break;
-                  case 'current-widgetGroup':
+                case 'current-widgetGroup':
                     document.getElementById('customWidgetGroupInput').value = payload || "None"; // Display the widget group
                     break;
             }
@@ -432,15 +436,33 @@
             parent.postMessage({ pluginMessage: { type: 'update-subheading' } }, '*');
         }
         function updateHeadingFontSize() {
-            parent.postMessage({ pluginMessage: { type: 'update-headingFontSize' } }, '*');
+            const newHeadingFontSize = document.getElementById('headingFontSizeInput').value.trim();
+          
+            if (newHeadingFontSize) {
+                parent.postMessage({ pluginMessage: { type: 'update-headingFontSize', payload: newHeadingFontSize } }, '*');
+                } else {
+                alert('Please enter a valid font size.');
+            }
         }
         
         function updateSubheadingFontSize() {
-            parent.postMessage({ pluginMessage: { type: 'update-subheadingFontSize' } }, '*');
+            const newSubheadingFontSize = document.getElementById('subheadingFontSizeInput').value.trim();
+          
+            if (newSubheadingFontSize) {
+                parent.postMessage({ pluginMessage: { type: 'update-subheadingFontSize', payload: newSubheadingFontSize } }, '*');
+                } else {
+                alert('Please enter a valid font size.');
+            }
         }
         
         function updateChoiceFontSize() {
-            parent.postMessage({ pluginMessage: { type: 'update-choiceFontSize' } }, '*');
+            const newChoiceFontSize = document.getElementById('choiceFontSizeInput').value.trim();
+          
+            if (newChoiceFontSize) {
+                parent.postMessage({ pluginMessage: { type: 'update-choiceFontSize', payload: newChoiceFontSize } }, '*');
+                } else {
+                alert('Please enter a valid font size.');
+            }
         }
         document.getElementById('setWidgetGroupButton').onclick = () => {
             const customWidgetGroup = document.getElementById('customWidgetGroupInput').value.trim();

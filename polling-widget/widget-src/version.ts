@@ -1,1 +1,1 @@
-export const widgetVersion = '2025-04-30T22:36:21Z';
+export const widgetVersion = '2025-05-05T21:51:08Z';
