@@ -629,7 +629,7 @@ if (isMultiVoteEnabled) {
       console.log('crown123', isCrownButtonPressed);
       setPublishedAt(getPSTDateFromVersion(widgetVersion));
       console.log("Current publishedAt state:", publishedAt);
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 600 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -880,13 +880,16 @@ if (isMultiVoteEnabled) {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-      <AutoLayout direction="vertical" spacing={8} padding={8}>
-      <Dropdown
-        options={Object.keys(likertScales)}
-        value={selectedScale}
-        onChange={handleScaleSelection}
-      />
-    </AutoLayout>
+      {!submitted && (                               
+  <AutoLayout direction="vertical" spacing={8} padding={8}>
+    <Dropdown
+      options={Object.keys(likertScales)}
+      value={selectedScale}
+      onChange={handleScaleSelection}
+    />
+  </AutoLayout>
+)}                                             
+
 
 <AutoLayout
   direction="horizontal"
