@@ -226,23 +226,24 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           width={submitted && !isQuestion ? "hug-contents" : "fill-parent"}
           height='hug-contents'
         >
-          {isEditing ? (
+          {submitted ? (
+            <Text
+              fontSize={isQuestion ? fontSize : fontSize - 4}
+              fontWeight={isQuestion ? "bold" : "normal"}
+              width="fill-parent"
+              fill={promptColor}
+            >
+              {value}
+            </Text>
+          ) : (
             <Input
               value={value}
-              onTextEditEnd={handleEditEnd}
+              onTextEditEnd={e => onValueChange(index, e.characters)}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
-              cornerRadius={getWidgetValue(12)}
               width="fill-parent"
               fontSize={isQuestion ? fontSize : fontSize - 4}
+              cornerRadius={getWidgetValue(12)}
             />
-          ) : (
-            <Text 
-              fontSize={isQuestion ? fontSize : fontSize - 4} 
-              fontWeight={isQuestion ? 'bold' : 'normal'}
-              width={submitted && !isQuestion ? "hug-contents" : "fill-parent"} 
-              fill={promptColor}>
-              {value || (isQuestion ? "Enter poll question" : "Enter option")}
-            </Text>
           )}
         </AutoLayout>
         {!isQuestion && !submitted && onRemove && (
@@ -367,11 +368,18 @@ const likertScales: Record<string, string[]> = {
 
 
 function handleScaleSelection(scaleKey: string) {
-  if (likertScales[scaleKey]) {
-      setSelectedScale(scaleKey);
-      setEntries([...likertScales[scaleKey]]);
-  }
+  if (!likertScales[scaleKey]) return;
+
+  const opts = likertScales[scaleKey];
+  setSelectedScale(scaleKey);
+  setEntries(opts);
+
+  // 🆕 keep the companion state arrays in sync
+  setVotes(new Array(opts.length).fill(0));
+  setVoters(new Array(opts.length).fill([]));
+  setUserVoteIndex(null);          // if you use single-vote mode
 }
+
   
   function getPSTDateFromVersion(versionDate: string): string {
     const date = new Date(versionDate);
@@ -946,26 +954,27 @@ if (isMultiVoteEnabled) {
   onClick={() => !submitted && setEditingIndex(-1)} // Prevent editing if submitted
   padding={{ left: getWidgetValue(2) }}
 >
-  {editingIndex === -1 ? (
-    <Input
-      value={title}
-      onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
-      placeholder="Enter poll title"
-      width="fill-parent"
-      fontSize={headingFontSize}
-      fontWeight="bold"
-      horizontalAlignText="left"
-    />
-  ) : (
-    <Text
-      fontSize={headingFontSize}
-      fontWeight="bold"
-      width="fill-parent"
-      horizontalAlignText="left"
-    >
-      {title || "Enter poll title"}
-    </Text>
-  )}
+{submitted ? (
+  <Text
+    fontSize={headingFontSize}
+    fontWeight="bold"
+    width="fill-parent"
+    horizontalAlignText="left"
+  >
+    {title || "Enter poll title"}
+  </Text>
+) : (
+  <Input
+    value={title}
+    onTextEditEnd={e => setTitle(e.characters)}
+    placeholder="Enter poll title"
+    width="fill-parent"
+    fontSize={headingFontSize}
+    fontWeight="bold"
+    horizontalAlignText="left"
+  />
+)}
+
 </AutoLayout>
 
   {/* Crown button aligned to the end */}
@@ -986,27 +995,25 @@ if (isMultiVoteEnabled) {
   verticalAlignItems="center"
   onClick={() => !submitted && setEditingIndex(-2)} // Prevent editing if submitted
 >
-  {editingIndex === -2 ? (
-    <Input
-      value={subheading}
-      onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
-      placeholder="Enter subheading"
-      width="fill-parent"
-      fontSize={subheadingFontSize}
-      fontWeight="normal"
-      fill="#666666"
-    />
-  ) : (
-    <Text
-      fontSize={subheadingFontSize}
-      fontWeight="normal"
-      width="fill-parent"
-      horizontalAlignText="left"
-      fill="#666666"
-    >
-      {subheading || "Enter subheading"}
-    </Text>
-  )}
+  {submitted ? (
+  <Text
+    fontSize={subheadingFontSize}
+    width="fill-parent"
+    horizontalAlignText="left"
+    fill="#666"
+  >
+    {subheading || "Enter subheading"}
+  </Text>
+) : (
+  <Input
+    value={subheading}
+    onTextEditEnd={e => setSubheading(e.characters)}
+    placeholder="Enter subheading"
+    width="fill-parent"
+    fontSize={subheadingFontSize}
+    fill="#666"
+  />
+)}
 </AutoLayout>
   
       {/* Poll Options */}
