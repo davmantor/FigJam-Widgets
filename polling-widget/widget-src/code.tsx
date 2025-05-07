@@ -752,73 +752,20 @@ if (isMultiVoteEnabled) {
             }
         };}
         else if (msg.type === 'update-headingFontSize') {
-          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-          figma.ui.postMessage({ type: 'edit-headingFontSize', payload: headingFontSize.toString() });
-      
-          figma.ui.onmessage = msg => {
-              if (msg.type === 'update-message') {
-                  setHeadingFontSize(Number(msg.payload.message));
-                  alreadyLoggedIn = true;
-
-                  setIsCrownButtonPressed(true);
-
-              }
-              else if (msg.type === 'close-plugin') {
-                console.log("closed");
-                setIsCrownButtonPressed(false);
-                figma.closePlugin();
-            } else if (msg.type === 'back-action') {
-                console.log("back");
-                alreadyLoggedIn = true;
-                handleOptionsClickChat();
-            }
-          };
+          console.log("calling prompt from options - headingFontSize", msg);
+        const updatedText = msg.payload;
+        setHeadingFontSize(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-subheadingFontSize') {
-          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-          figma.ui.postMessage({ type: 'edit-subheadingFontSize', payload: subheadingFontSize.toString() });
-      
-          figma.ui.onmessage = msg => {
-              if (msg.type === 'update-message') {
-                  setSubheadingFontSize(Number(msg.payload.message));
-                  alreadyLoggedIn = true;
-
-                  setIsCrownButtonPressed(true);
-
-              }
-              else if (msg.type === 'close-plugin') {
-                console.log("closed");
-                setIsCrownButtonPressed(false);
-                figma.closePlugin();
-            } else if (msg.type === 'back-action') {
-                console.log("back");
-                alreadyLoggedIn = true;
-                handleOptionsClickChat();
-                setIsCrownButtonPressed(true);
-
-            }
-          };
+        console.log("calling prompt from options - subheadingFontSize", msg);
+        const updatedText = msg.payload;
+        setSubheadingFontSize(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       } else if (msg.type === 'update-choiceFontSize') {
-          figma.showUI(__uiFiles__.main, { width: 400, height: 300 });
-          figma.ui.postMessage({ type: 'edit-choiceFontSize', payload: choiceFontSize.toString() });
-      
-          figma.ui.onmessage = msg => {
-              if (msg.type === 'update-message') {
-                  setChoiceFontSize(Number(msg.payload.message));
-                  alreadyLoggedIn = true;
-                  setIsCrownButtonPressed(true);
-
-
-              }
-              else if (msg.type === 'close-plugin') {
-                console.log("closed");
-                setIsCrownButtonPressed(false);
-                figma.closePlugin();
-            } else if (msg.type === 'back-action') {
-                console.log("back");
-                alreadyLoggedIn = true;
-                handleOptionsClickChat();
-            }
-          };
+        console.log("calling prompt from options - choiceFontSize", msg);
+        const updatedText = msg.payload;
+        setChoiceFontSize(parseInt(updatedText, 10));
+        alreadyLoggedIn = true;
       }
       else if (msg.type === 'update-widgetGroup') {
         setWidgetGroup(msg.payload); // Store in state
