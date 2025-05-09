@@ -280,25 +280,20 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
             />
             </AutoLayout>
           ))}
-           {displayedVoters.length >= 4 && (
+           {displayedVoters.length >= 4 && additionalVotes > 0 && (
             <AutoLayout
                    fill="#808080"
                   verticalAlignItems="center"
                   horizontalAlignItems="center"
-                  tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
+                  tooltip={voters.slice(4).map(voter => voter.name).join(', ')}
                   >
                     <Text fontSize={12} fill="#FFFFFF">
-                    + {displayedVoters.length + additionalVotes - 4}
+                    +{additionalVotes}
                     </Text>
                     </AutoLayout>
             )
             }
 
-          {additionalVotes > 0 && (
-            <Text fontSize={getWidgetValue(28)} fill="#000000">
-              +{additionalVotes}
-            </Text>
-          )}
         </AutoLayout>
         
         )}
