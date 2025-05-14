@@ -226,24 +226,23 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
           width={submitted && !isQuestion ? "hug-contents" : "fill-parent"}
           height='hug-contents'
         >
-          {submitted ? (
-            <Text
-              fontSize={isQuestion ? fontSize : fontSize - 4}
-              fontWeight={isQuestion ? "bold" : "normal"}
-              width="fill-parent"
-              fill={promptColor}
-            >
-              {value}
-            </Text>
-          ) : (
+          {isEditing ? (
             <Input
               value={value}
-              onTextEditEnd={e => onValueChange(index, e.characters)}
+              onTextEditEnd={handleEditEnd}
               placeholder={isQuestion ? "Enter poll question" : "Enter option"}
+              cornerRadius={getWidgetValue(12)}
               width="fill-parent"
               fontSize={isQuestion ? fontSize : fontSize - 4}
-              cornerRadius={getWidgetValue(12)}
             />
+          ) : (
+            <Text 
+              fontSize={isQuestion ? fontSize : fontSize - 4} 
+              fontWeight={isQuestion ? 'bold' : 'normal'}
+              width={submitted && !isQuestion ? "hug-contents" : "fill-parent"} 
+              fill={promptColor}>
+              {value || (isQuestion ? "Enter poll question" : "Enter option")}
+            </Text>
           )}
         </AutoLayout>
         {!isQuestion && !submitted && onRemove && (
@@ -280,20 +279,25 @@ const additionalVotes = (voters?.length || 0) - displayedVoters.length;
             />
             </AutoLayout>
           ))}
-           {displayedVoters.length >= 4 && additionalVotes > 0 && (
+           {displayedVoters.length >= 4 && (
             <AutoLayout
                    fill="#808080"
                   verticalAlignItems="center"
                   horizontalAlignItems="center"
-                  tooltip={voters.slice(4).map(voter => voter.name).join(', ')}
+                  tooltip= {voters.slice(4).map(voter => voter.name).join(', ')}
                   >
                     <Text fontSize={12} fill="#FFFFFF">
-                    +{additionalVotes}
+                    + {displayedVoters.length + additionalVotes - 4}
                     </Text>
                     </AutoLayout>
             )
             }
 
+          {additionalVotes > 0 && (
+            <Text fontSize={getWidgetValue(28)} fill="#000000">
+              +{additionalVotes}
+            </Text>
+          )}
         </AutoLayout>
         
         )}
@@ -351,7 +355,6 @@ function PollingWidget() {
     'publishedAt',
     getPSTDateFromVersion(widgetVersion)
   );
-  const [widgetGroup, setWidgetGroup] = useSyncedState<string>('widgetGroup',"");
   const [selectedScale, setSelectedScale] = useSyncedState("selectedScale", null);
 
 const likertScales: Record<string, string[]> = {
@@ -363,18 +366,11 @@ const likertScales: Record<string, string[]> = {
 
 
 function handleScaleSelection(scaleKey: string) {
-  if (!likertScales[scaleKey]) return;
-
-  const opts = likertScales[scaleKey];
-  setSelectedScale(scaleKey);
-  setEntries(opts);
-
-  // 🆕 keep the companion state arrays in sync
-  setVotes(new Array(opts.length).fill(0));
-  setVoters(new Array(opts.length).fill([]));
-  setUserVoteIndex(null);          // if you use single-vote mode
+  if (likertScales[scaleKey]) {
+      setSelectedScale(scaleKey);
+      setEntries([...likertScales[scaleKey]]);
+  }
 }
-
   
   function getPSTDateFromVersion(versionDate: string): string {
     const date = new Date(versionDate);
@@ -505,25 +501,6 @@ if (isMultiVoteEnabled) {
     console.log(pollId);
     console.log(votes);
   
-    // Wait for the database to update before proceeding
-    try {
-      console.log("I AM ENTERING THE TRY CATCH")
-      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/${pollId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedPoll),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      console.log('Database updated successfully');
-    } catch (error) {
-      console.error('Error updating poll:', error);
-    }
   };
 
   const toggleAnonymousVote = () => {
@@ -551,35 +528,6 @@ if (isMultiVoteEnabled) {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-  
-    try {
-      console.log(JSON.stringify(pollData));
-      // Send the data to the server to create a new poll
-      const response = await fetch('https://figjam-widgets-myhz.onrender.com/polls/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(pollData),  // Convert poll data to JSON string
-      });
-      console.log("POLL DATA");
-      console.log(JSON.stringify(pollData));
-  
-      // Check if the request was successful
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      // Optionally, handle the server response if needed
-      const data = await response.json();
-      console.log("THIS IS THE DATA" + JSON.stringify(data))
-      setPollId(data.pollId);
-      setLogId(data.logId);
-
-      console.log('Poll created successfully:', data);
-    } catch (error) {
-      console.error('Error creating poll:', error);
-    }
 
     // Set UI states
     setEntries(entries.map(entry => entry));
@@ -624,7 +572,7 @@ if (isMultiVoteEnabled) {
       console.log('crown123', isCrownButtonPressed);
       setPublishedAt(getPSTDateFromVersion(widgetVersion));
       console.log("Current publishedAt state:", publishedAt);
-      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 600 });
+      figma.showUI(__uiFiles__.optionsChat, { width: 400, height: 165 });
     figma.ui.postMessage({ type: 'alreadyLoggedIn',            payload: alreadyLoggedIn });
     figma.ui.postMessage({ type: 'current-widthValue',         payload: widgetWidth });
     figma.ui.postMessage({ type: 'current-borderWidthValue',   payload: borderWidth });
@@ -642,7 +590,6 @@ if (isMultiVoteEnabled) {
     figma.ui.postMessage({ type: 'current-headingFontSize', payload: headingFontSize });
     figma.ui.postMessage({ type: 'current-subheadingFontSize', payload: subheadingFontSize });
     figma.ui.postMessage({ type: 'current-choiceFontSize', payload: choiceFontSize });
-    figma.ui.postMessage({ type: 'current-widgetGroup', payload: widgetGroup });
     
 
     figma.ui.onmessage = async (msg) => {
@@ -762,9 +709,6 @@ if (isMultiVoteEnabled) {
           setChoiceFontSize(parseInt(updatedText, 10));
           alreadyLoggedIn = true;
       }
-      else if (msg.type === 'update-widgetGroup') {
-        setWidgetGroup(msg.payload); // Store in state
-      }
       
     };
   }})
@@ -781,37 +725,6 @@ if (isMultiVoteEnabled) {
     console.log(pollId)
     setLogId(widgetId); // Update the logId state with the new widgetId
     console.log("THIS IS THE WIDGET ID" + logId);
-    try {
-      // Make the PUT request to the server to check if the poll exists or update the ID
-      const response = await fetch(`https://figjam-widgets-myhz.onrender.com/polls/update-id/${pollId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newMessageObject),
-      });
-      console.log("pollId being used for update:", pollId);  // Log the pollId being used for findById
-  
-      // Parse the response from the server
-      const responseData = await response.json();
-      console.log(responseData);
-      // Check if the response is successful
-      if (response.status === 200) {
-        if (responseData.status === 'exists') {
-          // If the poll already exists, populate the widget with existing poll data
-          console.log('Poll already exists:', responseData.poll);
-          populateWidgetData(responseData.poll); // Call the function to update widget with poll data
-          console.log('LogId after update:', logId);
-
-        } else {
-          // If the poll was successfully updated with the new ID
-          console.log('Poll ID updated successfully');
-          console.log('LogId after update:', logId);
-        }
-      }
-    } catch (error) {
-      console.error('Error updating or retrieving poll ID');
-    }
   };
   
   // Helper function to populate widget with poll data
@@ -875,16 +788,13 @@ if (isMultiVoteEnabled) {
       strokeWidth={getWidgetValue(borderWidth)}
       width={widgetWidth}
     >
-      {!submitted && (                               
-  <AutoLayout direction="vertical" spacing={8} padding={8}>
-    <Dropdown
-      options={Object.keys(likertScales)}
-      value={selectedScale}
-      onChange={handleScaleSelection}
-    />
-  </AutoLayout>
-)}                                             
-
+      <AutoLayout direction="vertical" spacing={8} padding={8}>
+      <Dropdown
+        options={Object.keys(likertScales)}
+        value={selectedScale}
+        onChange={handleScaleSelection}
+      />
+    </AutoLayout>
 
 <AutoLayout
   direction="horizontal"
@@ -899,27 +809,26 @@ if (isMultiVoteEnabled) {
   onClick={() => !submitted && setEditingIndex(-1)} // Prevent editing if submitted
   padding={{ left: getWidgetValue(2) }}
 >
-{submitted ? (
-  <Text
-    fontSize={headingFontSize}
-    fontWeight="bold"
-    width="fill-parent"
-    horizontalAlignText="left"
-  >
-    {title || "Enter poll title"}
-  </Text>
-) : (
-  <Input
-    value={title}
-    onTextEditEnd={e => setTitle(e.characters)}
-    placeholder="Enter poll title"
-    width="fill-parent"
-    fontSize={headingFontSize}
-    fontWeight="bold"
-    horizontalAlignText="left"
-  />
-)}
-
+  {editingIndex === -1 ? (
+    <Input
+      value={title}
+      onTextEditEnd={(e) => handleValueChange(-1, e.characters)}
+      placeholder="Enter poll title"
+      width="fill-parent"
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      horizontalAlignText="left"
+    />
+  ) : (
+    <Text
+      fontSize={headingFontSize}
+      fontWeight="bold"
+      width="fill-parent"
+      horizontalAlignText="left"
+    >
+      {title || "Enter poll title"}
+    </Text>
+  )}
 </AutoLayout>
 
   {/* Crown button aligned to the end */}
@@ -940,25 +849,27 @@ if (isMultiVoteEnabled) {
   verticalAlignItems="center"
   onClick={() => !submitted && setEditingIndex(-2)} // Prevent editing if submitted
 >
-  {submitted ? (
-  <Text
-    fontSize={subheadingFontSize}
-    width="fill-parent"
-    horizontalAlignText="left"
-    fill="#666"
-  >
-    {subheading || "Enter subheading"}
-  </Text>
-) : (
-  <Input
-    value={subheading}
-    onTextEditEnd={e => setSubheading(e.characters)}
-    placeholder="Enter subheading"
-    width="fill-parent"
-    fontSize={subheadingFontSize}
-    fill="#666"
-  />
-)}
+  {editingIndex === -2 ? (
+    <Input
+      value={subheading}
+      onTextEditEnd={(e) => handleValueChange(-2, e.characters)}
+      placeholder="Enter subheading"
+      width="fill-parent"
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      fill="#666666"
+    />
+  ) : (
+    <Text
+      fontSize={subheadingFontSize}
+      fontWeight="normal"
+      width="fill-parent"
+      horizontalAlignText="left"
+      fill="#666666"
+    >
+      {subheading || "Enter subheading"}
+    </Text>
+  )}
 </AutoLayout>
   
       {/* Poll Options */}
