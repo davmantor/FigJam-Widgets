@@ -45,7 +45,12 @@
   var { useEffect, useSyncedState, waitForTask, Text, Input, AutoLayout, SVG, Image } = widget;
   function timeString(time) {
     const date = new Date(time);
-    const timeString2 = date.toLocaleTimeString("en-US").replace(/^0/, "").replace(/:\d{2} /, " ");
+    const ampm = date.getHours() >= 12 ? "PM" : "AM";
+    let minutes = date.getMinutes().toString();
+    if (minutes.length < 2) {
+      minutes = "0" + minutes;
+    }
+    const timeString2 = `${date.getHours() % 12 || 12}:${minutes} ${ampm}`;
     const dateString = `${date.getMonth() + 1}/${date.getDate()}`;
     return `${dateString} ${timeString2}`;
   }
@@ -76,7 +81,7 @@
     const [borderWidth, setBorderWidth] = useSyncedState("borderWidth", 1);
     const [fontSize, setFontSize] = useSyncedState("fontSize", 16);
     const [userName, setUserName] = useSyncedState("userName", "");
-    const [timestamp, setTimestamp] = useSyncedState("timestamp", 0);
+    const [timestamp, setTimestamp] = useSyncedState("timestamp", "1970-01-01T00:00:00.000Z");
     const [userPhotoUrl, setUserPhotoUrl] = useSyncedState("userPhotoUrl", null);
     const [shadowColor, setShadowColor] = useSyncedState("shadowColor", "#000000");
     const [shadowOffsetX, setShadowOffsetX] = useSyncedState("shadowOffsetX", 0);
@@ -84,8 +89,12 @@
     const [shadowBlur, setShadowBlur] = useSyncedState("shadowBlur", 10);
     const [shadowSpread, setShadowSpread] = useSyncedState("shadowSpread", 0);
     const [scrollIndex, setScrollIndex] = useSyncedState("scrollIndex", 0);
-    const calculateItemHeight = (response2) => Math.max(50, response2.length / 2);
-    const itemsPerPage = Math.floor(height / 50);
+    const calculateItemHeight = (response2) => {
+      const charactersPerLine = width / (fontSize * 0.6);
+      const lines = Math.ceil(response2.length / charactersPerLine);
+      return Math.max(50, lines * (fontSize + 6));
+    };
+    const itemsPerPage = 1;
     const handleScrollUp = () => {
       setScrollIndex((prev) => Math.max(0, prev - 1));
     };
@@ -158,6 +167,9 @@
         }
         if (msg.type === "duplicateAll") {
           waitForTask(handleDuplicateAll());
+        }
+        if (msg.type === "duplicateGroup") {
+          waitForTask(handleDuplicateAll(msg.widgetGroup));
         }
         if (msg.type === "setWidgetId") {
           setWidgetId(msg.widgetId);
@@ -237,15 +249,18 @@
       clone.y = node.absoluteTransform[1][2] + 20;
       figma.ui.postMessage({ type: "duplicate", status: "success" });
     });
-    const handleDuplicateAll = () => __async(this, null, function* () {
+    const handleDuplicateAll = (group) => __async(this, null, function* () {
       const nodes = figma.currentPage.findAll((node) => node.type === "WIDGET" && node.name === "Text Entry Widget");
       for (const node of nodes) {
+        if (group && node.widgetSyncedState.widgetGroup !== group) {
+          continue;
+        }
         console.log("duplicating widget", node.widgetSyncedState.widgetId);
         const clone = node.cloneWidget({});
         clone.x = node.absoluteTransform[0][2] + 20;
         clone.y = node.absoluteTransform[1][2] + 20;
       }
-      figma.ui.postMessage({ type: "duplicateAll", status: "success" });
+      figma.ui.postMessage({ type: "duplicateAll", group: !!group, status: "success" });
     });
     const handleSubmit = () => __async(this, null, function* () {
       var _a, _b;
@@ -272,7 +287,10 @@
         });
         const result = yield res.json();
         if (res.status === 200) {
-          setPreviousResponses(result.widget.previous);
+          const sortedResponses = result.widget.previous.sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          );
+          setPreviousResponses(sortedResponses);
           setShowPrevious(result.widget.showPrevious);
           setTimestamp(result.widget.current.timestamp);
         } else {
@@ -313,12 +331,19 @@
       console.log("refresh inside", currentWidgetId);
       const responses = yield getRefreshedResponses(currentWidgetId);
       if (responses !== null) {
-        setPreviousResponses(responses.previous);
+        const sortedResponses = responses.previous.sort(
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        setPreviousResponses(sortedResponses);
         setShowPrevious(responses.showPrevious);
-        if (responses.current) {
+        if (responses.current && responses.current.response) {
+          setSubmitted(true);
           setResponse(responses.current.response);
           setUserName(responses.current.userName);
+          setTimestamp(responses.current.timestamp);
           setUserPhotoUrl(responses.current.photoUrl || null);
+        } else {
+          setSubmitted(false);
         }
       }
     });
@@ -501,7 +526,20 @@
             height: calculateItemHeight(prev.response)
           },
           prev.photoUrl ? /* @__PURE__ */ figma.widget.h(Image, { src: prev.photoUrl, width: 20, height: 20, cornerRadius: 10 }) : /* @__PURE__ */ figma.widget.h(SVG, { src: AnonSVG, width: 20, height: 20 }),
-          /* @__PURE__ */ figma.widget.h(Text, { fontSize: 16, fill: "#333", width: "fill-parent" }, prev.userName, ": ", prev.response)
+          /* @__PURE__ */ figma.widget.h(
+            Text,
+            {
+              fontSize: 16,
+              fill: "#333",
+              width: "fill-parent",
+              verticalAlignText: "top",
+              horizontalAlignText: "left",
+              textAutoResize: "height"
+            },
+            prev.userName,
+            ": ",
+            prev.response
+          )
         ))
       ), /* @__PURE__ */ figma.widget.h(
         AutoLayout,
