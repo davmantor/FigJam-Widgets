@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Menu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
+      color: #333;
+      width: 100%;
+      height: 100%;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
+      padding: 20px;
+      overflow: auto;
+    }
+    .button-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .button:hover {
+      background-color: #0056b3;
+    }
+
+    .button.danger {
+      background-color: #dc3545;
+    }
+    .button.danger:hover {
+      background-color: #bd2130;
+    }
+    
+    .label {
+      font-size: 18px;
+      margin: 10px 0 5px;
+    }
+    .input {
+      padding: 10px;
+      margin: 5px 0 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    .input-small {
+      width: 30%;
+    }
+    .input-large {
+      width: 100%;
+      height: auto;
+      resize: vertical;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .input-label {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .new-response {
+      display: flex;
+      flex-direction: column;
+      background-color: #f1f1f1;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+    }
+    #adminMenu {
+      display: none;
+    }
+    #passwordScreen {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .response-container {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0;
+      width: 100%;
+    }
+    .response-item {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      background-color: #f1f1f1;
+      border: 1px solid #d1d1d1;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .response-item > * {
+      padding: 10px;
+    }
+    .response-header {
+      cursor: pointer;
+      background-color: #e1e1e1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+    .response-header .header-text {
+      white-space: nowrap;
+    }
+    .response-header .header-text-content {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #888;
+      flex-grow: 1;
+    }
+    .response-header img {
+      width: 24px;
+      height: 24px;
+      background-color: #222;
+      border-radius: 100%;
+      flex-shrink: 0;
+    }
+    .response-header .timestamp {
+      margin-left: 5px;
+      white-space: pre;
+      font-size: 12px;
+      text-align: center;
+    }
+    .response-header.current-response {
+      background-color: transparent;
+    }
+    .response-header .current-response-label {
+      background-color: #444;
+      color: white;
+      border-radius: 100px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      padding: 4px 10px;
+
+    }
+    .response-content {
+      display: none;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+    .widget-details-container {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-start;
+      white-space: nowrap;
+    }
+
+    .widget-details-container label {
+      margin-right: 10px;
+    }
+    
+    .widget-details-container input {
+      margin-right: 10px;
+      flex-grow: 1;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .shake {
+      animation: shakeAnimation 0.5s;
+    }
+    
+    @keyframes shakeAnimation {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    
+   
+    
+  </style>
+</head>
+<body>
+  <div id="passwordScreen">
+    <label class="label" for="passwordInput">Enter Password:</label>
+    <input class="input" onkeyup="if (event.key === 'Enter') checkPin()" type="password" id="passwordInput">
+    <button class="button" onclick="checkPin()" id="submitPasswordButton">Submit</button>
+  </div>
+  
+  
+  <div class="container" id="adminMenu">
+    <div class="button-container">
+      <button class="button" id="refreshButton" onclick="refresh()">Refresh</button>
+      <button class="button" id="revealOnlyButton">Reveal</button> <!-- New Reveal Only Button -->
+      <button class="button" id="revealAllButton">Reveal All</button>
+      <button class="button danger" id="resetResponseButton">Reset</button>
+      <button class="button danger" id="resetAllButton">Reset All</button>
+    </div>
+
+      
+    <div class="widget-details-container">
+      <label for="customWidgetIdInput">Widget ID:</label>
+      <input type="text" id="customWidgetIdInput" width="45ch" class="input" placeholder="Enter Widget ID">
+      <button class="button" id="setWidgetIdButton">Set Widget ID</button>
+    </div>
+
+    <div class="new-response">
+      <h3 style="margin-top: 0">New response</h3>
+      <input class="input input-small" type="text" placeholder="User Name" id="newUserNameInput">
+      <textarea class="input input-large" placeholder="Response" id="newResponseInput"></textarea>
+      <button class="button" id="addResponseButton">Add Response</button>
+      
+    </div>
+    <div id="previousResponsesContainer" class="response-container"></div>
+    
+    <h2>Widget appearance</h2>
+
+    <div>
+      <label class="label" for="widthInput">Dimensions:</label>
+      <div class="button-container">
+        <input class="input" type="number" id="widthInput" value="1020">
+        <span>x</span>
+        <input class="input" type="number" id="heightInput" value="235">
+      </div>
+    </div>
+    <div>
+      <label class="label" for="borderColorInput">Border Color:</label>
+      <input class="input" type="color" id="borderColorInput" value="#000000">
+    </div>
+    <div>
+      <label class="label" for="borderWidthInput">Border Width:</label>
+      <input class="input" type="number" id="borderWidthInput" value="1">
+    </div>
+    <div>
+      <label class="label" for="fontSizeInput">Font Size:</label>
+      <input class="input" type="number" id="fontSizeInput" value="16">
+    </div>
+
+    
+
+    <div>
+      <label class="label" for="shadowColorInput">Shadow Color:</label>
+      <input class="input" type="color" id="shadowColorInput" value="#000000">
+    </div>
+    <div>
+      <label class="label" for="shadowOffsetXInput">Shadow Offset X:</label>
+      <input class="input" type="number" id="shadowOffsetXInput" value="0">
+    </div>
+    <div>
+      <label class="label" for="shadowOffsetYInput">Shadow Offset Y:</label>
+      <input class="input" type="number" id="shadowOffsetYInput" value="2">
+    </div>
+    <div>
+      <label class="label" for="shadowBlurInput">Shadow Blur:</label>
+      <input class="input" type="number" id="shadowBlurInput" value="10">
+    </div>
+    <div>
+      <label class="label" for="shadowSpreadInput">Shadow Spread:</label>
+      <input class="input" type="number" id="shadowSpreadInput" value="0">
+    </div>
+
+    <h2 style="margin-bottom: 0">Update widgets</h2>
+    <p>These options will help you update widgets to the latest version. No data should be lost, but double check each widget if you're unsure.</p>
+    <div class="button-container">
+      <button class="button danger" id="duplicateButton">Duplicate this widget</button>
+      <button class="button danger" id="duplicateAllButton">Duplicate ALL widgets</button>
+    </div>
+  </div>
+
+  
+
+
+  <div id="popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); z-index: 1000;">
+    <p>Unsaved changes! Do you want to save them?</p>
+    <button class="button" id="popupSaveButton">Save</button>
+    <button class="button" id="popupCancelButton">Cancel</button>
+  </div>
+
+  
+  
+  <script>
+    const revealAllButton = document.getElementById('revealAllButton');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const borderColorInput = document.getElementById('borderColorInput');
+    const borderWidthInput = document.getElementById('borderWidthInput');
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    let passwordScreen = document.getElementById('passwordScreen');
+    const adminMenu = document.getElementById('adminMenu');
+    const submitPasswordButton = document.getElementById('submitPasswordButton');
+    let passwordInput = document.getElementById('passwordInput');
+    const previousResponsesContainer = document.getElementById('previousResponsesContainer');
+    const newResponseInput = document.getElementById('newResponseInput');
+    const newUserNameInput = document.getElementById('newUserNameInput');
+    const addResponseButton = document.getElementById('addResponseButton');
+    const popup = document.getElementById('popup');
+    const popupSaveButton = document.getElementById('popupSaveButton');
+    const popupCancelButton = document.getElementById('popupCancelButton');
+    const resetResponseButton = document.getElementById('resetResponseButton');
+    const resetAllButton = document.getElementById('resetAllButton');
+    const setWidgetIdButton = document.getElementById('setWidgetIdButton');
+    const customWidgetIdInput = document.getElementById('customWidgetIdInput');
+    const duplicateButton = document.getElementById('duplicateButton');
+    const duplicateAllButton = document.getElementById('duplicateAllButton');
+
+    const AnonSVG = `<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 256 256" xml:space="preserve">
+<defs>
+</defs>
+<g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+	<path d="M 45 88 c -11.049 0 -21.18 -2.003 -29.021 -8.634 C 6.212 71.105 0 58.764 0 45 C 0 20.187 20.187 0 45 0 c 24.813 0 45 20.187 45 45 c 0 13.765 -6.212 26.105 -15.979 34.366 C 66.181 85.998 56.049 88 45 88 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(214,214,214); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 60.71 c -11.479 0 -20.818 -9.339 -20.818 -20.817 c 0 -11.479 9.339 -20.818 20.818 -20.818 c 11.479 0 20.817 9.339 20.817 20.818 C 65.817 51.371 56.479 60.71 45 60.71 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<path d="M 45 90 c -10.613 0 -20.922 -3.773 -29.028 -10.625 c -0.648 -0.548 -0.88 -1.444 -0.579 -2.237 C 20.034 64.919 31.933 56.71 45 56.71 s 24.966 8.209 29.607 20.428 c 0.301 0.793 0.069 1.689 -0.579 2.237 C 65.922 86.227 55.613 90 45 90 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(165,164,164); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+</g>
+</svg>`;
+
+    let password;
+    let widgetId;
+    let unsavedResponse = null;
+    let unsavedUserName = null;
+    let currentEditingIndex = null;
+    let params = null;
+
+    window.onmessage = (event) => {
+      const message = event.data.pluginMessage;
+      if (message.type === 'initialize') {
+        widgetId = message.widgetId;
+        params = message.params;
+        console.log('Received params from widget:', params);
+        updateParameters(params);
+        fetchPreviousResponses();
+      }
+
+      if (message.type === 'updateResponse') {
+        setPreviousResponses(message.ret);
+      }
+
+      if (message.type === 'editCurrent') {
+        setResponse(message.ret.response);
+        setUserName(message.ret.userName);
+        setUserPhotoUrl(message.ret.photoUrl || null);
+        setSubmitted(true);
+      }
+    };
+
+    function customAlert(message) {
+      const modal = document.createElement('div');
+      modal.classList.add('modal');
+      modal.onclick = () => {
+        modal.remove();
+      };
+      const modalContent = document.createElement('div');
+      modalContent.onclick = (event) => {
+        event.stopPropagation();
+      }
+      modalContent.classList.add('modal-content');
+      modalContent.innerHTML = `<p>${message}</p>`;
+      const closeButton = document.createElement('button');
+      closeButton.innerText = 'Close';
+      closeButton.onclick = () => {
+        modal.remove();
+      };
+      modalContent.appendChild(closeButton);
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+    }
+
+    async function customConfirm(message) {
+      return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.onclick = () => {
+          modal.remove();
+          resolve(false);
+        };
+        const modalContent = document.createElement('div');
+        modalContent.onclick = (event) => {
+          event.stopPropagation();
+        }
+        modalContent.classList.add('modal-content');
+        modalContent.innerHTML = `<p>${message}</p>`;
+        const modalButtonRow = document.createElement('div');
+        modalButtonRow.classList.add('btn-row');
+        const confirmButton = document.createElement('button');
+        confirmButton.classList.add('button');
+        confirmButton.innerText = 'Confirm';
+        const cancelButton = document.createElement('button');
+        cancelButton.classList.add('button');
+        cancelButton.classList.add('danger');
+        cancelButton.innerText = 'Cancel';
+        confirmButton.onclick = () => {
+          modal.remove();
+          resolve(true);
+        };
+        cancelButton.onclick = () => {
+          modal.remove();
+          resolve(false);
+        };
+        modalButtonRow.appendChild(confirmButton);
+        modalButtonRow.appendChild(cancelButton);
+        modalContent.appendChild(modalButtonRow);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+      })
+    }
+    
+
+    function updateParameters(params) {
+      if (params) {
+        console.log("updated params", params.width);
+        widthInput.value = params.width;
+        heightInput.value = params.height;
+        borderColorInput.value = params.borderColor;
+        borderWidthInput.value = params.borderWidth;
+        fontSizeInput.value = params.fontSize;
+        shadowColorInput.value = params.shadowColor;
+        shadowOffsetXInput.value = params.shadowOffsetX;
+        shadowOffsetYInput.value = params.shadowOffsetY;
+        shadowBlurInput.value = params.shadowBlur;
+        shadowSpreadInput.value = params.shadowSpread;
+      }
+    }
+    
+    var correctPin = "qN5%QaDp"; // Set your desired PIN here
+    var deleteConfirmation = false;
+    passwordInput.focus();
+    
+
+    function checkPin() {
+      var pin = passwordInput.value;
+      if (pin === correctPin) {
+          passwordScreen.style.display = "none";
+          adminMenu.style.display = "flex";
+      } else {
+          passwordInput.classList.add('shake');
+          passwordInput.style.borderColor = "red";
+          passwordInput.style.borderWidth = "2px"; // Set border thickness to match the original
+    
+          setTimeout(() => {
+              passwordInput.classList.remove('shake');
+              passwordInput.value = '';  // Clear the input field
+              passwordInput.blur();      // Blur the input to remove focus
+              passwordInput.focus();     // Immediately refocus the input
+              passwordInput.style.borderColor = ""; // Reset border color
+          }, 500);  // Match the duration of the shake animation
+      }
+    }
+    
+    
+    revealOnlyButton.onclick = () => {
+      revealPreviousResponsesOnly();
+    };
+    
+    
+    function revealPreviousResponsesOnly() {
+      // Update params to show previous responses
+      params.showPrevious = true;
+      
+      // Send message to widget to update state
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'revealPrevious',
+          showPrevious: true
+        } 
+      }, '*');
+      
+      // Refresh the UI
+      fetchPreviousResponses();
+    }
+
+    setWidgetIdButton.onclick = () => {
+      const customWidgetId = customWidgetIdInput.value.trim();
+      if (customWidgetId) {
+        widgetId = customWidgetId;
+        customWidgetIdInput.value = widgetId;
+        parent.postMessage({ pluginMessage: { type: 'setWidgetId', widgetId: customWidgetId } }, '*');
+      } else {
+        customAlert('Please enter a valid Widget ID.');
+      }
+    };
+
+    
+    
+
+    resetResponseButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reset the current response?");
+      if (!confirmed) return;
+    
+      parent.postMessage({ pluginMessage: { type: 'resetResponse', params } }, '*');
+      setTimeout(() => {
+        refresh();
+      }, 1000);
+    };
+    
+
+    duplicateButton.onclick = () => {
+      duplicateButton.style.opacity = '0.5';
+      duplicateButton.style.pointerEvents = 'none';
+      duplicateButton.innerText = 'Duplicated';
+      parent.postMessage({ pluginMessage: { type: 'duplicate' } }, '*');
+    };
+
+    duplicateAllButton.onclick = () => {
+      duplicateAllButton.style.opacity = '0.5';
+      duplicateAllButton.style.pointerEvents = 'none';
+      duplicateAllButton.innerText = 'Duplicating all...';
+      parent.postMessage({ pluginMessage: { type: 'duplicateAll' } }, '*');
+    };
+
+    resetAllButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reset ALL widgets?");
+      if (!confirmed) return;
+    
+      resetAllButton.style.opacity = '0.5';
+      resetAllButton.style.pointerEvents = 'none';
+      resetAllButton.innerText = 'Resetting...';
+      parent.postMessage({ pluginMessage: { type: 'resetAll' } }, '*');
+    };
+    
+
+    revealAllButton.onclick = async () => {
+      const confirmed = await customConfirm("Are you sure you want to reveal ALL responses?");
+      if (!confirmed) return;
+    
+      revealAllButton.style.opacity = '0.5';
+      revealAllButton.style.pointerEvents = 'none';
+      revealAllButton.innerText = 'Revealing...';
+      parent.postMessage({ pluginMessage: { type: 'revealAll' } }, '*');
+    };
+    
+
+    widthInput.onchange = (event) => {
+      const width = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'resize', width, height: parseInt(heightInput.value, 10) } }, '*');
+    };
+
+    heightInput.onchange = (event) => {
+      const height = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'resize', width: parseInt(widthInput.value, 10), height } }, '*');
+    };
+
+    borderColorInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateBorderColor', color: event.target.value } }, '*');
+    };
+
+    borderWidthInput.onchange = (event) => {
+      const width = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'updateBorderWidth', width } }, '*');
+    };
+
+    fontSizeInput.onchange = (event) => {
+      const size = parseInt(event.target.value, 10);
+      parent.postMessage({ pluginMessage: { type: 'updateFontSize', size } }, '*');
+    };
+
+
+    shadowColorInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowColor', color: event.target.value } }, '*');
+    };
+    
+    shadowOffsetXInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowOffsetX', offset: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowOffsetYInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowOffsetY', offset: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowBlurInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowBlur', blur: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    shadowSpreadInput.onchange = (event) => {
+      parent.postMessage({ pluginMessage: { type: 'updateShadowSpread', spread: parseInt(event.target.value, 10) } }, '*');
+    };
+    
+    addResponseButton.onclick = () => {
+      const newResponse = newResponseInput.value.trim();
+      const newUserName = newUserNameInput.value.trim();
+      if (newResponse && newUserName) {
+        addResponse(newResponse, newUserName);
+      } else {
+        customAlert('Both response and user name are required.');
+      }
+    };
+
+    function fetchPreviousResponses() {
+      console.log('Using previous responses from params');
+      previousResponsesContainer.innerHTML = '';
+      if (params.current && params.current.response) {
+        const responseItem = document.createElement('div');
+        responseItem.className = 'response-item';
+    
+        // --- HEADER ---
+        const responseHeader = document.createElement('div');
+        responseHeader.onclick = () => {
+          handleUnsavedChanges(-1, responseHeader);
+        };
+        responseHeader.className = 'response-header current-response';
+
+        if (params.current.photoUrl) {
+          const photo = document.createElement('img');
+          photo.src = params.current.photoUrl;
+          responseHeader.appendChild(photo);
+        } else {
+          const photo = document.createElement('div');
+          photo.innerHTML = AnonSVG;
+          responseHeader.appendChild(photo);
+        }
+
+        const headerText = document.createElement('span');
+        headerText.className = 'header-text';
+        headerText.appendChild(document.createTextNode(params.current.userName));
+        responseHeader.appendChild(headerText);
+
+        const headerTextContent = document.createElement('span');
+        headerTextContent.className = 'header-text-content';
+        headerTextContent.textContent = params.current.response;
+        responseHeader.appendChild(headerTextContent);
+
+        const currentResponseLabel = document.createElement('span');
+        currentResponseLabel.className = 'current-response-label';
+        currentResponseLabel.textContent = '⭐ CURRENT';
+        responseHeader.appendChild(currentResponseLabel);
+
+        responseItem.appendChild(responseHeader);
+
+        // --- CONTENT ---
+        const responseContent = document.createElement('div');
+        responseContent.className = 'response-content';
+    
+        const userNameInput = document.createElement('input');
+        userNameInput.className = 'input input-small';
+        userNameInput.type = 'text';
+        userNameInput.value = params.current.userName;
+        userNameInput.placeholder = 'User Name';
+        userNameInput.oninput = (event) => {
+          unsavedUserName = event.target.value;
+          unsavedResponse = responseInput.value;
+          currentEditingIndex = -1;
+        };
+    
+        const responseInput = document.createElement('textarea');
+        responseInput.className = 'input input-large';
+        responseInput.value = params.current.response;
+        responseInput.placeholder = 'Response';
+        responseInput.oninput = (event) => {
+          unsavedResponse = event.target.value;
+          unsavedUserName = userNameInput.value;
+          currentEditingIndex = -1;
+        };
+
+        const timestampDiv = document.createElement('div');
+        timestampDiv.className = 'timestamp';
+        const timestamp = new Date(params.current.timestamp);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const formattedDate = timestamp.toLocaleString('en-US', options);
+        timestampDiv.textContent = formattedDate.replace(", ", "\n");
+        responseHeader.appendChild(timestampDiv);
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.style.marginBottom = '0px';
+
+        const saveButton = document.createElement('button');
+        saveButton.className = 'button';
+        saveButton.style.flexGrow = '1';
+        saveButton.innerText = 'Save';
+        saveButton.onclick = () => {
+          // loading state
+          saveButton.parentElement.style.opacity = '0.5';
+          saveButton.parentElement.style.pointerEvents = 'none';
+          let newPhotoUrl = undefined;
+          if (params.current.userName === userNameInput.value) {
+            newPhotoUrl = params.current.photoUrl;
+          }
+          editCurrentResponse(responseInput.value, userNameInput.value, newPhotoUrl);
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+        };
+
+        responseContent.appendChild(userNameInput);
+        responseContent.appendChild(responseInput);
+        buttonContainer.appendChild(saveButton);
+        responseContent.appendChild(buttonContainer);
+
+        responseItem.appendChild(responseHeader);
+        responseItem.appendChild(responseContent);
+
+        previousResponsesContainer.appendChild(responseItem);
+
+        const divider = document.createElement('div');
+        divider.style.height = '1px';
+        divider.style.backgroundColor = '#ccc';
+        divider.style.margin = '10px 0';
+        previousResponsesContainer.appendChild(divider);
+      }
+      params.previousResponses.forEach((response, index) => {
+        const responseItem = document.createElement('div');
+        responseItem.className = 'response-item';
+    
+        // --- HEADER ---
+        const responseHeader = document.createElement('div');
+        responseHeader.className = 'response-header';
+        responseHeader.onclick = () => {
+          handleUnsavedChanges(index, responseHeader);
+        };
+
+        if (response.photoUrl) {
+          const photo = document.createElement('img');
+          photo.src = response.photoUrl;
+          responseHeader.appendChild(photo);
+        } else {
+          const photo = document.createElement('div');
+          photo.innerHTML = AnonSVG;
+          responseHeader.appendChild(photo);
+        }
+
+        const headerText = document.createElement('span');
+        headerText.className = 'header-text';
+        headerText.appendChild(document.createTextNode(response.userName));
+        responseHeader.appendChild(headerText);
+
+        const headerTextContent = document.createElement('span');
+        headerTextContent.className = 'header-text-content';
+        headerTextContent.textContent = response.response;
+        responseHeader.appendChild(headerTextContent);
+
+        const timestampDiv = document.createElement('div');
+        timestampDiv.className = 'timestamp';
+        const timestamp = new Date(response.timestamp);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const formattedDate = timestamp.toLocaleString('en-US', options);
+        timestampDiv.textContent = formattedDate.replace(", ", "\n");
+        responseHeader.appendChild(timestampDiv);
+
+        // --- CONTENT ---
+        const responseContent = document.createElement('div');
+        responseContent.className = 'response-content';
+    
+        const userNameInput = document.createElement('input');
+        userNameInput.className = 'input input-small';
+        userNameInput.type = 'text';
+        userNameInput.value = response.userName;
+        userNameInput.placeholder = 'User Name';
+        userNameInput.oninput = (event) => {
+          unsavedUserName = event.target.value;
+          unsavedResponse = responseInput.value;
+          currentEditingIndex = index;
+        };
+    
+        const responseInput = document.createElement('textarea');
+        responseInput.className = 'input input-large';
+        responseInput.value = response.response;
+        responseInput.placeholder = 'Response';
+        responseInput.oninput = (event) => {
+          unsavedResponse = event.target.value;
+          unsavedUserName = userNameInput.value;
+          currentEditingIndex = index;
+        };
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.style.marginBottom = '0px';
+
+        const saveButton = document.createElement('button');
+        saveButton.className = 'button';
+        saveButton.style.flexGrow = '1';
+        saveButton.innerText = 'Save';
+        saveButton.onclick = () => {
+          // loading state
+          saveButton.parentElement.style.opacity = '0.5';
+          saveButton.parentElement.style.pointerEvents = 'none';
+          let newPhotoUrl = undefined;
+          if (response.userName === userNameInput.value) {
+            newPhotoUrl = response.photoUrl;
+          }
+          updateResponse(index, responseInput.value, userNameInput.value, newPhotoUrl);
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+        };
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'button danger';
+        deleteButton.innerText = 'Delete';
+        deleteButton.style.flexGrow = '1';
+        deleteButton.onclick = () => {
+          deleteButton.parentElement.style.opacity = '0.5';
+          deleteButton.parentElement.style.pointerEvents = 'none';
+          deleteResponse(index);
+        }
+
+        responseContent.appendChild(userNameInput);
+        responseContent.appendChild(responseInput);
+        buttonContainer.appendChild(saveButton);
+        buttonContainer.appendChild(deleteButton);
+        responseContent.appendChild(buttonContainer);
+
+        responseItem.appendChild(responseHeader);
+        responseItem.appendChild(responseContent);
+
+        previousResponsesContainer.appendChild(responseItem);
+      });
+    }
+
+    function handleUnsavedChanges(index, responseHeader) {
+      if (unsavedResponse !== null && currentEditingIndex !== index) {
+        popup.style.display = 'block';
+        popupSaveButton.onclick = () => {
+          updateResponse(currentEditingIndex, unsavedResponse, unsavedUserName);
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+          popup.style.display = 'none';
+          showResponseContent(responseHeader);
+        };
+        popupCancelButton.onclick = () => {
+          unsavedResponse = null;
+          unsavedUserName = null;
+          currentEditingIndex = null;
+          popup.style.display = 'none';
+          showResponseContent(responseHeader);
+        };
+      } else {
+        showResponseContent(responseHeader);
+      }
+    }
+
+    function showResponseContent(responseHeader) {
+      const responseContent = responseHeader.nextElementSibling;
+      console.log("showing")
+      responseContent.style.display = responseContent.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function addResponse(response, userName) {
+      console.log('add response called', response, userName);
+      if (response && userName) {
+        const timestamp = new Date().toISOString();
+        const newResponse = {
+          response,
+          userName,
+          timestamp,
+          photoUrl: null
+        };
+        
+        // Update params with new response
+        params.previousResponses = [newResponse, ...params.previousResponses];
+        
+        // Send message to widget to update state
+        parent.postMessage({ 
+          pluginMessage: { 
+            type: 'addResponse', 
+            response: newResponse 
+          } 
+        }, '*');
+        
+        // Refresh the UI
+        fetchPreviousResponses();
+        
+        // Clear input fields
+        newResponseInput.value = '';
+        newUserNameInput.value = '';
+      } else {
+        customAlert('Both response and user name are required.');
+      }
+    }
+
+    function updateResponse(index, newResponse, newUserName, newPhotoUrl=undefined) {
+      console.log('updateResponse called', index, newResponse, newUserName, newPhotoUrl);
+      if (index === -1) {
+        return editCurrentResponse(newResponse, newUserName);
+      }
+      
+      // Log state before update
+      console.log('Before update - Previous responses:', params.previousResponses);
+      console.log('Attempting to update response at index:', index);
+      
+      // Create a new array to avoid mutating the original
+      const updatedResponses = [...params.previousResponses];
+      updatedResponses[index] = {
+        ...updatedResponses[index],
+        response: newResponse,
+        userName: newUserName,
+        photoUrl: newPhotoUrl
+      };
+      
+      // Log state after update
+      console.log('After update - Previous responses:', updatedResponses);
+      
+      // Update local state
+      params.previousResponses = updatedResponses;
+      
+      // Send message to widget to update state
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'updateResponse',
+          ret: updatedResponses
+        } 
+      }, '*');
+      
+      // Refresh the UI
+      fetchPreviousResponses();
+    }
+
+    function editCurrentResponse(newResponse, newUserName, newPhotoUrl=undefined) {
+      // Log state before update
+      console.log('Before update - Current response:', params.current);
+      
+      // Create a new object for the current response
+      const updatedCurrent = {
+        ...params.current,
+        response: newResponse,
+        userName: newUserName,
+        photoUrl: newPhotoUrl
+      };
+      
+      // Log state after update
+      console.log('After update - Current response:', updatedCurrent);
+      
+      // Update local state
+      params.current = updatedCurrent;
+      
+      // Send message to widget to update state
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'editCurrent',
+          ret: updatedCurrent
+        } 
+      }, '*');
+      
+      // Refresh the UI
+      fetchPreviousResponses();
+    }
+
+    function deleteResponse(index) {
+      console.log(params);
+      // Log state before deletion
+      console.log('Before deletion - Previous responses:', params.previousResponses);
+      console.log('Attempting to delete response at index:', index);
+      
+      // Update local state
+      params.previousResponses.splice(index, 1);
+      
+      // Log state after deletion
+      console.log('After deletion - Previous responses:', params.previousResponses);
+      
+      // Send message to widget to update state
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'deleteResponse',
+          ret: params.previousResponses
+        } 
+      }, '*');
+      
+      // Refresh the UI
+      fetchPreviousResponses();
+    }    
+  </script>
+</body>
+  
+</html>

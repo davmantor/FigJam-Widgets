@@ -1,158 +1,102 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Message Options</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-      }
-      .widget-entry-bar input {
-        flex-shrink: 1;
-        flex-grow: 1;
-        width: 100%;
-      }
-      .container {
-        width: calc(100% - 20px);
-        padding: 10px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      #adminControls {
-        width: 100%;
-      }
-      .widget-entry-bar {
-        display: flex;
-        align-items: center;
-        background: white;
-        padding: 4px 2px;
-        margin: 6px;
-        border-radius: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        height: fit-content;
-        width: calc(100% - 20px);
-      }
-      .input {
-        padding: 6px 12px;
-        border: 2px solid #ccc;
-        border-radius: 20px;
-        outline: none;
-      }
-      #accentColorText,
-      #barColorText,
-      #borderColorText,
-      #promptColorText {
-        font-family: monospace;
-      }
-      .icon-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        margin-left: 8px;
-        width: 40px; /* Increased width */
-        height: 40px; /* Increased height */
-        padding: 10px; /* Added padding for better clickability */
-      }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .widget-entry-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 2px;
+            padding-left:4px;
+            padding-right:  4px;
+            margin: 6px;
+            border-radius: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+            height: fit-content;
+        }
+        .input {
+            padding: 6px 12px;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: #007aff;
+        }
+        .admin-controls {
+            display: none;
+            margin-top: 10px;
+        }
+        .pinForm {
+            padding-top: 5px;
+            text-align: center;
+            flex-direction: horizontal;
+        }
+        .adminControls{
+            padding-top: 5px;
+            text-align: center;
+            flex-direction: horizontal;
+        }
+        .button1 {
+            display: inline-flex;
+            vertical-align: middle;
+            padding: 6px 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 200px;
+            background-color: #007aff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 8px;
+            
+        }
+        
 
-      .icon-button svg {
-        width: 24px; /* Increase icon size */
-        height: 24px;
-      }
-
-      .icon {
-        width: 20px;
-        height: 20px;
-        fill: #007aff;
-      }
-      .pinForm {
-        padding-top: 5px;
-        text-align: center;
-        flex-direction: horizontal;
-      }
-      .button1 {
-        display: inline-flex;
-        vertical-align: middle;
-        padding: 6px 10px;
-        margin: 5px;
-        border: none;
-        border-radius: 200px;
-        background-color: #007aff;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        white-space: nowrap;
-      }
-
-      .published-info {
-        bottom: 10px; /* 10px from bottom */
-        left: 10px; /* 10px from left */
-        font-size: 12px;
-        font-weight: 300; /* Light font */
-        color: #888888; /* Soft gray color */
-        font-family: Arial, sans-serif;
-        opacity: 0.7; /* Slight transparency */
-      }
+        .published-info {
+            bottom: 10px; /* 10px from bottom */
+            left: 10px;   /* 10px from left */
+            font-size: 12px;
+            font-weight: 300;       /* Light font */
+            color: #888888;         /* Soft gray color */
+            font-family: Arial, sans-serif;
+            opacity: 0.7;           /* Slight transparency */
+        }
+        
+        
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <div id="pinForm">
-        <input
-          class="input"
-          type="password"
-          id="pinInput"
-          placeholder="Enter admin password"
-        />
-        <button class="button1" onclick="checkPin()">Submit</button>
-        <p id="error-message" style="color: red; display: none">
-          Incorrect password. Try again.
-        </p>
-      </div>
-      <div id="adminControls" style="display: none">
-        <div class="button1" onclick="updatePrompt()">
-          <svg
-            class="icon"
-            width="16px"
-            height="16px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="#FFFFFF"
-            stroke-width="0.00024000000000000003"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z"
-              fill="#FFFFFF"
-            ></path>
-          </svg>
-          Prompt
-        </div>
+        <div id="pinForm">
+            <input class="input" type="password" id="pinInput" placeholder="Enter admin password">
+            <button class="button1" onclick="checkPin()">Submit</button>
+            <p id="error-message" style="color: red; display: none;">Incorrect password. Try again.</p>
 
-        <div class="button1" onclick="updateSubheading()">
-          <svg
-            class="icon"
-            width="16px"
-            height="16px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="#FFFFFF"
-            stroke-width="0.00024000000000000003"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z"
-              fill="#FFFFFF"
-            ></path>
-          </svg>
-          Subheading
         </div>
         <div id="adminControls" style="display: none;">
 
@@ -224,18 +168,6 @@
                 <input type="text" id="choiceFontSizeInput" class="input" placeholder="16px">
                 <button class="button1" onclick="updateChoiceFontSize()">Choice/Vote Font Size</button>
             </div>
-            
-            <div class="container">
-                <div class="widget-entry-bar">
-                    <input type="text" id="customWidgetGroupInput" class="input" placeholder="Enter Widget Group">
-                    <button class="icon-button" id="setWidgetGroupButton" title="Set Widget Group">
-                        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2a10 10 0 1 1-10 10A10 10 0 0 1 12 2zm-1 14h2v-4h3l-4-4-4 4h3z" />
-                        </svg>
-                    </button>
-                </div>
-                <p id="widgetCountInfo">Widgets in group: <span id="widgetCount">0</span></p>
-            </div>
               <div class="button1" onclick="updateSubheading()">
                 <svg class="icon" width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8787 3.70705..."></path>
@@ -245,222 +177,17 @@
               <div class="published-info">
                 <strong>Compiled:</strong> <span id="publishedAtDisplay">Loading...</span>
             </div>
-        <div class="button1" onclick="updateWidgetId()">
-          <svg
-            class="icon"
-            width="16px"
-            height="16px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="#FFFFFF"
-            stroke-width="0.00024000000000000003"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M15.8787 3.70705C17.0503 2.53547 18.9498 2.53548 20.1213 3.70705L20.2929 3.87862C21.4645 5.05019 21.4645 6.94969 20.2929 8.12126L18.5556 9.85857L8.70713 19.7071C8.57897 19.8352 8.41839 19.9261 8.24256 19.9701L4.24256 20.9701C3.90178 21.0553 3.54129 20.9554 3.29291 20.7071C3.04453 20.4587 2.94468 20.0982 3.02988 19.7574L4.02988 15.7574C4.07384 15.5816 4.16476 15.421 4.29291 15.2928L14.1989 5.38685L15.8787 3.70705ZM18.7071 5.12126C18.3166 4.73074 17.6834 4.73074 17.2929 5.12126L16.3068 6.10738L17.8622 7.72357L18.8787 6.70705C19.2692 6.31653 19.2692 5.68336 18.8787 5.29283L18.7071 5.12126ZM16.4477 9.13804L14.8923 7.52185L5.90299 16.5112L5.37439 18.6256L7.48877 18.097L16.4477 9.13804Z"
-              fill="#FFFFFF"
-            ></path>
-          </svg>
-          ID
-        </div>
+            
+            
+              
 
-        <div id="borderColorButton" class="widget-entry-bar">
-          <input
-            type="color"
-            id="borderColorInput"
-            class="input"
-            value="#e0e0e0"
-          />
-          <span
-            id="borderColorText"
-            style="margin-left: 8px; font-size: 12px; color: #555"
-            >#e0e0e0</span
-          >
-          <button class="button1" onclick="updateBorderColor()">
-            Set Border Color
-          </button>
         </div>
-
-        <div id="promptColorButton" class="widget-entry-bar">
-          <input
-            type="color"
-            id="promptColorInput"
-            class="input"
-            value="#FFFFFF"
-          />
-          <span
-            id="promptColorText"
-            style="margin-left: 8px; font-size: 12px; color: #555"
-            >#e0e0e0</span
-          >
-          <button class="button1" onclick="updatePromptColor()">
-            Set Prompt Color
-          </button>
-        </div>
-
-        <div id="boxWidthButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="boxWidthInput"
-            class="input"
-            placeholder="300"
-          />
-          <button class="button1" onclick="updateWidth()">Set Box Width</button>
-        </div>
-
-        <div id="borderWidthButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="borderWidthInput"
-            class="input"
-            placeholder="2"
-          />
-          <button class="button1" onclick="updateBorderWidth()">
-            Set Border Width
-          </button>
-        </div>
-
-        <div id="widgetCornerRadiusButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="widgetCornerRadiusInput"
-            class="input"
-            placeholder="15"
-          />
-          <button class="button1" onclick="updateWidgetCornerRadius()">
-            Set Corner Radius
-          </button>
-        </div>
-
-        <div id="headingFontSizeButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="headingFontSizeInput"
-            class="input"
-            placeholder="20"
-          />
-          <button class="button1" onclick="updateHeadingFontSize()">
-            Set Heading Font Size
-          </button>
-        </div>
-
-        <div id="subheadingFontSizeButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="subheadingFontSizeInput"
-            class="input"
-            placeholder="14"
-          />
-          <button class="button1" onclick="updateSubheadingFontSize()">
-            Set Subheading Font Size
-          </button>
-        </div>
-
-        <div id="choiceFontSizeButton" class="widget-entry-bar">
-          <input
-            type="number"
-            id="choiceFontSizeInput"
-            class="input"
-            placeholder="16"
-          />
-          <button class="button1" onclick="updateChoiceFontSize()">
-            Set Choice Font Size
-          </button>
-        </div>
-
-        <div id="barColorButton" class="widget-entry-bar">
-          <input
-            type="color"
-            id="barColorInput"
-            class="input"
-            value="#f0f0f0"
-          />
-          <span
-            id="barColorText"
-            style="margin-left: 8px; font-size: 12px; color: #555"
-            >#e0e0e0</span
-          >
-          <button class="button1" onclick="updateWidgetBarColor()">
-            Set Bar Color
-          </button>
-        </div>
-
-        <div id="accentColorButton" class="widget-entry-bar">
-          <input
-            type="color"
-            id="accentColorInput"
-            class="input"
-            value="#24CE16"
-          />
-          <span
-            id="accentColorText"
-            style="margin-left: 8px; font-size: 12px; color: #555"
-            >#e0e0e0</span
-          >
-          <button class="button1" onclick="updateAccentColor()">
-            Set Accent Color
-          </button>
-        </div>
-
-        <div class="container" style="padding: 5px 0; margin-top: 10px; width: 100%; border-top: 1px solid #ccc">
-          <div class="widget-entry-bar">
-            <input
-              type="text"
-              id="customWidgetGroupInput"
-              class="input"
-              placeholder="Enter Widget Group"
-            />
-            <button
-              class="button1"
-              id="setWidgetGroupButton"
-              title="Set Widget Group"
-            >
-              Set Widget Group
-            </button>
-          </div>
-          <p id="widgetCountInfo" style="margin: 0.5em 0">
-            Widgets in group: <span id="widgetCount">0</span>
-          </p>
-        </div>
-        <div class="published-info">
-          <strong>Compiled:</strong>
-          <span id="publishedAtDisplay">Loading...</span>
-        </div>
-      </div>
     </div>
 
     <script>
-      let widgetId = null;
+        let widgetId = null;
+        const errorMessage = document.getElementById("error-message");
 
-      let debounceTimer;
-      const customWidgetGroupInput = document.getElementById(
-        "customWidgetGroupInput"
-      );
-      const widgetCountDisplay = document.getElementById("widgetCount");
-      const errorMessage = document.getElementById("error-message");
-
-      // Function to fetch the number of polls in the entered group
-      function countPollsInGroup(groupName) {
-        if (!groupName) {
-          widgetCountDisplay.textContent = "0";
-          return;
-        }
-
-        fetch(
-          `https://figjam-widgets-myhz.onrender.com/polls/group/${encodeURIComponent(
-            groupName
-          )}`
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            if (Array.isArray(data)) {
-              widgetCountDisplay.textContent = data.length; // Update count
-            } else {
-                alert("Please enter a valid Widget Group.");
-            }
-        };
         let widgetGroup = "None"; 
         window.onmessage = function(event) {
             console.log("called123!");
@@ -519,6 +246,7 @@
                     break;
                 case 'current-headingFontSize':
                     document.getElementById('headingFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
+                    document.getElementById('barColorText').textContent = payload;
                     break;
                 case 'current-subheadingFontSize':
                     document.getElementById('subheadingFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
@@ -526,375 +254,108 @@
                 case 'current-choiceFontSize':
                     document.getElementById('choiceFontSizeButton').insertAdjacentHTML("beforeend", payload + "px");
                     break;
-                case 'current-widgetGroup':
-                    document.getElementById('customWidgetGroupInput').value = payload || "None"; // Display the widget group
-                    break;
             }
-            errorMessage.style.display = "none"; // Hide any error messages
-          })
-          .catch(() => {
-            errorMessage.style.display = "block";
-            widgetCountDisplay.textContent = "0";
-          });
-      }
+        };
 
-      // Debounce function to avoid excessive API calls
-      function debounceCheck() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          countPollsInGroup(customWidgetGroupInput.value.trim());
-        }, 500); // 500ms delay to reduce server calls
-      }
+        var correctPin = "312cmpm15";
+        var deleteConfirmation = false;
 
-      // Event listener to check group usage as user types
-      customWidgetGroupInput.addEventListener("input", debounceCheck);
+        let failedAttempts = 0;
 
-      window.onmessage = function (event) {
-        console.log("called123!");
-        var messageType = event.data.pluginMessage.type;
-        var payload = event.data.pluginMessage.payload;
-        console.log("payload", payload);
-        switch (messageType) {
-          case "set-widget-log-id":
-            document.getElementById("widgetIdDisplay").textContent =
-              event.data.pluginMessage.payload;
-            break;
-          case "current-borderColor":
-            document.getElementById("borderColorInput").value = payload;
-            document.querySelector(
-              "#borderColorButton .button1"
-            ).style.backgroundColor = payload;
-            document.getElementById("borderColorText").textContent = payload;
-            break;
-          case "current-promptColor":
-            document.getElementById("promptColorInput").value = payload;
-            document.querySelector(
-              "#promptColorButton .button1"
-            ).style.backgroundColor = payload;
-            document.getElementById("promptColorText").textContent = payload;
-            break;
-          case "current-widthValue":
-            document.getElementById("boxWidthInput").value = payload;
-            break;
-          case "current-borderWidthValue":
-            document.getElementById("borderWidthInput").value = payload;
-            break;
-          case "current-widgetCornerRadius":
-            document.getElementById("widgetCornerRadiusInput").value = payload;
-            console.log(payload);
-            break;
-          case "current-barColor":
-            document.getElementById("barColorInput").value = payload;
-            document.querySelector(
-              "#barColorButton .button1"
-            ).style.backgroundColor = payload;
-            document.getElementById("barColorText").textContent = payload;
-          case "current-accentColor":
-            document.getElementById("accentColorInput").value = payload;
-            document.querySelector(
-              "#accentColorButton .button1"
-            ).style.backgroundColor = payload;
-            document.getElementById("accentColorText").textContent = payload;
-          case "current-widgetId":
-            document
-              .getElementById("widgetIdButton")
-              .insertAdjacentHTML("beforeend", payload);
-            break;
-          case "alreadyLoggedIn":
-            console.log("hello");
-            if (payload) {
-              document.getElementById("pinForm").style.display = "none";
-              document.getElementById("adminControls").style.display = "block";
+        function checkPin() {
+            const password = document.getElementById("pinInput").value;
+            if (password === "312cmpm15") {
+                document.getElementById("pinForm").style.display = "none";
+                document.getElementById("adminControls").style.display = "block";
+            } else {
+                document.getElementById("error-message").style.display = "block";
             }
-            break;
-          case "current-pollId":
-            widgetId = event.data.pluginMessage.payload;
-            console.log("widgetID", widgetId);
-            break;
-          case "current-publishedAt":
-            console.log("DATE IN UI");
-            document.getElementById("publishedAtDisplay").textContent =
-              payload || "Not Published";
-            break;
-          case "current-headingFontSize":
-            document.getElementById("headingFontSizeInput").value = payload;
-            break;
-          case "current-subheadingFontSize":
-            document.getElementById("subheadingFontSizeInput").value = payload;
-            break;
-          case "current-choiceFontSize":
-            document.getElementById("choiceFontSizeInput").value = payload;
-            break;
-          case "current-widgetGroup":
-            document.getElementById("customWidgetGroupInput").value =
-              payload || "None"; // Display the widget group
-            countPollsInGroup(payload);
-            break;
         }
-      };
+        
 
-      var correctPin = "312cmpm15";
-      var deleteConfirmation = false;
+        
 
-      let failedAttempts = 0;
-
-      function checkPin() {
-        const password = document.getElementById("pinInput").value;
-        if (password === "312cmpm15") {
-          document.getElementById("pinForm").style.display = "none";
-          document.getElementById("adminControls").style.display = "block";
-        } else {
-          document.getElementById("error-message").style.display = "block";
+        function updatePrompt() {
+            // Send a message to the plugin to pin the message
+            parent.postMessage({ pluginMessage: { type: 'update-prompt' } }, '*');
         }
-      }
 
-      const pinInput = document.getElementById("pinInput");
-      pinInput.addEventListener("keyup", function (event) {
-        if (event.key === "Enter") {
-          checkPin();
-        }
-      });
-      pinInput.focus();
-
-      function updatePrompt() {
-        // Send a message to the plugin to pin the message
-        parent.postMessage({ pluginMessage: { type: "update-prompt" } }, "*");
-      }
-
-      function updatePromptColor() {
-        // Send a message to the plugin to pin the message
-        const newPromptColor = document
-          .getElementById("promptColorInput")
-          .value.trim();
-
-        if (newPromptColor) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "update-promptColor",
-                payload: newPromptColor,
-              },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid prompt color.");
-        }
-      }
-
-      function updateBorderColor() {
-        const newBorderColor = document
-          .getElementById("borderColorInput")
-          .value.trim();
-
-        if (newBorderColor) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "update-borderColor",
-                payload: newBorderColor,
-              },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid border color.");
-        }
-      }
-
-      function updateWidth() {
-        // Send a message to the plugin to update the width
-        const newBoxWidth = document
-          .getElementById("boxWidthInput")
-          .value.trim()
-          .replace("px", "");
-
-        if (newBoxWidth) {
-          parent.postMessage(
-            { pluginMessage: { type: "update-width", payload: newBoxWidth } },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid box width.");
-        }
-      }
-
-      function updateBorderWidth() {
-        // Send a message to the plugin to update the border width
-        const newBorderWidth = document
-          .getElementById("borderWidthInput")
-          .value.trim();
-
-        if (newBorderWidth) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "update-borderWidth",
-                payload: newBorderWidth,
-              },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid border width.");
-        }
-      }
-
-      function updateWidgetBarColor() {
-        const newBarColor = document
-          .getElementById("barColorInput")
-          .value.trim();
-
-        if (newBarColor) {
-          parent.postMessage(
-            {
-              pluginMessage: { type: "update-barColor", payload: newBarColor },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid bar color.");
-        }
-      }
-
-      function updateAccentColor() {
-        const newAccentColor = document
-          .getElementById("accentColorInput")
-          .value.trim();
-
-        if (newAccentColor) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "update-accentColor",
-                payload: newAccentColor,
-              },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid accent color.");
-        }
-      }
-
-      function updateWidgetId() {
-        // Send a message to the plugin to update the border width
-        parent.postMessage({ pluginMessage: { type: "update-widgetId" } }, "*");
-      }
-
-      function updateWidgetCornerRadius() {
-        const newWidgetCornerRadius = document
-          .getElementById("widgetCornerRadiusInput")
-          .value.trim();
-
-        if (newWidgetCornerRadius) {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "update-widgetCornerRadius",
-                payload: newWidgetCornerRadius,
-              },
-            },
-            "*"
-          );
-        } else {
-          alert("Please enter a valid corner radius.");
-        }
-      }
-      function updateSubheading() {
-        console.log("Sending subheading update request to code.tsx");
-        parent.postMessage(
-          { pluginMessage: { type: "update-subheading" } },
-          "*"
-        );
-      }
-      function updateHeadingFontSize() {
-        const newHeadingFontSize = document
-          .getElementById("headingFontSizeInput")
-          .value.trim();
-
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: "update-headingFontSize",
-              payload: newHeadingFontSize,
-            },
-          },
-          "*"
-        );
-      }
-
-      function updateSubheadingFontSize() {
-        const newSubheadingFontSize = document
-          .getElementById("subheadingFontSizeInput")
-          .value.trim();
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: "update-subheadingFontSize",
-              payload: newSubheadingFontSize,
-            },
-          },
-          "*"
-        );
-      }
-
-      function updateChoiceFontSize() {
-        const newChoiceFontSize = document
-          .getElementById("choiceFontSizeInput")
-          .value.trim();
-
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: "update-choiceFontSize",
-              payload: newChoiceFontSize,
-            },
-          },
-          "*"
-        );
-      }
-      document.getElementById("setWidgetGroupButton").onclick = () => {
-        const customWidgetGroup = customWidgetGroupInput.value.trim();
-        console.log("HELLO", customWidgetGroup);
-
-        if (widgetId) {
-          if (customWidgetGroup) {
-            fetch(
-              "https://figjam-widgets-myhz.onrender.com/polls/update-group",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  widgetId: widgetId,
-                  group: customWidgetGroup,
-                }),
-              }
-            )
-              .then(() => {
-                console.log("Group updated on the server.");
-                parent.postMessage(
-                  {
-                    pluginMessage: {
-                      type: "update-widgetGroup",
-                      widgetGroup: customWidgetGroup,
-                    },
-                  },
-                  "*"
-                );
-
-                let currentCount =
-                  parseInt(widgetCountDisplay.textContent, 10) || 0;
-                widgetCountDisplay.textContent = currentCount + 1;
-              })
-              .catch((error) => {
-                console.error("Error updating group:", error);
-              });
+        function updatePromptColor() {
+            // Send a message to the plugin to pin the message
+            const newPromptColor = document.getElementById('promptColorInput').value.trim();
+          
+          if (newPromptColor) {
+            parent.postMessage({ pluginMessage: { type: 'update-promptColor', payload: newPromptColor } }, '*');
           } else {
-            alert("Please enter a valid Widget Group.");
+            alert('Please enter a valid prompt color.');
           }
+        }
+
+        function updateBorderColor() {
+            const newBorderColor = document.getElementById('borderColorInput').value.trim();
+            
+          if (newBorderColor) {
+            parent.postMessage({ pluginMessage: { type: 'update-borderColor', payload: newBorderColor } }, '*');
+          } else {
+            alert('Please enter a valid border color.');
+          }
+}
+
+        function updateWidth() {
+            // Send a message to the plugin to update the width
+            const newBoxWidth = document.getElementById('boxWidthInput').value.trim();
+          
+          if (newBoxWidth) {
+            parent.postMessage({ pluginMessage: { type: 'update-width', payload: newBoxWidth } }, '*');
+              } else {
+            alert('Please enter a valid box width.');
+      }
+        }
+
+        function updateBorderWidth() {
+            // Send a message to the plugin to update the border width
+            const newBorderWidth = document.getElementById('borderWidthInput').value.trim();
+          
+            if (newBorderWidth) {
+              parent.postMessage({ pluginMessage: { type: 'update-borderWidth', payload: newBorderWidth } }, '*');
+                } else {
+              alert('Please enter a valid border width.');
+        }
+        }
+
+        function updateWidgetBarColor() {
+            const newBarColor = document.getElementById('barColorInput').value.trim();
+          
+            if (newBarColor) {
+                parent.postMessage({ pluginMessage: { type: 'update-barColor', payload: newBarColor } }, '*');
+          } else {
+                alert('Please enter a valid bar color.');
+          }
+}
+
+        function updateAccentColor() {
+            const newAccentColor = document.getElementById('accentColorInput').value.trim();
+          
+          if (newAccentColor) {
+              parent.postMessage({ pluginMessage: { type: 'update-accentColor', payload: newAccentColor } }, '*');
         } else {
-          alert("Please submit the Widget before entering a group.");
+              alert('Please enter a valid accent color.');
+        }
+        }
+
+        function updateWidgetId() {
+            // Send a message to the plugin to update the border width
+            parent.postMessage({ pluginMessage: {type: 'update-widgetId'} }, '*');
+        }
+
+        function updateWidgetCornerRadius() {
+            const newWidgetCornerRadius = document.getElementById('widgetCornerRadiusInput').value.trim();
+          
+            if (newWidgetCornerRadius) {
+                parent.postMessage({ pluginMessage: { type: 'update-widgetCornerRadius', payload: newWidgetCornerRadius } }, '*');
+          } else {
+                alert('Please enter a valid corner radius.');
+          }
         }
         function updateSubheading() {
             console.log("Sending subheading update request to code.tsx");
@@ -929,15 +390,7 @@
                 alert('Please enter a valid font size.');
             }
         }
-        document.getElementById('setWidgetGroupButton').onclick = () => {
-            const customWidgetGroup = document.getElementById('customWidgetGroupInput').value.trim();
-          
-            if (customWidgetGroup) {
-              parent.postMessage({ pluginMessage: { type: 'update-widgetGroup', payload: customWidgetGroup } }, '*');
-            } else {
-              alert('Please enter a valid Widget Group.');
-            }
-          };
+
           document.addEventListener("DOMContentLoaded", function () {
             const borderColorInput = document.getElementById('borderColorInput');
             const borderColorButton = document.getElementById('borderColorInput').nextElementSibling;
@@ -981,6 +434,8 @@
                 accentColorText.textContent = color;
     });
 });
+          
+
     </script>
-  </body>
+</body>
 </html>
