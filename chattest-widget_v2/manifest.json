@@ -1,0 +1,20 @@
+{
+  "name": "chattest-widget_v2",
+  "id": "1507141147178247648",
+  "api": "1.0.0",
+  "documentAccess": "dynamic-page",
+  "editorType": ["figjam"],
+  "permissions": ["currentuser"], 
+  "containsWidget": true,
+  "main": "dist/code.js",
+  "ui": {
+    "main": "dist/ui.html", 
+    "options": "dist/options.html",
+    "check": "dist/events.html",
+    "optionsChat": "dist/optionsChat.html"
+  },
+  "widgetApi": "1.0.0",
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:4000"]}
+}
