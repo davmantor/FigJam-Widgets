@@ -1,0 +1,19 @@
+{
+  "name": "SimpleTextEntry",
+  "id": "1549858282844742399",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "networkAccess": {
+    "allowedDomains": ["https://s3-alpha.figma.com"]
+  },
+  "permissions": ["currentuser"],
+  "ui": "ui.html"
+}
