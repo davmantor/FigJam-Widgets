@@ -1,83 +1,129 @@
-<!doctype html>
-<meta charset="utf-8" />
-<title>Admin Menu</title>
-<style>
-  body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding:12px; }
-  .row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-  .row label { width:120px; font-size:12px; color:#333; }
-  .row input, .row textarea { flex:1; padding:6px 8px; border:1px solid #ccc; border-radius:6px; font-size:12px; }
-  .hint { font-size:11px; color:#666; margin-top:-4px; margin-bottom:8px; }
-  .btns { display:flex; gap:8px; margin-top:12px; }
-  button { padding:8px 12px; border-radius:6px; border:0; cursor:pointer; }
-  .apply { background:#000; color:#fff; }
-  .close { background:#eee; }
-</style>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root { color-scheme: light dark; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; font-size: 13px; margin: 12px; }
+      .hidden { display: none; }
+      .row { margin-top: 10px; }
+      .error { color: #c00; font-size: 12px; margin-top: 6px; min-height: 14px; }
+      input[type="number"], input[type="text"] { width: 100%; box-sizing: border-box; }
+      .btns { display: flex; gap: 8px; margin-top: 12px; }
+      button { padding: 6px 10px; }
+      label { display: block; margin-bottom: 4px; font-weight: 600; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    </style>
+  </head>
+  <body>
+    <!-- Password view -->
+    <div id="pw" class="">
+      <label>Password</label>
+      <input id="pwd" type="text" />
+      <div id="err" class="error"></div>
+      <div class="btns">
+        <button id="unlock">Unlock</button>
+        <button id="cancel">Cancel</button>
+      </div>
+    </div>
 
-<div class="row"><label>Width</label><input type="number" id="width" min="200" step="10"></div>
-<div class="row"><label>Height</label><input type="number" id="height" min="140" step="10"></div>
-<div class="row"><label>Font size</label><input type="number" id="fontSize" min="10" step="1"></div>
+    <!-- Admin panel view -->
+    <div id="panel" class="hidden">
+      <div class="grid">
+        <div class="row">
+          <label>Width (px)</label>
+          <input id="width" type="number" min="280" max="1000" step="10" />
+        </div>
+        <div class="row">
+          <label>Font size (base)</label>
+          <input id="fontSize" type="number" min="10" max="24" step="1" />
+        </div>
+        <div class="row">
+          <label>Border width (px)</label>
+          <input id="borderWidth" type="number" min="0" max="8" step="1" />
+        </div>
+        <div class="row">
+          <label>Border color</label>
+          <input id="borderColor" type="text" placeholder="#000000" />
+        </div>
+      </div>
 
-<div class="row"><label>Border color</label><input type="text" id="borderColor" placeholder="#000000"></div>
-<div class="row"><label>Border width</label><input type="number" id="borderWidth" min="0" step="1"></div>
+      <div class="btns">
+        <button id="reset">Reset submission</button>
+        <button id="done">Done</button>
+      </div>
+    </div>
 
-<div class="row"><label>Shadow color</label><input type="text" id="shadowColor" placeholder="#0000001A"></div>
-<div class="row"><label>Shadow blur</label><input type="number" id="shadowBlur" min="0" step="1"></div>
-<div class="row"><label>Shadow offset X</label><input type="number" id="shadowOffsetX" step="1"></div>
-<div class="row"><label>Shadow offset Y</label><input type="number" id="shadowOffsetY" step="1"></div>
+    <script>
+      // Tell widget we're ready
+      parent.postMessage({ pluginMessage: { type: "ready" } }, "*");
 
-<div class="row" style="align-items:flex-start">
-  <label>Admins</label>
-  <textarea id="admins" rows="3" placeholder="Comma-separated usernames, e.g.&#10;Alice Chen, Bob Rivera"></textarea>
-</div>
-<div class="hint">Anyone whose Figma username exactly matches a name in this list can open this menu.</div>
+      const pw = document.getElementById("pw");
+      const panel = document.getElementById("panel");
+      const err = document.getElementById("err");
 
-<div class="btns">
-  <button class="apply" id="apply">Apply</button>
-  <button class="close" id="close">Close</button>
-</div>
+      const widthEl = document.getElementById("width");
+      const fontSizeEl = document.getElementById("fontSize");
+      const borderWidthEl = document.getElementById("borderWidth");
+      const borderColorEl = document.getElementById("borderColor");
 
-<script>
-  // receive initial values
-  window.onmessage = (event) => {
-    const msg = event.data && event.data.pluginMessage;
-    if (!msg || msg.type !== "init") return;
-    const p = msg.payload || {};
-    document.getElementById("width").value = p.width ?? 420;
-    document.getElementById("height").value = p.height ?? 240;
-    document.getElementById("fontSize").value = p.fontSize ?? 14;
-    document.getElementById("borderColor").value = p.borderColor ?? "#000000";
-    document.getElementById("borderWidth").value = p.borderWidth ?? 1;
-    document.getElementById("shadowColor").value = p.shadowColor ?? "#0000001A";
-    document.getElementById("shadowBlur").value = p.shadowBlur ?? 8;
-    document.getElementById("shadowOffsetX").value = p.shadowOffsetX ?? 0;
-    document.getElementById("shadowOffsetY").value = p.shadowOffsetY ?? 2;
-    document.getElementById("admins").value = (p.admins || []).join(", ");
-  };
-
-  function number(id) { return Number(document.getElementById(id).value); }
-  function text(id) { return String(document.getElementById(id).value || ""); }
-
-  document.getElementById("apply").onclick = () => {
-    const adminsCSV = text("admins");
-    const admins = adminsCSV.split(",").map(s => s.trim()).filter(Boolean);
-    parent.postMessage({ pluginMessage: {
-      type: "apply",
-      payload: {
-        width: number("width"),
-        height: number("height"),
-        fontSize: number("fontSize"),
-        borderColor: text("borderColor"),
-        borderWidth: number("borderWidth"),
-        shadowColor: text("shadowColor"),
-        shadowBlur: number("shadowBlur"),
-        shadowOffsetX: number("shadowOffsetX"),
-        shadowOffsetY: number("shadowOffsetY"),
-        admins
+      function showPassword() {
+        pw.classList.remove("hidden");
+        panel.classList.add("hidden");
+        err.textContent = "";
+        document.getElementById("pwd").focus();
       }
-    }}, "*");
-  };
+      function showPanel(values) {
+        pw.classList.add("hidden");
+        panel.classList.remove("hidden");
+        if (values) {
+          widthEl.value = values.boxWidth ?? 420;
+          fontSizeEl.value = values.fontSizeBase ?? 14;
+          borderWidthEl.value = values.borderWidth ?? 1;
+          borderColorEl.value = values.borderColor ?? "#000000";
+        }
+      }
 
-  document.getElementById("close").onclick = () => {
-    parent.postMessage({ pluginMessage: { type: "close" } }, "*");
-  };
-</script>
+      onmessage = (event) => {
+        const msg = event.data?.pluginMessage;
+        if (!msg) return;
+        if (msg.type === "promptPassword") showPassword();
+        if (msg.type === "error") err.textContent = msg.message || "";
+        if (msg.type === "showAdminPanel") showPanel(msg.values || {});
+      };
+
+      // actions
+      document.getElementById("unlock").onclick = () => {
+        const value = document.getElementById("pwd").value;
+        parent.postMessage({ pluginMessage: { type: "passwordSubmit", value } }, "*");
+      };
+      document.getElementById("cancel").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+      };
+      document.getElementById("done").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+      };
+      document.getElementById("reset").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "resetResponse" } }, "*");
+      };
+
+      // live updates
+      widthEl.oninput = () => {
+        const val = Number(widthEl.value);
+        parent.postMessage({ pluginMessage: { type: "updateWidth", value: val } }, "*");
+      };
+      fontSizeEl.oninput = () => {
+        const val = Number(fontSizeEl.value);
+        parent.postMessage({ pluginMessage: { type: "updateFontSize", value: val } }, "*");
+      };
+      borderWidthEl.oninput = () => {
+        const val = Number(borderWidthEl.value);
+        parent.postMessage({ pluginMessage: { type: "updateBorderWidth", value: val } }, "*");
+      };
+      borderColorEl.oninput = () => {
+        const val = borderColorEl.value.trim();
+        parent.postMessage({ pluginMessage: { type: "updateBorderColor", value: val } }, "*");
+      };
+    </script>
+  </body>
+</html>
