@@ -105,6 +105,16 @@
       const shadowBlurEl = document.getElementById("shadowBlur");
       const shadowSpreadEl = document.getElementById("shadowSpread");
 
+      const pwdEl = document.getElementById("pwd");
+      const unlockBtn = document.getElementById("unlock");
+
+      pwdEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          unlockBtn.click();
+        }
+      });
+
       function showPassword() {
         pw.classList.remove("hidden");
         panel.classList.add("hidden");
