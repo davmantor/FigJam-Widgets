@@ -4,86 +4,206 @@
   <head>
     <meta charset="utf-8" />
     <style>
-      :root { color-scheme: light dark; }
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; font-size: 13px; margin: 12px; }
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #0f172a;
+        --muted: #64748b;
+        --card: #f8fafc;
+        --border: #e5e7eb;
+        --accent: #2563eb;
+        --accent-fg: #ffffff;
+        --danger: #dc2626;
+        --danger-fg: #ffffff;
+        --ring: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+        --radius: 10px;
+        --radius-sm: 8px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --fg: #e5e7eb;
+          --muted: #94a3b8;
+          --card: #0f172a;
+          --border: #1f2937;
+          --accent: #3b82f6;
+        }
+      }
+
+      html, body { height: 100%; }
+      body {
+        margin: 12px;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        font-size: 13px;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
       .hidden { display: none; }
-      .row { margin-top: 10px; }
-      .error { color: #c00; font-size: 12px; margin-top: 6px; min-height: 14px; }
-      input[type="number"], input[type="text"] { width: 100%; box-sizing: border-box; }
-      .btns { display: flex; gap: 8px; margin-top: 12px; }
-      button { padding: 6px 10px; }
-      label { display: block; margin-bottom: 4px; font-weight: 600; }
+
+      .surface {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+      }
+
+      .titlebar {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .title { font-weight: 700; font-size: 13px; letter-spacing: .2px; }
+      .subtitle { color: var(--muted); font-size: 12px; }
+
+      .section {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px;
+        margin-top: 10px;
+      }
+      .section h4 {
+        margin: 0 0 8px 0;
+        font-size: 12px;
+        letter-spacing: .2px;
+      }
+
+      .row { margin-top: 8px; }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--fg);
+        border-radius: 6px;
+        outline: none;
+      }
+      input::placeholder { color: var(--muted); }
+      input:focus { border-color: var(--accent); box-shadow: var(--ring); }
+
       .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+      @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+      .btns {
+        display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
+      }
+      button {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform .02s ease, opacity .15s ease, background .15s;
+        background: #0f172a; color: #ffffff;
+      }
+      button:hover { opacity: .92; }
+      button:active { transform: translateY(1px); }
+      .btn-ghost { background: transparent; color: var(--fg); }
+      .btn-accent { background: var(--accent); color: var(--accent-fg); border-color: color-mix(in oklab, var(--accent) 70%, var(--border)); }
+      .btn-danger { background: var(--danger); color: var(--danger-fg); border-color: color-mix(in oklab, var(--danger) 70%, var(--border)); }
+
+      .error {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 6px;
+        min-height: 14px;
+      }
     </style>
   </head>
   <body>
-    <!-- Password view -->
-    <div id="pw" class="">
-      <label>Password</label>
-      <input id="pwd" type="password" autocomplete="current-password" enterkeyhint="go"/>
-      <div id="err" class="error"></div>
-      <div class="btns">
-        <button id="unlock">Unlock</button>
-        <button id="cancel">Cancel</button>
-      </div>
-    </div>
+    <div class="surface">
+      <!-- Password view -->
+      <div id="pw" class="">
+        <div class="titlebar">
+          <div>
+            <div class="title">Admin access</div>
+            <div class="subtitle">Enter password to unlock controls</div>
+          </div>
+        </div>
 
-    <!-- Admin panel view -->
-    <div id="panel" class="hidden">
-      <div class="grid">
         <div class="row">
-          <label>Width (px)</label>
-          <input id="width" type="number" min="280" max="1200" step="10" />
+          <label>Password</label>
+          <input id="pwd" type="password" autocomplete="current-password" enterkeyhint="go" />
+          <div id="err" class="error" aria-live="polite"></div>
         </div>
-        <div class="row">
-          <label>Height (px)</label>
-          <input id="height" type="number" min="160" max="1200" step="10" />
-        </div>
-        <div class="row">
-          <label>Font size (base)</label>
-          <input id="fontSize" type="number" min="10" max="24" step="1" />
-        </div>
-        <div class="row">
-          <label>Border width (px)</label>
-          <input id="borderWidth" type="number" min="0" max="8" step="1" />
-        </div>
-        <div class="row">
-          <label>Border color</label>
-          <input id="borderColor" type="text" placeholder="#000000" />
+
+        <div class="btns">
+          <button id="cancel" class="btn-ghost">Cancel</button>
+          <button id="unlock" class="btn-accent">Unlock</button>
         </div>
       </div>
 
-      <h4 style="margin-top:16px;">Shadow</h4>
-      <div class="grid">
-        <div class="row">
-          <label>Color</label>
-          <input id="shadowColor" type="text" placeholder="#0000001A" />
+      <!-- Admin panel view -->
+      <div id="panel" class="hidden">
+        <div class="titlebar">
+          <div class="title">Widget settings</div>
         </div>
-        <div class="row">
-          <label>Blur</label>
-          <input id="shadowBlur" type="number" min="0" max="64" step="1" />
-        </div>
-        <div class="row">
-          <label>Spread</label>
-          <input id="shadowSpread" type="number" min="0" max="32" step="1" />
-        </div>
-      </div>
-      <div class="grid">
-        <div class="row">
-          <label>Offset X</label>
-          <input id="shadowOffsetX" type="number" min="-32" max="32" step="1" />
-        </div>
-        <div class="row">
-          <label>Offset Y</label>
-          <input id="shadowOffsetY" type="number" min="-32" max="32" step="1" />
-        </div>
-      </div>
 
-      <div class="btns">
-        <button id="unlockEdit">Edit submission</button>
-        <button id="reset">Reset submission</button>
-        <button id="done">Done</button>
+        <div class="section">
+          <h4>Frame</h4>
+          <div class="grid">
+            <div class="row">
+              <label>Width (px)</label>
+              <input id="width" type="number" min="280" max="1200" step="10" />
+            </div>
+            <div class="row">
+              <label>Height (px)</label>
+              <input id="height" type="number" min="160" max="1200" step="10" />
+            </div>
+            <div class="row">
+              <label>Font size (base)</label>
+              <input id="fontSize" type="number" min="10" max="24" step="1" />
+            </div>
+            <div class="row">
+              <label>Border width (px)</label>
+              <input id="borderWidth" type="number" min="0" max="8" step="1" />
+            </div>
+            <div class="row">
+              <label>Border color</label>
+              <input id="borderColor" type="text" placeholder="#000000" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h4>Shadow</h4>
+          <div class="grid">
+            <div class="row">
+              <label>Color</label>
+              <input id="shadowColor" type="text" placeholder="#000000" />
+            </div>
+            <div class="row">
+              <label>Blur</label>
+              <input id="shadowBlur" type="number" min="0" max="64" step="1" />
+            </div>
+            <div class="row">
+              <label>Spread</label>
+              <input id="shadowSpread" type="number" min="0" max="32" step="1" />
+            </div>
+            <div class="row">
+              <label>Offset X</label>
+              <input id="shadowOffsetX" type="number" min="-32" max="32" step="1" />
+            </div>
+            <div class="row">
+              <label>Offset Y</label>
+              <input id="shadowOffsetY" type="number" min="-32" max="32" step="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button id="unlockEdit" class="btn-accent">Edit submission</button>
+          <button id="reset" class="btn-danger">Reset submission</button>
+          <button id="done" class="btn-ghost">Done</button>
+        </div>
       </div>
     </div>
 
@@ -110,12 +230,11 @@
       const unlockBtn = document.getElementById("unlock");
 
       pwdEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === "NumpadEnter") {
           e.preventDefault();
           unlockBtn.click();
         }
       });
-
       pwdEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           document.getElementById("cancel").click();
@@ -133,12 +252,11 @@
         panel.classList.remove("hidden");
         if (values) {
           widthEl.value = values.boxWidth ?? 1020;
-          heightEl.value = values.boxHeight ?? 235;                 // NEW
+          heightEl.value = values.boxHeight ?? 235;
           fontSizeEl.value = values.fontSizeBase ?? 16;
           borderWidthEl.value = values.borderWidth ?? 1;
           borderColorEl.value = values.borderColor ?? "#000000";
 
-          // NEW: shadow fields
           shadowColorEl.value = values.shadowColor ?? "#000000";
           shadowOffsetXEl.value = values.shadowOffsetX ?? 0;
           shadowOffsetYEl.value = values.shadowOffsetY ?? 2;
@@ -176,7 +294,7 @@
       borderColorEl.oninput = () =>
         parent.postMessage({ pluginMessage: { type: "updateBorderColor", value: borderColorEl.value.trim() } }, "*");
 
-      // Shadow live updates — NEW
+      // Shadow live updates
       shadowColorEl.oninput = () =>
         parent.postMessage({ pluginMessage: { type: "updateShadowColor", value: shadowColorEl.value.trim() } }, "*");
       shadowOffsetXEl.oninput = () =>
