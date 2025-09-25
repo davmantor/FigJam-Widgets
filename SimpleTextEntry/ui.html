@@ -115,6 +115,12 @@
         }
       });
 
+      pwdEl.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          document.getElementById("cancel").click();
+        }
+      });
+
       function showPassword() {
         pw.classList.remove("hidden");
         panel.classList.add("hidden");
