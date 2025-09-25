@@ -81,6 +81,7 @@
       </div>
 
       <div class="btns">
+        <button id="unlockEdit">Edit submission</button>
         <button id="reset">Reset submission</button>
         <button id="done">Done</button>
       </div>
@@ -186,6 +187,9 @@
         parent.postMessage({ pluginMessage: { type: "updateShadowBlur", value: Number(shadowBlurEl.value) } }, "*");
       shadowSpreadEl.oninput = () =>
         parent.postMessage({ pluginMessage: { type: "updateShadowSpread", value: Number(shadowSpreadEl.value) } }, "*");
+
+      document.getElementById("unlockEdit").onclick = () =>
+        parent.postMessage({ pluginMessage: { type: "unlockForEdit" } }, "*");
     </script>
   </body>
 </html>

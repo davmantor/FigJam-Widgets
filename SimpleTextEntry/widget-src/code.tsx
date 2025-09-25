@@ -141,6 +141,11 @@ function Widget() {
             if (typeof msg.value === "number") setShadowSpread(msg.value);
             break;
 
+          case "unlockForEdit":
+            setSubmitted(false);
+            setText(storedText || "");
+            break;
+
           case "resetResponse":
             setSubmitted(false);
             setText("");
