@@ -18,8 +18,7 @@ function timeString(d: Date) {
   return `${mo}/${day} ${hr12}:${min} ${ampm}`;
 }
 
-// Set your admin password here
-const ADMIN_PASSWORD = "letmein";
+const ADMIN_PASSWORD = "312cmpm15";
 
 const FALLBACK_AVATAR = `
 <svg width="32" height="32" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
@@ -46,10 +45,16 @@ function Widget() {
   const [storedText, setStoredText] = useSyncedState<string>("storedText", "");
 
   // Appearance settings controlled by admin panel
-  const [boxWidth, setBoxWidth] = useSyncedState<number>("boxWidth", 420);
-  const [fontSizeBase, setFontSizeBase] = useSyncedState<number>("fontSizeBase", 14);
+  const [boxWidth, setBoxWidth] = useSyncedState<number>("boxWidth", 1020);
+  const [boxHeight, setBoxHeight] = useSyncedState<number>("boxHeight", 235); 
+  const [fontSizeBase, setFontSizeBase] = useSyncedState<number>("fontSizeBase", 16);
   const [borderColor, setBorderColor] = useSyncedState<string>("borderColor", "#000000");
   const [borderWidth, setBorderWidth] = useSyncedState<number>("borderWidth", 1);
+  const [shadowColor, setShadowColor] = useSyncedState<string>("shadowColor", "#000000");
+  const [shadowOffsetX, setShadowOffsetX] = useSyncedState<number>("shadowOffsetX", 0);
+  const [shadowOffsetY, setShadowOffsetY] = useSyncedState<number>("shadowOffsetY", 2);
+  const [shadowBlur, setShadowBlur] = useSyncedState<number>("shadowBlur", 10);
+  const [shadowSpread, setShadowSpread] = useSyncedState<number>("shadowSpread", 0);
 
   const handleSubmit = () => {
     if (submitted) return;
@@ -69,16 +74,22 @@ function Widget() {
   // Always prompt for password; after success, swap to admin panel
   function openAdminFlow(): Promise<void> {
     return new Promise<void>((resolve) => {
-      figma.showUI(__html__, { width: 420, height: 360 });
+      figma.showUI(__html__, { width: 480, height: 420 });
 
       const sendPanelState = () => {
         figma.ui.postMessage({
           type: "showAdminPanel",
           values: {
             boxWidth,
+            boxHeight,
             fontSizeBase,
             borderColor,
             borderWidth,
+            shadowColor,
+            shadowOffsetX,
+            shadowOffsetY,
+            shadowBlur,
+            shadowSpread,
           },
         });
       };
@@ -101,6 +112,9 @@ function Widget() {
           case "updateWidth":
             if (typeof msg.value === "number") setBoxWidth(msg.value);
             break;
+          case "updateHeight":
+            if (typeof msg.value === "number") setBoxHeight(msg.value);
+            break;
           case "updateFontSize":
             if (typeof msg.value === "number") setFontSizeBase(msg.value);
             break;
@@ -109,6 +123,21 @@ function Widget() {
             break;
           case "updateBorderColor":
             if (typeof msg.value === "string") setBorderColor(msg.value);
+            break;
+          case "updateShadowColor":
+            if (typeof msg.value === "string") setShadowColor(msg.value);
+            break;
+          case "updateShadowOffsetX":
+            if (typeof msg.value === "number") setShadowOffsetX(msg.value);
+            break;
+          case "updateShadowOffsetY":
+            if (typeof msg.value === "number") setShadowOffsetY(msg.value);
+            break;
+          case "updateShadowBlur":
+            if (typeof msg.value === "number") setShadowBlur(msg.value);
+            break;
+          case "updateShadowSpread":
+            if (typeof msg.value === "number") setShadowSpread(msg.value);
             break;
 
           case "resetResponse":
@@ -161,6 +190,8 @@ function Widget() {
     </AutoLayout>
   );
 
+  const inputHeight = Math.max(80, boxHeight - 120);
+
   return (
     <AutoLayout
       name="Simple Response Widget"
@@ -168,10 +199,17 @@ function Widget() {
       spacing={8}
       padding={16}
       width={boxWidth}
+      height={boxHeight}
       cornerRadius={12}
       stroke={borderColor}
       strokeWidth={borderWidth}
-      effect={{ type: "drop-shadow", color: "#0000001A", offset: { x: 0, y: 2 }, blur: 8 }}
+      effect={{
+        type: "drop-shadow",
+        color: shadowColor,
+        offset: { x: shadowOffsetX, y: shadowOffsetY},
+        blur: shadowBlur,
+        spread: shadowSpread,
+      }}
       fill="#FFF"
     >
       {/* crown in edit state too */}
@@ -197,7 +235,7 @@ function Widget() {
             fontSize={fontSizeBase}
             inputBehavior="multiline"
             width="fill-parent"
-            height={120}
+            height={inputHeight}
             onTextEditEnd={(e) => setText(e.characters)}
           />
           <AutoLayout>

@@ -1,3 +1,4 @@
+<!-- ui.html -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,6 +14,7 @@
       button { padding: 6px 10px; }
       label { display: block; margin-bottom: 4px; font-weight: 600; }
       .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
     </style>
   </head>
   <body>
@@ -32,7 +34,11 @@
       <div class="grid">
         <div class="row">
           <label>Width (px)</label>
-          <input id="width" type="number" min="280" max="1000" step="10" />
+          <input id="width" type="number" min="280" max="1200" step="10" />
+        </div>
+        <div class="row">
+          <label>Height (px)</label>
+          <input id="height" type="number" min="160" max="1200" step="10" />
         </div>
         <div class="row">
           <label>Font size (base)</label>
@@ -48,6 +54,32 @@
         </div>
       </div>
 
+      <h4 style="margin-top:16px;">Shadow</h4>
+      <div class="grid">
+        <div class="row">
+          <label>Color</label>
+          <input id="shadowColor" type="text" placeholder="#0000001A" />
+        </div>
+        <div class="row">
+          <label>Blur</label>
+          <input id="shadowBlur" type="number" min="0" max="64" step="1" />
+        </div>
+        <div class="row">
+          <label>Spread</label>
+          <input id="shadowSpread" type="number" min="0" max="32" step="1" />
+        </div>
+      </div>
+      <div class="grid">
+        <div class="row">
+          <label>Offset X</label>
+          <input id="shadowOffsetX" type="number" min="-32" max="32" step="1" />
+        </div>
+        <div class="row">
+          <label>Offset Y</label>
+          <input id="shadowOffsetY" type="number" min="-32" max="32" step="1" />
+        </div>
+      </div>
+
       <div class="btns">
         <button id="reset">Reset submission</button>
         <button id="done">Done</button>
@@ -55,7 +87,6 @@
     </div>
 
     <script>
-      // Tell widget we're ready
       parent.postMessage({ pluginMessage: { type: "ready" } }, "*");
 
       const pw = document.getElementById("pw");
@@ -63,9 +94,16 @@
       const err = document.getElementById("err");
 
       const widthEl = document.getElementById("width");
+      const heightEl = document.getElementById("height");
       const fontSizeEl = document.getElementById("fontSize");
       const borderWidthEl = document.getElementById("borderWidth");
       const borderColorEl = document.getElementById("borderColor");
+
+      const shadowColorEl = document.getElementById("shadowColor");
+      const shadowOffsetXEl = document.getElementById("shadowOffsetX");
+      const shadowOffsetYEl = document.getElementById("shadowOffsetY");
+      const shadowBlurEl = document.getElementById("shadowBlur");
+      const shadowSpreadEl = document.getElementById("shadowSpread");
 
       function showPassword() {
         pw.classList.remove("hidden");
@@ -77,10 +115,18 @@
         pw.classList.add("hidden");
         panel.classList.remove("hidden");
         if (values) {
-          widthEl.value = values.boxWidth ?? 420;
-          fontSizeEl.value = values.fontSizeBase ?? 14;
+          widthEl.value = values.boxWidth ?? 1020;
+          heightEl.value = values.boxHeight ?? 235;                 // NEW
+          fontSizeEl.value = values.fontSizeBase ?? 16;
           borderWidthEl.value = values.borderWidth ?? 1;
           borderColorEl.value = values.borderColor ?? "#000000";
+
+          // NEW: shadow fields
+          shadowColorEl.value = values.shadowColor ?? "#000000";
+          shadowOffsetXEl.value = values.shadowOffsetX ?? 0;
+          shadowOffsetYEl.value = values.shadowOffsetY ?? 2;
+          shadowBlurEl.value = values.shadowBlur ?? 10;
+          shadowSpreadEl.value = values.shadowSpread ?? 0;
         }
       }
 
@@ -92,38 +138,38 @@
         if (msg.type === "showAdminPanel") showPanel(msg.values || {});
       };
 
-      // actions
-      document.getElementById("unlock").onclick = () => {
-        const value = document.getElementById("pwd").value;
-        parent.postMessage({ pluginMessage: { type: "passwordSubmit", value } }, "*");
-      };
-      document.getElementById("cancel").onclick = () => {
+      document.getElementById("unlock").onclick = () =>
+        parent.postMessage({ pluginMessage: { type: "passwordSubmit", value: document.getElementById("pwd").value } }, "*");
+      document.getElementById("cancel").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "close" } }, "*");
-      };
-      document.getElementById("done").onclick = () => {
+      document.getElementById("done").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "close" } }, "*");
-      };
-      document.getElementById("reset").onclick = () => {
+      document.getElementById("reset").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "resetResponse" } }, "*");
-      };
 
-      // live updates
-      widthEl.oninput = () => {
-        const val = Number(widthEl.value);
-        parent.postMessage({ pluginMessage: { type: "updateWidth", value: val } }, "*");
-      };
-      fontSizeEl.oninput = () => {
-        const val = Number(fontSizeEl.value);
-        parent.postMessage({ pluginMessage: { type: "updateFontSize", value: val } }, "*");
-      };
-      borderWidthEl.oninput = () => {
-        const val = Number(borderWidthEl.value);
-        parent.postMessage({ pluginMessage: { type: "updateBorderWidth", value: val } }, "*");
-      };
-      borderColorEl.oninput = () => {
-        const val = borderColorEl.value.trim();
-        parent.postMessage({ pluginMessage: { type: "updateBorderColor", value: val } }, "*");
-      };
+      // Live updates
+      widthEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateWidth", value: Number(widthEl.value) } }, "*");
+      heightEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateHeight", value: Number(heightEl.value) } }, "*");
+      fontSizeEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateFontSize", value: Number(fontSizeEl.value) } }, "*");
+      borderWidthEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateBorderWidth", value: Number(borderWidthEl.value) } }, "*");
+      borderColorEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateBorderColor", value: borderColorEl.value.trim() } }, "*");
+
+      // Shadow live updates — NEW
+      shadowColorEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateShadowColor", value: shadowColorEl.value.trim() } }, "*");
+      shadowOffsetXEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateShadowOffsetX", value: Number(shadowOffsetXEl.value) } }, "*");
+      shadowOffsetYEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateShadowOffsetY", value: Number(shadowOffsetYEl.value) } }, "*");
+      shadowBlurEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateShadowBlur", value: Number(shadowBlurEl.value) } }, "*");
+      shadowSpreadEl.oninput = () =>
+        parent.postMessage({ pluginMessage: { type: "updateShadowSpread", value: Number(shadowSpreadEl.value) } }, "*");
     </script>
   </body>
 </html>
