@@ -44,9 +44,9 @@ function Widget() {
   const [timestampISO, setTimestampISO] = useSyncedState<string | null>("timestampISO", null);
   const [storedText, setStoredText] = useSyncedState<string>("storedText", "");
 
-  // Appearance settings controlled by admin panel
+  // Appearance settings controlled by admin panel (defaults from the complex widget)
   const [boxWidth, setBoxWidth] = useSyncedState<number>("boxWidth", 1020);
-  const [boxHeight, setBoxHeight] = useSyncedState<number>("boxHeight", 235); 
+  const [boxHeight, setBoxHeight] = useSyncedState<number>("boxHeight", 235);
   const [fontSizeBase, setFontSizeBase] = useSyncedState<number>("fontSizeBase", 16);
   const [borderColor, setBorderColor] = useSyncedState<string>("borderColor", "#000000");
   const [borderWidth, setBorderWidth] = useSyncedState<number>("borderWidth", 1);
@@ -61,7 +61,7 @@ function Widget() {
     const t = text.trim();
     if (!t) return;
 
-    const cu = figma.currentUser; // ok in handler
+    const cu = figma.currentUser;
     const now = new Date();
 
     setStoredText(t);
@@ -71,7 +71,7 @@ function Widget() {
     setSubmitted(true);
   };
 
-  // Always prompt for password; after success, swap to admin panel
+  // Admin panel flow
   function openAdminFlow(): Promise<void> {
     return new Promise<void>((resolve) => {
       figma.showUI(__html__, { width: 480, height: 420 });
@@ -102,7 +102,7 @@ function Widget() {
 
           case "passwordSubmit":
             if (msg.value === ADMIN_PASSWORD) {
-              sendPanelState(); // show admin panel
+              sendPanelState();
             } else {
               figma.ui.postMessage({ type: "error", message: "Incorrect password" });
             }
@@ -124,6 +124,7 @@ function Widget() {
           case "updateBorderColor":
             if (typeof msg.value === "string") setBorderColor(msg.value);
             break;
+
           case "updateShadowColor":
             if (typeof msg.value === "string") setShadowColor(msg.value);
             break;
@@ -159,7 +160,6 @@ function Widget() {
       };
 
       figma.ui.on("message", handler);
-      // fallback ping
       figma.ui.postMessage({ type: "promptPassword" });
     });
   }
@@ -178,7 +178,6 @@ function Widget() {
         </Text>
       </AutoLayout>
 
-      {/* Crown button */}
       <AutoLayout
         padding={6}
         cornerRadius={8}
@@ -190,14 +189,12 @@ function Widget() {
     </AutoLayout>
   );
 
-  const inputHeight = Math.max(80, boxHeight - 120);
-
   return (
     <AutoLayout
       name="Simple Response Widget"
       direction="vertical"
       spacing={8}
-      padding={16}
+      padding={{ top:16, right:16, bottom:8, left:16 }}
       width={boxWidth}
       height={boxHeight}
       cornerRadius={12}
@@ -206,38 +203,49 @@ function Widget() {
       effect={{
         type: "drop-shadow",
         color: shadowColor,
-        offset: { x: shadowOffsetX, y: shadowOffsetY},
+        offset: { x: shadowOffsetX, y: shadowOffsetY },
         blur: shadowBlur,
         spread: shadowSpread,
       }}
       fill="#FFF"
     >
-      {/* crown in edit state too */}
-      {!submitted && (
-        <AutoLayout width="fill-parent" horizontalAlignItems="end">
-          <AutoLayout
-            padding={6}
-            cornerRadius={8}
-            hoverStyle={{ fill: "#F2F2F2" }}
-            onClick={() => openAdminFlow()}
-          >
-            <SVG src={CROWN_ICON} width={fontSizeBase + 6} height={fontSizeBase + 6} />
-          </AutoLayout>
-        </AutoLayout>
-      )}
-
       {!submitted ? (
         <>
-          <Text fontSize={fontSizeBase + 2} fontWeight="bold">Your response</Text>
-          <Input
-            value={text}
-            placeholder="Type here…"
-            fontSize={fontSizeBase}
-            inputBehavior="multiline"
+          {/* Inline title + crown */}
+          <AutoLayout
+            direction="horizontal"
             width="fill-parent"
-            height={inputHeight}
-            onTextEditEnd={(e) => setText(e.characters)}
-          />
+            verticalAlignItems="center"
+            spacing={8}
+          >
+            <Text fontSize={fontSizeBase + 2} fontWeight="bold" layoutGrow={1}>
+              Your response
+            </Text>
+
+            <AutoLayout
+              padding={6}
+              cornerRadius={8}
+              hoverStyle={{ fill: "#F2F2F2" }}
+              onClick={() => openAdminFlow()}
+            >
+              <SVG src={CROWN_ICON} width={fontSizeBase + 6} height={fontSizeBase + 6} />
+            </AutoLayout>
+          </AutoLayout>
+
+          {/* Growable input area so the button never gets clipped */}
+          <AutoLayout direction="vertical" layoutGrow={1} width="fill-parent">
+            <Input
+              value={text}
+              placeholder="Type here…"
+              fontSize={fontSizeBase}
+              inputBehavior="multiline"
+              width="fill-parent"
+              height="fill-parent"
+              onTextEditEnd={(e) => setText(e.characters)}
+            />
+          </AutoLayout>
+
+          {/* Submit row anchored below */}
           <AutoLayout>
             <AutoLayout
               padding={{ vertical: 8, horizontal: 14 }}
