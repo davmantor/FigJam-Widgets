@@ -21,9 +21,13 @@
         --radius-sm: 8px;
       }
 
-      html, body { height: 100%; }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+      }
       body {
-        margin: 12px;
         font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         font-size: 13px;
         background: var(--bg);
@@ -81,8 +85,8 @@
       input::placeholder { color: var(--muted); }
       input:focus { border-color: var(--accent); box-shadow: var(--ring); }
 
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+      .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+      @media (max-width: 260px) { .grid { grid-template-columns: 1fr; } }
 
       .btns {
         display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
@@ -205,6 +209,7 @@
         <div class="btns">
           <button id="unlockEdit" class="btn-accent">Edit submission</button>
           <button id="reset" class="btn-highlight">Reset submission</button>
+          <button id="resetDefaults" class="btn-danger">Defaults</button>
         </div>
       </div>
     </div>
@@ -301,6 +306,10 @@
 
       document.getElementById("unlockEdit").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "unlockForEdit" } }, "*");
+
+      document.getElementById("resetDefaults").onclick = () =>
+        parent.postMessage({ pluginMessage: { type: "resetDefaults" } }, "*");
+
     </script>
   </body>
 </html>

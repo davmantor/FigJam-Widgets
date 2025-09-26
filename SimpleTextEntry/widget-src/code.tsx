@@ -85,9 +85,11 @@ function Widget() {
   };
 
   // Admin panel flow
+  const UI_SIZE_PW = { width: 260, height: 175 };
+  const UI_SIZE_PANEL = { width: 400, height: 413 };
   function openAdminFlow(): Promise<void> {
     return new Promise<void>((resolve) => {
-      figma.showUI(__html__, { width: 480, height: 420 });
+      figma.showUI(__html__, UI_SIZE_PW);
 
       const sendPanelState = () => {
         figma.ui.postMessage({
@@ -111,12 +113,15 @@ function Widget() {
         switch (msg.type) {
           case "ready":
             figma.ui.postMessage({ type: "promptPassword" });
+            figma.ui.resize(UI_SIZE_PW.width, UI_SIZE_PW.height);
             break;
           case "passwordSubmit":
             if (msg.value === ADMIN_PASSWORD) {
+              figma.ui.resize(UI_SIZE_PANEL.width, UI_SIZE_PANEL.height);
               sendPanelState();
             } else {
               figma.ui.postMessage({ type: "error", message: "Incorrect password" });
+              figma.ui.resize(UI_SIZE_PW.width, UI_SIZE_PW.height);
             }
             break;
 
@@ -164,6 +169,19 @@ function Widget() {
             setName("");
             setPhotoUrl(null);
             setTimestampISO(null);
+            break;
+
+          case "resetDefaults":
+            setBoxWidth(1020);
+            setBoxHeight(235);
+            setFontSizeBase(16);
+            setBorderColor("#000000");
+            setBorderWidth(1);
+            setShadowColor("#000000");
+            setShadowOffsetX(0);
+            setShadowOffsetY(2);
+            setShadowBlur(10);
+            setShadowSpread(0);
             break;
 
           case "close":
