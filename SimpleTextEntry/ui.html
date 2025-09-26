@@ -6,28 +6,19 @@
     <style>
       :root {
         color-scheme: light dark;
-        --bg: #ffffff;
-        --fg: #0f172a;
-        --muted: #64748b;
-        --card: #f8fafc;
-        --border: #e5e7eb;
-        --accent: #2563eb;
-        --accent-fg: #ffffff;
-        --danger: #dc2626;
-        --danger-fg: #ffffff;
+        --bg: #F1F5F9;
+        --fg: #303844;
+        --muted: #747470;
+        --card: #FFFFFF;
+        --border: #ACACAC;
+        --accent: #6ea6fb;
+        --accent-fg: #FFFFFF;
+        --danger: #DC2626;     /* red for error text */
+        --danger-fg: #FFFFFF;
+        --highlight: #F2DE56;  /* yellow for reset button */
         --ring: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
         --radius: 10px;
         --radius-sm: 8px;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #0b1220;
-          --fg: #e5e7eb;
-          --muted: #94a3b8;
-          --card: #0f172a;
-          --border: #1f2937;
-          --accent: #3b82f6;
-        }
       }
 
       html, body { height: 100%; }
@@ -107,11 +98,24 @@
       button:hover { opacity: .92; }
       button:active { transform: translateY(1px); }
       .btn-ghost { background: transparent; color: var(--fg); }
-      .btn-accent { background: var(--accent); color: var(--accent-fg); border-color: color-mix(in oklab, var(--accent) 70%, var(--border)); }
-      .btn-danger { background: var(--danger); color: var(--danger-fg); border-color: color-mix(in oklab, var(--danger) 70%, var(--border)); }
+      .btn-accent {
+        background: var(--accent);
+        color: var(--accent-fg);
+        border-color: color-mix(in oklab, var(--accent) 70%, var(--border));
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: var(--danger-fg);
+        border-color: color-mix(in oklab, var(--danger) 70%, var(--border));
+      }
+      .btn-highlight {
+        background: var(--highlight);
+        color: #303844; /* dark text for contrast on yellow */
+        border-color: color-mix(in oklab, var(--highlight) 70%, var(--border));
+      }
 
       .error {
-        color: var(--danger);
+        color: var(--danger); /* stays red */
         font-size: 12px;
         margin-top: 6px;
         min-height: 14px;
@@ -136,7 +140,6 @@
         </div>
 
         <div class="btns">
-          <button id="cancel" class="btn-ghost">Cancel</button>
           <button id="unlock" class="btn-accent">Unlock</button>
         </div>
       </div>
@@ -201,8 +204,7 @@
 
         <div class="btns">
           <button id="unlockEdit" class="btn-accent">Edit submission</button>
-          <button id="reset" class="btn-danger">Reset submission</button>
-          <button id="done" class="btn-ghost">Done</button>
+          <button id="reset" class="btn-highlight">Reset submission</button>
         </div>
       </div>
     </div>
@@ -233,11 +235,6 @@
         if (e.key === "Enter" || e.key === "NumpadEnter") {
           e.preventDefault();
           unlockBtn.click();
-        }
-      });
-      pwdEl.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          document.getElementById("cancel").click();
         }
       });
 
@@ -275,10 +272,6 @@
 
       document.getElementById("unlock").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "passwordSubmit", value: document.getElementById("pwd").value } }, "*");
-      document.getElementById("cancel").onclick = () =>
-        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
-      document.getElementById("done").onclick = () =>
-        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
       document.getElementById("reset").onclick = () =>
         parent.postMessage({ pluginMessage: { type: "resetResponse" } }, "*");
 
