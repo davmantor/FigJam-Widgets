@@ -41,9 +41,9 @@
 
       .titlebar {
         display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 4px;
       }
-      .title { font-weight: 700; font-size: 13px; letter-spacing: .2px; }
+      .title { font-weight: 700; font-size: 14px; letter-spacing: .2px; }
       .subtitle { color: var(--muted); font-size: 12px; }
 
       .section {
@@ -53,12 +53,12 @@
         margin-top: 10px;
       }
       .section h4 {
-        margin: 0 0 8px 0;
-        font-size: 12px;
+        margin: 0 0 4px 0;
+        font-size: 13px;
         letter-spacing: .2px;
       }
 
-      .row { margin-top: 8px; }
+      .row { margin-top: 2px; }
       label {
         display: block;
         margin-bottom: 4px;
@@ -171,7 +171,7 @@
             </div>
             <div class="row">
               <label>Border color</label>
-              <input id="borderColor" type="text" placeholder="#000000" />
+              <input id="borderColor" type="color" value="#000000" />
             </div>
           </div>
         </div>
@@ -181,7 +181,7 @@
           <div class="grid">
             <div class="row">
               <label>Color</label>
-              <input id="shadowColor" type="text" placeholder="#000000" />
+              <input id="shadowColor" type="color" value="#000000" />
             </div>
             <div class="row">
               <label>Blur</label>
