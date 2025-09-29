@@ -1,0 +1,24 @@
+{
+  "name": "SimpleChatThread",
+  "id": "1554586557789400141",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": {
+    "main": "dist/ui.html", 
+    "options": "dist/options.html",
+    "optionsChat": "dist/optionsChat.html"
+  },
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "permissions": [
+    "currentuser"
+  ],
+  "networkAccess": {     "allowedDomains": ["*"],
+  "reasoning": "MyPlugin queries httpbin.org/get for example responses.",
+  "devAllowedDomains": ["http://localhost:4000"]}
+}
