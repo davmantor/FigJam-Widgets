@@ -12,9 +12,6 @@
   "widgetApi": "1.0.0",
   "ui": "ui.html",
   "networkAccess": {
-    "allowedDomains": [
-      "https://tenor.googleapis.com",
-      "https://media.tenor.com"
-    ]
+    "allowedDomains": ["https://api.klipy.com", "https://static.klipy.com"]
   }
 }

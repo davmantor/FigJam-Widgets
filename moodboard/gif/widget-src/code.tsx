@@ -13,7 +13,7 @@ const {
   waitForTask,
 } = widget;
 
-const TENOR_API_KEY = "AIzaSyABOoQRf8M5Al8q_lMfoo3tEgYsUUiY-ik";
+const KLIPY_API_KEY = "Nn9wIdz3RozZOxzOXB4UboIdcEJYNLc9DQzf1lts2r68eVDoKw58mdsezYkv3qhL";
 const GIF_PROMPTS = [
   "yesss",
   "hmm",
@@ -159,9 +159,9 @@ function Widget() {
     results = 1,
     next = ""
   ) => {
-    const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(
+    const url = `https://api.klipy.com/v2/search?q=${encodeURIComponent(
       query
-    )}&media_filter=tinygif&contentfilter=medium&key=${TENOR_API_KEY}&limit=${results}${
+    )}&media_filter=tinygif&contentfilter=medium&key=${KLIPY_API_KEY}&limit=${results}${
       next ? `&pos=${next}` : ""
     }`;
     const response = await fetch(url);
@@ -221,7 +221,7 @@ function Widget() {
     );
   }
 
-  const gifWidth = (WIDGET_WIDTH - 32 - 16) / 3;
+  const gifWidth = (WIDGET_WIDTH - 36 - 16) / 3;
 
   return (
     <AutoLayout
@@ -267,7 +267,7 @@ function Widget() {
             verticalAlignText="center"
             fill="#ccc"
           >
-            Search Tenor
+            Search Klipy
           </Text>
         </AutoLayout>
       </AutoLayout>
